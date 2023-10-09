@@ -9,7 +9,7 @@ from typing import List
 forced_take = True
 
 class Checkers:
-    def __init__(self, num_rows = 4, num_cols = 6, num_rows_pieces = 1) -> None:
+    def __init__(self, num_rows = 4, num_cols = 5, num_rows_pieces = 1) -> None:
         self.board = Board(num_rows, num_cols, num_rows_pieces)
         pass
 
@@ -40,6 +40,13 @@ class Board:
                     self.board_matrix[y][x].occupant = Piece(Colors.BLACK)
                     self.board_matrix[self.num_rows-1-y][x].occupant = Piece(Colors.WHITE)
         self.board_matrix[1][3].occupant = Piece(Colors.WHITE)
+
+        # Test to see if king works
+        # self.board_matrix[4][4].occupant = Piece(Colors.BLACK, king=True)
+        # self.board_matrix[4][5].occupant = Piece(Colors.WHITE)
+        # self.board_matrix[3][3].occupant = Piece(Colors.WHITE)
+        # self.board_matrix[3][5].occupant = Piece(Colors.WHITE)
+
 
     def move_piece(self, from_row, from_col, to_row, to_col):
         self.board_matrix[to_row][to_col] = self.board_matrix[from_row][from_col]
@@ -151,57 +158,6 @@ class Board:
                         new_legal_moves.append(Move(i.start_row, i.start_col, jump_row, jump_col))
                         take_moves.append(Move(i.start_row, i.start_col, jump_row, jump_col))
         return new_legal_moves, take_moves
-    def calculate_legal_move(self, row: int, column: int, color: Colors):
-        legal_moves = []
-        legal_take_moves = []
-        piece = self.board_matrix[row][column].occupant
-        if(color == Colors.WHITE):
-            if(piece.color == Colors.WHITE and piece.king == False):
-                # NOT A KING
-                # Check if piece can move to the left
-                if(row-1 > 0 and column-1 > 0):
-                    # Check if can move to the left or take a piece on the left
-                    if(self.board_matrix[row-1][column-1].occupant == None):
-                        legal_moves.append(Move(row, column, row-1, column-1))
-                    elif(self.board_matrix[row-1][column-1].color == Colors.BLACK and self.board_matrix[row-2],[column-2].occupant == None):
-                        legal_take_moves.append(Move(row, column, row-2, column-2))
-                
-                if(row-1 > 0 and column+1 < self.num_cols-1):
-                    # Check if can move to the right or take a piece on the right
-                    if(self.board_matrix[row-1][column+1].occupant == None):
-                        legal_moves.append(Move(row, column, row-1, column+1))
-                    elif(self.board_matrix[row-1][column+1].color == Colors.BLACK and self.board_matrix[row-2],[column+2].occupant == None):
-                        legal_take_moves.append(Move(row, column, row-2, column+2))
-
-            else:
-                # If it is a king
-                pass
-
-        if(color == Colors.BLACK):
-            if(piece.color == Colors.BLACK and piece.king == False):
-                # NOT A KING
-                # Check if piece can move to the left
-                if(row+1 > 0 and column-1 > 0):
-                    # Check if can move to the left or take a piece on the left
-                    if(self.board_matrix[row+1][column-1].occupant == None):
-                        legal_moves.append(Move(row, column, row+1, column-1))
-                    elif(self.board_matrix[row+1][column-1].color == Colors.BLACK and self.board_matrix[row+2],[column-2].occupant == None):
-                        legal_take_moves.append(Move(row, column, row+2, column-2))
-                
-                if(row+1 > 0 and column+1 < self.num_cols-1):
-                    # Check if can move to the right or take a piece on the right
-                    if(self.board_matrix[row+1][column+1].occupant == None):
-                        legal_moves.append(Move(row, column, row+1, column+1))
-                    elif(self.board_matrix[row+1][column+1].color == Colors.BLACK and self.board_matrix[row+2],[column+2].occupant == None):
-                        legal_take_moves.append(Move(row, column, row+2, column+2))
-
-            else:
-                # If it is a king
-                pass
-
-
-        return legal_moves, legal_take_moves
-
 
 class Piece:
     def __init__(self, color = None, king = False) -> None:
