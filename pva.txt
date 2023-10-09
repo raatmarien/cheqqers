@@ -1,0 +1,6 @@
+Plan van aanpak:
+
+Dammen
+Dam/game class waarin het board staat
+board class die bestaat uit squares
+een squares class die bestaat uit pieces

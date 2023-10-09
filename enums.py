@@ -2,8 +2,8 @@ from enum import Enum
 
 class CheckersResult(Enum):
     UNFINISHED = 0
-    X_WINS = 1
-    O_WINS = 2
+    WHITE_WINS = 1
+    BLACK_WINS = 2
     DRAW = 3
     BOTH_WIN = 4
 
