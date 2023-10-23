@@ -65,6 +65,9 @@ class Checkers:
                     # self.board_matrix[self.num_rows-1-y][x].occupant = Piece(Colors.WHITE)
     
     def clear(self, run_on_hardware):
+        """
+        Create empty the board
+        """
         self.squares = {}
         self.empty_squares = set()
         self.last_result = [CheckersSquare.EMPTY] * 9
@@ -81,14 +84,20 @@ class Checkers:
         # Flip a tile
 
         # Moving one piece to an empty tile
-        QuditFlip(3, 0, mark.value)(self.squares[move])
+        QuditFlip(3, 0, mark.value)(self.squares[str(self.convert_xy_to_id(move.end_row, move.end_col))])
         self.remove_piece((move.start_row, move.start_col))
 
     def remove_piece(self, id: int or (int,int)):
-        if(isinstance(id, (int, int))):
-            self.convert_xy_to_id(id)
+        # if(isinstance(id, (int, int))):
+        if(type(id) is tuple):
+            id = self.convert_xy_to_id(id[0], id[1])
+        id = str(id)
         self.empty_squares.add(id)
-        self.squares[str(id)] = QuantumObject(str(id), CheckersSquare.EMPTY)
+        # self.squares[id] = CheckersSquare.EMPTY
+        # self.squares[id] = QuantumObject(id, CheckersSquare.EMPTY)
+        # QuditFlip(3, 0, CheckersSquare.EMPTY.value)(self.squares[id])
+        QuditFlip(3, CheckersSquare.WHITE.value, CheckersSquare.EMPTY.value)(self.squares[id])
+        QuditFlip(3, CheckersSquare.BLACK.value, CheckersSquare.EMPTY.value)(self.squares[id])
         return
         
     def convert_xy_to_id(self, x, y) -> int:
@@ -135,6 +144,8 @@ class GameInterface:
 
     def play(self):
         while(self.game.result() == CheckersResult.UNFINISHED and not self.quit):
+            move = Move(0, 0, 1, 1)
+            self.game.move(move, CheckersSquare.BLACK)
             print(self.print_board())
             exit()
             legal_moves = self.print_legal_moves()
@@ -152,7 +163,9 @@ class GameInterface:
             self.player = Colors.BLACK if self.player == Colors.WHITE else Colors.WHITE
 
     def print_board(self) -> str:
-        """Returns the TicTacToe board in ASCII form."""
+        """Returns the Checkers board in ASCII form.
+        Function take from quantum tiq taq toe"""
+        
         results = self.game.board.peek(count=100)
         hist = _histogram(self.game.num_rows, self.game.num_cols,
             [
@@ -161,8 +174,6 @@ class GameInterface:
             ]
         )
         output = "\n"
-        print(self.game.num_rows)
-        print(self.game.num_cols)
         for row in range(self.game.num_rows):
             for mark in CheckersSquare:
                 output += " "
