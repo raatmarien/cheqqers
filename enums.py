@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Union
 
 class CheckersResult(Enum):
     UNFINISHED = 0
@@ -8,8 +9,8 @@ class CheckersResult(Enum):
     BOTH_WIN = 4
 
 class CheckersRules(Enum):
-    """The different rulesets for Quantum TicTacToe.
-
+    """The different rulesets for Quantum Checkers.
+    TODO: change
     The quantum versions differ in the way split moves work, though in all
     cases a split move is implemented by 1) first flipping a square from empty
     to X or O (depending on the player), and then 2) performing a swap operation
@@ -29,5 +30,19 @@ class CheckersRules(Enum):
     QUANTUM_V3 = 3
 
 class Colors(Enum):
+    """
+    OLD used for classical checkers
+    """
     BLACK = 0
     WHITE = 1
+
+class CheckersSquare(Enum):
+    EMPTY = 0
+    WHITE = 1
+    BLACK = 2
+
+    @classmethod
+    def from_result(cls, value: Union[Enum, int]):
+        if isinstance(value, Enum):
+            return cls(value.value)
+        return cls(value)
