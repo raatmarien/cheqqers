@@ -13,7 +13,7 @@ from math import ceil
 
 # GLOBAL GAME SETTINGS
 _forced_take = True
-_MARK_SYMBOLS = {CheckersSquare.EMPTY: ".", CheckersSquare.WHITE: "w", CheckersSquare.BLACK: "b"}
+_MARK_SYMBOLS = {CheckersSquare.EMPTY: ".", CheckersSquare.WHITE: "w", CheckersSquare.BLACK: "b", "WHITE_KING": "W", "BLACK_KING": "B"}
 
 def _histogram(num_vertical, num_horizontal, results: List[List[CheckersSquare]]) -> List[Dict[CheckersSquare, int]]:
     """Turns a list of whole board measurements into a histogram.
@@ -169,7 +169,7 @@ class Checkers:
         """
         self.squares = {}
         self.king_squares = {}
-        self.last_result = [CheckersSquare.EMPTY] * 9
+        # self.last_result = [CheckersSquare.EMPTY] * 9
 
         for i in range(self.num_vertical*self.num_horizontal):
             self.squares[str(i)] = QuantumObject(str(i), CheckersSquare.EMPTY)
@@ -179,14 +179,15 @@ class Checkers:
 
     def move(self, move: Move, mark: CheckersSquare):
         # Moving one piece to an empty tile
-        QuditFlip(3, 0, mark.value)(self.squares[str(self.convert_xy_to_id(move.end_x, move.end_y))])
+        start_id = self.convert_xy_to_id(move.start_x, move.start_y)
+        end_id = self.convert_xy_to_id(move.end_x, move.end_y)
+        QuditFlip(3, 0, mark.value)(self.squares[str(id)])
         self.remove_piece((move.start_x, move.start_y), mark)
         # if we jump over a piece, we have to remove that piece as well
         if(abs(move.end_y-move.start_y) > 1):
-            print("Jumped")
-            print((int((move.end_x+move.start_x)/2), int((move.end_y+move.start_y)/2)))
             opponent_mark = CheckersSquare.BLACK if mark == CheckersSquare.WHITE else CheckersSquare.WHITE
-            self.remove_piece((int((move.end_x+move.start_x)/2), int((move.end_y+move.start_y)/2)), opponent_mark)
+            removed_piece_id = self.convert_xy_to_id((int((move.end_x+move.start_x)/2), int((move.end_y+move.start_y)/2)))
+            self.remove_piece(removed_piece_id, opponent_mark)
 
     def remove_piece(self, id: int or (int,int), mark: CheckersSquare):
         if(type(id) is tuple):
