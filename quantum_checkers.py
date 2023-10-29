@@ -169,12 +169,9 @@ class Checkers:
         """
         self.squares = {}
         self.king_squares = {}
-        self.empty_squares = set()
         self.last_result = [CheckersSquare.EMPTY] * 9
-        # self.empty_squares = [True]*(self.num_vertical*self.num_horizontal)
 
         for i in range(self.num_vertical*self.num_horizontal):
-            self.empty_squares.add(str(i))
             self.squares[str(i)] = QuantumObject(str(i), CheckersSquare.EMPTY)
         self.board = QuantumWorld(
             list(self.squares.values()), compile_to_qubits=run_on_hardware
@@ -195,7 +192,6 @@ class Checkers:
         if(type(id) is tuple):
             id = self.convert_xy_to_id(id[0], id[1])
         id = str(id)
-        self.empty_squares.add(id)
         # self.squares[id] = CheckersSquare.EMPTY
         # self.squares[id] = QuantumObject(id, CheckersSquare.EMPTY)
         # QuditFlip(3, 0, CheckersSquare.EMPTY.value)(self.squares[id])
