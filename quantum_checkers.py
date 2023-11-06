@@ -73,7 +73,6 @@ class Checkers:
                     # self.board_matrix[y][x].occupant = Piece(CheckersSquare.BLACK)
                     # self.board_matrix[self.num_vertical-1-y][x].occupant = Piece(CheckersSquare.WHITE)
     
-
     def measure(self) -> None:
         """Measures all squares on the TicTacToe board.
 
@@ -209,21 +208,39 @@ class Checkers:
             removed_piece_id = self.convert_xy_to_id((int((move.end_x+move.start_x)/2), int((move.end_y+move.start_y)/2)))
             self.remove_piece(removed_piece_id, opponent_mark)
 
+    def classic_move(self, move: Move, mark: CheckersSquare):
+        # Moving one piece to an empty tile
+        start_id = self.convert_xy_to_id(move.start_x, move.start_y)
+        end_id = self.convert_xy_to_id(move.end_x, move.end_y)
+        QuditFlip(3, 0, mark.value)(self.squares[str(end_id)])
+        self.remove_piece((move.start_x, move.start_y), mark)
+            
+    def classic_take_move(self, move: Move, mark: CheckersSquare):
+        # Moving one piece to an empty tile
+        start_id = self.convert_xy_to_id(move.start_x, move.start_y)
+        end_id = self.convert_xy_to_id(move.end_x, move.end_y)
+        QuditFlip(3, 0, mark.value)(self.squares[str(end_id)])
+        self.remove_piece((move.start_x, move.start_y), mark)
+        # if we jump over a piece, we have to remove that piece as well 
+        if(abs(move.end_y-move.start_y) > 1):
+            opponent_mark = CheckersSquare.BLACK if mark == CheckersSquare.WHITE else CheckersSquare.WHITE
+            removed_piece_id = self.convert_xy_to_id((int((move.end_x+move.start_x)/2), int((move.end_y+move.start_y)/2)))
+            self.remove_piece(removed_piece_id, opponent_mark)
+
     def split_move(self, move1: Move, move2: Move, mark: CheckersSquare):
         start_id1 = self.convert_xy_to_id(move1.start_x, move1.start_y)
         start_id2 = self.convert_xy_to_id(move2.start_x, move2.start_y)
         end_id1 = self.convert_xy_to_id(move1.end_x, move1.end_y)
         end_id2 = self.convert_xy_to_id(move2.end_x, move2.end_y)
-
         if start_id1 != start_id2:
             raise ValueError("Starting position are not equal. {start_id1} != {start_id2}")
         
         player_ids, opponent_ids = self.get_positions(mark)
-        
         if end_id1 not in player_ids+opponent_ids:
             CheckersSplit(mark, self.rules)(self.squares[str(end_id1)], self.squares[str(end_id2)])
         else:
             CheckersSplit(mark, self.rules)(self.squares[str(end_id2)], self.squares[str(end_id1)])
+
 
     def remove_piece(self, id: int or (int,int), mark: CheckersSquare):
         if(type(id) is tuple):
