@@ -73,6 +73,23 @@ class Checkers:
                     # self.board_matrix[y][x].occupant = Piece(CheckersSquare.BLACK)
                     # self.board_matrix[self.num_vertical-1-y][x].occupant = Piece(CheckersSquare.WHITE)
     
+
+    def measure(self) -> None:
+        """Measures all squares on the TicTacToe board.
+
+        Once the board is measured, a new board is created
+        that is initialized to the measured state.
+        This should happen when no more squares are empty.
+        """
+        self.last_result = [
+            CheckersSquare.from_result(square) for square in self.board.pop()
+        ]
+        for id in range(self.num_horizontal*self.num_vertical):
+            # if self.last_result[idx] == CheckersSquare.EMPTY:
+            #     self.empty_squares.add(name)
+            self.squares[str(id)] = QuantumObject(str(id), self.last_result[id])
+        self.board = QuantumWorld(list(self.squares.values()))
+
     def on_board(self, x, y):
         """
         Checks if given location is on the board on not. 
@@ -267,9 +284,19 @@ class GameInterface:
             # move = Move(0, 0, 1, 1)
             # self.game.move(move, CheckersSquare.BLACK)
 
-            move1 = Move(2,0,1,1)
-            move2 = Move(2,0,3,1)
+            move1 = Move(2,1,1,1)
+            move2 = Move(2,1,3,1)
+            # move3 = Move(3,1,4,2)
+            # move4 = Move(3,1,2,2)
             self.game.split_move(move1, move2, CheckersSquare.BLACK)
+            # self.print_board()
+            # self.game.split_move(move1, move2, CheckersSquare.BLACK)
+            # self.game.split_move(move3, move4, CheckersSquare.BLACK)
+            # self.game.remove_piece(self.game.convert_xy_to_id(3, 1), CheckersSquare.BLACK)
+            self.print_board()
+            # self.game.board.pop(str(self.game.convert_xy_to_id(1,1)))
+            self.game.measure()
+
             self.print_board()
             # exit()
             legal_moves = self.print_legal_moves()
