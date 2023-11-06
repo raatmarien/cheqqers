@@ -10,6 +10,7 @@ from unitary.alpha.qudit_effects import QuditFlip
 from math import ceil
 
 # https://quantumchess.net/play/
+# https://entanglement-chess.netlify.app/qm
 
 # GLOBAL GAME SETTINGS
 _forced_take = True
@@ -181,7 +182,7 @@ class Checkers:
         # Moving one piece to an empty tile
         start_id = self.convert_xy_to_id(move.start_x, move.start_y)
         end_id = self.convert_xy_to_id(move.end_x, move.end_y)
-        QuditFlip(3, 0, mark.value)(self.squares[str(id)])
+        QuditFlip(3, 0, mark.value)(self.squares[str(end_id)])
         self.remove_piece((move.start_x, move.start_y), mark)
         # if we jump over a piece, we have to remove that piece as well
         if(abs(move.end_y-move.start_y) > 1):
