@@ -1,0 +1,17 @@
+###################################################
+https://webdocs.cs.ualberta.ca/~chinook/games/
+Useful Algorithms
+
+Proof number search is a best-first search algorithm used to solve many games.
+L. Victor Allis, Maarten van der Meulen, and H. Jaap van den Herik, “Proof-number Search”, Artificial Intelligence, vol. 66, no. 1, pp. 91-124, March 1994.
+
+Depth-first proof number search is the depth-first search variant.
+A. Nagai, Df-PN Algorithm for Searching AND/OR Trees and Its Applications, Ph.D. thesis, Department of Information Science, University of Tokyo, 2002.
+
+Proof number search was based on David McAllester’s Conspiracy Numbers algorithm.
+David McAllester, “Conspiracy Numbers for Min-Max Search”, Artificial Intelligence, vol. 35, pp. 287-310, 1988.
+
+The graph-history interaction (GHI) problem can cause problems with  proofs. Akihiro Kishimoto and Martin Muller developed a high- performance and accurate solution to this problem (2004).
+Akihiro Kishimoto and Martin Müller, “A General Solution to the Graph History Interaction Problem”, American Association for Artificial Intelligence National Conference (AAAI), pp. 644-649, 2004.
+http://www.cs.ualberta.ca/~mmueller/ps/aaai-ghi.pdf
+###################################################

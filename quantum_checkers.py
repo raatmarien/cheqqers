@@ -241,7 +241,6 @@ class Checkers:
         else:
             CheckersSplit(mark, self.rules)(self.squares[str(end_id2)], self.squares[str(end_id1)])
 
-
     def remove_piece(self, id: int or (int,int), mark: CheckersSquare):
         if(type(id) is tuple):
             id = self.convert_xy_to_id(id[0], id[1])
@@ -313,6 +312,8 @@ class GameInterface:
             self.print_board()
             # self.game.board.pop(str(self.game.convert_xy_to_id(1,1)))
             self.game.measure()
+            old_board =deepcopy(self.game.board)
+            self.game.board=old_board
 
             self.print_board()
             # exit()
