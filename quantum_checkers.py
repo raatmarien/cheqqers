@@ -8,6 +8,7 @@ from copy import deepcopy
 from unitary.alpha import QuantumObject, QuantumWorld
 from unitary.alpha.qudit_effects import QuditFlip
 from math import ceil
+from quantum_split import CheckersSplit
 
 # https://quantumchess.net/play/
 # https://entanglement-chess.netlify.app/qm
@@ -46,8 +47,9 @@ class Move:
             print(f"{index}. [{self.start_x}][{self.start_y}] to [{self.end_x}][{self.end_y}]")
 
 class Checkers:
-    def __init__(self, run_on_hardware = False, num_vertical = 5, num_horizontal = 5, num_vertical_pieces = 1) -> None:
+    def __init__(self, run_on_hardware = False, num_vertical = 5, num_horizontal = 5, num_vertical_pieces = 1, rules = CheckersRules.QUANTUM_V3) -> None:
         # self.board = Board(num_vertical, num_horizontal, num_vertical_pieces)
+        self.rules = rules
         self.num_vertical = num_vertical
         self.num_horizontal = num_horizontal
         self.num_vertical_pieces = num_vertical_pieces # how many rows of one color need to be filled with pieces
@@ -190,6 +192,22 @@ class Checkers:
             removed_piece_id = self.convert_xy_to_id((int((move.end_x+move.start_x)/2), int((move.end_y+move.start_y)/2)))
             self.remove_piece(removed_piece_id, opponent_mark)
 
+    def split_move(self, move1: Move, move2: Move, mark: CheckersSquare):
+        start_id1 = self.convert_xy_to_id(move1.start_x, move1.start_y)
+        start_id2 = self.convert_xy_to_id(move2.start_x, move2.start_y)
+        end_id1 = self.convert_xy_to_id(move1.end_x, move1.end_y)
+        end_id2 = self.convert_xy_to_id(move2.end_x, move2.end_y)
+
+        if start_id1 != start_id2:
+            raise ValueError("Starting position are not equal. {start_id1} != {start_id2}")
+        
+        player_ids, opponent_ids = self.get_positions(mark)
+        
+        if end_id1 not in player_ids+opponent_ids:
+            CheckersSplit(mark, self.rules)(self.squares[str(end_id1)], self.squares[str(end_id2)])
+        else:
+            CheckersSplit(mark, self.rules)(self.squares[str(end_id2)], self.squares[str(end_id1)])
+
     def remove_piece(self, id: int or (int,int), mark: CheckersSquare):
         if(type(id) is tuple):
             id = self.convert_xy_to_id(id[0], id[1])
@@ -248,6 +266,10 @@ class GameInterface:
         while(self.game.result() == CheckersResult.UNFINISHED and not self.quit):
             # move = Move(0, 0, 1, 1)
             # self.game.move(move, CheckersSquare.BLACK)
+
+            move1 = Move(2,0,1,1)
+            move2 = Move(2,0,3,1)
+            self.game.split_move(move1, move2, CheckersSquare.BLACK)
             self.print_board()
             # exit()
             legal_moves = self.print_legal_moves()
