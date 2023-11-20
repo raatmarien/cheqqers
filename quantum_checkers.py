@@ -19,7 +19,7 @@ import cirq
 
 # GLOBAL GAME SETTINGS
 _forced_take = True
-_MARK_SYMBOLS = {CheckersSquare.EMPTY: ".", CheckersSquare.WHITE: "w", CheckersSquare.BLACK: "b", "WHITE_KING": "W", "BLACK_KING": "B"}
+_MARK_SYMBOLS = {CheckersSquare.EMPTY: ".", CheckersSquare.WHITE: "w", CheckersSquare.BLACK: "b", CheckersSquare.WHITE_KING: "W", CheckersSquare.BLACK_KING: "B"}
 
 def _histogram(num_vertical, num_horizontal, results: List[List[CheckersSquare]]) -> List[Dict[CheckersSquare, int]]:
     """Turns a list of whole board measurements into a histogram.
@@ -30,7 +30,7 @@ def _histogram(num_vertical, num_horizontal, results: List[List[CheckersSquare]]
     """
     hist = []
     for idx in range(num_vertical*num_horizontal):
-        hist.append({CheckersSquare.EMPTY: 0, CheckersSquare.WHITE: 0, CheckersSquare.BLACK: 0})
+        hist.append({CheckersSquare.EMPTY: 0, CheckersSquare.WHITE: 0, CheckersSquare.BLACK: 0, CheckersSquare.WHITE_KING: 0, CheckersSquare.BLACK_KING: 0})
     for r in results:
         for idx in range(num_vertical*num_horizontal):
             hist[idx][r[idx]] += 1
@@ -66,14 +66,14 @@ class Checkers:
         for y in range(num_vertical_pieces):
             for x in range(self.num_horizontal):
                 if(y%2==0 and x%2==0):
-                    QuditFlip(3, 0, CheckersSquare.BLACK.value)(self.squares[str(self.convert_xy_to_id(x,y))])
-                    QuditFlip(3, 0, CheckersSquare.WHITE.value)(self.squares[str(self.convert_xy_to_id(x,self.num_vertical-1-y))])
+                    QuditFlip(5, 0, CheckersSquare.BLACK.value)(self.squares[str(self.convert_xy_to_id(x,y))])
+                    QuditFlip(5, 0, CheckersSquare.WHITE.value)(self.squares[str(self.convert_xy_to_id(x,self.num_vertical-1-y))])
                     # self.board_matrix[y][x].occupant = Piece(CheckersSquare.BLACK)
                     # self.board_matrix[self.num_vertical-1-y][x].occupant = Piece(CheckersSquare.WHITE)
 
                 elif(y%2!=0 and x%2!=0):
-                    QuditFlip(3, 0, CheckersSquare.BLACK.value)(self.squares[str(self.convert_xy_to_id(x,y))])
-                    QuditFlip(3, 0, CheckersSquare.WHITE.value)(self.squares[str(self.convert_xy_to_id(x,self.num_vertical-1-y))])
+                    QuditFlip(5, 0, CheckersSquare.BLACK.value)(self.squares[str(self.convert_xy_to_id(x,y))])
+                    QuditFlip(5, 0, CheckersSquare.WHITE.value)(self.squares[str(self.convert_xy_to_id(x,self.num_vertical-1-y))])
                     # self.board_matrix[y][x].occupant = Piece(CheckersSquare.BLACK)
                     # self.board_matrix[self.num_vertical-1-y][x].occupant = Piece(CheckersSquare.WHITE)
     
@@ -204,7 +204,7 @@ class Checkers:
         # Moving one piece to an empty tile
         start_id = self.convert_xy_to_id(move.start_x, move.start_y)
         end_id = self.convert_xy_to_id(move.end_x, move.end_y)
-        QuditFlip(3, 0, mark.value)(self.squares[str(end_id)])
+        QuditFlip(5, 0, mark.value)(self.squares[str(end_id)])
         self.remove_piece((move.start_x, move.start_y), mark)
         # if we jump over a piece, we have to remove that piece as well
         if(abs(move.end_y-move.start_y) > 1):
@@ -216,14 +216,14 @@ class Checkers:
         # Moving one piece to an empty tile
         start_id = self.convert_xy_to_id(move.start_x, move.start_y)
         end_id = self.convert_xy_to_id(move.end_x, move.end_y)
-        QuditFlip(3, 0, mark.value)(self.squares[str(end_id)])
+        QuditFlip(5, 0, mark.value)(self.squares[str(end_id)])
         self.remove_piece((move.start_x, move.start_y), mark)
             
     def classic_take_move(self, move: Move_temp, mark: CheckersSquare):
         # Moving one piece to an empty tile
         start_id = self.convert_xy_to_id(move.start_x, move.start_y)
         end_id = self.convert_xy_to_id(move.end_x, move.end_y)
-        QuditFlip(3, 0, mark.value)(self.squares[str(end_id)])
+        QuditFlip(5, 0, mark.value)(self.squares[str(end_id)])
         self.remove_piece((move.start_x, move.start_y), mark)
         # if we jump over a piece, we have to remove that piece as well 
         if(abs(move.end_y-move.start_y) > 1):
@@ -254,7 +254,7 @@ class Checkers:
         # QuditFlip(3, 0, CheckersSquare.EMPTY.value)(self.squares[id])
         # QuditFlip(3, CheckersSquare.WHITE.value, CheckersSquare.EMPTY.value)(self.squares[id])
         # QuditFlip(3, CheckersSquare.BLACK.value, CheckersSquare.EMPTY.value)(self.squares[id])
-        QuditFlip(3, mark.value, CheckersSquare.EMPTY.value)(self.squares[id])
+        QuditFlip(5, mark.value, CheckersSquare.EMPTY.value)(self.squares[id])
         return
         
     def convert_xy_to_id(self, x, y) -> int:
@@ -314,8 +314,9 @@ class GameInterface:
             # split(self.game.board["2"], self.game.board["6"], self.game.board["8"], )
             # QuditXGate(3, 0, CheckersSquare.BLACK)(self.game.board["2"].qubit)
             # QuditISwapPowGate(3, 0.5)(self.game.board["2"].qubit, self.game.board["6"].qubit)
-            # CheckersSplit(CheckersSquare.BLACK)(self.game.board)
-            cirq.ISWAP(self.game.board["2"].qubit, self.game.board["7"].qubit) ** 0.5
+            CheckersSplit(CheckersSquare.BLACK, self.game.rules)(self.game.squares["2"], self.game.squares["6"], self.game.squares["8"])
+            CheckersSplit(CheckersSquare.BLACK, self.game.rules)(self.game.squares["6"], self.game.squares["10"], self.game.squares["12"])
+            # cirq.ISWAP(self.game.board["2"].qubit, self.game.board["7"].qubit) ** 0.5
             # yield cirq.ISWAP(s, t2) ** 0.5
             # yield cirq.ISWAP(s, t2) ** 0.5
 
@@ -329,7 +330,7 @@ class GameInterface:
             # move(self.game.board["0"], self.game.board["5"])
             # cirq.ISWAP(self.game.board["0"],"2")
             # self.game.board.pop(str(self.game.convert_xy_to_id(1,1)))
-            # self.game.measure()
+            self.game.measure()
             # old_board = deepcopy(self.game.board)
             # self.game.board=old_board
 
@@ -368,15 +369,17 @@ class GameInterface:
         output = "\n"
         for y in range(self.game.num_vertical):
             for mark in CheckersSquare:
+                print(mark, _MARK_SYMBOLS[mark])
                 output += " "
                 for x in range(self.game.num_horizontal):
-                    idx = self.game.convert_xy_to_id(x,y)               
-                    output += f" {_MARK_SYMBOLS[mark]} {hist[idx][mark]:3}"
+                    idx = self.game.convert_xy_to_id(x,y)  
+                    print(idx, hist[idx])             
+                    output += f" {_MARK_SYMBOLS[mark]} {hist[idx][mark]:5}"
                     if x != self.game.num_horizontal-1:
                         output += " |"
                 output += "\n"
             if y != self.game.num_vertical-1:
-                output += "--------"*self.game.num_horizontal + "\n"
+                output += "----------"*self.game.num_horizontal + "\n"
         return output
     
     def get_legal_moves(self) -> list:

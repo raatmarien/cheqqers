@@ -40,6 +40,8 @@ class CheckersSquare(Enum):
     EMPTY = 0
     WHITE = 1
     BLACK = 2
+    WHITE_KING = 3
+    BLACK_KING = 4
 
     @classmethod
     def from_result(cls, value: Union[Enum, int]):

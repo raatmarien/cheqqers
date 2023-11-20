@@ -65,14 +65,17 @@ class CheckersSplit(QuantumEffect):
         self.rules = rules
 
     def num_dimension(self) -> Optional[int]:
-        return 3
+        return 5
 
     def num_objects(self) -> Optional[int]:
-        return 2
+        return 3
 
     def effect(self, *objects):
-        square1 = objects[0]
-        square2 = objects[1]
-        yield QuditXGate(3, 0, self.mark.value)(square1.qubit)
-        yield QuditISwapPowGate(3, 0.5)(square1.qubit, square2.qubit)
+        source = objects[0]
+        target1 = objects[1]
+        target2 = objects[2]
+        # yield QuditXGate(5, 0, self.mark.value)(square1.qubit)
+        yield QuditISwapPowGate(5, 1)(source.qubit, target1.qubit)
+        yield QuditISwapPowGate(5, 0.5)(target1.qubit, target2.qubit)
+        # yield QuditISwapPowGate(5, 0.5)(square1.qubit, square2.qubit)
       
