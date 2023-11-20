@@ -38,7 +38,7 @@ def _histogram(num_vertical, num_horizontal, results: List[List[CheckersSquare]]
 
 
 class Move_temp:
-    def __init__(self, start_x, start_y, end1_x, end1_y, end2_x: None, end2_y: None) -> None:
+    def __init__(self, start_x, start_y, end1_x, end1_y, end2_x = None, end2_y = None) -> None:
         self.start_x = start_x
         self.start_y = start_y
         self.end1_x = end1_x
