@@ -306,40 +306,6 @@ class GameInterface:
 
     def play(self):
         while(self.game.result() == CheckersResult.UNFINISHED and not self.quit):
-            # move = Move_temp(0, 0, 1, 1)
-            # self.game.move(move, CheckersSquare.BLACK)
-
-            move1 = Move_temp(0,4,1,3)
-            # move2 = Move_temp(2,1,3,1)
-            # move3 = Move_temp(3,1,4,2)
-            # move4 = Move_temp(3,1,2,2)
-            # self.game.classic_move(move1, CheckersSquare.BLACK)
-            self.print_board()
-            # split = Split()
-            # split(self.game.board["2"], self.game.board["6"], self.game.board["8"], )
-            # QuditXGate(3, 0, CheckersSquare.BLACK)(self.game.board["2"].qubit)
-            # QuditISwapPowGate(3, 0.5)(self.game.board["2"].qubit, self.game.board["6"].qubit)
-            CheckersSplit(CheckersSquare.BLACK, self.game.rules)(self.game.squares["2"], self.game.squares["6"], self.game.squares["8"])
-            CheckersSplit(CheckersSquare.BLACK, self.game.rules)(self.game.squares["6"], self.game.squares["10"], self.game.squares["12"])
-            self.game.classic_move(move1, CheckersSquare.WHITE)
-            # cirq.ISWAP(self.game.board["2"].qubit, self.game.board["7"].qubit) ** 0.5
-            # yield cirq.ISWAP(s, t2) ** 0.5
-            # yield cirq.ISWAP(s, t2) ** 0.5
-
-            # self.game.split_move(move1, move2, CheckersSquare.BLACK)
-            # self.print_board()
-            # self.game.split_move(move1, move2, CheckersSquare.BLACK)
-            # self.game.split_move(move3, move4, CheckersSquare.BLACK)
-            # self.game.remove_piece(self.game.convert_xy_to_id(3, 1), CheckersSquare.BLACK)
-            
-            # move = Move()
-            # move(self.game.board["0"], self.game.board["5"])
-            # cirq.ISWAP(self.game.board["0"],"2")
-            # self.game.board.pop(str(self.game.convert_xy_to_id(1,1)))
-            self.game.measure()
-            # old_board = deepcopy(self.game.board)
-            # self.game.board=old_board
-
             self.print_board()
             # exit()
             legal_moves = self.print_legal_moves()
