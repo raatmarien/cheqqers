@@ -8,7 +8,7 @@ from copy import deepcopy
 from unitary.alpha import QuantumObject, QuantumWorld, Move, Split
 from unitary.alpha.qudit_effects import QuditFlip
 from math import ceil
-from quantum_split import CheckersSplit
+from quantum_split import CheckersSplit, CheckersClassicMove
 from unitary.alpha.qudit_gates import QuditXGate, QuditISwapPowGate
 # from cirq import ISWAP
 import cirq
@@ -38,11 +38,14 @@ def _histogram(num_vertical, num_horizontal, results: List[List[CheckersSquare]]
 
 
 class Move_temp:
-    def __init__(self, start_x, start_y, end_x, end_y) -> None:
+    def __init__(self, start_x, start_y, end1_x, end1_y, end2_x: None, end2_y: None) -> None:
         self.start_x = start_x
         self.start_y = start_y
-        self.end_x = end_x
-        self.end_y = end_y
+        self.end1_x = end1_x
+        self.end1_y = end1_y
+        self.end2_x = end2_x
+        self.end2_y = end2_y
+
 
     def print_move(self, index = -1) -> None:
         if(index <= 0):
@@ -215,9 +218,8 @@ class Checkers:
     def classic_move(self, move: Move_temp, mark: CheckersSquare):
         # Moving one piece to an empty tile
         start_id = self.convert_xy_to_id(move.start_x, move.start_y)
-        end_id = self.convert_xy_to_id(move.end_x, move.end_y)
-        QuditFlip(5, 0, mark.value)(self.squares[str(end_id)])
-        self.remove_piece((move.start_x, move.start_y), mark)
+        end_id = self.convert_xy_to_id(move.end1_x, move.end1_y)
+        CheckersClassicMove(5, 1)(self.squares[str(start_id)], self.squares[str(end_id)])
             
     def classic_take_move(self, move: Move_temp, mark: CheckersSquare):
         # Moving one piece to an empty tile
@@ -231,19 +233,22 @@ class Checkers:
             removed_piece_id = self.convert_xy_to_id((int((move.end_x+move.start_x)/2), int((move.end_y+move.start_y)/2)))
             self.remove_piece(removed_piece_id, opponent_mark)
 
-    def split_move(self, move1: Move_temp, move2: Move_temp, mark: CheckersSquare):
-        start_id1 = self.convert_xy_to_id(move1.start_x, move1.start_y)
-        start_id2 = self.convert_xy_to_id(move2.start_x, move2.start_y)
-        end_id1 = self.convert_xy_to_id(move1.end_x, move1.end_y)
-        end_id2 = self.convert_xy_to_id(move2.end_x, move2.end_y)
-        if start_id1 != start_id2:
-            raise ValueError("Starting position are not equal. {start_id1} != {start_id2}")
+    def split_move(self, move: Move_temp, mark: CheckersSquare):
+        source_id = self.convert_xy_to_id(move.start_x, move.start_y)
+        target1_id = self.convert_xy_to_id(move.end1_x, move.end1_y)
+        if(move.end2_x == None or move.end2_y == None):
+            raise ValueError("No second target given")
+        target2_id = self.convert_xy_to_id(move.end2_x, move.end2_y)
+            
         
         player_ids, opponent_ids = self.get_positions(mark)
-        if end_id1 not in player_ids+opponent_ids:
-            CheckersSplit(mark, self.rules)(self.squares[str(end_id1)], self.squares[str(end_id2)])
+        if target1_id not in player_ids+opponent_ids:
+            # CheckersSplit(mark, self.rules)(self.squares[str(end_id1)], self.squares[str(end_id2)])
+            CheckersSplit(mark, self.rules)(self.squares[source_id], self.squares[target1_id], self.squares[target2_id])
         else:
-            CheckersSplit(mark, self.rules)(self.squares[str(end_id2)], self.squares[str(end_id1)])
+            CheckersSplit(mark, self.rules)(self.squares[source_id], self.squares[target2_id], self.squares[target1_id])
+            
+
 
     def remove_piece(self, id: int or (int,int), mark: CheckersSquare):
         if(type(id) is tuple):
@@ -304,7 +309,7 @@ class GameInterface:
             # move = Move_temp(0, 0, 1, 1)
             # self.game.move(move, CheckersSquare.BLACK)
 
-            # move1 = Move_temp(2,0,1,1)
+            move1 = Move_temp(0,4,1,3)
             # move2 = Move_temp(2,1,3,1)
             # move3 = Move_temp(3,1,4,2)
             # move4 = Move_temp(3,1,2,2)
@@ -316,6 +321,7 @@ class GameInterface:
             # QuditISwapPowGate(3, 0.5)(self.game.board["2"].qubit, self.game.board["6"].qubit)
             CheckersSplit(CheckersSquare.BLACK, self.game.rules)(self.game.squares["2"], self.game.squares["6"], self.game.squares["8"])
             CheckersSplit(CheckersSquare.BLACK, self.game.rules)(self.game.squares["6"], self.game.squares["10"], self.game.squares["12"])
+            self.game.classic_move(move1, CheckersSquare.WHITE)
             # cirq.ISWAP(self.game.board["2"].qubit, self.game.board["7"].qubit) ** 0.5
             # yield cirq.ISWAP(s, t2) ** 0.5
             # yield cirq.ISWAP(s, t2) ** 0.5
@@ -369,12 +375,10 @@ class GameInterface:
         output = "\n"
         for y in range(self.game.num_vertical):
             for mark in CheckersSquare:
-                print(mark, _MARK_SYMBOLS[mark])
                 output += " "
                 for x in range(self.game.num_horizontal):
                     idx = self.game.convert_xy_to_id(x,y)  
-                    print(idx, hist[idx])             
-                    output += f" {_MARK_SYMBOLS[mark]} {hist[idx][mark]:5}"
+                    output += f" {_MARK_SYMBOLS[mark]} {hist[idx][mark]:3}"
                     if x != self.game.num_horizontal-1:
                         output += " |"
                 output += "\n"

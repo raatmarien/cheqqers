@@ -78,4 +78,26 @@ class CheckersSplit(QuantumEffect):
         yield QuditISwapPowGate(5, 1)(source.qubit, target1.qubit)
         yield QuditISwapPowGate(5, 0.5)(target1.qubit, target2.qubit)
         # yield QuditISwapPowGate(5, 0.5)(square1.qubit, square2.qubit)
+
+class CheckersClassicMove(QuantumEffect):
+    """
+    Flips a qubit from |0> to |1> then splits to another square.
+    Depending on the ruleset, the split is done either using a standard
+    sqrt-ISWAP gate
+    """
+
+    def __init__(self, checkers_type: CheckersSquare, rules: CheckersRules):
+        self.mark = checkers_type
+        self.rules = rules
+
+    def num_dimension(self) -> Optional[int]:
+        return 5
+
+    def num_objects(self) -> Optional[int]:
+        return 2
+
+    def effect(self, *objects):
+        source = objects[0]
+        target = objects[1]
+        yield QuditISwapPowGate(5, 1)(source.qubit, target.qubit)
       
