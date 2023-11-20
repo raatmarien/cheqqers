@@ -38,20 +38,20 @@ def _histogram(num_vertical, num_horizontal, results: List[List[CheckersSquare]]
 
 
 class Move_temp:
-    def __init__(self, start_x, start_y, end1_x, end1_y, end2_x = None, end2_y = None) -> None:
-        self.start_x = start_x
-        self.start_y = start_y
-        self.end1_x = end1_x
-        self.end1_y = end1_y
-        self.end2_x = end2_x
-        self.end2_y = end2_y
+    def __init__(self, source_x: int, source_y: int, target1_x: int, target1_y: int, target2_x: int = None, target2_y: int = None) -> None:
+        self.source_x = source_x
+        self.source_y = source_y
+        self.target1_x = target1_x
+        self.target1_y = target1_y
+        self.target2_x = target2_x
+        self.target2_y = target2_y
 
 
-    def print_move(self, index = -1) -> None:
-        if(index <= 0):
-            print(f"[{self.start_x}][{self.start_y}] to [{self.end_x}][{self.end_y}]")
-        else:
-            print(f"{index}. [{self.start_x}][{self.start_y}] to [{self.end_x}][{self.end_y}]")
+    # def print_move(self, index = -1) -> None:
+    #     if(index <= 0):
+    #         print(f"[{self.source_x}][{self.source_y}] to [{self.target1_x}][{self.target1_y}]")
+    #     else:
+    #         print(f"{index}. [{self.source_x}][{self.source_y}] to [{self.target1_x}][{self.target1_y}]")
 
 class Checkers:
     def __init__(self, run_on_hardware = False, num_vertical = 5, num_horizontal = 5, num_vertical_pieces = 1, rules = CheckersRules.QUANTUM_V3) -> None:
@@ -146,16 +146,19 @@ class Checkers:
             # If there is another piece, check if it is a different color than your own color
             # If so, check if one square further is empty
             # If so you can take a piece
-            end_id = self.convert_xy_to_id(move.end_x, move.end_y)
+            Move_temp()
+            source_id = self.convert_xy_to_id(move.source_x)
+
+            end_id = self.convert_xy_to_id(move.target1_x, move.target1_y)
             if(end_id not in player_ids and end_id not in opponent_ids): # it is an empty square, so it is possible move there
                legal_moves.append(move)
             elif(end_id in opponent_ids): # There is an opponent in this coordinate, check if we can jump over them
-                jump_y = move.end_y+(move.end_y-move.start_y)
-                jump_x = move.end_x+(move.end_x-move.start_x)
+                jump_y = move.target1_y+(move.target1_y-move.source_y)
+                jump_x = move.target1_x+(move.target1_x-move.source_x)
                 jump_id = self.convert_xy_to_id(jump_x, jump_y)
                 if(self.on_board(jump_x, jump_y) and jump_id not in (player_ids+opponent_ids)): # we can jump over if the coordinates are on the board and the piece is empty
-                    legal_moves.append(Move_temp(move.start_x, move.start_y, jump_x, jump_y))
-                    legal_take_moves.append(Move_temp(move.start_x, move.start_y, jump_x, jump_y))
+                    legal_moves.append(Move_temp(move.source_x, move.source_y, jump_x, jump_y))
+                    legal_take_moves.append(Move_temp(move.source_x, move.source_y, jump_x, jump_y))
         if(len(legal_take_moves) != 0 and _forced_take): # If we can take a piece and taking a piece is forced, return only the moves that can take a piece
             return legal_take_moves
         return legal_moves
@@ -167,26 +170,58 @@ class Checkers:
         """
         x, y = self.convert_id_to_xy(id)
         blind_moves = []
-        if(str(id) not in self.king_squares): # If the current piece is not a king
-            if player == CheckersSquare.WHITE: # White moves up -> y-1
-                if(self.on_board(x-1, y-1)):
-                    blind_moves.append(Move_temp(x,y,x-1,y-1))
-                if(self.on_board(x+1, y-1)):
-                    blind_moves.append(Move_temp(x,y,x+1,y-1))
-            else: # Black piece that moves down -> y+1
-                if(self.on_board(x-1, y+1)):
-                    blind_moves.append(Move_temp(x,y,x-1,y+1))
-                if(self.on_board(x+1, y+1)):
-                    blind_moves.append(Move_temp(x,y,x+1,y+1))
-        else: # King piece that can move in all for directions
+        # if(str(id) not in self.king_squares): # If the current piece is not a king
+        if player == CheckersSquare.WHITE: # White moves up -> y-1
+            left = False
+            right = False
             if(self.on_board(x-1, y-1)):
-                    blind_moves.append(Move_temp(x,y,x-1,y-1))
+                blind_moves.append(Move_temp(x,y,x-1,y-1))
+                left = True
             if(self.on_board(x+1, y-1)):
                 blind_moves.append(Move_temp(x,y,x+1,y-1))
+                right = True
+            if(left and right):
+                blind_moves.append(Move_temp(x,y,x-1,y-1,x+1,y-1))
+        elif player == CheckersSquare.BLACK: # Black piece that moves down -> y+1
+            left = False
+            right = False
             if(self.on_board(x-1, y+1)):
-                    blind_moves.append(Move_temp(x,y,x-1,y+1))
+                blind_moves.append(Move_temp(x,y,x-1,y+1))
+                left = True
             if(self.on_board(x+1, y+1)):
                 blind_moves.append(Move_temp(x,y,x+1,y+1))
+                right = True
+            if(left and right):
+                blind_moves.append(Move_temp(x,y,x-1,y-1,x+1,y-1))
+        else: # King piece that can move in all for directions
+            bottom_left, bottom_right, top_left, top_right = False, False, False, False
+            if(self.on_board(x-1, y-1)):
+                blind_moves.append(Move_temp(x,y,x-1,y-1))
+                top_left = True
+            if(self.on_board(x+1, y-1)):
+                blind_moves.append(Move_temp(x,y,x+1,y-1))
+                top_right = True
+            if(self.on_board(x-1, y+1)):
+                blind_moves.append(Move_temp(x,y,x-1,y+1))
+                bottom_left = False
+            if(self.on_board(x+1, y+1)):
+                blind_moves.append(Move_temp(x,y,x+1,y+1))
+                bottom_right = True
+            # TODO: fix this mess, currently checking all possible combinations. Can probably be done more optimally.
+            if(top_left):
+                if(top_right):
+                    blind_moves.append(Move_temp(x,y,x-1,y-1,x+1,y-1))
+                if(bottom_left):
+                    blind_moves.append(Move_temp(x,y,x-1,y-1,x-1,y+1))
+                if(bottom_right):
+                    blind_moves.append(Move_temp(x,y,x-1,y-1,x+1,y+1))
+            if(top_right):
+                if(bottom_left):
+                    blind_moves.append(Move_temp(x,y,x+1,y-1,x-1,y+1))
+                if(bottom_right):
+                    blind_moves.append(Move_temp(x,y,x+1,y-1,x+1,y+1))
+            if(bottom_left and bottom_right):
+                blind_moves.append(Move_temp(x,y,x-1,y+1,x+1,y+1))
         return blind_moves
     
     def clear(self, run_on_hardware):
@@ -203,42 +238,42 @@ class Checkers:
             list(self.squares.values()), compile_to_qubits=run_on_hardware
         )
 
-    def move(self, move: Move_temp, mark: CheckersSquare):
-        # Moving one piece to an empty tile
-        start_id = self.convert_xy_to_id(move.start_x, move.start_y)
-        end_id = self.convert_xy_to_id(move.end_x, move.end_y)
-        QuditFlip(5, 0, mark.value)(self.squares[str(end_id)])
-        self.remove_piece((move.start_x, move.start_y), mark)
-        # if we jump over a piece, we have to remove that piece as well
-        if(abs(move.end_y-move.start_y) > 1):
-            opponent_mark = CheckersSquare.BLACK if mark == CheckersSquare.WHITE else CheckersSquare.WHITE
-            removed_piece_id = self.convert_xy_to_id((int((move.end_x+move.start_x)/2), int((move.end_y+move.start_y)/2)))
-            self.remove_piece(removed_piece_id, opponent_mark)
+    # def move(self, move: Move_temp, mark: CheckersSquare):
+    #     # Moving one piece to an empty tile
+    #     start_id = self.convert_xy_to_id(move.source_x, move.source_y)
+    #     end_id = self.convert_xy_to_id(move.target1_x, move.target1_y)
+    #     QuditFlip(5, 0, mark.value)(self.squares[str(end_id)])
+    #     self.remove_piece((move.source_x, move.source_y), mark)
+    #     # if we jump over a piece, we have to remove that piece as well
+    #     if(abs(move.target1_y-move.source_y) > 1):
+    #         opponent_mark = CheckersSquare.BLACK if mark == CheckersSquare.WHITE else CheckersSquare.WHITE
+    #         removed_piece_id = self.convert_xy_to_id((int((move.target1_x+move.source_x)/2), int((move.target1_y+move.source_y)/2)))
+    #         self.remove_piece(removed_piece_id, opponent_mark)
 
     def classic_move(self, move: Move_temp, mark: CheckersSquare):
         # Moving one piece to an empty tile
-        start_id = self.convert_xy_to_id(move.start_x, move.start_y)
-        end_id = self.convert_xy_to_id(move.end1_x, move.end1_y)
+        start_id = self.convert_xy_to_id(move.source_x, move.source_y)
+        end_id = self.convert_xy_to_id(move.target1_x, move.target1_y)
         CheckersClassicMove(5, 1)(self.squares[str(start_id)], self.squares[str(end_id)])
             
-    def classic_take_move(self, move: Move_temp, mark: CheckersSquare):
-        # Moving one piece to an empty tile
-        start_id = self.convert_xy_to_id(move.start_x, move.start_y)
-        end_id = self.convert_xy_to_id(move.end_x, move.end_y)
-        QuditFlip(5, 0, mark.value)(self.squares[str(end_id)])
-        self.remove_piece((move.start_x, move.start_y), mark)
-        # if we jump over a piece, we have to remove that piece as well 
-        if(abs(move.end_y-move.start_y) > 1):
-            opponent_mark = CheckersSquare.BLACK if mark == CheckersSquare.WHITE else CheckersSquare.WHITE
-            removed_piece_id = self.convert_xy_to_id((int((move.end_x+move.start_x)/2), int((move.end_y+move.start_y)/2)))
-            self.remove_piece(removed_piece_id, opponent_mark)
+    # def classic_take_move(self, move: Move_temp, mark: CheckersSquare):
+    #     # Moving one piece to an empty tile
+    #     start_id = self.convert_xy_to_id(move.source_x, move.source_y)
+    #     end_id = self.convert_xy_to_id(move.target1_x, move.target1_y)
+    #     QuditFlip(5, 0, mark.value)(self.squares[str(end_id)])
+    #     self.remove_piece((move.source_x, move.source_y), mark)
+    #     # if we jump over a piece, we have to remove that piece as well 
+    #     if(abs(move.target1_y-move.source_y) > 1):
+    #         opponent_mark = CheckersSquare.BLACK if mark == CheckersSquare.WHITE else CheckersSquare.WHITE
+    #         removed_piece_id = self.convert_xy_to_id((int((move.target1_x+move.source_x)/2), int((move.target1_y+move.source_y)/2)))
+    #         self.remove_piece(removed_piece_id, opponent_mark)
 
     def split_move(self, move: Move_temp, mark: CheckersSquare):
-        source_id = self.convert_xy_to_id(move.start_x, move.start_y)
-        target1_id = self.convert_xy_to_id(move.end1_x, move.end1_y)
-        if(move.end2_x == None or move.end2_y == None):
+        source_id = self.convert_xy_to_id(move.source_x, move.source_y)
+        target1_id = self.convert_xy_to_id(move.target1_x, move.target1_y)
+        if(move.target2_x == None or move.target2_y == None):
             raise ValueError("No second target given")
-        target2_id = self.convert_xy_to_id(move.end2_x, move.end2_y)
+        target2_id = self.convert_xy_to_id(move.target2_x, move.target2_y)
             
         
         player_ids, opponent_ids = self.get_positions(mark)
@@ -292,8 +327,8 @@ class Checkers:
         #     return(CheckersResult.UNFINISHED)
         
     # def do_move(self, move: Move_temp):
-    #     self.board.move_piece(move.start_y, move.start_x, move.end_y, move.end_x)
-    #     print(move.start_y, move.start_x, move.end_y, move.end_x)
+    #     self.board.move_piece(move.source_y, move.source_x, move.target1_y, move.target1_x)
+    #     print(move.source_y, move.source_x, move.target1_y, move.target1_x)
         
 class GameInterface:
     def __init__(self, game: Checkers) -> None:
@@ -368,14 +403,7 @@ class GameInterface:
 
 def main():
     game = GameInterface(Checkers())
-    # for col in range(5):
-    #     for row in range(4):
-    #         print(col, row, end= " - ")
-    #         print(game.game.convert_xy_to_id(row,col))
     game.play()
-    # game.print_board()
-    # game.print_legal_moves()
-    # game.play()
 
 if __name__ == "__main__":
     main()
