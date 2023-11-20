@@ -5,13 +5,17 @@ from enums import (
 )
 from typing import List, Dict
 from copy import deepcopy
-from unitary.alpha import QuantumObject, QuantumWorld
+from unitary.alpha import QuantumObject, QuantumWorld, Move, Split
 from unitary.alpha.qudit_effects import QuditFlip
 from math import ceil
 from quantum_split import CheckersSplit
+from unitary.alpha.qudit_gates import QuditXGate, QuditISwapPowGate
+# from cirq import ISWAP
+import cirq
 
 # https://quantumchess.net/play/
 # https://entanglement-chess.netlify.app/qm
+# https://github.com/quantumlib/unitary/blob/main/docs/unitary/getting_started.ipynb
 
 # GLOBAL GAME SETTINGS
 _forced_take = True
@@ -33,7 +37,7 @@ def _histogram(num_vertical, num_horizontal, results: List[List[CheckersSquare]]
     return hist
 
 
-class Move:
+class Move_temp:
     def __init__(self, start_x, start_y, end_x, end_y) -> None:
         self.start_x = start_x
         self.start_y = start_y
@@ -147,8 +151,8 @@ class Checkers:
                 jump_x = move.end_x+(move.end_x-move.start_x)
                 jump_id = self.convert_xy_to_id(jump_x, jump_y)
                 if(self.on_board(jump_x, jump_y) and jump_id not in (player_ids+opponent_ids)): # we can jump over if the coordinates are on the board and the piece is empty
-                    legal_moves.append(Move(move.start_x, move.start_y, jump_x, jump_y))
-                    legal_take_moves.append(Move(move.start_x, move.start_y, jump_x, jump_y))
+                    legal_moves.append(Move_temp(move.start_x, move.start_y, jump_x, jump_y))
+                    legal_take_moves.append(Move_temp(move.start_x, move.start_y, jump_x, jump_y))
         if(len(legal_take_moves) != 0 and _forced_take): # If we can take a piece and taking a piece is forced, return only the moves that can take a piece
             return legal_take_moves
         return legal_moves
@@ -163,23 +167,23 @@ class Checkers:
         if(str(id) not in self.king_squares): # If the current piece is not a king
             if player == CheckersSquare.WHITE: # White moves up -> y-1
                 if(self.on_board(x-1, y-1)):
-                    blind_moves.append(Move(x,y,x-1,y-1))
+                    blind_moves.append(Move_temp(x,y,x-1,y-1))
                 if(self.on_board(x+1, y-1)):
-                    blind_moves.append(Move(x,y,x+1,y-1))
+                    blind_moves.append(Move_temp(x,y,x+1,y-1))
             else: # Black piece that moves down -> y+1
                 if(self.on_board(x-1, y+1)):
-                    blind_moves.append(Move(x,y,x-1,y+1))
+                    blind_moves.append(Move_temp(x,y,x-1,y+1))
                 if(self.on_board(x+1, y+1)):
-                    blind_moves.append(Move(x,y,x+1,y+1))
+                    blind_moves.append(Move_temp(x,y,x+1,y+1))
         else: # King piece that can move in all for directions
             if(self.on_board(x-1, y-1)):
-                    blind_moves.append(Move(x,y,x-1,y-1))
+                    blind_moves.append(Move_temp(x,y,x-1,y-1))
             if(self.on_board(x+1, y-1)):
-                blind_moves.append(Move(x,y,x+1,y-1))
+                blind_moves.append(Move_temp(x,y,x+1,y-1))
             if(self.on_board(x-1, y+1)):
-                    blind_moves.append(Move(x,y,x-1,y+1))
+                    blind_moves.append(Move_temp(x,y,x-1,y+1))
             if(self.on_board(x+1, y+1)):
-                blind_moves.append(Move(x,y,x+1,y+1))
+                blind_moves.append(Move_temp(x,y,x+1,y+1))
         return blind_moves
     
     def clear(self, run_on_hardware):
@@ -196,7 +200,7 @@ class Checkers:
             list(self.squares.values()), compile_to_qubits=run_on_hardware
         )
 
-    def move(self, move: Move, mark: CheckersSquare):
+    def move(self, move: Move_temp, mark: CheckersSquare):
         # Moving one piece to an empty tile
         start_id = self.convert_xy_to_id(move.start_x, move.start_y)
         end_id = self.convert_xy_to_id(move.end_x, move.end_y)
@@ -208,14 +212,14 @@ class Checkers:
             removed_piece_id = self.convert_xy_to_id((int((move.end_x+move.start_x)/2), int((move.end_y+move.start_y)/2)))
             self.remove_piece(removed_piece_id, opponent_mark)
 
-    def classic_move(self, move: Move, mark: CheckersSquare):
+    def classic_move(self, move: Move_temp, mark: CheckersSquare):
         # Moving one piece to an empty tile
         start_id = self.convert_xy_to_id(move.start_x, move.start_y)
         end_id = self.convert_xy_to_id(move.end_x, move.end_y)
         QuditFlip(3, 0, mark.value)(self.squares[str(end_id)])
         self.remove_piece((move.start_x, move.start_y), mark)
             
-    def classic_take_move(self, move: Move, mark: CheckersSquare):
+    def classic_take_move(self, move: Move_temp, mark: CheckersSquare):
         # Moving one piece to an empty tile
         start_id = self.convert_xy_to_id(move.start_x, move.start_y)
         end_id = self.convert_xy_to_id(move.end_x, move.end_y)
@@ -227,7 +231,7 @@ class Checkers:
             removed_piece_id = self.convert_xy_to_id((int((move.end_x+move.start_x)/2), int((move.end_y+move.start_y)/2)))
             self.remove_piece(removed_piece_id, opponent_mark)
 
-    def split_move(self, move1: Move, move2: Move, mark: CheckersSquare):
+    def split_move(self, move1: Move_temp, move2: Move_temp, mark: CheckersSquare):
         start_id1 = self.convert_xy_to_id(move1.start_x, move1.start_y)
         start_id2 = self.convert_xy_to_id(move2.start_x, move2.start_y)
         end_id1 = self.convert_xy_to_id(move1.end_x, move1.end_y)
@@ -282,7 +286,7 @@ class Checkers:
         # else:
         #     return(CheckersResult.UNFINISHED)
         
-    # def do_move(self, move: Move):
+    # def do_move(self, move: Move_temp):
     #     self.board.move_piece(move.start_y, move.start_x, move.end_y, move.end_x)
     #     print(move.start_y, move.start_x, move.end_y, move.end_x)
         
@@ -297,23 +301,37 @@ class GameInterface:
 
     def play(self):
         while(self.game.result() == CheckersResult.UNFINISHED and not self.quit):
-            # move = Move(0, 0, 1, 1)
+            # move = Move_temp(0, 0, 1, 1)
             # self.game.move(move, CheckersSquare.BLACK)
 
-            move1 = Move(2,1,1,1)
-            move2 = Move(2,1,3,1)
-            # move3 = Move(3,1,4,2)
-            # move4 = Move(3,1,2,2)
-            self.game.split_move(move1, move2, CheckersSquare.BLACK)
+            # move1 = Move_temp(2,0,1,1)
+            # move2 = Move_temp(2,1,3,1)
+            # move3 = Move_temp(3,1,4,2)
+            # move4 = Move_temp(3,1,2,2)
+            # self.game.classic_move(move1, CheckersSquare.BLACK)
+            self.print_board()
+            # split = Split()
+            # split(self.game.board["2"], self.game.board["6"], self.game.board["8"], )
+            # QuditXGate(3, 0, CheckersSquare.BLACK)(self.game.board["2"].qubit)
+            # QuditISwapPowGate(3, 0.5)(self.game.board["2"].qubit, self.game.board["6"].qubit)
+            # CheckersSplit(CheckersSquare.BLACK)(self.game.board)
+            cirq.ISWAP(self.game.board["2"].qubit, self.game.board["7"].qubit) ** 0.5
+            # yield cirq.ISWAP(s, t2) ** 0.5
+            # yield cirq.ISWAP(s, t2) ** 0.5
+
+            # self.game.split_move(move1, move2, CheckersSquare.BLACK)
             # self.print_board()
             # self.game.split_move(move1, move2, CheckersSquare.BLACK)
             # self.game.split_move(move3, move4, CheckersSquare.BLACK)
             # self.game.remove_piece(self.game.convert_xy_to_id(3, 1), CheckersSquare.BLACK)
-            self.print_board()
+            
+            # move = Move()
+            # move(self.game.board["0"], self.game.board["5"])
+            # cirq.ISWAP(self.game.board["0"],"2")
             # self.game.board.pop(str(self.game.convert_xy_to_id(1,1)))
-            self.game.measure()
-            old_board =deepcopy(self.game.board)
-            self.game.board=old_board
+            # self.game.measure()
+            # old_board = deepcopy(self.game.board)
+            # self.game.board=old_board
 
             self.print_board()
             # exit()
