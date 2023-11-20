@@ -46,7 +46,6 @@ class Move_temp:
         self.target2_x = target2_x
         self.target2_y = target2_y
 
-
     # def print_move(self, index = -1) -> None:
     #     if(index <= 0):
     #         print(f"[{self.source_x}][{self.source_y}] to [{self.target1_x}][{self.target1_y}]")
@@ -107,7 +106,8 @@ class Checkers:
 
     def get_positions(self, player):
         """
-        Returns all ids for player pieces and opponent pieces
+        Returns player_ids: list, opponent_ids: list
+        player_ids and opponent_ids contain the ids
         """
         results = self.board.peek(count=100)
         hist = _histogram(self.num_vertical, self.num_horizontal,
@@ -116,18 +116,19 @@ class Checkers:
                 for result in results
             ]
         )
-        player_ids = []
-        opponent_ids = []
-        for y in range(self.num_vertical):
-            for mark in (CheckersSquare.BLACK, CheckersSquare.WHITE):
-                for x in range(self.num_horizontal):
-                    id = self.convert_xy_to_id(x,y)
-                    if(hist[id][mark] != 0): # For the current player (white or black)
-                        if(mark == player):
-                            player_ids.append(id)
-                        else:
-                            opponent_ids.append(id)
-        return player_ids, opponent_ids
+        white_ids = []
+        black_ids = []
+        for id in range(self.num_vertical*self.num_horizontal):
+            for mark in (CheckersSquare.BLACK, CheckersSquare.WHITE, CheckersSquare.WHITE_KING, CheckersSquare.BLACK_KING):
+                if(hist[id][mark] != 0): # For the current player (white or black). Check both for entanglement (if that will be implemented)
+                    if(mark == CheckersSquare.WHITE or mark == CheckersSquare.WHITE_KING):
+                        white_ids.append(id)
+                    if(mark == CheckersSquare.WHITE or mark == CheckersSquare.WHITE_KING):
+                        black_ids.append(id)
+        if(player == CheckersSquare.WHITE):
+            return white_ids, black_ids
+        else:
+            return black_ids, white_ids
 
     def calculate_possible_moves(self, player: CheckersSquare) -> list:
         """
@@ -288,13 +289,12 @@ class Checkers:
     def remove_piece(self, id: int or (int,int), mark: CheckersSquare):
         if(type(id) is tuple):
             id = self.convert_xy_to_id(id[0], id[1])
-        id = str(id)
         # self.squares[id] = CheckersSquare.EMPTY
         # self.squares[id] = QuantumObject(id, CheckersSquare.EMPTY)
         # QuditFlip(3, 0, CheckersSquare.EMPTY.value)(self.squares[id])
         # QuditFlip(3, CheckersSquare.WHITE.value, CheckersSquare.EMPTY.value)(self.squares[id])
         # QuditFlip(3, CheckersSquare.BLACK.value, CheckersSquare.EMPTY.value)(self.squares[id])
-        QuditFlip(5, mark.value, CheckersSquare.EMPTY.value)(self.squares[id])
+        QuditFlip(5, mark.value, CheckersSquare.EMPTY.value)(self.squares[str(id)])
         return
         
     def convert_xy_to_id(self, x, y) -> int:
