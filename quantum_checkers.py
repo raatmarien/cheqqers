@@ -46,11 +46,15 @@ class Move_temp:
         self.target2_x = target2_x
         self.target2_y = target2_y
 
-    # def print_move(self, index = -1) -> None:
-    #     if(index <= 0):
-    #         print(f"[{self.source_x}][{self.source_y}] to [{self.target1_x}][{self.target1_y}]")
-    #     else:
-    #         print(f"{index}. [{self.source_x}][{self.source_y}] to [{self.target1_x}][{self.target1_y}]")
+    def print_move(self, index = -1) -> None:
+        output = f"[{self.source_x}][{self.source_y}] to [{self.target1_x}][{self.target1_y}]"
+        if(self.target2_x != None):
+            output += f" and [{self.target2_x}][{self.target2_y}]"
+        print(output)
+        # if(index <= 0):
+        #     print(f"[{self.source_x}][{self.source_y}] to [{self.target1_x}][{self.target1_y}]")
+        # else:
+        #     print(f"{index}. [{self.source_x}][{self.source_y}] to [{self.target1_x}][{self.target1_y}]")
 
 class Checkers:
     def __init__(self, run_on_hardware = False, num_vertical = 5, num_horizontal = 5, num_vertical_pieces = 1, rules = CheckersRules.QUANTUM_V3) -> None:
@@ -147,9 +151,10 @@ class Checkers:
             # If there is another piece, check if it is a different color than your own color
             # If so, check if one square further is empty
             # If so you can take a piece
-            Move_temp()
-            source_id = self.convert_xy_to_id(move.source_x)
-
+            source_id = self.convert_xy_to_id(move.source_x, move.source_y)
+            target1_id = self.convert_xy_to_id(move.target1_x, move.target1_y)
+            if(move.target2_x != None):
+                target2_id = self.convert_xy_to_id(move.target2_x, move.target2_y)
             end_id = self.convert_xy_to_id(move.target1_x, move.target1_y)
             if(end_id not in player_ids and end_id not in opponent_ids): # it is an empty square, so it is possible move there
                legal_moves.append(move)
