@@ -13,9 +13,22 @@ from unitary.alpha.qudit_gates import QuditXGate, QuditISwapPowGate
 # from cirq import ISWAP
 import cirq
 
+# GUI
+import pygame
+import sys
 # https://quantumchess.net/play/
 # https://entanglement-chess.netlify.app/qm
 # https://github.com/quantumlib/unitary/blob/main/docs/unitary/getting_started.ipynb
+
+# GLOBAL GUI SETTINGS
+# Constants
+WIDTH, HEIGHT = 600, 600
+SQUARE_W, SQUARE_H = 60, 60
+FPS = 60
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+DARK_BROWN = (33, 22, 12)
+LIGHT_BROWN = (217, 167, 121)
 
 # GLOBAL GAME SETTINGS
 _forced_take = True
@@ -35,7 +48,6 @@ def _histogram(num_vertical, num_horizontal, results: List[List[CheckersSquare]]
         for idx in range(num_vertical*num_horizontal):
             hist[idx][r[idx]] += 1
     return hist
-
 
 class Move_temp:
     def __init__(self, source_x: int, source_y: int, target1_x: int, target1_y: int, target2_x: int = None, target2_y: int = None) -> None:
@@ -345,30 +357,60 @@ class GameInterface:
         return input(f'Player {self.player.name} to move: ')
 
     def play(self):
+        pygame.init()
+        # Initialize the screen
+        infoObject = pygame.display.Info()
+        width = self.game.num_horizontal*SQUARE_W
+        height = self.game.num_vertical*SQUARE_H
+        self.screen = pygame.display.set_mode((width, height))
+        pygame.display.set_caption("Checkers")
+        
+        self.print_board()
+        # Clock to control the frame rate
+        clock = pygame.time.Clock()
         while(self.game.result() == CheckersResult.UNFINISHED and not self.quit):
-            self.print_board()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit(0)
+            # self.print_board()
+            self.draw_board()
             # exit()
-            legal_moves = self.print_legal_moves()
-            move = self.get_move()
-            try:
-                move = int(move)
-            except:
-                print("Input has to be an integer!")
-                continue
-            if(move > len(legal_moves) or move < 1):
-                print(f"Input has to be an integer between 1 and {len(legal_moves)}!")
-                continue
-            self.game.move(legal_moves[move-1], self.player)
+            # legal_moves = self.print_legal_moves()
+            # move = self.get_move()
+            # try:
+            #     move = int(move)
+            # except:
+            #     print("Input has to be an integer!")
+            #     continue
+            # if(move > len(legal_moves) or move < 1):
+            #     print(f"Input has to be an integer between 1 and {len(legal_moves)}!")
+            #     continue
+            # self.game.move(legal_moves[move-1], self.player)
 
-            self.player = CheckersSquare.BLACK if self.player == CheckersSquare.WHITE else CheckersSquare.WHITE
+            # self.player = CheckersSquare.BLACK if self.player == CheckersSquare.WHITE else CheckersSquare.WHITE
+    
+    def draw_board(self):
+        _, pieces = self.get_board()
+        for id in range(self.game.num_horizontal*self.game.num_vertical):
+            x, y = self.game.convert_id_to_xy(id)
+            screen_x = x * SQUARE_W
+            screen_y = y * SQUARE_H
+            color = LIGHT_BROWN if (id) % 2 == 0 else DARK_BROWN
+            pygame.draw.rect(self.screen, color, (screen_x, screen_y, SQUARE_W, SQUARE_H))
+            pygame.display.flip()
+
+            # color = LIGHT_BROWN if (id) % 2 == 0 else DARK_BROWN
+            # pygame.draw.rect(self.screen, color, (col * 75, row * 75, 75, 75))
 
     def print_board(self) -> str:
-        str_board = self.get_board()
+        str_board, _ = self.get_board()
         print(str_board)
+       
         return str_board
 
     def get_board(self) -> str:
-        """Returns the Checkers board in ASCII form.
+        """Returns the Checkers board in ASCII form. Also
         Function take from quantum tiq taq toe"""
         
         results = self.game.board.peek(count=100)
@@ -379,18 +421,21 @@ class GameInterface:
             ]
         )
         output = "\n"
+        board_list = {}
         for y in range(self.game.num_vertical):
             for mark in CheckersSquare:
                 output += " "
                 for x in range(self.game.num_horizontal):
                     idx = self.game.convert_xy_to_id(x,y)  
                     output += f" {_MARK_SYMBOLS[mark]} {hist[idx][mark]:3}"
+                    if(hist[idx][mark] > 0):
+                        board_list[str(idx)] = hist[idx][mark]
                     if x != self.game.num_horizontal-1:
                         output += " |"
                 output += "\n"
             if y != self.game.num_vertical-1:
                 output += "----------"*self.game.num_horizontal + "\n"
-        return output
+        return output, board_list
     
     def get_legal_moves(self) -> list:
         return self.game.calculate_possible_moves(self.player)
@@ -407,7 +452,7 @@ class GameInterface:
         return legal_moves
 
 def main():
-    game = GameInterface(Checkers())
+    game = GameInterface(Checkers(num_vertical=5, num_horizontal=5))
     game.play()
 
 if __name__ == "__main__":
