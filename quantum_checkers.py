@@ -31,6 +31,7 @@ BLACK = (0, 0, 0)
 DARK_BROWN = (33, 22, 12)
 LIGHT_BROWN = (217, 167, 121)
 RED = (255, 0, 0)
+BLUE = (0, 0, 255)
 CROWN_IMG = pygame.image.load("./crown.png")
 CROWN_IMG = pygame.transform.scale(CROWN_IMG, (int(SQUARE_W*0.65), int((CROWN_IMG.get_height()/(CROWN_IMG.get_width()/SQUARE_W))*0.65)))
 # GLOBAL GAME SETTINGS
@@ -398,6 +399,7 @@ class GameInterface:
         self.game = game
         self.player = CheckersSquare.WHITE
         self.quit = False
+        self.highlighted_squares = []
 
     def get_move(self):
         return input(f'Player {self.player.name} to move: ')
@@ -461,6 +463,8 @@ class GameInterface:
                 self.draw_circle(RED, screen_x, screen_y, int(SQUARE_W-0.15*SQUARE_W)//2, black_pieces[str(id)].king)
             elif(str(id) in white_pieces):
                 self.draw_circle(WHITE, screen_x, screen_y, int(SQUARE_W-0.15*SQUARE_W)//2, white_pieces[str(id)].king)
+            if(id in self.highlighted_squares):
+                pygame.gfxdraw.rectangle(self.screen, (screen_x, screen_y, SQUARE_W, SQUARE_H), BLUE)
             # pygame.display.flip()
             # pygame.display.update()
 
@@ -472,13 +476,17 @@ class GameInterface:
         y = y // SQUARE_H
         return self.game.convert_xy_to_id(x, y)
 
+    # def highlight_piece(self, x, y)
+
     def handle_click(self, mouse_pos):
+        self.highlighted_squares = []
         mouse_x, mouse_y = mouse_pos[0], mouse_pos[1]
         id = self.get_id_from_mouse_pos(mouse_x, mouse_y)
         print(id)
         legal_moves = self.get_legal_moves()
         self.print_legal_moves()
         print(legal_moves)
+        self.highlighted_squares.append(id)
 
     def print_board(self) -> str:
         str_board, _ = self.get_board()
