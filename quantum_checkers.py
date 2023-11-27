@@ -31,6 +31,8 @@ BLACK = (0, 0, 0)
 DARK_BROWN = (33, 22, 12)
 LIGHT_BROWN = (217, 167, 121)
 RED = (255, 0, 0)
+CROWN_IMG = pygame.image.load("./crown.png")
+CROWN_IMG = pygame.transform.scale(CROWN_IMG, (int(SQUARE_W*0.65), int((CROWN_IMG.get_height()/(CROWN_IMG.get_width()/SQUARE_W))*0.65)))
 # GLOBAL GAME SETTINGS
 _forced_take = True
 _MARK_SYMBOLS = {CheckersSquare.EMPTY: ".", CheckersSquare.WHITE: "w", CheckersSquare.BLACK: "b", CheckersSquare.WHITE_KING: "W", CheckersSquare.BLACK_KING: "B"}
@@ -49,6 +51,15 @@ def _histogram(num_vertical, num_horizontal, results: List[List[CheckersSquare]]
         for idx in range(num_vertical*num_horizontal):
             hist[idx][r[idx]] += 1
     return hist
+
+class Move_id:
+    """
+    Unused at the moment
+    """
+    def __init__(self, source_id: int, target1_id: int, target2_id: int = None) -> None:
+        self.source_id = source_id
+        self.target1_id = target1_id
+        self.target2_id = target2_id
 
 class Move_temp:
     def __init__(self, source_x: int, source_y: int, target1_x: int, target1_y: int, target2_x: int = None, target2_y: int = None) -> None:
@@ -427,9 +438,12 @@ class GameInterface:
             # self.game.move(legal_moves[move-1], self.player)
 
             # self.player = CheckersSquare.BLACK if self.player == CheckersSquare.WHITE else CheckersSquare.WHITE
-    def draw_circle(self, color, x, y, radius):
-        gfxdraw.aacircle(self.screen, x, y, radius, color)
-        gfxdraw.filled_circle(self.screen, x, y, radius, color)
+    def draw_circle(self, color, x, y, radius, king = False):
+        gfxdraw.aacircle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, color)
+        gfxdraw.filled_circle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, color)
+        if(king):
+            c = CROWN_IMG.get_rect(center=(x+SQUARE_W//2, y+SQUARE_H//2)) # centers the image
+            self.screen.blit(CROWN_IMG, c)
 
     def draw_board(self):
         _, pieces = self.get_board()
@@ -444,9 +458,9 @@ class GameInterface:
             pygame.draw.rect(self.screen, color, (screen_x, screen_y, SQUARE_W, SQUARE_H))
             if(str(id) in black_pieces):
                 # pygame.draw.circle(self.screen, RED, (screen_x+SQUARE_W//2, screen_y+SQUARE_H//2), int(SQUARE_W-0.15*SQUARE_W)//2)
-                self.draw_circle(RED, screen_x+SQUARE_W//2, screen_y+SQUARE_H//2, int(SQUARE_W-0.15*SQUARE_W)//2)
-            if(str(id) in white_pieces):
-                self.draw_circle(WHITE, screen_x+SQUARE_W//2, screen_y+SQUARE_H//2, int(SQUARE_W-0.15*SQUARE_W)//2)
+                self.draw_circle(RED, screen_x, screen_y, int(SQUARE_W-0.15*SQUARE_W)//2, black_pieces[str(id)].king)
+            elif(str(id) in white_pieces):
+                self.draw_circle(WHITE, screen_x, screen_y, int(SQUARE_W-0.15*SQUARE_W)//2, white_pieces[str(id)].king)
             # pygame.display.flip()
             # pygame.display.update()
 
@@ -458,13 +472,12 @@ class GameInterface:
         y = y // SQUARE_H
         return self.game.convert_xy_to_id(x, y)
 
-
-
     def handle_click(self, mouse_pos):
         mouse_x, mouse_y = mouse_pos[0], mouse_pos[1]
         id = self.get_id_from_mouse_pos(mouse_x, mouse_y)
         print(id)
         legal_moves = self.get_legal_moves()
+        self.print_legal_moves()
         print(legal_moves)
 
     def print_board(self) -> str:
