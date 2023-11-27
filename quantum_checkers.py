@@ -10,6 +10,7 @@ from unitary.alpha.qudit_effects import QuditFlip
 from math import ceil
 from quantum_split import CheckersSplit, CheckersClassicMove
 from unitary.alpha.qudit_gates import QuditXGate, QuditISwapPowGate
+from pygame import gfxdraw
 # from cirq import ISWAP
 import cirq
 
@@ -29,7 +30,7 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 DARK_BROWN = (33, 22, 12)
 LIGHT_BROWN = (217, 167, 121)
-
+RED = (255, 0, 0)
 # GLOBAL GAME SETTINGS
 _forced_take = True
 _MARK_SYMBOLS = {CheckersSquare.EMPTY: ".", CheckersSquare.WHITE: "w", CheckersSquare.BLACK: "b", CheckersSquare.WHITE_KING: "W", CheckersSquare.BLACK_KING: "B"}
@@ -68,6 +69,12 @@ class Move_temp:
         # else:
         #     print(f"{index}. [{self.source_x}][{self.source_y}] to [{self.target1_x}][{self.target1_y}]")
 
+class Piece():
+    def __init__(self, id, color: CheckersSquare, king=False) -> None:
+        self.id = id
+        self.color = color
+        self.king = False
+
 class Checkers:
     def __init__(self, run_on_hardware = False, num_vertical = 5, num_horizontal = 5, num_vertical_pieces = 1, rules = CheckersRules.QUANTUM_V3) -> None:
         # self.board = Board(num_vertical, num_horizontal, num_vertical_pieces)
@@ -83,13 +90,13 @@ class Checkers:
         # Add initial pieces to board
         for y in range(num_vertical_pieces):
             for x in range(self.num_horizontal):
-                if(y%2==0 and x%2==0):
+                if(y%2==0 and x%2==1):
                     QuditFlip(5, 0, CheckersSquare.BLACK.value)(self.squares[str(self.convert_xy_to_id(x,y))])
                     QuditFlip(5, 0, CheckersSquare.WHITE.value)(self.squares[str(self.convert_xy_to_id(x,self.num_vertical-1-y))])
                     # self.board_matrix[y][x].occupant = Piece(CheckersSquare.BLACK)
                     # self.board_matrix[self.num_vertical-1-y][x].occupant = Piece(CheckersSquare.WHITE)
 
-                elif(y%2!=0 and x%2!=0):
+                elif(y%2!=0 and x%2!=1):
                     QuditFlip(5, 0, CheckersSquare.BLACK.value)(self.squares[str(self.convert_xy_to_id(x,y))])
                     QuditFlip(5, 0, CheckersSquare.WHITE.value)(self.squares[str(self.convert_xy_to_id(x,self.num_vertical-1-y))])
                     # self.board_matrix[y][x].occupant = Piece(CheckersSquare.BLACK)
@@ -120,6 +127,36 @@ class Checkers:
             return False
         return True
 
+    def get_advanced_positions(self, player):
+        """
+        Returns dicitionary of players ids and opponent ids Piece class, 
+        player_ids and opponent_ids contain the ids
+        """
+        results = self.board.peek(count=100)
+        hist = _histogram(self.num_vertical, self.num_horizontal,
+            [
+                [CheckersSquare.from_result(square) for square in result]
+                for result in results
+            ]
+        )
+        white_pieces = {}
+        black_pieces = {}
+        for id in range(self.num_vertical*self.num_horizontal):
+            for mark in (CheckersSquare.BLACK, CheckersSquare.WHITE, CheckersSquare.WHITE_KING, CheckersSquare.BLACK_KING):
+                if(hist[id][mark] != 0): # For the current player (white or black). Check both for entanglement (if that will be implemented)
+                    if(mark == CheckersSquare.WHITE):
+                        white_pieces[str(id)] = Piece(id, mark, False)
+                    elif(mark == CheckersSquare.WHITE_KING):
+                        white_pieces[str(id)] = Piece(id, mark, True)
+                    if(mark == CheckersSquare.BLACK):
+                        black_pieces[str(id)] = Piece(id, mark, False)
+                    elif(mark == CheckersSquare.WHITE_KING):
+                        black_pieces[str(id)] = Piece(id, mark, True)
+        if(player == CheckersSquare.WHITE):
+            return white_pieces, black_pieces
+        else:
+            return black_pieces, white_pieces
+
     def get_positions(self, player):
         """
         Returns player_ids: list, opponent_ids: list
@@ -139,7 +176,7 @@ class Checkers:
                 if(hist[id][mark] != 0): # For the current player (white or black). Check both for entanglement (if that will be implemented)
                     if(mark == CheckersSquare.WHITE or mark == CheckersSquare.WHITE_KING):
                         white_ids.append(id)
-                    if(mark == CheckersSquare.WHITE or mark == CheckersSquare.WHITE_KING):
+                    if(mark == CheckersSquare.BLACK or mark == CheckersSquare.BLACK_KING):
                         black_ids.append(id)
         if(player == CheckersSquare.WHITE):
             return white_ids, black_ids
@@ -301,8 +338,6 @@ class Checkers:
         else:
             CheckersSplit(mark, self.rules)(self.squares[source_id], self.squares[target2_id], self.squares[target1_id])
             
-
-
     def remove_piece(self, id: int or (int,int), mark: CheckersSquare):
         if(type(id) is tuple):
             id = self.convert_xy_to_id(id[0], id[1])
@@ -363,7 +398,7 @@ class GameInterface:
         width = self.game.num_horizontal*SQUARE_W
         height = self.game.num_vertical*SQUARE_H
         self.screen = pygame.display.set_mode((width, height))
-        pygame.display.set_caption("Checkers")
+        pygame.display.set_caption("Quantum Checkers")
         
         self.print_board()
         # Clock to control the frame rate
@@ -373,8 +408,11 @@ class GameInterface:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit(0)
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    self.handle_click(event.pos)
             # self.print_board()
             self.draw_board()
+            pygame.display.flip() # needs to be called outside draw function
             # exit()
             # legal_moves = self.print_legal_moves()
             # move = self.get_move()
@@ -389,19 +427,45 @@ class GameInterface:
             # self.game.move(legal_moves[move-1], self.player)
 
             # self.player = CheckersSquare.BLACK if self.player == CheckersSquare.WHITE else CheckersSquare.WHITE
-    
+    def draw_circle(self, color, x, y, radius):
+        gfxdraw.aacircle(self.screen, x, y, radius, color)
+        gfxdraw.filled_circle(self.screen, x, y, radius, color)
+
     def draw_board(self):
         _, pieces = self.get_board()
+        self.screen.fill(WHITE)
+        # self.game.get_positions(CheckersSquare.WHITE)
+        white_pieces, black_pieces = self.game.get_advanced_positions(CheckersSquare.WHITE)
         for id in range(self.game.num_horizontal*self.game.num_vertical):
             x, y = self.game.convert_id_to_xy(id)
             screen_x = x * SQUARE_W
             screen_y = y * SQUARE_H
             color = LIGHT_BROWN if (id) % 2 == 0 else DARK_BROWN
             pygame.draw.rect(self.screen, color, (screen_x, screen_y, SQUARE_W, SQUARE_H))
-            pygame.display.flip()
+            if(str(id) in black_pieces):
+                # pygame.draw.circle(self.screen, RED, (screen_x+SQUARE_W//2, screen_y+SQUARE_H//2), int(SQUARE_W-0.15*SQUARE_W)//2)
+                self.draw_circle(RED, screen_x+SQUARE_W//2, screen_y+SQUARE_H//2, int(SQUARE_W-0.15*SQUARE_W)//2)
+            if(str(id) in white_pieces):
+                self.draw_circle(WHITE, screen_x+SQUARE_W//2, screen_y+SQUARE_H//2, int(SQUARE_W-0.15*SQUARE_W)//2)
+            # pygame.display.flip()
+            # pygame.display.update()
 
             # color = LIGHT_BROWN if (id) % 2 == 0 else DARK_BROWN
             # pygame.draw.rect(self.screen, color, (col * 75, row * 75, 75, 75))
+
+    def get_id_from_mouse_pos(self, x, y):
+        x = x // SQUARE_W
+        y = y // SQUARE_H
+        return self.game.convert_xy_to_id(x, y)
+
+
+
+    def handle_click(self, mouse_pos):
+        mouse_x, mouse_y = mouse_pos[0], mouse_pos[1]
+        id = self.get_id_from_mouse_pos(mouse_x, mouse_y)
+        print(id)
+        legal_moves = self.get_legal_moves()
+        print(legal_moves)
 
     def print_board(self) -> str:
         str_board, _ = self.get_board()
@@ -452,7 +516,7 @@ class GameInterface:
         return legal_moves
 
 def main():
-    game = GameInterface(Checkers(num_vertical=5, num_horizontal=5))
+    game = GameInterface(Checkers(num_vertical=5, num_horizontal=5, num_vertical_pieces=2))
     game.play()
 
 if __name__ == "__main__":
