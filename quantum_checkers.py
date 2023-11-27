@@ -23,6 +23,7 @@ import sys
 
 # GLOBAL GUI SETTINGS
 # Constants
+GUI = False
 WIDTH, HEIGHT = 600, 600
 SQUARE_W, SQUARE_H = 60, 60
 FPS = 60
@@ -61,6 +62,12 @@ class Move_id:
         self.source_id = source_id
         self.target1_id = target1_id
         self.target2_id = target2_id
+    
+    def print_move(self, index = -1) -> None:
+        output = f"[{self.source_id}] to [{self.target1_id}]"
+        if(self.target2_id != None):
+            output += f" and [{self.target2_id}]"
+        print(output)
 
 class Move_temp:
     def __init__(self, source_x: int, source_y: int, target1_x: int, target1_y: int, target2_x: int = None, target2_y: int = None) -> None:
@@ -214,18 +221,21 @@ class Checkers:
             # If so you can take a piece
             source_id = self.convert_xy_to_id(move.source_x, move.source_y)
             target1_id = self.convert_xy_to_id(move.target1_x, move.target1_y)
+            target2_id = None
             if(move.target2_x != None):
                 target2_id = self.convert_xy_to_id(move.target2_x, move.target2_y)
-            end_id = self.convert_xy_to_id(move.target1_x, move.target1_y)
-            if(end_id not in player_ids and end_id not in opponent_ids): # it is an empty square, so it is possible move there
-               legal_moves.append(move)
-            elif(end_id in opponent_ids): # There is an opponent in this coordinate, check if we can jump over them
+            target1_id = self.convert_xy_to_id(move.target1_x, move.target1_y)
+            if(target1_id not in player_ids and target1_id not in opponent_ids): # it is an empty square, so it is possible move there
+               legal_moves.append(Move_id(source_id, target1_id, target2_id))
+            elif(target1_id in opponent_ids): # There is an opponent in this coordinate, check if we can jump over them
                 jump_y = move.target1_y+(move.target1_y-move.source_y)
                 jump_x = move.target1_x+(move.target1_x-move.source_x)
                 jump_id = self.convert_xy_to_id(jump_x, jump_y)
                 if(self.on_board(jump_x, jump_y) and jump_id not in (player_ids+opponent_ids)): # we can jump over if the coordinates are on the board and the piece is empty
-                    legal_moves.append(Move_temp(move.source_x, move.source_y, jump_x, jump_y))
-                    legal_take_moves.append(Move_temp(move.source_x, move.source_y, jump_x, jump_y))
+                    # legal_moves.append(Move_temp(move.source_x, move.source_y, jump_x, jump_y))
+                    legal_moves.append(Move_id(source_id, jump_id))
+                    # legal_take_moves.append(Move_temp(move.source_x, move.source_y, jump_x, jump_y))
+                    legal_take_moves.append(Move_id(source_id, jump_id))
         if(len(legal_take_moves) != 0 and _forced_take): # If we can take a piece and taking a piece is forced, return only the moves that can take a piece
             return legal_take_moves
         return legal_moves
@@ -305,6 +315,13 @@ class Checkers:
             list(self.squares.values()), compile_to_qubits=run_on_hardware
         )
 
+    def move(self, move: Move_id, player):
+        if(move.target2_id == None):
+            self.classic_move(move, player)
+            return
+        # if not classical move it is a split move
+        self.split_move(move, player)
+
     # def move(self, move: Move_temp, mark: CheckersSquare):
     #     # Moving one piece to an empty tile
     #     start_id = self.convert_xy_to_id(move.source_x, move.source_y)
@@ -317,11 +334,11 @@ class Checkers:
     #         removed_piece_id = self.convert_xy_to_id((int((move.target1_x+move.source_x)/2), int((move.target1_y+move.source_y)/2)))
     #         self.remove_piece(removed_piece_id, opponent_mark)
 
-    def classic_move(self, move: Move_temp, mark: CheckersSquare):
+    def classic_move(self, move: Move_id, mark: CheckersSquare):
         # Moving one piece to an empty tile
-        start_id = self.convert_xy_to_id(move.source_x, move.source_y)
-        end_id = self.convert_xy_to_id(move.target1_x, move.target1_y)
-        CheckersClassicMove(5, 1)(self.squares[str(start_id)], self.squares[str(end_id)])
+        # start_id = self.convert_xy_to_id(move.source_x, move.source_y)
+        # end_id = self.convert_xy_to_id(move.target1_x, move.target1_y)
+        CheckersClassicMove(5, 1)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
             
     # def classic_take_move(self, move: Move_temp, mark: CheckersSquare):
     #     # Moving one piece to an empty tile
@@ -335,20 +352,20 @@ class Checkers:
     #         removed_piece_id = self.convert_xy_to_id((int((move.target1_x+move.source_x)/2), int((move.target1_y+move.source_y)/2)))
     #         self.remove_piece(removed_piece_id, opponent_mark)
 
-    def split_move(self, move: Move_temp, mark: CheckersSquare):
-        source_id = self.convert_xy_to_id(move.source_x, move.source_y)
-        target1_id = self.convert_xy_to_id(move.target1_x, move.target1_y)
-        if(move.target2_x == None or move.target2_y == None):
+    def split_move(self, move: Move_id, mark: CheckersSquare):
+        # source_id = self.convert_xy_to_id(move.source_x, move.source_y)
+        # target1_id = self.convert_xy_to_id(move.target1_x, move.target1_y)
+        if(move.target2_id == None):
             raise ValueError("No second target given")
-        target2_id = self.convert_xy_to_id(move.target2_x, move.target2_y)
+        # target2_id = self.convert_xy_to_id(move.target2_x, move.target2_y)
             
         
         player_ids, opponent_ids = self.get_positions(mark)
-        if target1_id not in player_ids+opponent_ids:
+        if move.target1_id not in player_ids+opponent_ids:
             # CheckersSplit(mark, self.rules)(self.squares[str(end_id1)], self.squares[str(end_id2)])
-            CheckersSplit(mark, self.rules)(self.squares[source_id], self.squares[target1_id], self.squares[target2_id])
+            CheckersSplit(mark, self.rules)(self.squares[move.source_id], self.squares[move.target1_id], self.squares[move.target2_id])
         else:
-            CheckersSplit(mark, self.rules)(self.squares[source_id], self.squares[target2_id], self.squares[target1_id])
+            CheckersSplit(mark, self.rules)(self.squares[move.source_id], self.squares[move.target2_id], self.squares[move.target1_id])
             
     def remove_piece(self, id: int or (int,int), mark: CheckersSquare):
         if(type(id) is tuple):
@@ -405,41 +422,46 @@ class GameInterface:
         return input(f'Player {self.player.name} to move: ')
 
     def play(self):
-        pygame.init()
-        # Initialize the screen
-        infoObject = pygame.display.Info()
-        width = self.game.num_horizontal*SQUARE_W
-        height = self.game.num_vertical*SQUARE_H
-        self.screen = pygame.display.set_mode((width, height))
-        pygame.display.set_caption("Quantum Checkers")
+        if(GUI):
+            pygame.init()
+            # Initialize the screen
+            infoObject = pygame.display.Info()
+            width = self.game.num_horizontal*SQUARE_W
+            height = self.game.num_vertical*SQUARE_H
+            self.screen = pygame.display.set_mode((width, height))
+            pygame.display.set_caption("Quantum Checkers")
         
-        self.print_board()
+        # self.print_board()
         # Clock to control the frame rate
         clock = pygame.time.Clock()
         while(self.game.result() == CheckersResult.UNFINISHED and not self.quit):
-            for event in pygame.event.get():
+            if(GUI):
+                event = pygame.event.wait()
+                # for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit(0)
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     self.handle_click(event.pos)
-            # self.print_board()
-            self.draw_board()
-            pygame.display.flip() # needs to be called outside draw function
+                # self.print_board()
+                self.draw_board()
+                pygame.display.flip() # needs to be called outside draw function
+            else:
             # exit()
-            # legal_moves = self.print_legal_moves()
-            # move = self.get_move()
-            # try:
-            #     move = int(move)
-            # except:
-            #     print("Input has to be an integer!")
-            #     continue
-            # if(move > len(legal_moves) or move < 1):
-            #     print(f"Input has to be an integer between 1 and {len(legal_moves)}!")
-            #     continue
-            # self.game.move(legal_moves[move-1], self.player)
+                self.print_board()
+                legal_moves = self.print_legal_moves()
+                move = self.get_move()
+                try:
+                    move = int(move)
+                except:
+                    print("Input has to be an integer!")
+                    continue
+                if(move > len(legal_moves) or move < 1):
+                    print(f"Input has to be an integer between 1 and {len(legal_moves)}!")
+                    continue
+                self.game.move(legal_moves[move-1], self.player)
 
-            # self.player = CheckersSquare.BLACK if self.player == CheckersSquare.WHITE else CheckersSquare.WHITE
+                self.player = CheckersSquare.BLACK if self.player == CheckersSquare.WHITE else CheckersSquare.WHITE
     def draw_circle(self, color, x, y, radius, king = False):
         gfxdraw.aacircle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, color)
         gfxdraw.filled_circle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, color)
@@ -519,7 +541,7 @@ class GameInterface:
                         output += " |"
                 output += "\n"
             if y != self.game.num_vertical-1:
-                output += "----------"*self.game.num_horizontal + "\n"
+                output += "--------"*self.game.num_horizontal + "\n"
         return output, board_list
     
     def get_legal_moves(self) -> list:
