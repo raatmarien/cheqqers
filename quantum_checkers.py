@@ -23,7 +23,7 @@ import sys
 
 # GLOBAL GUI SETTINGS
 # Constants
-GUI = False
+GUI = True
 WIDTH, HEIGHT = 600, 600
 SQUARE_W, SQUARE_H = 60, 60
 FPS = 60
@@ -442,7 +442,11 @@ class GameInterface:
                     pygame.quit()
                     sys.exit(0)
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    self.handle_click(event.pos)
+                    down_pos = event.pos
+                    # self.handle_click(event.pos)
+                if event.type == pygame.MOUSEBUTTONUP:
+                    # Detect swipes for quantum moves
+                    self.handle_click(down_pos, event.pos)
                 # self.print_board()
                 self.draw_board()
                 pygame.display.flip() # needs to be called outside draw function
@@ -500,15 +504,19 @@ class GameInterface:
 
     # def highlight_piece(self, x, y)
 
-    def handle_click(self, mouse_pos):
-        self.highlighted_squares = []
-        mouse_x, mouse_y = mouse_pos[0], mouse_pos[1]
-        id = self.get_id_from_mouse_pos(mouse_x, mouse_y)
-        print(id)
+    def handle_click(self, first_pos, second_pos):
+        # self.highlighted_squares = []
+        mouse_x, mouse_y = first_pos[0], first_pos[1]
+        first_id = self.get_id_from_mouse_pos(mouse_x, mouse_y)
+        mouse_x, mouse_y = second_pos[0], second_pos[1]
+        second_id = self.get_id_from_mouse_pos(mouse_x, mouse_y)
+        if(first_id == second_id):
+            self.highlighted_squares.append(id)
+            return  
         legal_moves = self.get_legal_moves()
-        self.print_legal_moves()
-        print(legal_moves)
-        self.highlighted_squares.append(id)
+        # self.print_legal_moves()
+        # print(legal_moves)
+       
 
     def print_board(self) -> str:
         str_board, _ = self.get_board()
