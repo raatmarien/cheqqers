@@ -111,6 +111,7 @@ class Checkers:
         # Initialize empty board
         self.clear(run_on_hardware)
         # Add initial pieces to board
+        QuditFlip(5, 0, CheckersSquare.WHITE.value)(self.squares[str(11)]) # TODO: REMOVE
         for y in range(num_vertical_pieces):
             for x in range(self.num_horizontal):
                 if(y%2==0 and x%2==1):
@@ -369,10 +370,26 @@ class Checkers:
 
     def classic_move(self, move: Move_id, mark: CheckersSquare):
         # Moving one piece to an empty tile
-        CheckersClassicMove(5, 1)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
         is_adjacent, jumped_id = self.is_adjacent(move.source_id, move.target1_id)
         if(not is_adjacent): # if ids are not adjacent we jumped over a piece and need to remove it
-            self.peek(self.squares[str(jumped_id)])      
+            print(mark)
+            peek = (self.board.peek(objects=[self.squares[str(jumped_id)]])) # peek returns double list of all object peeked. For one object that looks like [[<CheckersSquare.WHITE: 1>]]
+            print(peek)
+            self.board.pop(objects=[self.squares[str(jumped_id)]])
+            peek = (self.board.peek(objects=[self.squares[str(jumped_id)]])) # peek returns double list of all object peeked. For one object that looks like [[<CheckersSquare.WHITE: 1>]]
+            print(peek)
+            # print(peek)
+            # print(peek[0])
+            # print(type(peek))
+            # print(type(peek[0]))
+            # print(peek[0][0])
+            if(peek[0][0] != CheckersSquare.EMPTY): # if it is not empty we can take the piece
+                print("JUMPED OVER PIECE, REMOVED")
+                CheckersClassicMove(5, 1)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
+                self.remove_piece(jumped_id, mark)
+        else: # not a jump
+            CheckersClassicMove(5, 1)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
+            
 
 
     def split_move(self, move: Move_id, mark: CheckersSquare):
@@ -446,6 +463,8 @@ class GameInterface:
         return input(f'Player {self.player.name} to move: ')
 
     def play(self):
+        temp = Move_id(11, 5, 7)
+        self.game.split_move(temp, CheckersSquare.WHITE)
         if(GUI):
             pygame.init()
             # Initialize the screen
