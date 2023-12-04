@@ -224,10 +224,23 @@ class Checkers:
             target2_id = None
             if(move.target2_x != None):
                 target2_id = self.convert_xy_to_id(move.target2_x, move.target2_y)
-            target1_id = self.convert_xy_to_id(move.target1_x, move.target1_y)
-            if(target1_id not in player_ids and target1_id not in opponent_ids): # it is an empty square, so it is possible move there
-               legal_moves.append(Move_id(source_id, target1_id, target2_id))
-            elif(target1_id in opponent_ids): # There is an opponent in this coordinate, check if we can jump over them
+
+            # CLASSICAL MOVE    
+            if(target1_id not in player_ids and target1_id not in opponent_ids and target2_id == None): # it is an empty square, so it is possible move there
+               legal_moves.append(Move_id(source_id, target1_id))
+            
+            # QUANTUM SPLIT MOVE
+            elif(target1_id not in player_ids and target1_id not in opponent_ids and target2_id not in player_ids and target2_id not in opponent_ids):
+                # jump1_y = move.target1_y+(move.target1_y-move.source_y)
+                # jump1_x = move.target1_x+(move.target1_x-move.source_x)
+                # jump2_y = move.target1_y+(move.target2_y-move.source_y)
+                # jump2_x = move.target1_x+(move.target2_x-move.source_x)
+                # jump1_id = self.convert_xy_to_id(jump1_x, jump1_y)
+                # jump2_id = self.convert_xy_to_id(jump2_x, jump2_y)
+                legal_moves.append(Move_id(source_id, target1_id, target2_id))
+            
+            # CLASSICAL TAKE MOVE
+            elif(target1_id in opponent_ids and target2_id == None): # There is an opponent in this coordinate, check if we can jump over them
                 jump_y = move.target1_y+(move.target1_y-move.source_y)
                 jump_x = move.target1_x+(move.target1_x-move.source_x)
                 jump_id = self.convert_xy_to_id(jump_x, jump_y)
@@ -236,6 +249,7 @@ class Checkers:
                     legal_moves.append(Move_id(source_id, jump_id))
                     # legal_take_moves.append(Move_temp(move.source_x, move.source_y, jump_x, jump_y))
                     legal_take_moves.append(Move_id(source_id, jump_id))
+            
         if(len(legal_take_moves) != 0 and _forced_take): # If we can take a piece and taking a piece is forced, return only the moves that can take a piece
             return legal_take_moves
         return legal_moves
