@@ -23,7 +23,7 @@ import sys
 
 # GLOBAL GUI SETTINGS
 # Constants
-GUI = True
+GUI = False
 WIDTH, HEIGHT = 600, 600
 SQUARE_W, SQUARE_H = 60, 60
 FPS = 60
@@ -363,9 +363,9 @@ class Checkers:
         player_ids, opponent_ids = self.get_positions(mark)
         if move.target1_id not in player_ids+opponent_ids:
             # CheckersSplit(mark, self.rules)(self.squares[str(end_id1)], self.squares[str(end_id2)])
-            CheckersSplit(mark, self.rules)(self.squares[move.source_id], self.squares[move.target1_id], self.squares[move.target2_id])
+            CheckersSplit(mark, self.rules)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)], self.squares[str(move.target2_id)])
         else:
-            CheckersSplit(mark, self.rules)(self.squares[move.source_id], self.squares[move.target2_id], self.squares[move.target1_id])
+            CheckersSplit(mark, self.rules)(self.squares[str(move.source_id)], self.squares[str(move.target2_id)], self.squares[str(move.target1_id)])
             
     def remove_piece(self, id: int or (int,int), mark: CheckersSquare):
         if(type(id) is tuple):
