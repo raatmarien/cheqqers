@@ -371,9 +371,8 @@ class Checkers:
         # Moving one piece to an empty tile
         CheckersClassicMove(5, 1)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
         is_adjacent, jumped_id = self.is_adjacent(move.source_id, move.target1_id)
-        if(not is_adjacent): # if ids are not adjacent we jumped over a piece
-            jumped_id = 2
-        
+        if(not is_adjacent): # if ids are not adjacent we jumped over a piece and need to remove it
+            self.peek(self.squares[str(jumped_id)])      
 
 
     def split_move(self, move: Move_id, mark: CheckersSquare):
