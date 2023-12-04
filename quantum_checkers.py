@@ -372,19 +372,10 @@ class Checkers:
         # Moving one piece to an empty tile
         is_adjacent, jumped_id = self.is_adjacent(move.source_id, move.target1_id)
         if(not is_adjacent): # if ids are not adjacent we jumped over a piece and need to remove it
-            print(mark)
-            peek = (self.board.peek(objects=[self.squares[str(jumped_id)]])) # peek returns double list of all object peeked. For one object that looks like [[<CheckersSquare.WHITE: 1>]]
-            print(peek)
             self.board.pop(objects=[self.squares[str(jumped_id)]])
             peek = (self.board.peek(objects=[self.squares[str(jumped_id)]])) # peek returns double list of all object peeked. For one object that looks like [[<CheckersSquare.WHITE: 1>]]
-            print(peek)
-            # print(peek)
-            # print(peek[0])
-            # print(type(peek))
-            # print(type(peek[0]))
-            # print(peek[0][0])
+
             if(peek[0][0] != CheckersSquare.EMPTY): # if it is not empty we can take the piece
-                print("JUMPED OVER PIECE, REMOVED")
                 CheckersClassicMove(5, 1)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
                 self.remove_piece(jumped_id, mark)
         else: # not a jump
