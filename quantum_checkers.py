@@ -3,6 +3,8 @@ from enums import (
     CheckersRules,
     CheckersSquare
 )
+import argparse
+import os
 from typing import List, Dict
 from copy import deepcopy
 from unitary.alpha import QuantumObject, QuantumWorld, Move, Split
@@ -33,7 +35,7 @@ DARK_BROWN = (33, 22, 12)
 LIGHT_BROWN = (217, 167, 121)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
-CROWN_IMG = pygame.image.load("./crown.png")
+CROWN_IMG = pygame.image.load(os.path.join(os.path.dirname(__file__), "crown.png"))
 CROWN_IMG = pygame.transform.scale(CROWN_IMG, (int(SQUARE_W*0.65), int((CROWN_IMG.get_height()/(CROWN_IMG.get_width()/SQUARE_W))*0.65)))
 # GLOBAL GAME SETTINGS
 _forced_take = True
@@ -64,7 +66,10 @@ class Move_id:
         self.target2_id = target2_id
     
     def print_move(self, index = -1) -> None:
-        output = f"[{self.source_id}] to [{self.target1_id}]"
+        output = ""
+        if(index != -1):
+            output = str(index) + ": "
+        output += f"[{self.source_id}] to [{self.target1_id}]"
         if(self.target2_id != None):
             output += f" and [{self.target2_id}]"
         print(output)
@@ -79,14 +84,13 @@ class Move_temp:
         self.target2_y = target2_y
 
     def print_move(self, index = -1) -> None:
-        output = f"[{self.source_x}][{self.source_y}] to [{self.target1_x}][{self.target1_y}]"
-        if(self.target2_x != None):
-            output += f" and [{self.target2_x}][{self.target2_y}]"
+        output = ""
+        if(index != -1):
+            output = str(index) + ": "
+        output += f"[{self.source_id}] to [{self.target1_id}]"
+        if(self.target2_id != None):
+            output += f" and [{self.target2_id}]"
         print(output)
-        # if(index <= 0):
-        #     print(f"[{self.source_x}][{self.source_y}] to [{self.target1_x}][{self.target1_y}]")
-        # else:
-        #     print(f"{index}. [{self.source_x}][{self.source_y}] to [{self.target1_x}][{self.target1_y}]")
 
 class Piece():
     def __init__(self, id, color: CheckersSquare, king=False) -> None:
@@ -112,17 +116,13 @@ class Checkers:
                 if(y%2==0 and x%2==1):
                     QuditFlip(5, 0, CheckersSquare.BLACK.value)(self.squares[str(self.convert_xy_to_id(x,y))])
                     QuditFlip(5, 0, CheckersSquare.WHITE.value)(self.squares[str(self.convert_xy_to_id(x,self.num_vertical-1-y))])
-                    # self.board_matrix[y][x].occupant = Piece(CheckersSquare.BLACK)
-                    # self.board_matrix[self.num_vertical-1-y][x].occupant = Piece(CheckersSquare.WHITE)
 
-                elif(y%2!=0 and x%2!=1):
-                    QuditFlip(5, 0, CheckersSquare.BLACK.value)(self.squares[str(self.convert_xy_to_id(x,y))])
-                    QuditFlip(5, 0, CheckersSquare.WHITE.value)(self.squares[str(self.convert_xy_to_id(x,self.num_vertical-1-y))])
-                    # self.board_matrix[y][x].occupant = Piece(CheckersSquare.BLACK)
-                    # self.board_matrix[self.num_vertical-1-y][x].occupant = Piece(CheckersSquare.WHITE)
+                # elif(y%2!=0 and x%2!=1):
+                    # QuditFlip(5, 0, CheckersSquare.BLACK.value)(self.squares[str(self.convert_xy_to_id(x,y))])
+                    # QuditFlip(5, 0, CheckersSquare.WHITE.value)(self.squares[str(self.convert_xy_to_id(x,self.num_vertical-1-y))])
     
     def measure(self) -> None:
-        """Measures all squares on the TicTacToe board.
+        """Measures all squares on the Checkers board.
 
         Once the board is measured, a new board is created
         that is initialized to the measured state.
@@ -348,23 +348,25 @@ class Checkers:
     #         removed_piece_id = self.convert_xy_to_id((int((move.target1_x+move.source_x)/2), int((move.target1_y+move.source_y)/2)))
     #         self.remove_piece(removed_piece_id, opponent_mark)
 
+    # def king(self, id, mark):
+
+    def is_adjacent(self, id1, id2):
+        """
+        Checks if id1 is adjacent to id2 (one of the eight squares surrounding it)
+        Returns true if id1 and id2 are adjacent
+        """
+        x1, y1 = self.convert_id_to_xy(id1)
+        x2, y2 = self.convert_id_to_xy(id2)
+        if(abs(x1-x2) > 1 or abs(y1-y2) > 1):
+            return False
+        return True
+
+
     def classic_move(self, move: Move_id, mark: CheckersSquare):
         # Moving one piece to an empty tile
-        # start_id = self.convert_xy_to_id(move.source_x, move.source_y)
-        # end_id = self.convert_xy_to_id(move.target1_x, move.target1_y)
         CheckersClassicMove(5, 1)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
-            
-    # def classic_take_move(self, move: Move_temp, mark: CheckersSquare):
-    #     # Moving one piece to an empty tile
-    #     start_id = self.convert_xy_to_id(move.source_x, move.source_y)
-    #     end_id = self.convert_xy_to_id(move.target1_x, move.target1_y)
-    #     QuditFlip(5, 0, mark.value)(self.squares[str(end_id)])
-    #     self.remove_piece((move.source_x, move.source_y), mark)
-    #     # if we jump over a piece, we have to remove that piece as well 
-    #     if(abs(move.target1_y-move.source_y) > 1):
-    #         opponent_mark = CheckersSquare.BLACK if mark == CheckersSquare.WHITE else CheckersSquare.WHITE
-    #         removed_piece_id = self.convert_xy_to_id((int((move.target1_x+move.source_x)/2), int((move.target1_y+move.source_y)/2)))
-    #         self.remove_piece(removed_piece_id, opponent_mark)
+        
+
 
     def split_move(self, move: Move_id, mark: CheckersSquare):
         # source_id = self.convert_xy_to_id(move.source_x, move.source_y)
@@ -431,11 +433,13 @@ class GameInterface:
         self.player = CheckersSquare.WHITE
         self.quit = False
         self.highlighted_squares = []
+        self.status = CheckersResult.UNFINISHED
 
     def get_move(self):
         return input(f'Player {self.player.name} to move: ')
 
     def play(self):
+        finished = False
         if(GUI):
             pygame.init()
             # Initialize the screen
@@ -448,7 +452,7 @@ class GameInterface:
         # self.print_board()
         # Clock to control the frame rate
         clock = pygame.time.Clock()
-        while(self.game.result() == CheckersResult.UNFINISHED and not self.quit):
+        while(self.status == CheckersResult.UNFINISHED and not self.quit):
             if(GUI):
                 event = pygame.event.wait()
                 # for event in pygame.event.get():
@@ -465,9 +469,12 @@ class GameInterface:
                 self.draw_board()
                 pygame.display.flip() # needs to be called outside draw function
             else:
-            # exit()
+                legal_moves = self.get_legal_moves()
+                if(len(legal_moves) == 0):
+                    self.status = CheckersResult.DRAW
+                    continue
                 self.print_board()
-                legal_moves = self.print_legal_moves()
+                self.print_legal_moves(legal_moves)
                 move = self.get_move()
                 try:
                     move = int(move)
@@ -480,6 +487,7 @@ class GameInterface:
                 self.game.move(legal_moves[move-1], self.player)
 
                 self.player = CheckersSquare.BLACK if self.player == CheckersSquare.WHITE else CheckersSquare.WHITE
+
     def draw_circle(self, color, x, y, radius, king = False):
         gfxdraw.aacircle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, color)
         gfxdraw.filled_circle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, color)
@@ -539,7 +547,7 @@ class GameInterface:
         return str_board
 
     def get_board(self) -> str:
-        """Returns the Checkers board in ASCII form. Also
+        """Returns the Checkers board in ASCII form. Also returns dictionary with id as key.
         Function take from quantum tiq taq toe"""
         
         results = self.game.board.peek(count=100)
@@ -569,19 +577,25 @@ class GameInterface:
     def get_legal_moves(self) -> list:
         return self.game.calculate_possible_moves(self.player)
 
-    def print_legal_moves(self) -> list:
+    def print_legal_moves(self, legal_moves = None) -> list:
         """
         Prints all legal moves the current player can do
         """
         index = 1 # Start counter at 1
-        legal_moves = self.get_legal_moves()
+        if(legal_moves == None):
+            legal_moves = self.get_legal_moves()
         for i in legal_moves:
             i.print_move(index)
             index += 1
         return legal_moves
 
 def main():
-    game = GameInterface(Checkers(num_vertical=5, num_horizontal=5, num_vertical_pieces=2))
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--num_rows', help='The number of rows of the checkboard', default=5)
+    parser.add_argument('--num_columns', help='The number of columns of the checkboard', default=5)
+    parser.add_argument('--num_vertical_pieces', help='The number of rows that are filled with checkerpieces', default=1)
+    args = parser.parse_args()
+    game = GameInterface(Checkers(num_vertical=args.num_rows, num_horizontal=args.num_columns, num_vertical_pieces=args.num_vertical_pieces))
     game.play()
 
 if __name__ == "__main__":
