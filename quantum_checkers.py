@@ -354,17 +354,25 @@ class Checkers:
         """
         Checks if id1 is adjacent to id2 (one of the eight squares surrounding it)
         Returns true if id1 and id2 are adjacent
+        Returns false and the jumped over id if id1 and id2 are not adjacent
         """
+        if(id1 < 0 or id1 > self.num_horizontal*self.num_vertical-1 or id2 < 0 or id2 > self.num_horizontal*self.num_vertical-1):
+            return False
         x1, y1 = self.convert_id_to_xy(id1)
         x2, y2 = self.convert_id_to_xy(id2)
         if(abs(x1-x2) > 1 or abs(y1-y2) > 1):
-            return False
-        return True
+            if(abs(x1-x2) == 2 and abs(y1-y2) == 2):
+                return False, self.convert_xy_to_id(max(x1, x2)-1, max(y1, y2)-1)
+            return False, None
+        return True, None
 
 
     def classic_move(self, move: Move_id, mark: CheckersSquare):
         # Moving one piece to an empty tile
         CheckersClassicMove(5, 1)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
+        is_adjacent, jumped_id = self.is_adjacent(move.source_id, move.target1_id)
+        if(not is_adjacent): # if ids are not adjacent we jumped over a piece
+            jumped_id = 2
         
 
 
@@ -439,7 +447,6 @@ class GameInterface:
         return input(f'Player {self.player.name} to move: ')
 
     def play(self):
-        finished = False
         if(GUI):
             pygame.init()
             # Initialize the screen
