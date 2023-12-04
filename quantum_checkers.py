@@ -223,6 +223,7 @@ class Checkers:
             target1_id = self.convert_xy_to_id(move.target1_x, move.target1_y)
             target2_id = None
             if(move.target2_x != None):
+                print(move.target2_x, move.target2_y)
                 target2_id = self.convert_xy_to_id(move.target2_x, move.target2_y)
 
             # CLASSICAL MOVE    
@@ -237,6 +238,7 @@ class Checkers:
                 # jump2_x = move.target1_x+(move.target2_x-move.source_x)
                 # jump1_id = self.convert_xy_to_id(jump1_x, jump1_y)
                 # jump2_id = self.convert_xy_to_id(jump2_x, jump2_y)
+                print(target2_id)
                 legal_moves.append(Move_id(source_id, target1_id, target2_id))
             
             # CLASSICAL TAKE MOVE
@@ -283,7 +285,7 @@ class Checkers:
                 blind_moves.append(Move_temp(x,y,x+1,y+1))
                 right = True
             if(left and right):
-                blind_moves.append(Move_temp(x,y,x-1,y-1,x+1,y-1))
+                blind_moves.append(Move_temp(x,y,x-1,y+1,x+1,y+1))
         else: # King piece that can move in all for directions
             bottom_left, bottom_right, top_left, top_right = False, False, False, False
             if(self.on_board(x-1, y-1)):
