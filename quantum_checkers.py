@@ -58,7 +58,7 @@ def _histogram(num_vertical, num_horizontal, results: List[List[CheckersSquare]]
 
 class Move_id:
     """
-    Unused at the moment
+    Logic for doing moves using ids
     """
     def __init__(self, source_id: int, target1_id: int, target2_id: int = None) -> None:
         self.source_id = source_id
@@ -114,12 +114,11 @@ class Checkers:
         for y in range(num_vertical_pieces):
             for x in range(self.num_horizontal):
                 if(y%2==0 and x%2==1):
-                    # QuditFlip(5, 0, CheckersSquare.BLACK.value)(self.squares[str(self.convert_xy_to_id(x,y))])
+                    QuditFlip(5, 0, CheckersSquare.BLACK.value)(self.squares[str(self.convert_xy_to_id(x,y))])
                     QuditFlip(5, 0, CheckersSquare.WHITE.value)(self.squares[str(self.convert_xy_to_id(x,self.num_vertical-1-y))])
-
-                # elif(y%2!=0 and x%2!=1):
-                    # QuditFlip(5, 0, CheckersSquare.BLACK.value)(self.squares[str(self.convert_xy_to_id(x,y))])
-                    # QuditFlip(5, 0, CheckersSquare.WHITE.value)(self.squares[str(self.convert_xy_to_id(x,self.num_vertical-1-y))])
+                elif(y%2!=0 and x%2!=1):
+                    QuditFlip(5, 0, CheckersSquare.BLACK.value)(self.squares[str(self.convert_xy_to_id(x,y))])
+                    QuditFlip(5, 0, CheckersSquare.WHITE.value)(self.squares[str(self.convert_xy_to_id(x,self.num_vertical-1-y))])
     
     def measure(self) -> None:
         """Measures all squares on the Checkers board.
@@ -371,15 +370,21 @@ class Checkers:
             return False, None
         return True, None
 
-
-
     def classic_move(self, move: Move_id, mark: CheckersSquare):
-        # Moving one piece to an empty tile
+        """
+        This function moves a piece from one square to another. If it jumps over a piece it also removes this piece.
+        It also measures the piece itself or the piece it is taking if it is relevant.
+        """
         is_adjacent, jumped_id = self.is_adjacent(move.source_id, move.target1_id)
         if(not is_adjacent): # if ids are not adjacent we jumped over a piece and need to remove it
+            # First check if the piece we are using is actually there
+            self.board.pop(objects=[self.squares[str(move.source_id)]])
+            peek = (self.board.peek(objects=[self.squares[str(move.source_id)]]))
+            if(peek[0][0] == CheckersSquare.EMPTY): # If the piece is not there, turn is wasted
+                return
+
             self.board.pop(objects=[self.squares[str(jumped_id)]])
             peek = (self.board.peek(objects=[self.squares[str(jumped_id)]])) # peek returns double list of all object peeked. For one object that looks like [[<CheckersSquare.WHITE: 1>]]
-
             if(peek[0][0] != CheckersSquare.EMPTY): # if it is not empty we can take the piece
                 CheckersClassicMove(5, 1)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
                 self.remove_piece(jumped_id, peek[0][0])
@@ -625,3 +630,4 @@ if __name__ == "__main__":
 
 #TODO: Toevoegen dat je meerdere stukken achter kan slaan
 #TODO: fixen dat stuk niet geslagen worden nadat het gelezen wordt.
+#TODO: if piece is in superposition behind another piece, add the possibilty to take the piece
