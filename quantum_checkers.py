@@ -349,7 +349,12 @@ class Checkers:
     #         removed_piece_id = self.convert_xy_to_id((int((move.target1_x+move.source_x)/2), int((move.target1_y+move.source_y)/2)))
     #         self.remove_piece(removed_piece_id, opponent_mark)
 
-    # def king(self, id, mark):
+    def king(self, id, mark):
+        if(mark == CheckersSquare.WHITE):
+            QuditFlip(5, mark.value, CheckersSquare.WHITE_KING.value)(self.squares[str(id)])
+        elif(mark == CheckersSquare.BLACK):
+            QuditFlip(5, mark.value, CheckersSquare.BLACK_KING.value)(self.squares[str(id)])
+        return
 
     def is_adjacent(self, id1, id2):
         """
@@ -368,6 +373,7 @@ class Checkers:
         return True, None
 
 
+
     def classic_move(self, move: Move_id, mark: CheckersSquare):
         # Moving one piece to an empty tile
         is_adjacent, jumped_id = self.is_adjacent(move.source_id, move.target1_id)
@@ -377,12 +383,11 @@ class Checkers:
 
             if(peek[0][0] != CheckersSquare.EMPTY): # if it is not empty we can take the piece
                 CheckersClassicMove(5, 1)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
-                self.remove_piece(jumped_id, mark)
+                
+                self.remove_piece(jumped_id, peek[0][0])
         else: # not a jump
             CheckersClassicMove(5, 1)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
             
-
-
     def split_move(self, move: Move_id, mark: CheckersSquare):
         # source_id = self.convert_xy_to_id(move.source_x, move.source_y)
         # target1_id = self.convert_xy_to_id(move.target1_x, move.target1_y)
@@ -616,3 +621,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+#TODO: Toevoegen dat je meerdere stukken achter kan slaan
+#TODO: fixen dat stuk niet geslagen worden nadat het gelezen wordt.
