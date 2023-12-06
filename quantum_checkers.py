@@ -255,7 +255,7 @@ class Checkers:
             return legal_take_moves
         return legal_moves
     
-    def calculate_blind_moves(self, id, player):
+    def calculate_blind_moves(self, id: int, player):
         """
         For the piece in id, that belongs to player, calculate all 'possible' moves ignoring other pieces, but checking for boundaries of the board
         Important: Assumes there is a piece in the position of the id that belongs to the current player
@@ -349,7 +349,7 @@ class Checkers:
     #         removed_piece_id = self.convert_xy_to_id((int((move.target1_x+move.source_x)/2), int((move.target1_y+move.source_y)/2)))
     #         self.remove_piece(removed_piece_id, opponent_mark)
 
-    def king(self, id, mark):
+    def king(self, id: int, mark):
         if(mark == CheckersSquare.WHITE):
             QuditFlip(5, mark.value, CheckersSquare.WHITE_KING.value)(self.squares[str(id)])
         elif(mark == CheckersSquare.BLACK):
@@ -383,10 +383,11 @@ class Checkers:
 
             if(peek[0][0] != CheckersSquare.EMPTY): # if it is not empty we can take the piece
                 CheckersClassicMove(5, 1)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
-                
                 self.remove_piece(jumped_id, peek[0][0])
         else: # not a jump
             CheckersClassicMove(5, 1)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
+        if(move.target1_id <= self.num_vertical-1 or move.target1_id >= self.num_horizontal*self.num_vertical-self.num_vertical):
+                self.king(move.target1_id, mark)
             
     def split_move(self, move: Move_id, mark: CheckersSquare):
         # source_id = self.convert_xy_to_id(move.source_x, move.source_y)
