@@ -111,11 +111,10 @@ class Checkers:
         # Initialize empty board
         self.clear(run_on_hardware)
         # Add initial pieces to board
-        QuditFlip(5, 0, CheckersSquare.WHITE.value)(self.squares[str(11)]) # TODO: REMOVE
         for y in range(num_vertical_pieces):
             for x in range(self.num_horizontal):
                 if(y%2==0 and x%2==1):
-                    QuditFlip(5, 0, CheckersSquare.BLACK.value)(self.squares[str(self.convert_xy_to_id(x,y))])
+                    # QuditFlip(5, 0, CheckersSquare.BLACK.value)(self.squares[str(self.convert_xy_to_id(x,y))])
                     QuditFlip(5, 0, CheckersSquare.WHITE.value)(self.squares[str(self.convert_xy_to_id(x,self.num_vertical-1-y))])
 
                 # elif(y%2!=0 and x%2!=1):
@@ -403,7 +402,10 @@ class Checkers:
             CheckersSplit(mark, self.rules)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)], self.squares[str(move.target2_id)])
         else:
             CheckersSplit(mark, self.rules)(self.squares[str(move.source_id)], self.squares[str(move.target2_id)], self.squares[str(move.target1_id)])
-            
+        if(move.target1_id <= self.num_vertical-1 or move.target1_id >= self.num_horizontal*self.num_vertical-self.num_vertical):
+            self.king(move.target1_id, mark)
+            self.king(move.target2_id, mark)
+
     def remove_piece(self, id: int or (int,int), mark: CheckersSquare):
         if(type(id) is tuple):
             id = self.convert_xy_to_id(id[0], id[1])
@@ -460,8 +462,6 @@ class GameInterface:
         return input(f'Player {self.player.name} to move: ')
 
     def play(self):
-        temp = Move_id(11, 5, 7)
-        self.game.split_move(temp, CheckersSquare.WHITE)
         if(GUI):
             pygame.init()
             # Initialize the screen
