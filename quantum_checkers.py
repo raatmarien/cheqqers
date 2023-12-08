@@ -664,3 +664,4 @@ if __name__ == "__main__":
 #TODO: if piece is in superposition behind another piece, add the possibilty to take the piece
 #TODO: Fix dat king pieces niet zichzelf in superpositie kunnen zetten
 #TODO: entanglement messes with everything -> 3, 3, 4, 4, 4
+#TODO: Push this
