@@ -181,7 +181,7 @@ class Checkers:
         player_ids and opponent_ids contain the ids of the current player and other player
         Returns 2 2d list that contain normal ids and king ids
         """
-        results = self.board.peek(count=100)
+        results = self.board.peek(count=1)
         hist = _histogram(self.num_vertical, self.num_horizontal,
             [
                 [CheckersSquare.from_result(square) for square in result]
@@ -663,3 +663,4 @@ if __name__ == "__main__":
 #TODO: fixen dat stuk niet geslagen worden nadat het gelezen wordt.
 #TODO: if piece is in superposition behind another piece, add the possibilty to take the piece
 #TODO: Fix dat king pieces niet zichzelf in superpositie kunnen zetten
+#TODO: entanglement messes with everything -> 3, 3, 4, 4, 4

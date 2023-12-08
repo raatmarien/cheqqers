@@ -1,0 +1,84 @@
+ERROR 1
+Traceback (most recent call last):
+  File ".\quantum_checkers.py", line 666, in <module>
+    main()
+  File ".\quantum_checkers.py", line 663, in main
+    game.play()
+  File ".\quantum_checkers.py", line 536, in play
+    legal_moves = self.get_legal_moves()
+  File ".\quantum_checkers.py", line 642, in get_legal_moves
+    return self.game.calculate_possible_moves(self.player)
+  File ".\quantum_checkers.py", line 220, in calculate_possible_moves
+    player_ids, opponent_ids = self.get_positions(player)
+  File ".\quantum_checkers.py", line 184, in get_positions
+    results = self.board.peek(count=100)
+  File "C:\Users\Luuk\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\LocalCache\local-packages\Python37\site-packages\unitary\alpha\quantum_world.py", line 383, in peek
+    results = self.sampler.run(measure_circuit, repetitions=num_reps)
+  File "C:\Users\Luuk\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\LocalCache\local-packages\Python37\site-packages\cirq\work\sampler.py", line 63, in 
+run
+    return self.run_sweep(program, param_resolver, repetitions)[0]
+  File "C:\Users\Luuk\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\LocalCache\local-packages\Python37\site-packages\cirq\sim\simulator.py", line 72, in run_sweep
+    return list(self.run_sweep_iter(program, params, repetitions))
+  File "C:\Users\Luuk\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\LocalCache\local-packages\Python37\site-packages\cirq\sim\simulator.py", line 104, in run_sweep_iter
+    circuit=program, param_resolver=param_resolver, repetitions=repetitions
+  File "C:\Users\Luuk\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\LocalCache\local-packages\Python37\site-packages\cirq\sim\simulator_base.py", line 245, in _run
+    for step_result in self._core_iterator(circuit=prefix, sim_state=sim_state):
+  File "C:\Users\Luuk\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\LocalCache\local-packages\Python37\site-packages\cirq\sim\simulator_base.py", line 220, in _core_iterator
+    protocols.act_on(op, sim_state)
+  File "C:\Users\Luuk\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\LocalCache\local-packages\Python37\site-packages\cirq\protocols\act_on_protocol.py", line 153, in act_on
+    result = arg_fallback(action, qubits=qubits, allow_decompose=allow_decompose)
+  File "C:\Users\Luuk\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\LocalCache\local-packages\Python37\site-packages\cirq\sim\simulation_product_state.py", line 109, in _act_on_fallback_
+    op_args_opt = op_args_opt.kronecker_product(self.sim_states[q])
+  File "C:\Users\Luuk\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\LocalCache\local-packages\Python37\site-packages\cirq\sim\simulation_state.py", line 172, in kronecker_product
+    args._state = self._state.kron(other._state)
+  File "C:\Users\Luuk\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\LocalCache\local-packages\Python37\site-packages\cirq\sim\state_vector_simulation_state.py", line 109, in kron
+    self._state_vector, other._state_vector
+  File "C:\Users\Luuk\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\LocalCache\local-packages\Python37\site-packages\cirq\linalg\transformations.py", line 608, in state_vector_kronecker_product
+    return np.outer(t1, t2).reshape(t1.shape + t2.shape)
+  File "<__array_function__ internals>", line 6, in outer
+  File "C:\Users\Luuk\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\LocalCache\local-packages\Python37\site-packages\numpy\core\numeric.py", line 936, in outer
+    return multiply(a.ravel()[:, newaxis], b.ravel()[newaxis, :], out)
+numpy.core._exceptions.MemoryError: Unable to allocate 45.5 GiB for an array with shape (3125, 1953125) and data type complex64
+
+
+ERROR 2
+Traceback (most recent call last):
+  File ".\quantum_checkers.py", line 660, in <module>
+    main()
+  File ".\quantum_checkers.py", line 657, in main
+    game.play()
+  File ".\quantum_checkers.py", line 530, in play
+    legal_moves = self.get_legal_moves()
+  File ".\quantum_checkers.py", line 636, in get_legal_moves
+    return self.game.calculate_possible_moves(self.player)
+  File ".\quantum_checkers.py", line 219, in calculate_possible_moves
+    player_ids, opponent_ids = self.get_positions(player)
+  File ".\quantum_checkers.py", line 184, in get_positions
+    results = self.board.peek(count=100)
+  File "C:\Users\Luuk\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\LocalCache\local-packages\Python37\site-packages\unitary\alpha\quantum_world.py", line 383, in peek
+    results = self.sampler.run(measure_circuit, repetitions=num_reps)
+  File "C:\Users\Luuk\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\LocalCache\local-packages\Python37\site-packages\cirq\work\sampler.py", line 63, in run  
+    return self.run_sweep(program, param_resolver, repetitions)[0]
+  File "C:\Users\Luuk\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\LocalCache\local-packages\Python37\site-packages\cirq\sim\simulator.py", line 72, in run_sweep
+    return list(self.run_sweep_iter(program, params, repetitions))
+  File "C:\Users\Luuk\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\LocalCache\local-packages\Python37\site-packages\cirq\sim\simulator.py", line 104, in run_sweep_iter
+    circuit=program, param_resolver=param_resolver, repetitions=repetitions
+  File "C:\Users\Luuk\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\LocalCache\local-packages\Python37\site-packages\cirq\sim\simulator_base.py", line 245, in _run
+    for step_result in self._core_iterator(circuit=prefix, sim_state=sim_state):
+  File "C:\Users\Luuk\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\LocalCache\local-packages\Python37\site-packages\cirq\sim\simulator_base.py", line 220, in _core_iterator
+    protocols.act_on(op, sim_state)
+  File "C:\Users\Luuk\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\LocalCache\local-packages\Python37\site-packages\cirq\protocols\act_on_protocol.py", line 153, in act_on
+    result = arg_fallback(action, qubits=qubits, allow_decompose=allow_decompose)
+  File "C:\Users\Luuk\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\LocalCache\local-packages\Python37\site-packages\cirq\sim\simulation_product_state.py", line 109, in _act_on_fallback_
+    op_args_opt = op_args_opt.kronecker_product(self.sim_states[q])
+  File "C:\Users\Luuk\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\LocalCache\local-packages\Python37\site-packages\cirq\sim\simulation_state.py", line 172, in kronecker_product
+    args._state = self._state.kron(other._state)
+  File "C:\Users\Luuk\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\LocalCache\local-packages\Python37\site-packages\cirq\sim\state_vector_simulation_state.py", line 109, in kron
+    self._state_vector, other._state_vector
+  File "C:\Users\Luuk\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\LocalCache\local-packages\Python37\site-packages\cirq\linalg\transformations.py", line 608, in state_vector_kronecker_product
+    return np.outer(t1, t2).reshape(t1.shape + t2.shape)
+  File "<__array_function__ internals>", line 6, in outer
+  File "C:\Users\Luuk\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\LocalCache\local-packages\Python37\site-packages\numpy\core\numeric.py", line 936, in outer
+    return multiply(a.ravel()[:, newaxis], b.ravel()[newaxis, :], out)
+numpy.core._exceptions.MemoryError: Unable to allocate 45.5 GiB for an array with shape (9765625, 625) and data type complex64
+PS C:\Users\Luuk\Desktop\School map master\Master Scriptie\quantum_checkers> 
