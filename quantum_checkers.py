@@ -219,10 +219,14 @@ class Checkers:
         player_ids, opponent_ids = self.get_positions(player)
         blind_moves = []
         for id in player_ids[0]: #all normal ids
-            print(player_ids[0])
             blind_moves += self.calculate_blind_moves(id, player)
         for id in player_ids[1]:
             blind_moves += self.calculate_blind_moves(id, king_player)
+        
+        # Append all ids to one list'
+        player_ids = player_ids[0] + player_ids[1]
+        opponent_ids = opponent_ids[0] + opponent_ids[1]
+
         for move in blind_moves:
             # For each move check if there is a piece in the position
             # If it is empty it is a legal move
@@ -658,4 +662,4 @@ if __name__ == "__main__":
 #TODO: Toevoegen dat je meerdere stukken achter kan slaan
 #TODO: fixen dat stuk niet geslagen worden nadat het gelezen wordt.
 #TODO: if piece is in superposition behind another piece, add the possibilty to take the piece
-#TODO: fixen dat king pieces niet terug kunnen bewegen
+#TODO: Fix dat king pieces niet zichzelf in superpositie kunnen zetten
