@@ -177,8 +177,9 @@ class Checkers:
 
     def get_positions(self, player):
         """
-        Returns player_ids: list, opponent_ids: list
-        player_ids and opponent_ids contain the ids
+        Returns player_ids: [list, list], opponent_ids: [list, list]
+        player_ids and opponent_ids contain the ids of the current player and other player
+        Returns 2 2d list that contain normal ids and king ids
         """
         results = self.board.peek(count=100)
         hist = _histogram(self.num_vertical, self.num_horizontal,
@@ -188,30 +189,40 @@ class Checkers:
             ]
         )
         white_ids = []
+        white_king_ids = []
         black_ids = []
+        black_king_ids = []
         for id in range(self.num_vertical*self.num_horizontal):
             for mark in (CheckersSquare.BLACK, CheckersSquare.WHITE, CheckersSquare.WHITE_KING, CheckersSquare.BLACK_KING):
                 if(hist[id][mark] != 0): # For the current player (white or black). Check both for entanglement (if that will be implemented)
-                    if(mark == CheckersSquare.WHITE or mark == CheckersSquare.WHITE_KING):
+                    if(mark == CheckersSquare.WHITE):
                         white_ids.append(id)
-                    if(mark == CheckersSquare.BLACK or mark == CheckersSquare.BLACK_KING):
+                    if(mark == CheckersSquare.WHITE_KING):
+                        white_king_ids.append(id)
+                    if(mark == CheckersSquare.BLACK):
                         black_ids.append(id)
+                    if(mark == CheckersSquare.BLACK_KING):
+                        black_king_ids.append(id)
         if(player == CheckersSquare.WHITE):
-            return white_ids, black_ids
+            return [white_ids, white_king_ids], [black_ids, black_king_ids]
         else:
-            return black_ids, white_ids
+            return [black_ids, black_king_ids], [white_ids, white_king_ids]
 
     def calculate_possible_moves(self, player: CheckersSquare) -> list:
         """
         Calculates all possible moves for 'player'
         Loop over all pieces, if there is a chance that there is a piece in the right color calculate legal moves for that piece
         """
+        king_player = CheckersSquare.WHITE_KING if player == CheckersSquare.WHITE else CheckersSquare.BLACK_KING
         legal_moves = [] # All legal moves
         legal_take_moves = [] # Only the moves which can take another player
         player_ids, opponent_ids = self.get_positions(player)
         blind_moves = []
-        for id in player_ids:
+        for id in player_ids[0]: #all normal ids
+            print(player_ids[0])
             blind_moves += self.calculate_blind_moves(id, player)
+        for id in player_ids[1]:
+            blind_moves += self.calculate_blind_moves(id, king_player)
         for move in blind_moves:
             # For each move check if there is a piece in the position
             # If it is empty it is a legal move
@@ -370,6 +381,19 @@ class Checkers:
             return False, None
         return True, None
 
+    def can_take_piece(self, id):
+        """
+        For a specific ID, checks if it can take pieces. Used for checking if you can take another piece after taking a piece
+        """
+        jump_y = move.target1_y+(move.target1_y-move.source_y)
+        jump_x = move.target1_x+(move.target1_x-move.source_x)
+        jump_id = self.convert_xy_to_id(jump_x, jump_y)
+        if(self.on_board(jump_x, jump_y) and jump_id not in (player_ids+opponent_ids)): # we can jump over if the coordinates are on the board and the piece is empty
+            # legal_moves.append(Move_temp(move.source_x, move.source_y, jump_x, jump_y))
+            legal_moves.append(Move_id(source_id, jump_id))
+            # legal_take_moves.append(Move_temp(move.source_x, move.source_y, jump_x, jump_y))
+            legal_take_moves.append(Move_id(source_id, jump_id))
+
     def classic_move(self, move: Move_id, mark: CheckersSquare):
         """
         This function moves a piece from one square to another. If it jumps over a piece it also removes this piece.
@@ -392,6 +416,9 @@ class Checkers:
             CheckersClassicMove(5, 1)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
         if(move.target1_id <= self.num_vertical-1 or move.target1_id >= self.num_horizontal*self.num_vertical-self.num_vertical):
                 self.king(move.target1_id, mark)
+        
+        # Check if you can take another piece
+
             
     def split_move(self, move: Move_id, mark: CheckersSquare):
         # source_id = self.convert_xy_to_id(move.source_x, move.source_y)
@@ -631,3 +658,4 @@ if __name__ == "__main__":
 #TODO: Toevoegen dat je meerdere stukken achter kan slaan
 #TODO: fixen dat stuk niet geslagen worden nadat het gelezen wordt.
 #TODO: if piece is in superposition behind another piece, add the possibilty to take the piece
+#TODO: fixen dat king pieces niet terug kunnen bewegen
