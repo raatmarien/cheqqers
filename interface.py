@@ -167,6 +167,9 @@ class GameInterface:
     def get_legal_moves(self) -> list:
         return self.game.calculate_possible_moves(self.player)
 
+    # def print_move():
+
+
     def print_legal_moves(self, legal_moves = None) -> list:
         """
         Prints all legal moves the current player can do
@@ -174,8 +177,15 @@ class GameInterface:
         index = 1 # Start counter at 1
         if(legal_moves == None):
             legal_moves = self.get_legal_moves()
-        print(legal_moves)
-        for i in legal_moves:
-            i.print_move(index)
-            index += 1
+        # print(legal_moves)
+        for key, value in legal_moves.items():
+            if(type(value) == list and len(value) > 1):
+                print(f"{str(index)}: [{key}] to [{value[0]}]")
+                index += 1
+                print(f"{str(index)}: [{key}] to [{value[1]}]")
+                index+=1
+                print(f"{str(index)}: [{key}] to [{value[0]}] and [{value[1]}]")
+            else:
+                print(f"{str(index)}: [{key}] to [{value[0]}]")
+            index +=1
         return legal_moves
