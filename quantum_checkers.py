@@ -253,7 +253,7 @@ class Checkers:
                         legal_moves[source_id] = [jump_id]
                     else:
                         legal_moves[source_id].append(jump_id)
-                    legal_take_moves.append(Move_id(source_id, jump_id))
+                    # legal_take_moves.append(Move_id(source_id, jump_id))
                     if(source_id not in legal_take_moves):
                         legal_take_moves[source_id] = [jump_id]
                     else:
