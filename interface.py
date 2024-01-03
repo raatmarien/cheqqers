@@ -1,4 +1,4 @@
-from quantum_checkers import Checkers
+from quantum_checkers import Checkers, Move_id
 import pygame
 from enums import (
     CheckersResult,
@@ -82,7 +82,7 @@ class GameInterface:
                 pygame.display.flip() # needs to be called outside draw function
             else:
                 self.print_board()
-                self.print_legal_moves(legal_moves)
+                legal_moves = self.print_legal_moves(legal_moves) # Changes legal moves
                 move = self.get_move()
                 try:
                     move = int(move)
@@ -174,6 +174,7 @@ class GameInterface:
         """
         Prints all legal moves the current player can do
         """
+        legal_moves_list = []
         index = 1 # Start counter at 1
         if(legal_moves == None):
             legal_moves = self.get_legal_moves()
@@ -181,11 +182,15 @@ class GameInterface:
         for key, value in legal_moves.items():
             if(type(value) == list and len(value) > 1):
                 print(f"{str(index)}: [{key}] to [{value[0]}]")
+                legal_moves_list.append(Move_id(source_id=key, target1_id=value[0]))
                 index += 1
                 print(f"{str(index)}: [{key}] to [{value[1]}]")
+                legal_moves_list.append(Move_id(source_id=key, target1_id=value[1]))
                 index+=1
                 print(f"{str(index)}: [{key}] to [{value[0]}] and [{value[1]}]")
+                legal_moves_list.append(Move_id(source_id=key, target1_id=value[0], target2_id=value[1]))
             else:
                 print(f"{str(index)}: [{key}] to [{value[0]}]")
+                legal_moves_list.append(Move_id(source_id=key, target1_id=value[0]))
             index +=1
-        return legal_moves
+        return legal_moves_list
