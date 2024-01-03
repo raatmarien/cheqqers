@@ -25,6 +25,7 @@ BLACK = (0, 0, 0)
 GREY = (51,51,51)
 DARK_BROWN = (145,94,42)
 LIGHT_BROWN = (231,203,175)
+YELLOW = (230,225,7)
 L_RED = (221, 0, 0)
 RED = (180,2,1)
 BLUE = (0, 0, 255)
@@ -58,6 +59,11 @@ class GameInterface:
         pygame.display.set_caption("Quantum Checkers")
         # Clock to control the frame rate
         clock = pygame.time.Clock()
+
+    def highlight_squares(self, moves_dict):
+        for key, value in moves_dict.items():
+            self.highlighted_squares.append(key)
+
         
     def play(self):
         while(self.status == CheckersResult.UNFINISHED and not self.quit):
@@ -67,6 +73,7 @@ class GameInterface:
                 self.status = CheckersResult.DRAW
                 continue
             if(self.GUI):
+                self.highlight_squares(legal_moves)
                 event = pygame.event.wait()
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -82,7 +89,7 @@ class GameInterface:
                 pygame.display.flip() # needs to be called outside draw function
             else:
                 self.print_board()
-                legal_moves = self.print_legal_moves(legal_moves) # Changes legal moves
+                legal_moves = self.print_legal_moves(legal_moves) # Changes legal moves to be a list of Move classes for selecting a move
                 move = self.get_move()
                 try:
                     move = int(move)
@@ -95,15 +102,25 @@ class GameInterface:
                 self.game.move(legal_moves[move-1], self.player)
                 self.player = CheckersSquare.BLACK if self.player == CheckersSquare.WHITE else CheckersSquare.WHITE
 
-    def draw_circle(self, color, x, y, radius, king = False):
+    def draw_circle(self, color, x, y, radius, king = False, highlited = False):
         if(color == RED):
-            gfxdraw.filled_circle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, RED)
-            gfxdraw.filled_circle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius-int(radius*0.1), L_RED)
-            gfxdraw.aacircle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, RED)
+            if(highlited):
+                highlight_color = YELLOW
+            else:
+                highlight_color = RED
+            gfxdraw.filled_circle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, highlight_color)
+            gfxdraw.filled_circle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius-int(radius*0.15), L_RED)
+            gfxdraw.aacircle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius-int(radius*0.15), L_RED)
+            gfxdraw.aacircle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, highlight_color)
         else:
-            gfxdraw.filled_circle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, BLACK)
-            gfxdraw.filled_circle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius-int(radius**0.1), GREY)
-            gfxdraw.aacircle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, BLACK)
+            if(highlited):
+                highlight_color = YELLOW
+            else:
+                highlight_color = BLACK
+            gfxdraw.filled_circle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, highlight_color)
+            gfxdraw.filled_circle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius-int(radius*0.15), GREY)
+            gfxdraw.aacircle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius-int(radius*0.15), GREY)
+            gfxdraw.aacircle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, highlight_color)
         if(king):
             c = CROWN_IMG.get_rect(center=(x+SQUARE_W//2, y+SQUARE_H//2)) # centers the image
             self.screen.blit(CROWN_IMG, c)
@@ -120,14 +137,15 @@ class GameInterface:
             screen_y = y * SQUARE_H
             color = LIGHT_BROWN if (id) % 2 == 0 else DARK_BROWN
             pygame.draw.rect(self.screen, color, (screen_x, screen_y, SQUARE_W, SQUARE_H))
+            highlight=True if (id in self.highlighted_squares) else False
             if(str(id) in black_pieces):
                 # pygame.draw.circle(self.screen, RED, (screen_x+SQUARE_W//2, screen_y+SQUARE_H//2), int(SQUARE_W-0.15*SQUARE_W)//2)
-                self.draw_circle(RED, screen_x, screen_y, int(SQUARE_W-0.15*SQUARE_W)//2, black_pieces[str(id)].king)
+                self.draw_circle(RED, screen_x, screen_y, int(SQUARE_W-0.15*SQUARE_W)//2, black_pieces[str(id)].king, highlight)
             elif(str(id) in white_pieces):
-                self.draw_circle(GREY, screen_x, screen_y, int(SQUARE_W-0.15*SQUARE_W)//2, white_pieces[str(id)].king)
-            if(id in self.highlighted_squares):
-                pygame.gfxdraw.rectangle(self.screen, (screen_x, screen_y, SQUARE_W, SQUARE_H), BLUE)
-                self.draw_circle(BLUE, screen_x, screen_y, int(SQUARE_W-0.15*SQUARE_W)//2, white_pieces[str(id)].king)
+                self.draw_circle(GREY, screen_x, screen_y, int(SQUARE_W-0.15*SQUARE_W)//2, white_pieces[str(id)].king, highlight)
+            # if(id in self.highlighted_squares):
+            #     pygame.gfxdraw.rectangle(self.screen, (screen_x, screen_y, SQUARE_W, SQUARE_H), BLUE)
+            #     self.draw_circle(BLUE, screen_x, screen_y, int(SQUARE_W-0.15*SQUARE_W)//2, white_pieces[str(id)].king)
             # pygame.display.flip()
             # pygame.display.update()
 

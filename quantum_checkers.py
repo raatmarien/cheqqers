@@ -205,8 +205,6 @@ class Checkers:
         opponent_ids = opponent_ids[0] + opponent_ids[1]
 
         for move in blind_moves:
-            print(move)
-            print(legal_moves)
             # For each move check if there is a piece in the position
             # If it is empty it is a legal move
             # If there is another piece, check if it is a different color than your own color
@@ -506,9 +504,6 @@ class Checkers:
         # else:
         #     return(CheckersResult.UNFINISHED)
         
-    # def do_move(self, move: Move_temp):
-    #     self.board.move_piece(move.source_y, move.source_x, move.target1_y, move.target1_x)
-    #     print(move.source_y, move.source_x, move.target1_y, move.target1_x)
         
 
 
