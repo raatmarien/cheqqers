@@ -372,18 +372,7 @@ class Checkers:
             if y != self.num_vertical-1:
                 output += "--------"*self.num_horizontal + "\n"
         return output, board_list
-    # def move(self, move: Move_temp, mark: CheckersSquare):
-    #     # Moving one piece to an empty tile
-    #     start_id = self.convert_xy_to_id(move.source_x, move.source_y)
-    #     end_id = self.convert_xy_to_id(move.target1_x, move.target1_y)
-    #     QuditFlip(5, 0, mark.value)(self.squares[str(end_id)])
-    #     self.remove_piece((move.source_x, move.source_y), mark)
-    #     # if we jump over a piece, we have to remove that piece as well
-    #     if(abs(move.target1_y-move.source_y) > 1):
-    #         opponent_mark = CheckersSquare.BLACK if mark == CheckersSquare.WHITE else CheckersSquare.WHITE
-    #         removed_piece_id = self.convert_xy_to_id((int((move.target1_x+move.source_x)/2), int((move.target1_y+move.source_y)/2)))
-    #         self.remove_piece(removed_piece_id, opponent_mark)
-
+    
     def king(self, id: int, mark):
         if(mark == CheckersSquare.WHITE):
             QuditFlip(5, mark.value, CheckersSquare.WHITE_KING.value)(self.squares[str(id)])

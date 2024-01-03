@@ -39,12 +39,13 @@ class GameInterface:
         self.quit = False
         self.highlighted_squares = []
         self.status = CheckersResult.UNFINISHED
+        self.selected_id = -1 #Square select by player, used for highlighting and moving pieces
         if(GUI == "True"):
             self.GUI = True
+            self.init_gui()
         else:
             self.GUI = False
-        if(self.GUI):
-            self.init_gui()
+            
 
     def get_move(self):
         return input(f'Player {self.player.name} to move: ')
@@ -60,7 +61,14 @@ class GameInterface:
         # Clock to control the frame rate
         clock = pygame.time.Clock()
 
-    def highlight_squares(self, moves_dict):
+    def highlight_squares(self, moves_dict: dict):
+        poss_moves = moves_dict.get(self.selected_id)
+        if(poss_moves is not None):
+            self.highlighted_squares.append(self.selected_id)
+            for i in poss_moves:
+                self.highlighted_squares.append(i)
+            return
+        # no piece selected that is able to move
         for key, value in moves_dict.items():
             self.highlighted_squares.append(key)
 
@@ -73,20 +81,20 @@ class GameInterface:
                 self.status = CheckersResult.DRAW
                 continue
             if(self.GUI):
-                self.highlight_squares(legal_moves)
-                event = pygame.event.wait()
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit(0)
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    down_pos = event.pos
-                    # self.handle_click(event.pos)
-                if event.type == pygame.MOUSEBUTTONUP:
-                    # Detect swipes for quantum moves
-                    self.handle_click(down_pos, event.pos)
-                # self.print_board()
-                self.draw_board()
-                pygame.display.flip() # needs to be called outside draw function
+                for event in pygame.event.get(): 
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        sys.exit(0)
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        down_pos = event.pos
+                        # self.handle_click(event.pos)
+                    if event.type == pygame.MOUSEBUTTONUP:
+                        # Detect swipes for quantum moves
+                        self.handle_click(down_pos, event.pos)
+                    # self.print_board()
+                    self.highlight_squares(legal_moves)
+                    self.draw_board()
+                    pygame.display.flip() # needs to be called outside draw function
             else:
                 self.print_board()
                 legal_moves = self.print_legal_moves(legal_moves) # Changes legal moves to be a list of Move classes for selecting a move
@@ -126,10 +134,7 @@ class GameInterface:
             self.screen.blit(CROWN_IMG, c)
 
     def draw_board(self):
-        _, pieces = self.game.get_board()
         self.screen.fill(WHITE)
-        # print(self.highlighted_squares)
-        # self.game.get_positions(CheckersSquare.WHITE)
         white_pieces, black_pieces = self.game.get_advanced_positions(CheckersSquare.WHITE)
         for id in range(self.game.num_horizontal*self.game.num_vertical):
             x, y = self.game.convert_id_to_xy(id)
@@ -137,20 +142,16 @@ class GameInterface:
             screen_y = y * SQUARE_H
             color = LIGHT_BROWN if (id) % 2 == 0 else DARK_BROWN
             pygame.draw.rect(self.screen, color, (screen_x, screen_y, SQUARE_W, SQUARE_H))
-            highlight=True if (id in self.highlighted_squares) else False
+            highlight = True if (id in self.highlighted_squares) else False
             if(str(id) in black_pieces):
                 # pygame.draw.circle(self.screen, RED, (screen_x+SQUARE_W//2, screen_y+SQUARE_H//2), int(SQUARE_W-0.15*SQUARE_W)//2)
                 self.draw_circle(RED, screen_x, screen_y, int(SQUARE_W-0.15*SQUARE_W)//2, black_pieces[str(id)].king, highlight)
             elif(str(id) in white_pieces):
                 self.draw_circle(GREY, screen_x, screen_y, int(SQUARE_W-0.15*SQUARE_W)//2, white_pieces[str(id)].king, highlight)
-            # if(id in self.highlighted_squares):
-            #     pygame.gfxdraw.rectangle(self.screen, (screen_x, screen_y, SQUARE_W, SQUARE_H), BLUE)
-            #     self.draw_circle(BLUE, screen_x, screen_y, int(SQUARE_W-0.15*SQUARE_W)//2, white_pieces[str(id)].king)
-            # pygame.display.flip()
-            # pygame.display.update()
-
-            # color = LIGHT_BROWN if (id) % 2 == 0 else DARK_BROWN
-            # pygame.draw.rect(self.screen, color, (col * 75, row * 75, 75, 75))
+            elif(id in self.highlighted_squares): # Highlight squares for where the selected piece can move
+                gfxdraw.circle(self.screen, screen_x+SQUARE_W//2, screen_y+SQUARE_H//2, int(SQUARE_W-0.15*SQUARE_W)//2, WHITE)
+                gfxdraw.aacircle(self.screen, screen_x+SQUARE_W//2, screen_y+SQUARE_H//2, int(SQUARE_W-0.15*SQUARE_W)//2, WHITE)
+            
 
     def get_id_from_mouse_pos(self, x, y):
         x = x // SQUARE_W
@@ -165,9 +166,8 @@ class GameInterface:
         first_id = self.get_id_from_mouse_pos(mouse_x, mouse_y)
         mouse_x, mouse_y = second_pos[0], second_pos[1]
         second_id = self.get_id_from_mouse_pos(mouse_x, mouse_y)
-        print(mouse_x,mouse_y,first_id,second_id)
         if(first_id == second_id): # Select a piece to move
-            self.highlighted_squares.append(first_id)
+            self.selected_id = first_id
             return  
         # Did not select a piece
 
