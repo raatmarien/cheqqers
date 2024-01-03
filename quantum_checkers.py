@@ -158,7 +158,7 @@ class Checkers:
         player_ids and opponent_ids contain the ids of the current player and other player
         Returns 2 2d list that contain normal ids and king ids
         """
-        results = self.board.peek(count=1)
+        results = self.board.peek(count=100)
         hist = _histogram(self.num_vertical, self.num_horizontal,
             [
                 [CheckersSquare.from_result(square) for square in result]
