@@ -191,8 +191,8 @@ class Checkers:
         Loop over all pieces, if there is a chance that there is a piece in the right color calculate legal moves for that piece
         """
         king_player = CheckersSquare.WHITE_KING if player == CheckersSquare.WHITE else CheckersSquare.BLACK_KING
-        legal_moves = [] # All legal moves
-        legal_take_moves = [] # Only the moves which can take another player
+        legal_moves = {} # All legal moves
+        legal_take_moves = {} # Only the moves which can take another player
         player_ids, opponent_ids = self.get_positions(player)
         blind_moves = []
         for id in player_ids[0]: #all normal ids
@@ -218,7 +218,11 @@ class Checkers:
 
             # CLASSICAL MOVE    
             if(target1_id not in player_ids and target1_id not in opponent_ids and target2_id == None): # it is an empty square, so it is possible move there
-               legal_moves.append(Move_id(source_id, target1_id))
+                # legal_moves.append(Move_id(source_id, target1_id))
+                if(source_id not in legal_moves):
+                   legal_moves[source_id] = [target1_id]
+                else:
+                   legal_moves[source_id].append(target1_id)
             
             # QUANTUM SPLIT MOVE
             elif(target1_id not in player_ids and target1_id not in opponent_ids and target2_id not in player_ids and target2_id not in opponent_ids):
@@ -228,18 +232,30 @@ class Checkers:
                 # jump2_x = move.target1_x+(move.target2_x-move.source_x)
                 # jump1_id = self.convert_xy_to_id(jump1_x, jump1_y)
                 # jump2_id = self.convert_xy_to_id(jump2_x, jump2_y)
-                legal_moves.append(Move_id(source_id, target1_id, target2_id))
-            
+                # legal_moves.append(Move_id(source_id, target1_id, target2_id))
+                if(source_id not in legal_moves):
+                   legal_moves[source_id] = [target1_id, target2_id]
+                else:
+                   legal_moves[source_id].append(target1_id)
+                   legal_moves[source_id].append(target2_id)
+
+
             # CLASSICAL TAKE MOVE
             elif(target1_id in opponent_ids and target2_id == None): # There is an opponent in this coordinate, check if we can jump over them
                 jump_y = move.target1_y+(move.target1_y-move.source_y)
                 jump_x = move.target1_x+(move.target1_x-move.source_x)
                 jump_id = self.convert_xy_to_id(jump_x, jump_y)
                 if(self.on_board(jump_x, jump_y) and jump_id not in (player_ids+opponent_ids)): # we can jump over if the coordinates are on the board and the piece is empty
-                    # legal_moves.append(Move_temp(move.source_x, move.source_y, jump_x, jump_y))
-                    legal_moves.append(Move_id(source_id, jump_id))
-                    # legal_take_moves.append(Move_temp(move.source_x, move.source_y, jump_x, jump_y))
+                    # legal_moves.append(Move_id(source_id, jump_id))
+                    if(source_id not in legal_moves):
+                        legal_moves[source_id] = [jump_id]
+                    else:
+                        legal_moves[source_id].append(jump_id)
                     legal_take_moves.append(Move_id(source_id, jump_id))
+                    if(source_id not in legal_take_moves):
+                        legal_take_moves[source_id] = [jump_id]
+                    else:
+                        legal_take_moves[source_id].append(jump_id)
             
         if(len(legal_take_moves) != 0 and _forced_take): # If we can take a piece and taking a piece is forced, return only the moves that can take a piece
             return legal_take_moves

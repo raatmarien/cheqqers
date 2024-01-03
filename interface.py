@@ -38,7 +38,10 @@ class GameInterface:
         self.quit = False
         self.highlighted_squares = []
         self.status = CheckersResult.UNFINISHED
-        self.GUI = GUI
+        if(GUI == "True"):
+            self.GUI = True
+        else:
+            self.GUI = False
         if(self.GUI):
             self.init_gui()
 
@@ -59,6 +62,7 @@ class GameInterface:
     def play(self):
         while(self.status == CheckersResult.UNFINISHED and not self.quit):
             legal_moves = self.get_legal_moves()
+            # print(legal_moves)
             if(len(legal_moves) == 0):
                 self.status = CheckersResult.DRAW
                 continue
@@ -74,7 +78,6 @@ class GameInterface:
                     # Detect swipes for quantum moves
                     self.handle_click(down_pos, event.pos)
                 # self.print_board()
-                print("test")
                 self.draw_board()
                 pygame.display.flip() # needs to be called outside draw function
             else:
@@ -108,7 +111,7 @@ class GameInterface:
     def draw_board(self):
         _, pieces = self.game.get_board()
         self.screen.fill(WHITE)
-        print(self.highlighted_squares)
+        # print(self.highlighted_squares)
         # self.game.get_positions(CheckersSquare.WHITE)
         white_pieces, black_pieces = self.game.get_advanced_positions(CheckersSquare.WHITE)
         for id in range(self.game.num_horizontal*self.game.num_vertical):
@@ -171,6 +174,7 @@ class GameInterface:
         index = 1 # Start counter at 1
         if(legal_moves == None):
             legal_moves = self.get_legal_moves()
+        print(legal_moves)
         for i in legal_moves:
             i.print_move(index)
             index += 1
