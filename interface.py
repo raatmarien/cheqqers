@@ -1,5 +1,3 @@
-GUI = False
-
 from quantum_checkers import Checkers
 import pygame
 from enums import (
@@ -19,48 +17,53 @@ import sys
 
 # GLOBAL GUI SETTINGS
 # Constants
-GUI = False
 WIDTH, HEIGHT = 600, 600
 SQUARE_W, SQUARE_H = 60, 60
 FPS = 60
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-DARK_BROWN = (33, 22, 12)
-LIGHT_BROWN = (217, 167, 121)
-RED = (255, 0, 0)
+GREY = (51,51,51)
+DARK_BROWN = (145,94,42)
+LIGHT_BROWN = (231,203,175)
+L_RED = (221, 0, 0)
+RED = (180,2,1)
 BLUE = (0, 0, 255)
 CROWN_IMG = pygame.image.load(os.path.join(os.path.dirname(__file__), "crown.png"))
 CROWN_IMG = pygame.transform.scale(CROWN_IMG, (int(SQUARE_W*0.65), int((CROWN_IMG.get_height()/(CROWN_IMG.get_width()/SQUARE_W))*0.65)))
-
-
+  
 class GameInterface:
-    def __init__(self, game: Checkers) -> None:
+    def __init__(self, game: Checkers, GUI = False) -> None:
         self.game = game
         self.player = CheckersSquare.WHITE
         self.quit = False
         self.highlighted_squares = []
         self.status = CheckersResult.UNFINISHED
+        self.GUI = GUI
+        if(self.GUI):
+            self.init_gui()
 
     def get_move(self):
         return input(f'Player {self.player.name} to move: ')
-
-    def play(self):
-        if(GUI):
-            pygame.init()
-            # Initialize the screen
-            infoObject = pygame.display.Info()
-            width = self.game.num_horizontal*SQUARE_W
-            height = self.game.num_vertical*SQUARE_H
-            self.screen = pygame.display.set_mode((width, height))
-            pygame.display.set_caption("Quantum Checkers")
-        
-        # self.print_board()
+    
+    def init_gui(self):
+        pygame.init()
+        # Initialize the screen
+        infoObject = pygame.display.Info()
+        width = self.game.num_horizontal*SQUARE_W
+        height = self.game.num_vertical*SQUARE_H
+        self.screen = pygame.display.set_mode((width, height))
+        pygame.display.set_caption("Quantum Checkers")
         # Clock to control the frame rate
         clock = pygame.time.Clock()
+        
+    def play(self):
         while(self.status == CheckersResult.UNFINISHED and not self.quit):
-            if(GUI):
+            legal_moves = self.get_legal_moves()
+            if(len(legal_moves) == 0):
+                self.status = CheckersResult.DRAW
+                continue
+            if(self.GUI):
                 event = pygame.event.wait()
-                # for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit(0)
@@ -71,13 +74,10 @@ class GameInterface:
                     # Detect swipes for quantum moves
                     self.handle_click(down_pos, event.pos)
                 # self.print_board()
+                print("test")
                 self.draw_board()
                 pygame.display.flip() # needs to be called outside draw function
             else:
-                legal_moves = self.get_legal_moves()
-                if(len(legal_moves) == 0):
-                    self.status = CheckersResult.DRAW
-                    continue
                 self.print_board()
                 self.print_legal_moves(legal_moves)
                 move = self.get_move()
@@ -90,19 +90,25 @@ class GameInterface:
                     print(f"Input has to be an integer between 1 and {len(legal_moves)}!")
                     continue
                 self.game.move(legal_moves[move-1], self.player)
-
                 self.player = CheckersSquare.BLACK if self.player == CheckersSquare.WHITE else CheckersSquare.WHITE
 
     def draw_circle(self, color, x, y, radius, king = False):
-        gfxdraw.aacircle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, color)
-        gfxdraw.filled_circle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, color)
+        if(color == RED):
+            gfxdraw.filled_circle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, RED)
+            gfxdraw.filled_circle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius-int(radius*0.1), L_RED)
+            gfxdraw.aacircle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, RED)
+        else:
+            gfxdraw.filled_circle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, BLACK)
+            gfxdraw.filled_circle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius-int(radius**0.1), GREY)
+            gfxdraw.aacircle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, BLACK)
         if(king):
             c = CROWN_IMG.get_rect(center=(x+SQUARE_W//2, y+SQUARE_H//2)) # centers the image
             self.screen.blit(CROWN_IMG, c)
 
     def draw_board(self):
-        _, pieces = self.get_board()
+        _, pieces = self.game.get_board()
         self.screen.fill(WHITE)
+        print(self.highlighted_squares)
         # self.game.get_positions(CheckersSquare.WHITE)
         white_pieces, black_pieces = self.game.get_advanced_positions(CheckersSquare.WHITE)
         for id in range(self.game.num_horizontal*self.game.num_vertical):
@@ -115,9 +121,10 @@ class GameInterface:
                 # pygame.draw.circle(self.screen, RED, (screen_x+SQUARE_W//2, screen_y+SQUARE_H//2), int(SQUARE_W-0.15*SQUARE_W)//2)
                 self.draw_circle(RED, screen_x, screen_y, int(SQUARE_W-0.15*SQUARE_W)//2, black_pieces[str(id)].king)
             elif(str(id) in white_pieces):
-                self.draw_circle(WHITE, screen_x, screen_y, int(SQUARE_W-0.15*SQUARE_W)//2, white_pieces[str(id)].king)
+                self.draw_circle(GREY, screen_x, screen_y, int(SQUARE_W-0.15*SQUARE_W)//2, white_pieces[str(id)].king)
             if(id in self.highlighted_squares):
                 pygame.gfxdraw.rectangle(self.screen, (screen_x, screen_y, SQUARE_W, SQUARE_H), BLUE)
+                self.draw_circle(BLUE, screen_x, screen_y, int(SQUARE_W-0.15*SQUARE_W)//2, white_pieces[str(id)].king)
             # pygame.display.flip()
             # pygame.display.update()
 
@@ -132,15 +139,18 @@ class GameInterface:
     # def highlight_piece(self, x, y)
 
     def handle_click(self, first_pos, second_pos):
-        # self.highlighted_squares = []
+        self.highlighted_squares = []
         mouse_x, mouse_y = first_pos[0], first_pos[1]
         first_id = self.get_id_from_mouse_pos(mouse_x, mouse_y)
         mouse_x, mouse_y = second_pos[0], second_pos[1]
         second_id = self.get_id_from_mouse_pos(mouse_x, mouse_y)
-        if(first_id == second_id):
-            self.highlighted_squares.append(id)
+        print(mouse_x,mouse_y,first_id,second_id)
+        if(first_id == second_id): # Select a piece to move
+            self.highlighted_squares.append(first_id)
             return  
-        legal_moves = self.get_legal_moves()
+        # Did not select a piece
+
+        # legal_moves = self.get_legal_moves()
         # self.print_legal_moves()
         # print(legal_moves)
        

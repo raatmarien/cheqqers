@@ -3,8 +3,7 @@ from enums import (
     CheckersRules,
     CheckersSquare
 )
-import argparse
-import os
+
 from typing import List, Dict
 from copy import deepcopy
 from unitary.alpha import QuantumObject, QuantumWorld, Move, Split
