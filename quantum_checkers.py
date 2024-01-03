@@ -205,6 +205,8 @@ class Checkers:
         opponent_ids = opponent_ids[0] + opponent_ids[1]
 
         for move in blind_moves:
+            print(move)
+            print(legal_moves)
             # For each move check if there is a piece in the position
             # If it is empty it is a legal move
             # If there is another piece, check if it is a different color than your own color
@@ -221,7 +223,7 @@ class Checkers:
                 # legal_moves.append(Move_id(source_id, target1_id))
                 if(source_id not in legal_moves):
                    legal_moves[source_id] = [target1_id]
-                else:
+                elif(target1_id not in legal_moves[source_id]): # to prevent duplicates
                    legal_moves[source_id].append(target1_id)
             
             # QUANTUM SPLIT MOVE
@@ -236,8 +238,10 @@ class Checkers:
                 if(source_id not in legal_moves):
                    legal_moves[source_id] = [target1_id, target2_id]
                 else:
-                   legal_moves[source_id].append(target1_id)
-                   legal_moves[source_id].append(target2_id)
+                    if(target1_id not in legal_moves[source_id]):
+                        legal_moves[source_id].append(target1_id)
+                    if(target2_id not in legal_moves[source_id]):
+                        legal_moves[source_id].append(target2_id)
 
 
             # CLASSICAL TAKE MOVE
