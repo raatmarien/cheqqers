@@ -94,7 +94,6 @@ class GameInterface:
                             legal_moves = self.get_legal_moves() # We have to calculate them again because the player has chanced for the highlight function
                     self.highlight_squares(legal_moves)
                     self.draw_board()
-                    self.print_board()
                     pygame.display.flip() # needs to be called outside draw function
             else:
                 self.print_board()
@@ -136,11 +135,18 @@ class GameInterface:
     def draw_board(self):
         self.screen.fill(WHITE)
         white_pieces, black_pieces = self.game.get_advanced_positions(CheckersSquare.WHITE)
+        flip = True
         for id in range(self.game.num_horizontal*self.game.num_vertical):
+            # print(f"{id}, {self.game.num_horizontal}, {id % self.game.num_horizontal == 0}")
+            if(id % self.game.num_horizontal == 0):
+                flip = not flip
             x, y = self.game.convert_id_to_xy(id)
             screen_x = x * SQUARE_W
             screen_y = y * SQUARE_H
-            color = LIGHT_BROWN if (id) % 2 == 0 else DARK_BROWN
+            if(flip and self.game.num_horizontal % 2 == 0): # For even length we need to flip the board the squares drawn, not for uneven length
+                color = DARK_BROWN if (id) % 2 == 0 else LIGHT_BROWN
+            else:
+                color = LIGHT_BROWN if (id) % 2 == 0 else DARK_BROWN
             pygame.draw.rect(self.screen, color, (screen_x, screen_y, SQUARE_W, SQUARE_H))
             highlight = True if (id in self.highlighted_squares) else False
             if(str(id) in black_pieces):

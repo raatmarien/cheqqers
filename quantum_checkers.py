@@ -88,6 +88,12 @@ class Checkers:
             exit()
         # Initialize empty board
         self.clear(run_on_hardware)
+
+        # Test to take multipe pieces
+        # QuditFlip(5, 0, CheckersSquare.BLACK.value)(self.squares[str(6)])
+        # QuditFlip(5, 0, CheckersSquare.BLACK.value)(self.squares[str(18)])
+        # QuditFlip(5, 0, CheckersSquare.WHITE.value)(self.squares[str(24)])
+
         # Add initial pieces to board
         for y in range(num_vertical_pieces):
             for x in range(self.num_horizontal):
