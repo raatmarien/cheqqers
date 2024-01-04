@@ -139,20 +139,14 @@ class Checkers:
         for id in range(self.num_vertical*self.num_horizontal):
             for mark in (CheckersSquare.BLACK, CheckersSquare.WHITE, CheckersSquare.WHITE_KING, CheckersSquare.BLACK_KING):
                 if(hist[id][mark] != 0): # For the current player (white or black). Check both for entanglement (if that will be implemented)
-                    print(mark)
                     if(mark == CheckersSquare.WHITE):
-                        print("TRUE non king")
                         white_pieces[str(id)] = Piece(id, mark, False)
                     elif(mark == CheckersSquare.WHITE_KING):
-                        print("TRUE for king")
                         white_pieces[str(id)] = Piece(id, mark, True)
                     if(mark == CheckersSquare.BLACK):
                         black_pieces[str(id)] = Piece(id, mark, False)
-                    elif(mark == CheckersSquare.WHITE_KING):
+                    elif(mark == CheckersSquare.BLACK_KING):
                         black_pieces[str(id)] = Piece(id, mark, True)
-        for key, value in white_pieces.items():
-            print(f"{key}, {value.id}, {value.color}, {value.king}")
-        print("###")
         if(player == CheckersSquare.WHITE):
             return white_pieces, black_pieces
         else:
