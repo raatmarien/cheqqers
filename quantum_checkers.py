@@ -79,6 +79,7 @@ class Checkers:
     def __init__(self, run_on_hardware = False, num_vertical = 5, num_horizontal = 5, num_vertical_pieces = 1, rules = CheckersRules.QUANTUM_V3) -> None:
         # self.board = Board(num_vertical, num_horizontal, num_vertical_pieces)
         self.rules = rules
+        self.player = CheckersSquare.WHITE
         self.num_vertical = num_vertical
         self.num_horizontal = num_horizontal
         self.num_vertical_pieces = num_vertical_pieces # how many rows of one color need to be filled with pieces
@@ -189,6 +190,7 @@ class Checkers:
         """
         Calculates all possible moves for 'player'
         Loop over all pieces, if there is a chance that there is a piece in the right color calculate legal moves for that piece
+        Returns true if the player can take another piece
         """
         king_player = CheckersSquare.WHITE_KING if player == CheckersSquare.WHITE else CheckersSquare.BLACK_KING
         legal_moves = {} # All legal moves
@@ -260,8 +262,8 @@ class Checkers:
                         legal_take_moves[source_id].append(jump_id)
             
         if(len(legal_take_moves) != 0 and _forced_take): # If we can take a piece and taking a piece is forced, return only the moves that can take a piece
-            return legal_take_moves
-        return legal_moves
+            return legal_take_moves, True
+        return legal_moves, False
     
     def calculate_blind_moves(self, id: int, player):
         """
@@ -338,12 +340,20 @@ class Checkers:
             list(self.squares.values()), compile_to_qubits=run_on_hardware
         )
 
-    def move(self, move: Move_id, player):
+    def move(self, move: Move_id, player = None):
+        if(player == None):
+            player = self.player
         if(move.target2_id == None):
             self.classic_move(move, player)
+        else:
+            # if not classical move it is a split move
+            self.split_move(move, player)
+
+        # If a move has been done we need to flip the player, IF they can not take another piece
+        _, can_take = self.calculate_possible_moves(self.player)
+        if(can_take):
             return
-        # if not classical move it is a split move
-        self.split_move(move, player)
+        self.player = CheckersSquare.BLACK if self.player == CheckersSquare.WHITE else CheckersSquare.WHITE
 
     def get_board(self) -> str:
         """Returns the Checkers board in ASCII form. Also returns dictionary with id as key.

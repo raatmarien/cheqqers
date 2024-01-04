@@ -35,7 +35,7 @@ CROWN_IMG = pygame.transform.scale(CROWN_IMG, (int(SQUARE_W*0.65), int((CROWN_IM
 class GameInterface:
     def __init__(self, game: Checkers, GUI = False) -> None:
         self.game = game
-        self.player = CheckersSquare.WHITE
+        
         self.quit = False
         self.highlighted_squares = []
         self.status = CheckersResult.UNFINISHED
@@ -48,7 +48,7 @@ class GameInterface:
             self.GUI = False       
 
     def get_move(self):
-        return input(f'Player {self.player.name} to move: ')
+        return input(f'Player {self.game.player.name} to move: ')
     
     def init_gui(self):
         pygame.init()
@@ -108,8 +108,7 @@ class GameInterface:
                 if(move > len(legal_moves) or move < 1):
                     print(f"Input has to be an integer between 1 and {len(legal_moves)}!")
                     continue
-                self.game.move(legal_moves[move-1], self.player)
-                self.player = CheckersSquare.BLACK if self.player == CheckersSquare.WHITE else CheckersSquare.WHITE
+                self.game.move(legal_moves[move-1], self.game.player)
 
     def draw_circle(self, color, x, y, radius, king = False, highlited = False):
         if(color == RED):
@@ -137,8 +136,6 @@ class GameInterface:
     def draw_board(self):
         self.screen.fill(WHITE)
         white_pieces, black_pieces = self.game.get_advanced_positions(CheckersSquare.WHITE)
-        for key, value in white_pieces.items():
-            print(f"{key}, {value.id}, {value.color}, {value.king}")
         for id in range(self.game.num_horizontal*self.game.num_vertical):
             x, y = self.game.convert_id_to_xy(id)
             screen_x = x * SQUARE_W
@@ -164,11 +161,10 @@ class GameInterface:
         """
         Do a game move and reset values for GUI
         """
-        self.game.move(move, self.player)
+        self.game.move(move, self.game.player)
         self.selected_id = -1 # value used in highlight function to check if we need to return
         self.move_locations = None
         self.highlighted_squares = []
-        self.player = CheckersSquare.BLACK if self.player == CheckersSquare.WHITE else CheckersSquare.WHITE
         return
 
     def handle_click(self, first_pos, second_pos):
@@ -196,7 +192,8 @@ class GameInterface:
         return str_board
     
     def get_legal_moves(self) -> list:
-        return self.game.calculate_possible_moves(self.player)
+        moves, _ = self.game.calculate_possible_moves(self.game.player)
+        return moves
 
     def print_legal_moves(self, legal_moves = None) -> list:
         """
