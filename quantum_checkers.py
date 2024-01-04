@@ -347,17 +347,18 @@ class Checkers:
         )
 
     def move(self, move: Move_id, player = None):
+        prev_taken = False
         if(player == None):
             player = self.player
         if(move.target2_id == None):
-            self.classic_move(move, player)
+            prev_taken = self.classic_move(move, player)
         else:
             # if not classical move it is a split move
             self.split_move(move, player)
 
         # If a move has been done we need to flip the player, IF they can not take another piece
         _, can_take = self.calculate_possible_moves(self.player)
-        if(can_take):
+        if(prev_taken and can_take): # If we took a piece and we can take another piece do not chance the player
             return
         self.player = CheckersSquare.BLACK if self.player == CheckersSquare.WHITE else CheckersSquare.WHITE
 
@@ -430,25 +431,29 @@ class Checkers:
         This function moves a piece from one square to another. If it jumps over a piece it also removes this piece.
         It also measures the piece itself or the piece it is taking if it is relevant.
         """
+        taken = False # To return if the move took a piece or not
         is_adjacent, jumped_id = self.is_adjacent(move.source_id, move.target1_id)
         if(not is_adjacent): # if ids are not adjacent we jumped over a piece and need to remove it
+            
             # First check if the piece we are using is actually there
             self.board.pop(objects=[self.squares[str(move.source_id)]])
             peek = (self.board.peek(objects=[self.squares[str(move.source_id)]]))
             if(peek[0][0] == CheckersSquare.EMPTY): # If the piece is not there, turn is wasted
-                return
+                return taken
 
+            # Next check if the piece we are taking is actually there
             self.board.pop(objects=[self.squares[str(jumped_id)]])
             peek = (self.board.peek(objects=[self.squares[str(jumped_id)]])) # peek returns double list of all object peeked. For one object that looks like [[<CheckersSquare.WHITE: 1>]]
-            if(peek[0][0] != CheckersSquare.EMPTY): # if it is not empty we can take the piece
-                CheckersClassicMove(5, 1)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
-                self.remove_piece(jumped_id, peek[0][0])
+            if(peek[0][0] == CheckersSquare.EMPTY): # if it empty our turn is wasted
+                return taken
+            CheckersClassicMove(5, 1)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
+            self.remove_piece(jumped_id, peek[0][0])
+            taken = True
         else: # not a jump
             CheckersClassicMove(5, 1)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
         if(move.target1_id <= self.num_vertical-1 or move.target1_id >= self.num_horizontal*self.num_vertical-self.num_vertical):
-                self.king(move.target1_id, mark)
-        
-        # Check if you can take another piece
+            self.king(move.target1_id, mark)
+        return taken
 
             
     def split_move(self, move: Move_id, mark: CheckersSquare):
@@ -511,3 +516,4 @@ class Checkers:
         
     
 #TODO: if piece is in superposition behind another piece, add the possibilty to take the piece
+#TODO: Check if you can take a piece only needs to happen after you have actually taken a piece.
