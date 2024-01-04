@@ -64,9 +64,9 @@ class Move_temp:
         output = ""
         if(index != -1):
             output = str(index) + ": "
-        output += f"[{self.source_id}] to [{self.target1_id}]"
-        if(self.target2_id != None):
-            output += f" and [{self.target2_id}]"
+        output += f"[{self.source_x}, {self.source_y}] to [{self.target1_x}, {self.target1_y}]"
+        if(self.target2_x != None):
+            output += f" and [{self.target2_x}, {self.target2_y}]"
         print(output)
 
 class Piece():
@@ -90,19 +90,19 @@ class Checkers:
         self.clear(run_on_hardware)
 
         # Test to take multipe pieces
-        # QuditFlip(5, 0, CheckersSquare.BLACK.value)(self.squares[str(6)])
+        QuditFlip(5, 0, CheckersSquare.BLACK.value)(self.squares[str(18)])
         # QuditFlip(5, 0, CheckersSquare.BLACK.value)(self.squares[str(18)])
-        # QuditFlip(5, 0, CheckersSquare.WHITE.value)(self.squares[str(24)])
+        QuditFlip(5, 0, CheckersSquare.WHITE.value)(self.squares[str(6)])
 
         # Add initial pieces to board
-        for y in range(num_vertical_pieces):
-            for x in range(self.num_horizontal):
-                if(y%2==0 and x%2==1):
-                    QuditFlip(5, 0, CheckersSquare.BLACK.value)(self.squares[str(self.convert_xy_to_id(x,y))])
-                    QuditFlip(5, 0, CheckersSquare.WHITE.value)(self.squares[str(self.convert_xy_to_id(x,self.num_vertical-1-y))])
-                elif(y%2!=0 and x%2!=1):
-                    QuditFlip(5, 0, CheckersSquare.BLACK.value)(self.squares[str(self.convert_xy_to_id(x,y))])
-                    QuditFlip(5, 0, CheckersSquare.WHITE.value)(self.squares[str(self.convert_xy_to_id(x,self.num_vertical-1-y))])
+        # for y in range(num_vertical_pieces):
+        #     for x in range(self.num_horizontal):
+        #         if(y%2==0 and x%2==1):
+        #             QuditFlip(5, 0, CheckersSquare.BLACK.value)(self.squares[str(self.convert_xy_to_id(x,y))])
+        #             QuditFlip(5, 0, CheckersSquare.WHITE.value)(self.squares[str(self.convert_xy_to_id(x,self.num_vertical-1-y))])
+        #         elif(y%2!=0 and x%2!=1):
+        #             QuditFlip(5, 0, CheckersSquare.BLACK.value)(self.squares[str(self.convert_xy_to_id(x,y))])
+        #             QuditFlip(5, 0, CheckersSquare.WHITE.value)(self.squares[str(self.convert_xy_to_id(x,self.num_vertical-1-y))])
     
     def measure(self) -> None:
         """Measures all squares on the Checkers board.
@@ -234,13 +234,6 @@ class Checkers:
             
             # QUANTUM SPLIT MOVE
             elif(target1_id not in player_ids and target1_id not in opponent_ids and target2_id not in player_ids and target2_id not in opponent_ids):
-                # jump1_y = move.target1_y+(move.target1_y-move.source_y)
-                # jump1_x = move.target1_x+(move.target1_x-move.source_x)
-                # jump2_y = move.target1_y+(move.target2_y-move.source_y)
-                # jump2_x = move.target1_x+(move.target2_x-move.source_x)
-                # jump1_id = self.convert_xy_to_id(jump1_x, jump1_y)
-                # jump2_id = self.convert_xy_to_id(jump2_x, jump2_y)
-                # legal_moves.append(Move_id(source_id, target1_id, target2_id))
                 if(source_id not in legal_moves):
                    legal_moves[source_id] = [target1_id, target2_id]
                 else:
@@ -348,17 +341,26 @@ class Checkers:
 
     def move(self, move: Move_id, player = None):
         prev_taken = False
+        to_king = []
         if(player == None):
             player = self.player
+
         if(move.target2_id == None):
             prev_taken = self.classic_move(move, player)
+            to_king.append(move.target1_id)
         else:
             # if not classical move it is a split move
             self.split_move(move, player)
+            to_king.append(move.target1_id)
+            to_king.append(move.target2_id)
+        
+        player_ids, _ = self.get_positions(player)
+        for id in to_king:
+            if((id <= self.num_vertical-1 or id >= self.num_horizontal*self.num_vertical-self.num_vertical) and id not in player_ids[1]):
+                self.king(id, player)
 
-        # If a move has been done we need to flip the player, IF they can not take another piece
-        _, can_take = self.calculate_possible_moves(self.player)
-        if(prev_taken and can_take): # If we took a piece and we can take another piece do not chance the player
+        # If a move has been done we need to flip the player, IF they can not take another piece SHOULD CHECK IF THE PIECE YOU JUST USED CAN GO AGAIN
+        if(prev_taken and self.can_take_piece(move.target1_id)): # If we took a piece and we can take another piece do not chance the player
             return
         self.player = CheckersSquare.BLACK if self.player == CheckersSquare.WHITE else CheckersSquare.WHITE
 
@@ -417,14 +419,29 @@ class Checkers:
         """
         For a specific ID, checks if it can take pieces. Used for checking if you can take another piece after taking a piece
         """
-        jump_y = move.target1_y+(move.target1_y-move.source_y)
-        jump_x = move.target1_x+(move.target1_x-move.source_x)
-        jump_id = self.convert_xy_to_id(jump_x, jump_y)
-        if(self.on_board(jump_x, jump_y) and jump_id not in (player_ids+opponent_ids)): # we can jump over if the coordinates are on the board and the piece is empty
-            # legal_moves.append(Move_temp(move.source_x, move.source_y, jump_x, jump_y))
-            legal_moves.append(Move_id(source_id, jump_id))
-            # legal_take_moves.append(Move_temp(move.source_x, move.source_y, jump_x, jump_y))
-            legal_take_moves.append(Move_id(source_id, jump_id))
+        blind_moves = self.calculate_blind_moves(id, self.player)
+        player_ids, opponent_ids = self.get_positions(self.player)
+        
+        # Concatenate all normal pieces and king pieces
+        player_ids = player_ids[0] + player_ids[1]
+        opponent_ids = opponent_ids[0] + opponent_ids[1]
+        for move in blind_moves:
+            target1_id = self.convert_xy_to_id(move.target1_x, move.target1_y)
+            if(target1_id in opponent_ids and move.target2_x == None):                
+                jump_y = move.target1_y+(move.target1_y-move.source_y)
+                jump_x = move.target1_x+(move.target1_x-move.source_x)
+                jump_id = self.convert_xy_to_id(jump_x, jump_y)
+                if(self.on_board(jump_x, jump_y) and jump_id not in (player_ids+opponent_ids)): # we can jump over if the coordinates are on the board and the piece is empty
+                    # legal_moves.append(Move_id(source_id, jump_id))
+                    return True
+        return False
+
+        # jump_y = move.target1_y+(move.target1_y-move.source_y)
+        # jump_x = move.target1_x+(move.target1_x-move.source_x)
+        # jump_id = self.convert_xy_to_id(jump_x, jump_y)
+        # if(self.on_board(jump_x, jump_y) and jump_id not in (player_ids+opponent_ids)): # we can jump over if the coordinates are on the board and the piece is empty
+        #     legal_moves.append(Move_id(source_id, jump_id))
+        #     legal_take_moves.append(Move_id(source_id, jump_id))
 
     def classic_move(self, move: Move_id, mark: CheckersSquare):
         """
@@ -451,8 +468,6 @@ class Checkers:
             taken = True
         else: # not a jump
             CheckersClassicMove(5, 1)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
-        if(move.target1_id <= self.num_vertical-1 or move.target1_id >= self.num_horizontal*self.num_vertical-self.num_vertical):
-            self.king(move.target1_id, mark)
         return taken
 
             
@@ -470,9 +485,6 @@ class Checkers:
             CheckersSplit(mark, self.rules)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)], self.squares[str(move.target2_id)])
         else:
             CheckersSplit(mark, self.rules)(self.squares[str(move.source_id)], self.squares[str(move.target2_id)], self.squares[str(move.target1_id)])
-        if(move.target1_id <= self.num_vertical-1 or move.target1_id >= self.num_horizontal*self.num_vertical-self.num_vertical):
-            self.king(move.target1_id, mark)
-            self.king(move.target2_id, mark)
 
     def remove_piece(self, id: int or (int,int), mark: CheckersSquare):
         if(type(id) is tuple):
