@@ -94,7 +94,7 @@ class GameInterface:
                             legal_moves = self.get_legal_moves() # We have to calculate them again because the player has chanced for the highlight function
                     self.highlight_squares(legal_moves)
                     self.draw_board()
-                   
+                    self.print_board()
                     pygame.display.flip() # needs to be called outside draw function
             else:
                 self.print_board()
@@ -137,6 +137,8 @@ class GameInterface:
     def draw_board(self):
         self.screen.fill(WHITE)
         white_pieces, black_pieces = self.game.get_advanced_positions(CheckersSquare.WHITE)
+        for key, value in white_pieces.items():
+            print(f"{key}, {value.id}, {value.color}, {value.king}")
         for id in range(self.game.num_horizontal*self.game.num_vertical):
             x, y = self.game.convert_id_to_xy(id)
             screen_x = x * SQUARE_W
@@ -146,9 +148,9 @@ class GameInterface:
             highlight = True if (id in self.highlighted_squares) else False
             if(str(id) in black_pieces):
                 # pygame.draw.circle(self.screen, RED, (screen_x+SQUARE_W//2, screen_y+SQUARE_H//2), int(SQUARE_W-0.15*SQUARE_W)//2)
-                self.draw_circle(RED, screen_x, screen_y, int(SQUARE_W-0.15*SQUARE_W)//2, black_pieces[str(id)].king, highlight)
+                self.draw_circle(GREY, screen_x, screen_y, int(SQUARE_W-0.15*SQUARE_W)//2, black_pieces[str(id)].king, highlight)
             elif(str(id) in white_pieces):
-                self.draw_circle(GREY, screen_x, screen_y, int(SQUARE_W-0.15*SQUARE_W)//2, white_pieces[str(id)].king, highlight)
+                self.draw_circle(RED, screen_x, screen_y, int(SQUARE_W-0.15*SQUARE_W)//2, white_pieces[str(id)].king, highlight)
             elif(id in self.highlighted_squares): # Highlight squares for where the selected piece can move
                 gfxdraw.circle(self.screen, screen_x+SQUARE_W//2, screen_y+SQUARE_H//2, int(SQUARE_W-0.15*SQUARE_W)//2, WHITE)
                 gfxdraw.aacircle(self.screen, screen_x+SQUARE_W//2, screen_y+SQUARE_H//2, int(SQUARE_W-0.15*SQUARE_W)//2, WHITE)

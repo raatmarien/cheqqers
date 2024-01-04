@@ -73,7 +73,7 @@ class Piece():
     def __init__(self, id, color: CheckersSquare, king=False) -> None:
         self.id = id
         self.color = color
-        self.king = False
+        self.king = king
 
 class Checkers:
     def __init__(self, run_on_hardware = False, num_vertical = 5, num_horizontal = 5, num_vertical_pieces = 1, rules = CheckersRules.QUANTUM_V3) -> None:
@@ -124,7 +124,7 @@ class Checkers:
 
     def get_advanced_positions(self, player):
         """
-        Returns dicitionary of players ids and opponent ids Piece class, 
+        Returns dicitionary of players ids and opponent ids using the Piece class, 
         player_ids and opponent_ids contain the ids
         """
         results = self.board.peek(count=100)
@@ -139,14 +139,20 @@ class Checkers:
         for id in range(self.num_vertical*self.num_horizontal):
             for mark in (CheckersSquare.BLACK, CheckersSquare.WHITE, CheckersSquare.WHITE_KING, CheckersSquare.BLACK_KING):
                 if(hist[id][mark] != 0): # For the current player (white or black). Check both for entanglement (if that will be implemented)
+                    print(mark)
                     if(mark == CheckersSquare.WHITE):
+                        print("TRUE non king")
                         white_pieces[str(id)] = Piece(id, mark, False)
                     elif(mark == CheckersSquare.WHITE_KING):
+                        print("TRUE for king")
                         white_pieces[str(id)] = Piece(id, mark, True)
                     if(mark == CheckersSquare.BLACK):
                         black_pieces[str(id)] = Piece(id, mark, False)
                     elif(mark == CheckersSquare.WHITE_KING):
                         black_pieces[str(id)] = Piece(id, mark, True)
+        for key, value in white_pieces.items():
+            print(f"{key}, {value.id}, {value.color}, {value.king}")
+        print("###")
         if(player == CheckersSquare.WHITE):
             return white_pieces, black_pieces
         else:
@@ -154,7 +160,7 @@ class Checkers:
 
     def get_positions(self, player):
         """
-        Returns player_ids: [list, list], opponent_ids: [list, list]
+        Returns player_ids: [normal pieces, king pieces], opponent_ids: [normal pieces, king pieces]
         player_ids and opponent_ids contain the ids of the current player and other player
         Returns 2 2d list that contain normal ids and king ids
         """
