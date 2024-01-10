@@ -35,7 +35,6 @@ CROWN_IMG = pygame.transform.scale(CROWN_IMG, (int(SQUARE_W*0.65), int((CROWN_IM
 class GameInterface:
     def __init__(self, game: Checkers, GUI = False) -> None:
         self.game = game
-        
         self.quit = False
         self.highlighted_squares = []
         self.status = CheckersResult.UNFINISHED

@@ -90,19 +90,19 @@ class Checkers:
         self.clear(run_on_hardware)
 
         # Test to take multipe pieces
-        QuditFlip(5, 0, CheckersSquare.BLACK.value)(self.squares[str(18)])
         # QuditFlip(5, 0, CheckersSquare.BLACK.value)(self.squares[str(18)])
-        QuditFlip(5, 0, CheckersSquare.WHITE.value)(self.squares[str(6)])
+        # QuditFlip(5, 0, CheckersSquare.BLACK.value)(self.squares[str(18)])
+        # QuditFlip(5, 0, CheckersSquare.WHITE.value)(self.squares[str(6)])
 
         # Add initial pieces to board
-        # for y in range(num_vertical_pieces):
-        #     for x in range(self.num_horizontal):
-        #         if(y%2==0 and x%2==1):
-        #             QuditFlip(5, 0, CheckersSquare.BLACK.value)(self.squares[str(self.convert_xy_to_id(x,y))])
-        #             QuditFlip(5, 0, CheckersSquare.WHITE.value)(self.squares[str(self.convert_xy_to_id(x,self.num_vertical-1-y))])
-        #         elif(y%2!=0 and x%2!=1):
-        #             QuditFlip(5, 0, CheckersSquare.BLACK.value)(self.squares[str(self.convert_xy_to_id(x,y))])
-        #             QuditFlip(5, 0, CheckersSquare.WHITE.value)(self.squares[str(self.convert_xy_to_id(x,self.num_vertical-1-y))])
+        for y in range(num_vertical_pieces):
+            for x in range(self.num_horizontal):
+                if(y%2==0 and x%2==1):
+                    QuditFlip(5, 0, CheckersSquare.BLACK.value)(self.squares[str(self.convert_xy_to_id(x,y))])
+                    QuditFlip(5, 0, CheckersSquare.WHITE.value)(self.squares[str(self.convert_xy_to_id(x,self.num_vertical-1-y))])
+                elif(y%2!=0 and x%2!=1):
+                    QuditFlip(5, 0, CheckersSquare.BLACK.value)(self.squares[str(self.convert_xy_to_id(x,y))])
+                    QuditFlip(5, 0, CheckersSquare.WHITE.value)(self.squares[str(self.convert_xy_to_id(x,self.num_vertical-1-y))])
     
     def measure(self) -> None:
         """Measures all squares on the Checkers board.
@@ -356,7 +356,9 @@ class Checkers:
         
         player_ids, _ = self.get_positions(player)
         for id in to_king:
-            if((id <= self.num_vertical-1 or id >= self.num_horizontal*self.num_vertical-self.num_vertical) and id not in player_ids[1]):
+            _, y = self.convert_id_to_xy(id)
+            if((y == self.num_vertical or y == 0) and id not in player_ids[1]):
+                # print(id, self.num_vertical-1, self.num_horizontal*self.num_vertical-self.num_vertical)
                 self.king(id, player)
 
         # If a move has been done we need to flip the player, IF they can not take another piece SHOULD CHECK IF THE PIECE YOU JUST USED CAN GO AGAIN
@@ -469,6 +471,11 @@ class Checkers:
         else: # not a jump
             CheckersClassicMove(5, 1)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
         return taken
+    
+    ######### MOVE IN QUANTUM CHESS ########
+    # yield cirq.ISWAP(s, t) ** 0.5
+    # yield cirq.ISWAP(s, t) ** 0.5
+    ########################################
 
             
     def split_move(self, move: Move_id, mark: CheckersSquare):
