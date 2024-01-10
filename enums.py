@@ -8,6 +8,15 @@ class CheckersResult(Enum):
     DRAW = 3
     BOTH_WIN = 4
 
+class CheckersPlayer(Enum):
+    WHITE = 0
+    BLACK = 1
+
+class MoveType(Enum):
+    CLASSIC = 0
+    SPLIT = 1
+    TAKE = 2
+
 class CheckersRules(Enum):
     """The different rulesets for Quantum Checkers.
     TODO: change
@@ -38,10 +47,7 @@ class Colors(Enum):
 
 class CheckersSquare(Enum):
     EMPTY = 0
-    WHITE = 1
-    BLACK = 2
-    WHITE_KING = 3
-    BLACK_KING = 4
+    FULL = 1
 
     @classmethod
     def from_result(cls, value: Union[Enum, int]):

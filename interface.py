@@ -76,6 +76,8 @@ class GameInterface:
         while(self.status == CheckersResult.UNFINISHED and not self.quit):
             legal_moves = self.get_legal_moves()
             # print(legal_moves)
+            # self.game.get_board()
+            print(len(legal_moves))
             if(len(legal_moves) == 0):
                 self.status = CheckersResult.DRAW
                 continue
@@ -95,6 +97,7 @@ class GameInterface:
                     self.draw_board()
                     pygame.display.flip() # needs to be called outside draw function
             else:
+                print("test")
                 self.print_board()
                 legal_moves = self.print_legal_moves(legal_moves) # Changes legal moves to be a list of Move classes for selecting a move
                 move = self.get_move()
