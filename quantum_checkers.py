@@ -90,6 +90,7 @@ class Checkers:
         self.num_horizontal = num_horizontal
         self.num_vertical_pieces = num_vertical_pieces # how many rows of one color need to be filled with pieces
         self.classical_squares = {} # Contains information about a square (e.g. white, king, etc...)
+        self.related_squares =[] # List of lists that keep track of squares in superpositions that are related to each other. This way if a square is measured we know the related squares of that square
         self.white_squares = {}
         self.black_squares = {}
         if(num_vertical_pieces*2 >= num_vertical):
@@ -521,12 +522,14 @@ class Checkers:
             self.board.pop(objects=[self.squares[str(move.source_id)]])
             peek = (self.board.peek(objects=[self.squares[str(move.source_id)]]))
             if(peek[0][0] == CheckersSquare.EMPTY): # If the piece is not there, turn is wasted
+                self.remove_piece(move.source_id)
                 return taken
 
             # Next check if the piece we are taking is actually there
             self.board.pop(objects=[self.squares[str(jumped_id)]])
             peek = (self.board.peek(objects=[self.squares[str(jumped_id)]])) # peek returns double list of all object peeked. For one object that looks like [[<CheckersSquare.WHITE: 1>]]
             if(peek[0][0] == CheckersSquare.EMPTY): # if it empty our turn is wasted
+                self.remove_piece(jumped_id)
                 return taken
             # CheckersClassicMove(5, 1)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
             # Move(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])          
@@ -561,8 +564,17 @@ class Checkers:
         self.classical_squares[str(move.target1_id)] = Piece(str(move.target1_id), color=original_piece.color, king=original_piece.king, superposition=True)
         self.classical_squares[str(move.target2_id)] = Piece(str(move.target1_id), color=original_piece.color, king=original_piece.king, superposition=True)
         self.remove_piece(move.source_id)
-        # else:
-        #     CheckersSplit(mark, self.rules)(self.squares[str(move.source_id)], self.squares[str(move.target2_id)], self.squares[str(move.target1_id)])
+        
+        for squares in self.related_squares:
+            if(move.source_id in squares):
+                squares.remove(move.source_id)
+                squares.append(move.target1_id)
+                squares.append(move.target2_id)
+                return
+        # If we get here this the first time this piece goes in superposition
+        self.related_squares.append[move.target1_id, move.target2_id]
+
+       
 
     def remove_piece(self, id: int or (int,int), flip = False):
         """
@@ -617,3 +629,5 @@ class Checkers:
 #TODO: Add movetype to move_id when calculating possible moves to reduce extra calculations
 #TODO: Test Enum.CheckerRules values in split move
 #TODO: Clean up calculating legal moves function with using only 1 for loop
+#TODO: Fix classical_squares not removing all the related quantum objects when measuring which are on the board
+#TODO: Find a better solution to keep track of self.related_squares
