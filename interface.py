@@ -75,9 +75,6 @@ class GameInterface:
     def play(self):
         while(self.status == CheckersResult.UNFINISHED and not self.quit):
             legal_moves = self.get_legal_moves()
-            # print(legal_moves)
-            # self.game.get_board()
-            print(len(legal_moves))
             if(len(legal_moves) == 0):
                 self.status = CheckersResult.DRAW
                 continue
@@ -97,9 +94,8 @@ class GameInterface:
                     self.draw_board()
                     pygame.display.flip() # needs to be called outside draw function
             else:
-                print("test")
                 self.print_board()
-                legal_moves = self.print_legal_moves(legal_moves) # Changes legal moves to be a list of Move classes for selecting a move
+                self.print_legal_moves(legal_moves) # Changes legal moves to be a list of Move classes for selecting a move
                 move = self.get_move()
                 try:
                     move = int(move)
@@ -109,7 +105,7 @@ class GameInterface:
                 if(move > len(legal_moves) or move < 1):
                     print(f"Input has to be an integer between 1 and {len(legal_moves)}!")
                     continue
-                self.game.move(legal_moves[move-1], self.game.player)
+                self.game.player_move(legal_moves[move-1], self.game.player)
 
     def draw_circle(self, color, x, y, radius, king = False, highlited = False):
         if(color == RED):
@@ -194,9 +190,8 @@ class GameInterface:
             self.do_game_move(Move_id(self.selected_id, first_id, second_id))
 
     def print_board(self) -> str:
-        str_board, _ = self.game.get_board()
+        str_board = self.game.get_board()
         print(str_board)
-       
         return str_board
     
     def get_legal_moves(self) -> list:
@@ -207,23 +202,25 @@ class GameInterface:
         """
         Prints all legal moves the current player can do
         """
-        legal_moves_list = []
         index = 1 # Start counter at 1
         if(legal_moves == None):
             legal_moves = self.get_legal_moves()
+        for move in legal_moves:
+            move.print_move(index=index)
+            index += 1
         # print(legal_moves)
-        for key, value in legal_moves.items():
-            if(type(value) == list and len(value) > 1):
-                print(f"{str(index)}: [{key}] to [{value[0]}]")
-                legal_moves_list.append(Move_id(source_id=key, target1_id=value[0]))
-                index += 1
-                print(f"{str(index)}: [{key}] to [{value[1]}]")
-                legal_moves_list.append(Move_id(source_id=key, target1_id=value[1]))
-                index+=1
-                print(f"{str(index)}: [{key}] to [{value[0]}] and [{value[1]}]")
-                legal_moves_list.append(Move_id(source_id=key, target1_id=value[0], target2_id=value[1]))
-            else:
-                print(f"{str(index)}: [{key}] to [{value[0]}]")
-                legal_moves_list.append(Move_id(source_id=key, target1_id=value[0]))
-            index +=1
-        return legal_moves_list
+        # for key, value in legal_moves.items():
+        #     if(type(value) == list and len(value) > 1):
+        #         print(f"{str(index)}: [{key}] to [{value[0]}]")
+        #         legal_moves_list.append(Move_id(source_id=key, target1_id=value[0]))
+        #         index += 1
+        #         print(f"{str(index)}: [{key}] to [{value[1]}]")
+        #         legal_moves_list.append(Move_id(source_id=key, target1_id=value[1]))
+        #         index+=1
+        #         print(f"{str(index)}: [{key}] to [{value[0]}] and [{value[1]}]")
+        #         legal_moves_list.append(Move_id(source_id=key, target1_id=value[0], target2_id=value[1]))
+        #     else:
+        #         print(f"{str(index)}: [{key}] to [{value[0]}]")
+        #         legal_moves_list.append(Move_id(source_id=key, target1_id=value[0]))
+        #     index +=1
+        return legal_moves

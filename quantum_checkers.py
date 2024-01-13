@@ -109,29 +109,27 @@ class Checkers:
             for x in range(self.num_horizontal):
                 if(y%2==0 and x%2==1):
                     id = self.convert_xy_to_id(x,y)
-                    print(id)
+                    # print(id)
                     # QuditFlip(1, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # Black
-                    print(self.board.peek([self.squares[str(id)]]))
+                    # print(self.board.peek([self.squares[str(id)]]))
                     # flip(self.squares[str(id)])
                     QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # Black
-                    print(self.board.peek([self.squares[str(id)]]))
-                    print("#")
+                    # print(self.board.peek([self.squares[str(id)]]))
+                    # print("#")
                     self.classical_squares[str(id)] = Piece(id, CheckersPlayer.BLACK)
                     id = self.convert_xy_to_id(x,self.num_vertical-1-y)
-                    # QuditFlip(1, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # White
-                    flip(self.squares[str(id)])
+                    QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # White
+                    # flip(self.squares[str(id)])
                     self.classical_squares[str(id)] = Piece(id, CheckersPlayer.WHITE)
                 elif(y%2!=0 and x%2!=1):
                     id = self.convert_xy_to_id(x,y)
-                    # QuditFlip(1, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # Black
-                    flip(self.squares[str(id)])
+                    QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # Black
+                    # flip(self.squares[str(id)])
                     self.classical_squares[str(id)] = Piece(id, CheckersPlayer.BLACK)
                     id = self.convert_xy_to_id(x,self.num_vertical-1-y)
-                    # QuditFlip(1, 0, CheckersSquare.FULL.value)(self.squares[str(id)])
-                    flip(self.squares[str(id)])
-                    self.classical_squares[str(id)] = Piece(id, CheckersPlayer.WHITE) # White
-        print(self.board.peek([self.squares["0"], self.squares["1"], self.squares["2"], self.squares["3"]]))
-  
+                    QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)])
+                    # flip(self.squares[str(id)])
+                    self.classical_squares[str(id)] = Piece(id, CheckersPlayer.WHITE) # White  
 
     def measure(self) -> None:
         """Measures all squares on the Checkers board.
@@ -206,12 +204,11 @@ class Checkers:
         black_ids = []
         black_king_ids = []
         for key, value in self.classical_squares.items():
+            id = int(key)
             if(value.color == CheckersPlayer.WHITE):
-                if(value.king):
-                    white_king_ids.append(key) if (value.king) else white_ids.append(key)
+                white_king_ids.append(id) if (value.king) else white_ids.append(id)
             else:
-                if(value.king):
-                    black_king_ids.append(key) if(value.king) else black_ids.append(key)
+                black_king_ids.append(id) if(value.king) else black_ids.append(id)
                 
         
         
@@ -246,11 +243,11 @@ class Checkers:
             blind_moves += self.calculate_blind_moves(id, player, False)
         for id in player_ids[1]:
             blind_moves += self.calculate_blind_moves(id, player, True)
-        
         # Append all ids to one list'
         player_ids = player_ids[0] + player_ids[1]
         opponent_ids = opponent_ids[0] + opponent_ids[1]
-
+        print(f"Player ids: {player_ids}")
+        print(f"Opponent ids: {opponent_ids} ")
         for move in blind_moves:
             # For each move check if there is a piece in the position
             # If it is empty it is a legal move
@@ -262,7 +259,7 @@ class Checkers:
             target2_id = None
             if(move.target2_x != None):
                 target2_id = self.convert_xy_to_id(move.target2_x, move.target2_y)
-
+            print(f"{source_id} to {target1_id} and {target2_id}")
             # CLASSICAL MOVE    
             if(target1_id not in player_ids and target1_id not in opponent_ids and target2_id == None): # it is an empty square, so it is possible move there
                 legal_moves.append(Move_id(MoveType.CLASSIC, source_id, target1_id))
@@ -299,7 +296,6 @@ class Checkers:
                     #     legal_take_moves[source_id] = [jump_id]
                     # else:
                     #     legal_take_moves[source_id].append(jump_id)
-            
         if(len(legal_take_moves) != 0 and _forced_take): # If we can take a piece and taking a piece is forced, return only the moves that can take a piece
             return legal_take_moves, True
         return legal_moves, False
@@ -309,7 +305,8 @@ class Checkers:
         For the piece in id, that belongs to player, calculate all 'possible' moves ignoring other pieces, but checking for boundaries of the board
         Important: Assumes there is a piece in the position of the id that belongs to the current player
         """
-        x, y = self.convert_id_to_xy(id)
+        # print(id, type(id))
+        x, y = self.convert_id_to_xy(int(id))
         blind_moves = []
         # if(str(id) not in self.king_squares): # If the current piece is not a king
         if player == CheckersPlayer.WHITE and not king: # White moves up -> y-1
@@ -389,7 +386,7 @@ class Checkers:
             player = self.player
 
         if(move.target2_id == None):
-            prev_taken = self.classic_move(move, player)
+            prev_taken = self.classic_move(move)
             to_king.append(move.target1_id)
         else:
             # if not classical move it is a split move
@@ -398,11 +395,16 @@ class Checkers:
             to_king.append(move.target2_id)
         
         # player_ids, _ = self.get_positions(player)
+        print(f"To king: {to_king}")
         for id in to_king:
             _, y = self.convert_id_to_xy(id)
-            if((y == self.num_vertical or y == 0) and self.classical_squares[str(id)].king == False):
+            print(f"y: {y}")
+            print(f"true or false: {self.classical_squares[str(id)].king}" )
+            print((y == self.num_vertical or y == 0))
+            print(self.classical_squares[str(id)].king == False)
+            if((y == self.num_vertical-1 or y == 0) and self.classical_squares[str(id)].king == False):
                 # print(id, self.num_vertical-1, self.num_horizontal*self.num_vertical-self.num_vertical)
-                self.king(id, player)
+                self.king(id)
 
         # If a move has been done we need to flip the player, IF they can not take another piece SHOULD CHECK IF THE PIECE YOU JUST USED CAN GO AGAIN
         if(prev_taken and self.can_take_piece(move.target1_id)): # If we took a piece and we can take another piece do not chance the player
@@ -420,25 +422,51 @@ class Checkers:
                 for result in results
             ]
         )
-        print(hist)
         output = "\n"
-        board_list = {}
         for y in range(self.num_vertical):
-            for mark in CheckersSquare:
+            for mark in [CheckersSquare.EMPTY, CheckersPlayer.WHITE, CheckersPlayer.BLACK]:
                 output += " "
                 for x in range(self.num_horizontal):
-                    idx = self.convert_xy_to_id(x,y)  
-                    output += f" {hist[idx][mark]:3}"
-                    if(hist[idx][mark] > 0):
-                        board_list[str(idx)] = hist[idx][mark]
+                    idx = self.convert_xy_to_id(x,y)
+                    if(mark == CheckersSquare.EMPTY):
+                        output += f" . {hist[idx][CheckersSquare.EMPTY]:3}"
+                    elif(mark == CheckersPlayer.WHITE):
+                        identifier = "w"
+                        if(hist[idx][CheckersSquare.FULL] > 0 and self.classical_squares[str(idx)].color == CheckersPlayer.WHITE):
+                            if(self.classical_squares[str(idx)].king):
+                                identifier = "W"
+                            output += f" {identifier} {hist[idx][CheckersSquare.FULL]:3}"
+                        else:
+                            output += f" {identifier} {0:3}"
+                    else:
+                        identifier = "b"
+                        if(hist[idx][CheckersSquare.FULL] > 0 and self.classical_squares[str(idx)].color == CheckersPlayer.BLACK):
+                            if(self.classical_squares[str(idx)].king):
+                                identifier = "B"
+                            output += f" {identifier} {hist[idx][CheckersSquare.FULL]:3}"
+                        else:
+                            output += f" {identifier} {0:3}"
+                    # if(mark == CheckersSquare.FULL and hist[idx][mark] > 0):
+                    #     print(f"At {idx} here is a piece")
+                    #     print(self.classical_squares[str(idx)])
+                    #     if(self.classical_squares[str(idx)].color == CheckersPlayer.WHITE):
+                    #         output += f" {CheckersPlayer.WHITE} {hist[idx][mark]:3}"
+                    #     else:
+                    #         output += f" {CheckersPlayer.BLACK} {hist[idx][mark]:3}"
+                    #     # output += f" {_MARK_SYMBOLS[mark]} {hist[idx][mark]:3}"
+                    # else:
+                    #     output += f" {CheckersSquare.EMPTY} {hist[idx][mark]:3}"
+                    # if(hist[idx][mark] > 0):
+                    #     board_list[str(idx)] = hist[idx][mark]
                     if x != self.num_horizontal-1:
                         output += " |"
                 output += "\n"
             if y != self.num_vertical-1:
                 output += "--------"*self.num_horizontal + "\n"
-        return output, board_list
+        return output
     
     def king(self, id: int):
+        print(f"Kingng {id}")
         self.classical_squares[str(id)].king = True
         # if(mark == CheckersSquare.WHITE):
         #     QuditFlip(5, mark.value, CheckersSquare.WHITE_KING.value)(self.squares[str(id)])
@@ -490,7 +518,7 @@ class Checkers:
         #     legal_moves.append(Move_id(source_id, jump_id))
         #     legal_take_moves.append(Move_id(source_id, jump_id))
 
-    def classic_move(self, move: Move_id, mark: CheckersSquare):
+    def classic_move(self, move: Move_id):
         """
         This function moves a piece from one square to another. If it jumps over a piece it also removes this piece.
         It also measures the piece itself or the piece it is taking if it is relevant.
@@ -511,13 +539,15 @@ class Checkers:
                 return taken
             # CheckersClassicMove(5, 1)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
             # Move(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])          
-            self.remove_piece(jumped_id)
+            self.remove_piece(jumped_id, True)
             taken = True
         # else: # not a jump
-            # CheckersClassicMove(2, 1)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])  
-        Move(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
+            # CheckersClassicMove(2, 1)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)]) 
+        print(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
+        # Move(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
+        CheckersClassicMove(2, 1)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
         self.classical_squares[str(move.target1_id)] = self.classical_squares[str(move.source_id)]
-        self.remove_piece(str(move.source_id))     
+        self.remove_piece(move.source_id)     
         return taken
     
     ######### MOVE IN QUANTUM CHESS ########
@@ -536,16 +566,17 @@ class Checkers:
         # if move.target1_id not in player_ids+opponent_ids:
             # CheckersSplit(mark, self.rules)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)], self.squares[str(move.target2_id)])
         original_piece = self.classical_squares[str(move.source_id)]
-        Split(self.squares[str(move.source_id)], self.squares[str(move.target1_id)], self.squares[str(move.target2_id)])
+        # Split(self.squares[str(move.source_id)], self.squares[str(move.target1_id)], self.squares[str(move.target2_id)])
+        CheckersSplit(CheckersSquare.FULL, self.rules)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)], self.squares[str(move.target2_id)])
         self.classical_squares[str(move.target1_id)] = Piece(str(move.target1_id), color=original_piece.color, king=original_piece.king, superposition=True)
         self.classical_squares[str(move.target2_id)] = Piece(str(move.target1_id), color=original_piece.color, king=original_piece.king, superposition=True)
         self.remove_piece(move.source_id)
         # else:
         #     CheckersSplit(mark, self.rules)(self.squares[str(move.source_id)], self.squares[str(move.target2_id)], self.squares[str(move.target1_id)])
 
-    def remove_piece(self, id: int or (int,int)):
+    def remove_piece(self, id: int or (int,int), flip = False):
         """
-        Removes a piece if the piece exists, otherwise does nothing
+        Removes a piece from the classical_squares list. If flip is true it will also flip the quantum state of that square.
         """
         if(type(id) is tuple):
             id = self.convert_xy_to_id(id[0], id[1])
@@ -556,7 +587,9 @@ class Checkers:
         # QuditFlip(3, CheckersSquare.BLACK.value, CheckersSquare.EMPTY.value)(self.squares[id])
         # QuditFlip(5, mark.value, CheckersSquare.EMPTY.value)(self.squares[str(id)])
         if(str(id) in self.classical_squares):
-            Flip(str(id))
+            if(flip):
+                QuditFlip(2, CheckersSquare.FULL.value, CheckersSquare.EMPTY.value)(self.squares[str(id)])
+            self.classical_squares.pop(str(id))
         return
         
     def convert_xy_to_id(self, x, y) -> int:
@@ -566,7 +599,7 @@ class Checkers:
         """
         return ((y*self.num_horizontal+x))
     
-    def convert_id_to_xy(self, id) -> (int, int):
+    def convert_id_to_xy(self, id: int) -> (int, int):
         return (id % self.num_horizontal, id // self.num_horizontal)
 
     def result(self):
