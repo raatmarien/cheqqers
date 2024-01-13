@@ -246,8 +246,6 @@ class Checkers:
         # Append all ids to one list'
         player_ids = player_ids[0] + player_ids[1]
         opponent_ids = opponent_ids[0] + opponent_ids[1]
-        print(f"Player ids: {player_ids}")
-        print(f"Opponent ids: {opponent_ids} ")
         for move in blind_moves:
             # For each move check if there is a piece in the position
             # If it is empty it is a legal move
@@ -259,7 +257,6 @@ class Checkers:
             target2_id = None
             if(move.target2_x != None):
                 target2_id = self.convert_xy_to_id(move.target2_x, move.target2_y)
-            print(f"{source_id} to {target1_id} and {target2_id}")
             # CLASSICAL MOVE    
             if(target1_id not in player_ids and target1_id not in opponent_ids and target2_id == None): # it is an empty square, so it is possible move there
                 legal_moves.append(Move_id(MoveType.CLASSIC, source_id, target1_id))
@@ -395,13 +392,8 @@ class Checkers:
             to_king.append(move.target2_id)
         
         # player_ids, _ = self.get_positions(player)
-        print(f"To king: {to_king}")
         for id in to_king:
             _, y = self.convert_id_to_xy(id)
-            print(f"y: {y}")
-            print(f"true or false: {self.classical_squares[str(id)].king}" )
-            print((y == self.num_vertical or y == 0))
-            print(self.classical_squares[str(id)].king == False)
             if((y == self.num_vertical-1 or y == 0) and self.classical_squares[str(id)].king == False):
                 # print(id, self.num_vertical-1, self.num_horizontal*self.num_vertical-self.num_vertical)
                 self.king(id)
@@ -466,7 +458,6 @@ class Checkers:
         return output
     
     def king(self, id: int):
-        print(f"Kingng {id}")
         self.classical_squares[str(id)].king = True
         # if(mark == CheckersSquare.WHITE):
         #     QuditFlip(5, mark.value, CheckersSquare.WHITE_KING.value)(self.squares[str(id)])
@@ -543,7 +534,6 @@ class Checkers:
             taken = True
         # else: # not a jump
             # CheckersClassicMove(2, 1)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)]) 
-        print(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
         # Move(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
         CheckersClassicMove(2, 1)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
         self.classical_squares[str(move.target1_id)] = self.classical_squares[str(move.source_id)]
