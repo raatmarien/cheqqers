@@ -132,6 +132,26 @@ class Checkers:
                     # flip(self.squares[str(id)])
                     self.classical_squares[str(id)] = Piece(id, CheckersPlayer.WHITE) # White  
 
+    def measure_square(self, id) -> CheckersSquare:
+        """
+        Measures single square and returns CheckersSquare.EMPTY or CheckersSquare.FULL
+        """
+        print(f"Checking for id: {id}")
+        self.board.pop(objects=[self.squares[str(id)]])
+        original_peek = (self.board.peek(objects=[self.squares[str(id)]])) # peek returns double list of all object peeked. For one object that looks like [[<CheckersSquare.WHITE: 1>]]
+        ids = self.remove_from_rel_squares(id)
+        # Check out all ids, for the one that remained, remove all others from classical squares
+        print(f"IDS: {ids}")
+        for classical_id in ids:
+            peek = (self.board.peek(objects=[self.squares[str(classical_id)]]))
+            if(peek[0][0] == CheckersSquare.FULL):
+                print(f"Classical ID [{classical_id}] is full")
+                continue
+            else:
+                print(f"Classical ID [{classical_id}] is NOT full")
+                self.remove_piece(str(classical_id))
+        return(original_peek[0][0])
+
     def measure(self) -> None:
         """Measures all squares on the Checkers board.
 
@@ -378,14 +398,20 @@ class Checkers:
         )
 
     def player_move(self, move: Move_id, player: CheckersPlayer = None):
+        print("OLD:")
+        print("[", end="")
+        for key, value in self.classical_squares.items():
+            print(f"{key}, ", end="")
+        print("]")
+        print(f"Related squares: {self.related_squares}")
         prev_taken = False
         to_king = [] # list that holds moved pieces to check if they need to be kinged
         if(player == None):
             player = self.player
-
         if(move.target2_id == None):
-            prev_taken = self.classic_move(move)
-            to_king.append(move.target1_id)
+            prev_taken, failed = self.classic_move(move)
+            if(not failed):
+                to_king.append(move.target1_id)
         else:
             # if not classical move it is a split move
             self.split_move(move, player)
@@ -400,9 +426,17 @@ class Checkers:
                 self.king(id)
 
         # If a move has been done we need to flip the player, IF they can not take another piece SHOULD CHECK IF THE PIECE YOU JUST USED CAN GO AGAIN
+        
+        print("NEW:")
+        print("[", end="")
+        for key, value in self.classical_squares.items():
+            print(f"{key}, ", end="")
+        print("]")
+        print(f"Related squares: {self.related_squares}")
         if(prev_taken and self.can_take_piece(move.target1_id)): # If we took a piece and we can take another piece do not chance the player
             return
         self.player = CheckersPlayer.BLACK if self.player == CheckersPlayer.WHITE else CheckersPlayer.WHITE
+        return
 
     def get_board(self) -> str:
         """Returns the Checkers board in ASCII form. Also returns dictionary with id as key.
@@ -510,27 +544,26 @@ class Checkers:
         #     legal_moves.append(Move_id(source_id, jump_id))
         #     legal_take_moves.append(Move_id(source_id, jump_id))
 
-    def classic_move(self, move: Move_id):
+    def classic_move(self, move: Move_id) -> [bool, bool]:
         """
         This function moves a piece from one square to another. If it jumps over a piece it also removes this piece.
         It also measures the piece itself or the piece it is taking if it is relevant.
+        Returns two booleans. First one is true if a piece has been taken. Second one is true if a move has failed
         """
         taken = False # To return if the move took a piece or not
+        wasted = True
         is_adjacent, jumped_id = self.is_adjacent(move.source_id, move.target1_id)
         if(not is_adjacent): # if ids are not adjacent we jumped over a piece and need to remove it
             # First check if the piece we are using is actually there
-            self.board.pop(objects=[self.squares[str(move.source_id)]])
-            peek = (self.board.peek(objects=[self.squares[str(move.source_id)]]))
-            if(peek[0][0] == CheckersSquare.EMPTY): # If the piece is not there, turn is wasted
+            
+            if(self.measure_square(move.source_id) == CheckersSquare.EMPTY): # If the piece is not there, turn is wasted
                 self.remove_piece(move.source_id)
-                return taken
+                return taken, True
 
             # Next check if the piece we are taking is actually there
-            self.board.pop(objects=[self.squares[str(jumped_id)]])
-            peek = (self.board.peek(objects=[self.squares[str(jumped_id)]])) # peek returns double list of all object peeked. For one object that looks like [[<CheckersSquare.WHITE: 1>]]
-            if(peek[0][0] == CheckersSquare.EMPTY): # if it empty our turn is wasted
+            if(self.measure_square(jumped_id) == CheckersSquare.EMPTY): # if it empty our turn is wasted
                 self.remove_piece(jumped_id)
-                return taken
+                return taken, True
             # CheckersClassicMove(5, 1)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
             # Move(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])          
             self.remove_piece(jumped_id, True)
@@ -540,8 +573,14 @@ class Checkers:
         # Move(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
         CheckersClassicMove(2, 1)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
         self.classical_squares[str(move.target1_id)] = self.classical_squares[str(move.source_id)]
-        self.remove_piece(move.source_id)     
-        return taken
+        # If we do a classical move on a piece in superposition, we need to update the related squares list
+        for squares in self.related_squares:
+            if(str(move.source_id) in squares):
+                squares.append(str(move.target1_id))
+                break
+        self.remove_id_from_rel_squares(move.source_id)
+        self.remove_piece(move.source_id)
+        return taken, False
     
     ######### MOVE IN QUANTUM CHESS ########
     # yield cirq.ISWAP(s, t) ** 0.5
@@ -563,18 +602,19 @@ class Checkers:
         CheckersSplit(CheckersSquare.FULL, self.rules)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)], self.squares[str(move.target2_id)])
         self.classical_squares[str(move.target1_id)] = Piece(str(move.target1_id), color=original_piece.color, king=original_piece.king, superposition=True)
         self.classical_squares[str(move.target2_id)] = Piece(str(move.target1_id), color=original_piece.color, king=original_piece.king, superposition=True)
-        self.remove_piece(move.source_id)
         
+        # If the piece was already in superposition, we need to append this piece to the list
         for squares in self.related_squares:
-            if(move.source_id in squares):
-                squares.remove(move.source_id)
-                squares.append(move.target1_id)
-                squares.append(move.target2_id)
-                return
-        # If we get here this the first time this piece goes in superposition
-        self.related_squares.append[move.target1_id, move.target2_id]
-
-       
+            if(str(move.source_id) in squares):
+                squares.append(str(move.target1_id))
+                squares.append(str(move.target2_id))
+                break
+        else: # Is executed if break was never called
+            # If we get here this the first time this piece goes in superposition, so we add a new list
+            self.related_squares.append([str(move.target1_id), str(move.target2_id)])
+        self.remove_id_from_rel_squares(move.source_id)
+        self.remove_piece(move.source_id)
+        return       
 
     def remove_piece(self, id: int or (int,int), flip = False):
         """
@@ -589,10 +629,37 @@ class Checkers:
         # QuditFlip(3, CheckersSquare.BLACK.value, CheckersSquare.EMPTY.value)(self.squares[id])
         # QuditFlip(5, mark.value, CheckersSquare.EMPTY.value)(self.squares[str(id)])
         if(str(id) in self.classical_squares):
+            self.classical_squares.pop(str(id))
             if(flip):
                 QuditFlip(2, CheckersSquare.FULL.value, CheckersSquare.EMPTY.value)(self.squares[str(id)])
-            self.classical_squares.pop(str(id))
         return
+    
+    def remove_id_from_rel_squares(self, id):
+        # Check if the id we need to remove used to be in a superposition.
+        temp_list = deepcopy(self.related_squares)
+        print(f"CHECKING REMOVING FOR ID: {id}...")
+        for index, squares in enumerate(temp_list):
+            if(str(id) in squares):
+                self.related_squares[index].remove(str(id))
+                if(len(self.related_squares[index]) <= 1): # If the length is one, we have returned to classical state
+                    self.related_squares.pop(index)
+                return
+
+    def remove_from_rel_squares(self, id):
+        """
+        If an ID is measured, the id itself and all related squares need to be removed
+        """
+        temp_list = deepcopy(self.related_squares)
+        print(f"CHECKING REMOVING ENTIRE LIST ID: {id}... for: \n{self.related_squares}")
+        for index, squares in enumerate(temp_list):
+            print(squares)
+            if(str(id) in squares):
+                print("TRUE")
+                print("DONE CHECKING REMOVING ENTIRE LIST")
+                return self.related_squares.pop(index)
+        print(self.related_squares)
+        print("DONE CHECKING REMOVING ENTIRE LIST")
+        return []
         
     def convert_xy_to_id(self, x, y) -> int:
         """
