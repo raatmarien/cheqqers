@@ -152,12 +152,13 @@ class Checkers:
                 self.remove_piece(str(classical_id))
         return(original_peek[0][0])
 
-    def measure(self) -> None:
+    def measure(self) -> None:  
         """Measures all squares on the Checkers board.
 
         Once the board is measured, a new board is created
         that is initialized to the measured state.
         This should happen when no more squares are empty.
+        CURRENTLY NOT UP TO DATE, DOESNT UPDATE CLASSICAL SQUARES AND RELATED SQUARES
         """
         self.last_result = [
             CheckersSquare.from_result(square) for square in self.board.pop()
