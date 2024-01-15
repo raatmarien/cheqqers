@@ -48,7 +48,7 @@ class Move_id:
         
     
     def print_move(self, index = -1) -> None:
-        output = ""
+        output = f"({self.movetype.name}) "
         if(index != -1):
             output = str(index) + ": "
         output += f"[{self.source_id}] to [{self.target1_id}]"
@@ -178,35 +178,47 @@ class Checkers:
             return False
         return True
 
-    def get_advanced_positions(self, player):
-        """
-        Returns dicitionary of players ids and opponent ids using the Piece class, 
-        player_ids and opponent_ids contain the ids
-        """
-        results = self.board.peek(count=100)
-        hist = _histogram(self.num_vertical, self.num_horizontal,
-            [
-                [CheckersSquare.from_result(square) for square in result]
-                for result in results
-            ]
-        )
+    # def get_advanced_positions(self, player):
+    #     """
+    #     FUNCTION NOT WORKING ANYMORE
+    #     Returns dicitionary of players ids and opponent ids using the Piece class, 
+    #     player_ids and opponent_ids contain the ids
+    #     """
+    #     results = self.board.peek(count=100)
+    #     hist = _histogram(self.num_vertical, self.num_horizontal,
+    #         [
+    #             [CheckersSquare.from_result(square) for square in result]
+    #             for result in results
+    #         ]
+    #     )
+    #     white_pieces = {}
+    #     black_pieces = {}
+    #     for id in range(self.num_vertical*self.num_horizontal):
+    #         for mark in (CheckersSquare.BLACK, CheckersSquare.WHITE, CheckersSquare.WHITE_KING, CheckersSquare.BLACK_KING):
+    #             if(hist[id][mark] != 0): # For the current player (white or black). Check both for entanglement (if that will be implemented)
+    #                 if(mark == CheckersSquare.WHITE):
+    #                     white_pieces[str(id)] = Piece(id, mark, False)
+    #                 elif(mark == CheckersSquare.WHITE_KING):
+    #                     white_pieces[str(id)] = Piece(id, mark, True)
+    #                 if(mark == CheckersSquare.BLACK):
+    #                     black_pieces[str(id)] = Piece(id, mark, False)
+    #                 elif(mark == CheckersSquare.BLACK_KING):
+    #                     black_pieces[str(id)] = Piece(id, mark, True)
+    #     if(player == CheckersSquare.WHITE):
+    #         return white_pieces, black_pieces
+    #     else:
+    #         return black_pieces, white_pieces
+
+    def get_advanced_positions(self, player: CheckersPlayer):
         white_pieces = {}
         black_pieces = {}
-        for id in range(self.num_vertical*self.num_horizontal):
-            for mark in (CheckersSquare.BLACK, CheckersSquare.WHITE, CheckersSquare.WHITE_KING, CheckersSquare.BLACK_KING):
-                if(hist[id][mark] != 0): # For the current player (white or black). Check both for entanglement (if that will be implemented)
-                    if(mark == CheckersSquare.WHITE):
-                        white_pieces[str(id)] = Piece(id, mark, False)
-                    elif(mark == CheckersSquare.WHITE_KING):
-                        white_pieces[str(id)] = Piece(id, mark, True)
-                    if(mark == CheckersSquare.BLACK):
-                        black_pieces[str(id)] = Piece(id, mark, False)
-                    elif(mark == CheckersSquare.BLACK_KING):
-                        black_pieces[str(id)] = Piece(id, mark, True)
-        if(player == CheckersSquare.WHITE):
-            return white_pieces, black_pieces
-        else:
-            return black_pieces, white_pieces
+        for key, value in self.classical_squares.items():
+            id = str(key)
+            if(value.color == CheckersPlayer.WHITE):
+                white_pieces[id] = value
+            else:
+                black_pieces[id] = value
+        return (white_pieces, black_pieces) if (player == CheckersPlayer.WHITE) else (black_pieces, white_pieces)
 
     def get_positions(self, player: CheckersPlayer):
         """

@@ -2,8 +2,8 @@ from quantum_checkers import Checkers, Move_id
 import pygame
 from enums import (
     CheckersResult,
-    CheckersRules,
-    CheckersSquare
+    CheckersPlayer,
+    MoveType
 )
 import os
 from pygame import gfxdraw
@@ -39,7 +39,7 @@ class GameInterface:
         self.highlighted_squares = []
         self.status = CheckersResult.UNFINISHED
         self.selected_id = None # Square select by player, used for highlighting and moving pieces
-        self.move_locations = None # If a piece is selected, this variable will store the locations the piece can move to
+        self.move_locations = set() # If a piece is selected, this variable will store the locations the piece can move to
         if(GUI == "True"):
             self.GUI = True
             self.init_gui()
@@ -60,17 +60,23 @@ class GameInterface:
         # Clock to control the frame rate
         clock = pygame.time.Clock()
 
-    def highlight_squares(self, moves_dict: dict):
+    def highlight_squares(self, moves_list: list):
         self.highlighted_squares = []
-        self.move_locations = moves_dict.get(self.selected_id)
-        if(self.move_locations is not None):
+        movable_pieces = []
+        for move in moves_list:
+            movable_pieces.append(move.source_id)
+            if(move.source_id == self.selected_id):
+                self.move_locations.add(move.target1_id)
+            
+
+        if(len(self.move_locations) > 0):
             self.highlighted_squares.append(self.selected_id)
             for i in self.move_locations:
                 self.highlighted_squares.append(i)
             return
-        # no piece selected that is able to move
-        for key, value in moves_dict.items():
-            self.highlighted_squares.append(key)
+        # no piece selected that is able to move TODO
+        for idx in movable_pieces:
+            self.highlighted_squares.append(idx)
         
     def play(self):
         while(self.status == CheckersResult.UNFINISHED and not self.quit):
@@ -90,6 +96,7 @@ class GameInterface:
                         # Detect swipes for quantum moves
                         if(self.handle_click(down_pos, event.pos)):
                             legal_moves = self.get_legal_moves() # We have to calculate them again because the player has chanced for the highlight function
+                    
                     self.highlight_squares(legal_moves)
                     self.draw_board()
                     pygame.display.flip() # needs to be called outside draw function
@@ -130,9 +137,16 @@ class GameInterface:
             c = CROWN_IMG.get_rect(center=(x+SQUARE_W//2, y+SQUARE_H//2)) # centers the image
             self.screen.blit(CROWN_IMG, c)
 
+    def get_positions(self, player) -> [[list, list], [list, list]]:
+        """
+        Gets the positions of all the pieces from the game.
+        Returns two lists of lists of the player positions and opponent positions separated by the normal pieces and king pieces
+        """
+        return self.game.get_positions(player)
+
     def draw_board(self):
         self.screen.fill(WHITE)
-        white_pieces, black_pieces = self.game.get_advanced_positions(CheckersSquare.WHITE)
+        white_pieces, black_pieces = self.game.get_advanced_positions(CheckersPlayer.WHITE)
         flip = True
         for id in range(self.game.num_horizontal*self.game.num_vertical):
             # print(f"{id}, {self.game.num_horizontal}, {id % self.game.num_horizontal == 0}")
@@ -165,9 +179,9 @@ class GameInterface:
         """
         Do a game move and reset values for GUI
         """
-        self.game.move(move, self.game.player)
+        self.game.player_move(move, self.game.player)
         self.selected_id = -1 # value used in highlight function to check if we need to return
-        self.move_locations = None
+        self.move_locations.clear()
         self.highlighted_squares = []
         return
 
@@ -182,12 +196,12 @@ class GameInterface:
         second_id = self.get_id_from_mouse_pos(mouse_x, mouse_y)
         if(first_id == second_id):
             if(self.selected_id is not None and self.move_locations is not None and first_id in self.move_locations): # We want to move the piece to first id
-                self.do_game_move(Move_id(self.selected_id, first_id))
+                self.do_game_move(Move_id(MoveType.CLASSIC, self.selected_id, first_id)) #classic move
                 return True
             self.selected_id = first_id
             return False
         elif(self.selected_id is not None and self.move_locations is not None and first_id in self.move_locations and second_id in self.move_locations):
-            self.do_game_move(Move_id(self.selected_id, first_id, second_id))
+            self.do_game_move(Move_id(MoveType.SPLIT, self.selected_id, first_id, second_id)) #split move
 
     def print_board(self) -> str:
         str_board = self.game.get_board()
