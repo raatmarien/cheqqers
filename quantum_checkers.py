@@ -136,19 +136,15 @@ class Checkers:
         """
         Measures single square and returns CheckersSquare.EMPTY or CheckersSquare.FULL
         """
-        print(f"Checking for id: {id}")
         self.board.pop(objects=[self.squares[str(id)]])
         original_peek = (self.board.peek(objects=[self.squares[str(id)]])) # peek returns double list of all object peeked. For one object that looks like [[<CheckersSquare.WHITE: 1>]]
         ids = self.remove_from_rel_squares(id)
         # Check out all ids, for the one that remained, remove all others from classical squares
-        print(f"IDS: {ids}")
         for classical_id in ids:
             peek = (self.board.peek(objects=[self.squares[str(classical_id)]]))
             if(peek[0][0] == CheckersSquare.FULL):
-                print(f"Classical ID [{classical_id}] is full")
                 continue
             else:
-                print(f"Classical ID [{classical_id}] is NOT full")
                 self.remove_piece(str(classical_id))
         return(original_peek[0][0])
 
@@ -411,12 +407,6 @@ class Checkers:
         )
 
     def player_move(self, move: Move_id, player: CheckersPlayer = None):
-        print("OLD:")
-        print("[", end="")
-        for key, value in self.classical_squares.items():
-            print(f"{key}, ", end="")
-        print("]")
-        print(f"Related squares: {self.related_squares}")
         prev_taken = False
         to_king = [] # list that holds moved pieces to check if they need to be kinged
         if(player == None):
@@ -439,13 +429,6 @@ class Checkers:
                 self.king(id)
 
         # If a move has been done we need to flip the player, IF they can not take another piece SHOULD CHECK IF THE PIECE YOU JUST USED CAN GO AGAIN
-        
-        print("NEW:")
-        print("[", end="")
-        for key, value in self.classical_squares.items():
-            print(f"{key}, ", end="")
-        print("]")
-        print(f"Related squares: {self.related_squares}")
         if(prev_taken and self.can_take_piece(move.target1_id)): # If we took a piece and we can take another piece do not chance the player
             return
         self.player = CheckersPlayer.BLACK if self.player == CheckersPlayer.WHITE else CheckersPlayer.WHITE
@@ -650,7 +633,6 @@ class Checkers:
     def remove_id_from_rel_squares(self, id):
         # Check if the id we need to remove used to be in a superposition.
         temp_list = deepcopy(self.related_squares)
-        print(f"CHECKING REMOVING FOR ID: {id}...")
         for index, squares in enumerate(temp_list):
             if(str(id) in squares):
                 self.related_squares[index].remove(str(id))
@@ -663,15 +645,9 @@ class Checkers:
         If an ID is measured, the id itself and all related squares need to be removed
         """
         temp_list = deepcopy(self.related_squares)
-        print(f"CHECKING REMOVING ENTIRE LIST ID: {id}... for: \n{self.related_squares}")
         for index, squares in enumerate(temp_list):
-            print(squares)
             if(str(id) in squares):
-                print("TRUE")
-                print("DONE CHECKING REMOVING ENTIRE LIST")
                 return self.related_squares.pop(index)
-        print(self.related_squares)
-        print("DONE CHECKING REMOVING ENTIRE LIST")
         return []
         
     def convert_xy_to_id(self, x, y) -> int:
@@ -709,5 +685,4 @@ class Checkers:
 #TODO: Add movetype to move_id when calculating possible moves to reduce extra calculations
 #TODO: Test Enum.CheckerRules values in split move
 #TODO: Clean up calculating legal moves function with using only 1 for loop
-#TODO: Fix classical_squares not removing all the related quantum objects when measuring which are on the board
-#TODO: Find a better solution to keep track of self.related_squares
+#TODO: Bug with king pieces in edge position not being able to do a split move
