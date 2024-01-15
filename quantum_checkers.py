@@ -462,10 +462,7 @@ class Checkers:
                 output += " "
                 for x in range(self.num_horizontal):
                     idx = self.convert_xy_to_id(x,y)
-                    if(idx % 2 == 0): # Do not print every other tile, to reduce clutter
-                        output += " "
-                        output += "-"*5
-                    elif(mark == CheckersSquare.EMPTY):
+                    if(mark == CheckersSquare.EMPTY):
                         output += f" . {hist[idx][CheckersSquare.EMPTY]:3}"
                     elif(mark == CheckersPlayer.WHITE):
                         identifier = "w"
@@ -483,18 +480,6 @@ class Checkers:
                             output += f" {identifier} {hist[idx][CheckersSquare.FULL]:3}"
                         else:
                             output += f" {identifier} {0:3}"
-                    # if(mark == CheckersSquare.FULL and hist[idx][mark] > 0):
-                    #     print(f"At {idx} here is a piece")
-                    #     print(self.classical_squares[str(idx)])
-                    #     if(self.classical_squares[str(idx)].color == CheckersPlayer.WHITE):
-                    #         output += f" {CheckersPlayer.WHITE} {hist[idx][mark]:3}"
-                    #     else:
-                    #         output += f" {CheckersPlayer.BLACK} {hist[idx][mark]:3}"
-                    #     # output += f" {_MARK_SYMBOLS[mark]} {hist[idx][mark]:3}"
-                    # else:
-                    #     output += f" {CheckersSquare.EMPTY} {hist[idx][mark]:3}"
-                    # if(hist[idx][mark] > 0):
-                    #     board_list[str(idx)] = hist[idx][mark]
                     if x != self.num_horizontal-1:
                         output += " |"
                 output += "\n"
