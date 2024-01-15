@@ -7,7 +7,7 @@ from enums import (
 )
 import os
 from pygame import gfxdraw
-
+import time
 # GUI
 import pygame
 import sys

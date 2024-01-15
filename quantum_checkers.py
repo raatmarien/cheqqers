@@ -103,6 +103,12 @@ class Checkers:
         # QuditFlip(5, 0, CheckersSquare.BLACK.value)(self.squares[str(18)])
         # QuditFlip(5, 0, CheckersSquare.BLACK.value)(self.squares[str(18)])
         # QuditFlip(5, 0, CheckersSquare.WHITE.value)(self.squares[str(6)])
+        # id = 5
+        # QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # Black
+        # self.classical_squares[str(id)] = Piece(id, CheckersPlayer.BLACK, king=True)
+        # id = 8
+        # QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # White
+        # self.classical_squares[str(id)] = Piece(id, CheckersPlayer.WHITE, king=True)
 
         # Add initial pieces to board
         for y in range(num_vertical_pieces):
@@ -368,7 +374,7 @@ class Checkers:
                 top_right = True
             if(self.on_board(x-1, y+1)):
                 blind_moves.append(Move_temp(x,y,x-1,y+1))
-                bottom_left = False
+                bottom_left = True
             if(self.on_board(x+1, y+1)):
                 blind_moves.append(Move_temp(x,y,x+1,y+1))
                 bottom_right = True
