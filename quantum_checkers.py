@@ -462,7 +462,10 @@ class Checkers:
                 output += " "
                 for x in range(self.num_horizontal):
                     idx = self.convert_xy_to_id(x,y)
-                    if(mark == CheckersSquare.EMPTY):
+                    if(idx % 2 == 0): # Do not print every other tile, to reduce clutter
+                        output += " "
+                        output += "-"*5
+                    elif(mark == CheckersSquare.EMPTY):
                         output += f" . {hist[idx][CheckersSquare.EMPTY]:3}"
                     elif(mark == CheckersPlayer.WHITE):
                         identifier = "w"
@@ -551,6 +554,12 @@ class Checkers:
         #     legal_moves.append(Move_id(source_id, jump_id))
         #     legal_take_moves.append(Move_id(source_id, jump_id))
 
+    def recreate_board(self, move: Move_id):
+        """
+        Used to recreate the board when doing a classical move (for performance reasons)
+        """
+        pass
+
     def classic_move(self, move: Move_id) -> [bool, bool]:
         """
         This function moves a piece from one square to another. If it jumps over a piece it also removes this piece.
@@ -558,7 +567,6 @@ class Checkers:
         Returns two booleans. First one is true if a piece has been taken. Second one is true if a move has failed
         """
         taken = False # To return if the move took a piece or not
-        wasted = True
         is_adjacent, jumped_id = self.is_adjacent(move.source_id, move.target1_id)
         if(not is_adjacent): # if ids are not adjacent we jumped over a piece and need to remove it
             # First check if the piece we are using is actually there
@@ -579,6 +587,7 @@ class Checkers:
             # CheckersClassicMove(2, 1)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)]) 
         # Move(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
         CheckersClassicMove(2, 1)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
+        # TODO: RECREATE BOARD INSTEAD OF DOING THE MOVE.
         self.classical_squares[str(move.target1_id)] = self.classical_squares[str(move.source_id)]
         # If we do a classical move on a piece in superposition, we need to update the related squares list
         for squares in self.related_squares:
