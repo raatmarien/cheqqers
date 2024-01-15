@@ -100,9 +100,15 @@ class Checkers:
         self.clear(run_on_hardware)
 
         # Test to take multipe pieces
-        # QuditFlip(5, 0, CheckersSquare.BLACK.value)(self.squares[str(18)])
-        # QuditFlip(5, 0, CheckersSquare.BLACK.value)(self.squares[str(18)])
-        # QuditFlip(5, 0, CheckersSquare.WHITE.value)(self.squares[str(6)])
+        # id = 24
+        # QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)])
+        # self.classical_squares[str(id)] = Piece(id, CheckersPlayer.WHITE, king=True)
+        # id = 18
+        # QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)])
+        # self.classical_squares[str(id)] = Piece(id, CheckersPlayer.BLACK, king=True)
+        # id = 6
+        # QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)])
+        # self.classical_squares[str(id)] = Piece(id, CheckersPlayer.BLACK, king=True)
         # id = 5
         # QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # Black
         # self.classical_squares[str(id)] = Piece(id, CheckersPlayer.BLACK, king=True)
@@ -112,7 +118,6 @@ class Checkers:
 
         # Add initial pieces to board
         for y in range(num_vertical_pieces):
-            flip = alpha.Flip()
             for x in range(self.num_horizontal):
                 if(y%2==0 and x%2==1):
                     id = self.convert_xy_to_id(x,y)
