@@ -462,7 +462,10 @@ class Checkers:
                 output += " "
                 for x in range(self.num_horizontal):
                     idx = self.convert_xy_to_id(x,y)
-                    if(mark == CheckersSquare.EMPTY):
+                    if(x % 2 == 0 and y % 2 == 0 or x % 2 == 1 and y % 2 == 1):
+                        output += " "
+                        output += f"-"*5
+                    elif(mark == CheckersSquare.EMPTY):
                         output += f" . {hist[idx][CheckersSquare.EMPTY]:3}"
                     elif(mark == CheckersPlayer.WHITE):
                         identifier = "w"
