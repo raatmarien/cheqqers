@@ -96,6 +96,7 @@ class Checkers:
         self.related_squares =[] # List of lists that keep track of squares in superpositions that are related to each other. This way if a square is measured we know the related squares of that square
         self.white_squares = {}
         self.black_squares = {}
+        self.superposition_pieces = set() # contains a list of pieces that started the superposition. This is needed to recreate the board when a move has been done
         if(num_vertical_pieces*2 >= num_vertical):
             print(f"Too many rows ({num_vertical_pieces}) filled with pieces. Decrease this number for this size of board. [{num_vertical}]x[{num_horizontal}]")
             exit()
@@ -120,7 +121,6 @@ class Checkers:
         # self.classical_squares[str(id)] = Piece(id, CheckersPlayer.WHITE, king=True)
 
         # Add initial pieces to board
-        # This initializer assumes the board is symmetrical. (Same number of pieces on each row)
         for y in range(self.num_vertical):
             for x in range(self.num_horizontal):
                 if(x % 2 == 1 and y % 2 == 0 or x % 2 == 0 and y % 2 == 1):
@@ -609,8 +609,12 @@ class Checkers:
         original_piece = self.classical_squares[str(move.source_id)]
         # Split(self.squares[str(move.source_id)], self.squares[str(move.target1_id)], self.squares[str(move.target2_id)])
         CheckersSplit(CheckersSquare.FULL, self.rules)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)], self.squares[str(move.target2_id)])
-        self.classical_squares[str(move.target1_id)] = Piece(str(move.target1_id), color=original_piece.color, king=original_piece.king, superposition=True)
-        self.classical_squares[str(move.target2_id)] = Piece(str(move.target2_id), color=original_piece.color, king=original_piece.king, superposition=True)
+        left_child = Piece(str(move.target1_id), color=original_piece.color, king=original_piece.king, superposition=True)
+        right_child = Piece(str(move.target2_id), color=original_piece.color, king=original_piece.king, superposition=True)
+        self.classical_squares[str(move.target1_id)] = left_child
+        self.classical_squares[str(move.target2_id)] = right_child
+        self.classical_squares[str(move.source_id)].left_child = self.classical_squares[str(move.target1_id)]
+        self.classical_squares[str(move.source_id)].right_child = self.classical_squares[str(move.target2_id)]
         
         # If the piece was already in superposition, we need to append this piece to the list
         for squares in self.related_squares:
@@ -621,8 +625,10 @@ class Checkers:
         else: # Is executed if break was never called
             # If we get here this the first time this piece goes in superposition, so we add a new list
             self.related_squares.append([str(move.target1_id), str(move.target2_id)])
+            self.superposition_pieces.add(original_piece)
         self.remove_id_from_rel_squares(move.source_id)
         self.remove_piece(move.source_id)
+        print(self.superposition_pieces)
         return       
 
     def remove_piece(self, id: int or (int,int), flip = False):
@@ -697,3 +703,27 @@ class Checkers:
 #TODO: Clean up calculating legal moves function with using only 1 for loop
 #TODO: Instead of first clearing the entire board and then flipping the pieces, just initialize the pieces immediately correctly
 #TODO: In measure_square() already removing the squares, but I also call it after a funciton
+    
+if __name__ == '__main__':
+    s = set()
+    p1 = Piece("1", CheckersPlayer.WHITE)
+    p2 = Piece("2", CheckersPlayer.BLACK)
+    dic = {}
+    dic["1"] = p1
+    dic["2"] = p2
+    s.add(p1)
+    for key, value in dic.items():
+        print(key, value)
+    p1.left_child = dic["2"]
+    for key, value in dic.items():
+        print(key, value)
+    print(p1.left_child.color)
+    dic["3"] = dic["2"]
+    for key, value in dic.items():
+        print(key, value)
+    dic.pop("2")
+    for key, value in dic.items():
+        print(key, value)
+    print(p1.left_child.color)
+
+    
