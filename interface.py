@@ -1,5 +1,6 @@
 from quantum_checkers import Checkers, Move_id
 import pygame
+import random
 from enums import (
     CheckersResult,
     CheckersPlayer,
@@ -80,8 +81,11 @@ class GameInterface:
             self.highlighted_squares.append(idx)
         
     def play(self):
+        counter = 0
         while(self.status == CheckersResult.UNFINISHED and not self.quit):
+            start_time = time.time()
             legal_moves = self.get_legal_moves()
+            legal_time = time.time() - start_time
             if(len(legal_moves) == 0):
                 self.status = CheckersResult.DRAW
                 continue
@@ -101,9 +105,14 @@ class GameInterface:
                     self.draw_board()
                     pygame.display.flip() # needs to be called outside draw function
             else:
+                start_time = time.time()
                 self.print_board()
+                print_time = time.time() - start_time
                 self.print_legal_moves(legal_moves) # Changes legal moves to be a list of Move classes for selecting a move
-                move = self.get_move()
+                # move = self.get_move()
+                counter += 1
+                print(f"Move number {counter}")
+                move = random.randint(1, len(legal_moves))
                 try:
                     move = int(move)
                 except:
@@ -112,8 +121,12 @@ class GameInterface:
                 if(move > len(legal_moves) or move < 1):
                     print(f"Input has to be an integer between 1 and {len(legal_moves)}!")
                     continue
+                start_time = time.time()
                 self.game.player_move(legal_moves[move-1], self.game.player)
-
+                print("Legal time: %.6f seconds ---" % (legal_time))
+                print("Print time: %.6f seconds ---" % (print_time))
+                print("Move time: %.6f seconds ---" % (time.time() - start_time))
+                time.sleep(1)
     def draw_circle(self, color, x, y, radius, king = False, highlited = False):
         if(color == RED):
             if(highlited):

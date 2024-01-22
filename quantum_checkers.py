@@ -369,9 +369,11 @@ class Checkers:
         """
         print("TESTING")
         for id in range(self.num_vertical*self.num_horizontal):
-            if(str(id) in self.classical_squares):
+            if(str(id) in self.classical_squares): # If there is a piece
+                if(self.classical_squares[str(id)].superposition): #If it is in superposition, we dont want to initaliaze it to full (100 %)
+                    continue
                 self.squares[str(id)] = QuantumObject(str(id), CheckersSquare.FULL)
-            else:
+            else: # If there is no piece in the square, we can just set it to empty
                 self.squares[str(id)] = QuantumObject(str(id), CheckersSquare.EMPTY)
         self.board = QuantumWorld(
             list(self.squares.values()), compile_to_qubits=self.run_on_hardware
@@ -566,10 +568,9 @@ class Checkers:
             self.remove_piece(jumped_id, True)
             taken = True
         peek = (self.board.peek(objects=[self.squares[str(move.source_id)]]))
-        print(peek)
         if(peek[0][0] == CheckersSquare.FULL):
             pass # If
-        # CheckersClassicMove(2, 1)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
+        CheckersClassicMove(2, 1)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
         # TODO: RECREATE BOARD INSTEAD OF DOING THE MOVE.
         self.classical_squares[str(move.target1_id)] = self.classical_squares[str(move.source_id)]
         # If we do a classical move on a piece in superposition, we need to update the related squares list
@@ -579,7 +580,7 @@ class Checkers:
                 break
         self.remove_id_from_rel_squares(move.source_id)
         self.remove_piece(move.source_id)
-        self.test_new_filled_board()
+        # self.test_new_filled_board()
         return taken, False
     
     ######### MOVE IN QUANTUM CHESS ########
