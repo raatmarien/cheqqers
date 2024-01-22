@@ -87,6 +87,7 @@ class Checkers:
         self.rules = rules
         self.player = CheckersPlayer.WHITE
         self.num_vertical = num_vertical
+        self.run_on_hardware = run_on_hardware
         self.num_horizontal = num_horizontal
         self.num_vertical_pieces = num_vertical_pieces # how many rows of one color need to be filled with pieces
         self.classical_squares = {} # Contains information about a square (e.g. white, king, etc...)
@@ -97,7 +98,7 @@ class Checkers:
             print(f"Too many rows ({num_vertical_pieces}) filled with pieces. Decrease this number for this size of board. [{num_vertical}]x[{num_horizontal}]")
             exit()
         # Initialize empty board
-        self.clear(run_on_hardware)
+        self.clear()
 
         # Test to take multipe pieces
         # id = 24
@@ -121,26 +122,19 @@ class Checkers:
             for x in range(self.num_horizontal):
                 if(y%2==0 and x%2==1):
                     id = self.convert_xy_to_id(x,y)
-                    # print(id)
-                    # QuditFlip(1, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # Black
-                    # print(self.board.peek([self.squares[str(id)]]))
-                    # flip(self.squares[str(id)])
                     QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # Black
-                    # print(self.board.peek([self.squares[str(id)]]))
-                    # print("#")
                     self.classical_squares[str(id)] = Piece(id, CheckersPlayer.BLACK)
+
                     id = self.convert_xy_to_id(x,self.num_vertical-1-y)
                     QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # White
-                    # flip(self.squares[str(id)])
                     self.classical_squares[str(id)] = Piece(id, CheckersPlayer.WHITE)
                 elif(y%2!=0 and x%2!=1):
                     id = self.convert_xy_to_id(x,y)
                     QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # Black
-                    # flip(self.squares[str(id)])
                     self.classical_squares[str(id)] = Piece(id, CheckersPlayer.BLACK)
+
                     id = self.convert_xy_to_id(x,self.num_vertical-1-y)
                     QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)])
-                    # flip(self.squares[str(id)])
                     self.classical_squares[str(id)] = Piece(id, CheckersPlayer.WHITE) # White  
 
     def measure_square(self, id) -> CheckersSquare:
@@ -184,37 +178,6 @@ class Checkers:
         if(x < 0 or x > self.num_horizontal-1 or y < 0 or y > self.num_vertical-1):
             return False
         return True
-
-    # def get_advanced_positions(self, player):
-    #     """
-    #     FUNCTION NOT WORKING ANYMORE
-    #     Returns dicitionary of players ids and opponent ids using the Piece class, 
-    #     player_ids and opponent_ids contain the ids
-    #     """
-    #     results = self.board.peek(count=100)
-    #     hist = _histogram(self.num_vertical, self.num_horizontal,
-    #         [
-    #             [CheckersSquare.from_result(square) for square in result]
-    #             for result in results
-    #         ]
-    #     )
-    #     white_pieces = {}
-    #     black_pieces = {}
-    #     for id in range(self.num_vertical*self.num_horizontal):
-    #         for mark in (CheckersSquare.BLACK, CheckersSquare.WHITE, CheckersSquare.WHITE_KING, CheckersSquare.BLACK_KING):
-    #             if(hist[id][mark] != 0): # For the current player (white or black). Check both for entanglement (if that will be implemented)
-    #                 if(mark == CheckersSquare.WHITE):
-    #                     white_pieces[str(id)] = Piece(id, mark, False)
-    #                 elif(mark == CheckersSquare.WHITE_KING):
-    #                     white_pieces[str(id)] = Piece(id, mark, True)
-    #                 if(mark == CheckersSquare.BLACK):
-    #                     black_pieces[str(id)] = Piece(id, mark, False)
-    #                 elif(mark == CheckersSquare.BLACK_KING):
-    #                     black_pieces[str(id)] = Piece(id, mark, True)
-    #     if(player == CheckersSquare.WHITE):
-    #         return white_pieces, black_pieces
-    #     else:
-    #         return black_pieces, white_pieces
 
     def get_advanced_positions(self, player: CheckersPlayer):
         white_pieces = {}
@@ -400,7 +363,40 @@ class Checkers:
                 blind_moves.append(Move_temp(x,y,x-1,y+1,x+1,y+1))
         return blind_moves
     
-    def clear(self, run_on_hardware):
+    def test_new_filled_board(self):
+        """
+        Test function for creating new board
+        """
+        print("TESTING")
+        for id in range(self.num_vertical*self.num_horizontal):
+            if(str(id) in self.classical_squares):
+                self.squares[str(id)] = QuantumObject(str(id), CheckersSquare.FULL)
+            else:
+                self.squares[str(id)] = QuantumObject(str(id), CheckersSquare.EMPTY)
+        self.board = QuantumWorld(
+            list(self.squares.values()), compile_to_qubits=self.run_on_hardware
+        )
+        self.create_new_filled_board()
+
+
+        # FOR SPLIT MOVES FORST INITALIZE RANDOM BIT AND THEN USE IT TO SPLIT TWO QBITS
+        # QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(0)])
+        # CheckersSplit(CheckersSquare.FULL, self.rules)(self.squares[str(0)], self.squares[str(11)], self.squares[str(13)])
+        # self.classical_squares[str(11)] = Piece(str(11), color=CheckersPlayer.BLACK, superposition=True)
+        # self.classical_squares[str(13)] = Piece(str(13), color=CheckersPlayer.BLACK, superposition=True)
+        # id = 1
+        # QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)])
+        # self.classical_squares[str(id)] = Piece(id, CheckersPlayer.WHITE) # White
+
+    def create_new_filled_board(self):
+        """
+        Creates new board with the values in self.squares
+        """
+        self.board = QuantumWorld(
+            list(self.squares.values()), compile_to_qubits=self.run_on_hardware
+        )
+    
+    def clear(self):
         """
         Create empty the board
         """
@@ -414,7 +410,7 @@ class Checkers:
         for i in range(self.num_vertical*self.num_horizontal):
             self.squares[str(i)] = QuantumObject(str(i), CheckersSquare.EMPTY)
         self.board = QuantumWorld(
-            list(self.squares.values()), compile_to_qubits=run_on_hardware
+            list(self.squares.values()), compile_to_qubits=self.run_on_hardware
         )
 
     def player_move(self, move: Move_id, player: CheckersPlayer = None):
@@ -566,15 +562,14 @@ class Checkers:
             # Next check if the piece we are taking is actually there
             if(self.measure_square(jumped_id) == CheckersSquare.EMPTY): # if it empty our turn is wasted
                 self.remove_piece(jumped_id)
-                return taken, True
-            # CheckersClassicMove(5, 1)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
-            # Move(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])          
+                return taken, True    
             self.remove_piece(jumped_id, True)
             taken = True
-        # else: # not a jump
-            # CheckersClassicMove(2, 1)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)]) 
-        # Move(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
-        CheckersClassicMove(2, 1)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
+        peek = (self.board.peek(objects=[self.squares[str(move.source_id)]]))
+        print(peek)
+        if(peek[0][0] == CheckersSquare.FULL):
+            pass # If
+        # CheckersClassicMove(2, 1)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
         # TODO: RECREATE BOARD INSTEAD OF DOING THE MOVE.
         self.classical_squares[str(move.target1_id)] = self.classical_squares[str(move.source_id)]
         # If we do a classical move on a piece in superposition, we need to update the related squares list
@@ -584,6 +579,7 @@ class Checkers:
                 break
         self.remove_id_from_rel_squares(move.source_id)
         self.remove_piece(move.source_id)
+        self.test_new_filled_board()
         return taken, False
     
     ######### MOVE IN QUANTUM CHESS ########
@@ -605,7 +601,7 @@ class Checkers:
         # Split(self.squares[str(move.source_id)], self.squares[str(move.target1_id)], self.squares[str(move.target2_id)])
         CheckersSplit(CheckersSquare.FULL, self.rules)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)], self.squares[str(move.target2_id)])
         self.classical_squares[str(move.target1_id)] = Piece(str(move.target1_id), color=original_piece.color, king=original_piece.king, superposition=True)
-        self.classical_squares[str(move.target2_id)] = Piece(str(move.target1_id), color=original_piece.color, king=original_piece.king, superposition=True)
+        self.classical_squares[str(move.target2_id)] = Piece(str(move.target2_id), color=original_piece.color, king=original_piece.king, superposition=True)
         
         # If the piece was already in superposition, we need to append this piece to the list
         for squares in self.related_squares:
@@ -626,12 +622,6 @@ class Checkers:
         """
         if(type(id) is tuple):
             id = self.convert_xy_to_id(id[0], id[1])
-        # self.squares[id] = CheckersSquare.EMPTY
-        # self.squares[id] = QuantumObject(id, CheckersSquare.EMPTY)
-        # QuditFlip(3, 0, CheckersSquare.EMPTY.value)(self.squares[id])
-        # QuditFlip(3, CheckersSquare.WHITE.value, CheckersSquare.EMPTY.value)(self.squares[id])
-        # QuditFlip(3, CheckersSquare.BLACK.value, CheckersSquare.EMPTY.value)(self.squares[id])
-        # QuditFlip(5, mark.value, CheckersSquare.EMPTY.value)(self.squares[str(id)])
         if(str(id) in self.classical_squares):
             self.classical_squares.pop(str(id))
             if(flip):
@@ -639,6 +629,9 @@ class Checkers:
         return
     
     def remove_id_from_rel_squares(self, id):
+        """
+        If this piece was in superposition, all pieces that were in superposition need to be popped.
+        """
         # Check if the id we need to remove used to be in a superposition.
         temp_list = deepcopy(self.related_squares)
         for index, squares in enumerate(temp_list):
@@ -693,4 +686,5 @@ class Checkers:
 #TODO: Add movetype to move_id when calculating possible moves to reduce extra calculations
 #TODO: Test Enum.CheckerRules values in split move
 #TODO: Clean up calculating legal moves function with using only 1 for loop
-#TODO: Bug with king pieces in edge position not being able to do a split move
+#TODO: Instead of first clearing the entire board and then flipping the pieces, just initialize the pieces immediately correctly
+#TODO: In measure_square() already removing the squares, but I also call it after a funciton
