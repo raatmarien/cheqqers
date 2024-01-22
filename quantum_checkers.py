@@ -75,8 +75,7 @@ class Move_temp:
         print(output)
 
 class Piece():
-    def __init__(self, id, color: CheckersPlayer, king: bool = False, superposition: bool = False, left_child = None, right_child = None) -> None:
-        self.id = id
+    def __init__(self, color: CheckersPlayer, king: bool = False, superposition: bool = False, left_child = None, right_child = None) -> None:
         self.color = color
         self.king = king
         self.superposition = superposition
@@ -127,10 +126,10 @@ class Checkers:
                     id = self.convert_xy_to_id(x, y)
                     if(y <= self.num_vertical_pieces-1): # We are in the beginning rows, initalize black
                         QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # Black
-                        self.classical_squares[str(id)] = Piece(id, CheckersPlayer.BLACK)
+                        self.classical_squares[str(id)] = Piece(CheckersPlayer.BLACK)
                     elif(y >= self.num_vertical - self.num_vertical_pieces):
                         QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # White
-                        self.classical_squares[str(id)] = Piece(id, CheckersPlayer.WHITE)
+                        self.classical_squares[str(id)] = Piece(CheckersPlayer.WHITE)
 
         # for y in range(num_vertical_pieces):
         #     for x in range(self.num_horizontal):
@@ -609,8 +608,8 @@ class Checkers:
         original_piece = self.classical_squares[str(move.source_id)]
         # Split(self.squares[str(move.source_id)], self.squares[str(move.target1_id)], self.squares[str(move.target2_id)])
         CheckersSplit(CheckersSquare.FULL, self.rules)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)], self.squares[str(move.target2_id)])
-        left_child = Piece(str(move.target1_id), color=original_piece.color, king=original_piece.king, superposition=True)
-        right_child = Piece(str(move.target2_id), color=original_piece.color, king=original_piece.king, superposition=True)
+        left_child = Piece(color=original_piece.color, king=original_piece.king, superposition=True)
+        right_child = Piece(color=original_piece.color, king=original_piece.king, superposition=True)
         self.classical_squares[str(move.target1_id)] = left_child
         self.classical_squares[str(move.target2_id)] = right_child
         self.classical_squares[str(move.source_id)].left_child = self.classical_squares[str(move.target1_id)]
@@ -706,8 +705,8 @@ class Checkers:
     
 if __name__ == '__main__':
     s = set()
-    p1 = Piece("1", CheckersPlayer.WHITE)
-    p2 = Piece("2", CheckersPlayer.BLACK)
+    p1 = Piece(CheckersPlayer.WHITE)
+    p2 = Piece(CheckersPlayer.BLACK)
     dic = {}
     dic["1"] = p1
     dic["2"] = p2
