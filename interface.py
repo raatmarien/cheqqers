@@ -109,7 +109,7 @@ class GameInterface:
                 self.print_board()
                 print_time = time.time() - start_time
                 self.print_legal_moves(legal_moves) # Changes legal moves to be a list of Move classes for selecting a move
-                # move = self.get_move()
+                move = self.get_move()
                 counter += 1
                 print(f"Move number {counter}")
                 move = random.randint(1, len(legal_moves))
