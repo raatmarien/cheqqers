@@ -121,19 +121,30 @@ class Checkers:
 
         # Add initial pieces to board
         # This initializer assumes the board is symmetrical. (Same number of pieces on each row)
-        for y in range(num_vertical_pieces):
+        for y in range(self.num_vertical):
             for x in range(self.num_horizontal):
-                if(y%2==0 and x%2==1 or y%2!=0 and x%2!=1):
-                    print("1")
+                if(x % 2 == 1 and y % 2 == 0 or x % 2 == 0 and y % 2 == 1):
                     id = self.convert_xy_to_id(x, y)
-                    QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # Black
-                    self.classical_squares[str(id)] = Piece(id, CheckersPlayer.BLACK)
-                    print(id)
-                    id = self.convert_xy_to_id(x, self.num_vertical-1-y)
-                    QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # White
-                    self.classical_squares[str(id)] = Piece(id, CheckersPlayer.WHITE)
-                    print(id)
-                    
+                    if(y <= self.num_vertical_pieces-1): # We are in the beginning rows, initalize black
+                        QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # Black
+                        self.classical_squares[str(id)] = Piece(id, CheckersPlayer.BLACK)
+                    elif(y >= self.num_vertical - self.num_vertical_pieces):
+                        QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # White
+                        self.classical_squares[str(id)] = Piece(id, CheckersPlayer.WHITE)
+
+        # for y in range(num_vertical_pieces):
+        #     for x in range(self.num_horizontal):
+        #         if(y%2==0 and x%2==1 or y%2!=0 and x%2!=1):
+        #             print("1")
+        #             id = self.convert_xy_to_id(x, y)
+        #             QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # Black
+        #             self.classical_squares[str(id)] = Piece(id, CheckersPlayer.BLACK)
+        #             print(id)
+        #             id = self.convert_xy_to_id(x, self.num_vertical-1-y)
+        #             QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # White
+        #             self.classical_squares[str(id)] = Piece(id, CheckersPlayer.WHITE)
+        #             print(id)
+
     def measure_square(self, id) -> CheckersSquare:
         """
         Measures single square and returns CheckersSquare.EMPTY or CheckersSquare.FULL
