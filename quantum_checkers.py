@@ -102,6 +102,7 @@ class Checkers:
         self.classical_squares = {} # Contains information about a square (e.g. white, king, etc...)
         self.related_squares = [] # List of lists that keep track of squares in superpositions that are related to each other. This way if a square is measured we know the related squares of that square
         self.q_rel_moves = [] # parallel to related squares, but keeps track of quantum moves
+        self.q_moves = [] # Just a list of al quantum moves so we can do them again when doing a new move
         self.white_squares = {}
         self.black_squares = {}
         self.superposition_pieces = set() # contains a list of pieces that started the superposition. This is needed to recreate the board when a move has been done
@@ -144,18 +145,22 @@ class Checkers:
         """
         Measures single square and returns CheckersSquare.EMPTY or CheckersSquare.FULL
         """
+        print(f"MEASURING ID {id}")
         self.board.pop(objects=[self.squares[str(id)]])
         original_peek = (self.board.peek(objects=[self.squares[str(id)]])) # peek returns double list of all object peeked. For one object that looks like [[<CheckersSquare.WHITE: 1>]]
         ids = self.remove_from_rel_squares(id)
+        print(f"ALL RELATED IDS: {ids}")
         # Check out all ids, for the one that remained, remove all others from classical squares
         for classical_id in ids:
             peek = (self.board.peek(objects=[self.squares[str(classical_id)]]))
             if(peek[0][0] == CheckersSquare.FULL):
+                print(f"Full for ID {classical_id}")
                 continue
             self.remove_piece(str(classical_id))
         return(original_peek[0][0])
 
-    def measure(self) -> None:  
+    def measure(self) -> None:
+        print("MEASURING ALL")  
         """Measures all squares on the Checkers board.
 
         Once the board is measured, a new board is created
@@ -435,6 +440,9 @@ class Checkers:
             print(f"{i}:")
             for m in qm:
                 m.print_move()
+        print("Q moves order:")
+        for m in self.q_moves:
+            m.print_move()
         return
 
     def get_board(self) -> str:
@@ -461,6 +469,7 @@ class Checkers:
                         output += f" . {hist[idx][CheckersSquare.EMPTY]:3}"
                     elif(mark == CheckersPlayer.WHITE):
                         identifier = "w"
+                        print(f"VALUE AT {idx} is {hist[idx][CheckersSquare.FULL]}")
                         if(hist[idx][CheckersSquare.FULL] > 0 and self.classical_squares[str(idx)].color == CheckersPlayer.WHITE):
                             if(self.classical_squares[str(idx)].king):
                                 identifier = "W"
@@ -573,8 +582,9 @@ class Checkers:
             if(str(move.source_id) in squares):
                 squares.append(str(move.target1_id))
                 self.q_rel_moves[i].append(move)
+                self.q_moves.append(move)
                 break
-        self.remove_id_from_rel_squares(move) # possibly useless, since in measure the squares are already removed
+        self.remove_id_from_rel_squares(move, move.source_id) # possibly useless, since in measure the squares are already removed
         self.remove_piece(move.source_id)
         # self.test_new_filled_board()
         return taken, False
@@ -607,13 +617,15 @@ class Checkers:
                 print("Appending move")
                 move.print_move()
                 self.q_rel_moves[i].append(move)
+                self.q_moves.append(move)
                 break
         else: # Is executed if break was never called
             # If we get here this the first time this piece goes in superposition, so we add a new list
             self.related_squares.append([str(move.target1_id), str(move.target2_id)])
             self.q_rel_moves.append([move])
+            self.q_moves.append(move)
             self.superposition_pieces.add(original_piece)
-        self.remove_id_from_rel_squares(move)
+        self.remove_id_from_rel_squares(move, move.source_id)
         self.remove_piece(move.source_id)
         return       
 
@@ -623,6 +635,7 @@ class Checkers:
         """
         if(type(id) is tuple):
             id = self.convert_xy_to_id(id[0], id[1])
+        print(f"REMOVING {id}")
         if(str(id) in self.classical_squares):
             self.classical_squares.pop(str(id))
             if(flip):
@@ -640,14 +653,14 @@ class Checkers:
                     m.target2_id = move.target1_id
                     break
             self.q_rel_moves[index].remove(move)
+            self.q_moves.remove(move)
         return
 
-    def remove_id_from_rel_squares(self, move: Move_id):
+    def remove_id_from_rel_squares(self, move, id):
         """
         If this piece was in superposition, all pieces that were in superposition need to be popped.
         """
         # Check if the id we need to remove used to be in a superposition.
-        id = move.source_id
         temp_list = deepcopy(self.related_squares)
         for index, squares in enumerate(temp_list):
             if(str(id) in squares):
@@ -658,16 +671,22 @@ class Checkers:
                 
                 if(len(self.related_squares[index]) <= 1): # If the length is one, we have returned to classical state (Basically if we did not just do a classical move)
                     self.related_squares.pop(index)
+                    for mv in self.q_rel_moves[index]:
+                        if(mv in self.q_moves):
+                            self.q_moves.remove(mv)
                     self.q_rel_moves.pop(index)
                 return
 
     def remove_from_rel_squares(self, id):
         """
-        If an ID is measured, the id itself and all related squares need to be removed
+        If an ID is measured, the ID itself and all related squares need to be removed
         """
         temp_list = deepcopy(self.related_squares)
         for index, squares in enumerate(temp_list):
             if(str(id) in squares):
+                for mv in self.q_rel_moves[index]:
+                    if(mv in self.q_moves):
+                        self.q_moves.remove(mv)
                 self.q_rel_moves.pop(index)
                 return self.related_squares.pop(index)
         return []
