@@ -132,8 +132,8 @@ class GameInterface:
                 self.print_legal_moves(legal_moves) # Changes legal moves to be a list of Move classes for selecting a move
                 counter += 1
                 print(f"Move number {counter}")
-                move = self.get_move()
-                # move = random.randint(1, len(legal_moves))
+                # move = self.get_move()
+                move = random.randint(1, len(legal_moves))
                 moves.append(move)
                 try:
                     move = int(move)

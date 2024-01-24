@@ -145,10 +145,10 @@ class Checkers:
                     id = self.convert_xy_to_id(x, y)
                     if(y <= self.num_vertical_pieces-1): # We are in the beginning rows, initialize black
                         QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # Black
-                        self.classical_squares[str(id)] = Piece(str(id+1), CheckersPlayer.BLACK, True)
+                        self.classical_squares[str(id)] = Piece(str(id+1), CheckersPlayer.BLACK)
                     elif(y >= self.num_vertical - self.num_vertical_pieces):
                         QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # White
-                        self.classical_squares[str(id)] = Piece(str(id), CheckersPlayer.WHITE, True)
+                        self.classical_squares[str(id)] = Piece(str(id), CheckersPlayer.WHITE)
 
     def write_to_log(self, string):
         self.log = open("./log.txt", "a")
@@ -506,11 +506,6 @@ class Checkers:
                             output += f" . {hist[idx][CheckersSquare.EMPTY]:3}"
                         elif(mark == CheckersPlayer.WHITE):
                             identifier = "w"
-                            if(hist[idx][CheckersSquare.FULL] > 0):
-                                print("Check1")
-                                print(idx)
-                                print(self.classical_squares.keys())
-                                print(hist[idx][CheckersSquare.FULL])
                             if(hist[idx][CheckersSquare.FULL] > 0 and self.classical_squares[str(idx)].color == CheckersPlayer.WHITE):
                                 if(self.classical_squares[str(idx)].king):
                                     identifier = "W"
@@ -535,6 +530,7 @@ class Checkers:
             output = ""
             for i in self.q_moves:
                 output += i.get_move()
+                output+= " --- "
             print(output)
             output = ""
             for qm in self.q_rel_moves:
@@ -639,7 +635,8 @@ class Checkers:
                 self.q_rel_moves[i].append(move)
                 self.q_moves.append(move)
                 break
-        self.remove_id_from_rel_squares(move, move.source_id) # possibly useless, since in measure the squares are already removed
+        self.concat_moves(move, move.source_id)
+        # self.remove_id_from_rel_squares(move, move.source_id) # possibly useless, since in measure the squares are already removed
         self.remove_piece(move.source_id)
         self.alternate_classic_move()
         return taken, False
@@ -694,23 +691,28 @@ class Checkers:
                 QuditFlip(2, CheckersSquare.FULL.value, CheckersSquare.EMPTY.value)(self.squares[str(id)])
         return
     
-    def concat_moves(self, move, index): # used to concatenate a classical move after a split move to make it one split move
+    def concat_moves(self, move, id): # used to concatenate a classical move after a split move to make it one split move
         # ID is the id that connect two moves. e.g. 21 -> 15 and 17; 15 -> 11
         # CANT OPTIMIZE IF
         # MOVE GOES BACK TO ORIGNAL SOURCE ID
         # MOVE GOES TO OTHER TARGET ID
-        if(move.movetype == MoveType.CLASSIC):
-            for org_move in self.q_rel_moves[index]:
-                if (org_move.target1_id == move.source_id and move.target1_id != org_move.source_id and move.target1_id != org_move.target2_id):
-                    org_move.target1_id = move.target1_id
-                    self.q_rel_moves[index].remove(move)
-                    self.q_moves.remove(move)
-                    return
-                if(org_move.target2_id == move.source_id and move.target1_id != org_move.source_id and move.target1_id != org_move.target1_id):
-                    org_move.target2_id = move.target1_id
-                    self.q_rel_moves[index].remove(move)
-                    self.q_moves.remove(move)
-                    return
+        # Check if the id is in super position
+        if(move.movetype != MoveType.CLASSIC):
+            return
+        temp_list = deepcopy(self.related_squares)
+        for index, rel_squares in enumerate(temp_list):
+            if(str(id) in rel_squares): # it is in super positionn
+                for org_move in self.q_rel_moves[index]: # For all quantum moves that are related to the id 
+                    if (org_move.target1_id == move.source_id and move.target1_id != org_move.source_id and move.target1_id != org_move.target2_id):
+                        org_move.target1_id = move.target1_id
+                        self.q_rel_moves[index].remove(move)
+                        self.q_moves.remove(move)
+                        return
+                    if(org_move.target2_id == move.source_id and move.target1_id != org_move.source_id and move.target1_id != org_move.target1_id):
+                        org_move.target2_id = move.target1_id
+                        self.q_rel_moves[index].remove(move)
+                        self.q_moves.remove(move)
+                        return
         return
 
     def remove_id_from_rel_squares(self, move, id):
@@ -723,7 +725,6 @@ class Checkers:
             if(str(id) in squares):
                 i = self.related_squares[index].index(str(id)) # Get the index of the element we are removing
                 self.related_squares[index].remove(str(id))
-                self.concat_moves(move, index)
                 
                 if(len(self.related_squares[index]) <= 1): # If the length is one, we have returned to classical state (Basically if we did not just do a classical move)
                     self.related_squares.pop(index)
