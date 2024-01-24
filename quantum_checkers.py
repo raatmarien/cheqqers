@@ -577,7 +577,7 @@ class Checkers:
                 squares.append(str(move.target1_id))
                 self.q_rel_moves[i].append(move)
                 break
-        self.remove_id_from_rel_squares(move.source_id) # possibly useless, since in measure the squares are already removed
+        self.remove_id_from_rel_squares(move) # possibly useless, since in measure the squares are already removed
         self.remove_piece(move.source_id)
         # self.test_new_filled_board()
         return taken, False
@@ -614,7 +614,7 @@ class Checkers:
             self.related_squares.append([str(move.target1_id), str(move.target2_id)])
             self.q_rel_moves.append([move])
             self.superposition_pieces.add(original_piece)
-        self.remove_id_from_rel_squares(move.source_id)
+        self.remove_id_from_rel_squares(move)
         self.remove_piece(move.source_id)
         return       
 
@@ -630,16 +630,38 @@ class Checkers:
                 QuditFlip(2, CheckersSquare.FULL.value, CheckersSquare.EMPTY.value)(self.squares[str(id)])
         return
     
-    def remove_id_from_rel_squares(self, id):
+    def concat_moves(self, move, index): # used to concatenate a classical move after a split move to make it one split move
+        # Id is the id that connect two moves. e.g. 21 -> 15 and 17; 15 -> 11
+        print("Move given to concat_moves():")
+        move.print_move()
+        if(move.movetype == MoveType.CLASSIC):
+            for m in self.q_rel_moves[index]:
+                if (m.target1_id == move.source_id):
+                    m.target1_id = move.target1_id
+                    print("HERE1")
+                    return
+                if(m.target2_id == move.source_id):
+                    print("HERE2")
+                    m.target2_id = move.target1_id
+                    return
+        return
+
+
+    def remove_id_from_rel_squares(self, move: Move_id):
         """
         If this piece was in superposition, all pieces that were in superposition need to be popped.
         """
         # Check if the id we need to remove used to be in a superposition.
+        id = move.source_id
         temp_list = deepcopy(self.related_squares)
         for index, squares in enumerate(temp_list):
             if(str(id) in squares):
+                print(f"ID: {id}")
+                i = self.related_squares[index].index(str(id)) # Get the index of the element we are removing
                 self.related_squares[index].remove(str(id))
-                if(len(self.related_squares[index]) <= 1): # If the length is one, we have returned to classical state
+                self.concat_moves(move, index)
+                self.q_rel_moves[index].remove(move)
+                if(len(self.related_squares[index]) <= 1): # If the length is one, we have returned to classical state (Basically if we did not just do a classical move)
                     self.related_squares.pop(index)
                     self.q_rel_moves.pop(index)
                 return
