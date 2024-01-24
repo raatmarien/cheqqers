@@ -5,10 +5,10 @@ import time
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--num_rows', help='The number of rows of the checkboard. INT', default=7)
-    parser.add_argument('--num_columns', help='The number of columns of the checkboard. INT', default=5)
+    parser.add_argument('--num_rows', help='The number of rows of the checkboard. INT', default=8)
+    parser.add_argument('--num_columns', help='The number of columns of the checkboard. INT', default=8)
     parser.add_argument('--num_vertical_pieces', help='The number of rows that are filled with checkerpieces. INT', default=1)
-    parser.add_argument('--GUI', help='If GUI is enabled. True or False', default="True")
+    parser.add_argument('--GUI', help='If GUI is enabled. True or False', default="False")
     args = parser.parse_args()
     if(args.num_columns % 2 == 1 and args.num_rows % 2 == 0):
         warning_len = len("# WARNING: If the number of columns is uneven and the number of rows is even the board is not symmetrical. #")

@@ -41,6 +41,7 @@ class GameInterface:
         self.status = CheckersResult.UNFINISHED
         self.selected_id = None # Square select by player, used for highlighting and moving pieces
         self.move_locations = set() # If a piece is selected, this variable will store the locations the piece can move to
+        open('./log.txt', 'w').close()
         if(GUI == "True"):
             self.GUI = True
             self.init_gui()
@@ -80,6 +81,16 @@ class GameInterface:
         for idx in movable_pieces:
             self.highlighted_squares.append(idx)
         
+    def write_to_log(self, move, counter):
+        self.log = open("./log.txt", "a")
+        self.log.write("#########################\n")
+        self.log.write(str(counter))
+        self.log.write(self.game.get_board())
+        st = move.print_move()
+        self.log.write(st)
+        self.log.write("\n\n")
+        self.log.close()
+
     def play(self):
         counter = 0
         # for i in [3, 3, 2, 5, 5, 1]:
@@ -104,6 +115,8 @@ class GameInterface:
                     if event.type == pygame.MOUSEBUTTONUP:
                         # Detect swipes for quantum moves
                         if(self.handle_click(down_pos, event.pos)):
+                            counter += 1
+                            print(f"Move number {counter}")
                             legal_moves = self.get_legal_moves() # We have to calculate them again because the player has chanced for the highlight function
                     self.highlight_squares(legal_moves)
                     self.draw_board()
@@ -113,10 +126,10 @@ class GameInterface:
                 self.print_board()
                 print_time = time.time() - start_time
                 self.print_legal_moves(legal_moves) # Changes legal moves to be a list of Move classes for selecting a move
-                move = self.get_move()
                 counter += 1
                 print(f"Move number {counter}")
-                # move = random.randint(1, len(legal_moves))
+                # move = self.get_move()
+                move = random.randint(1, len(legal_moves))
                 try:
                     move = int(move)
                 except:
@@ -126,10 +139,13 @@ class GameInterface:
                     print(f"Input has to be an integer between 1 and {len(legal_moves)}!")
                     continue
                 start_time = time.time()
+                print(f"Move is ({move}):", end="")
+                legal_moves[move-1].print_move()
                 self.game.player_move(legal_moves[move-1], self.game.player)
                 print("Legal time: %.6f seconds ---" % (legal_time))
                 print("Print time: %.6f seconds ---" % (print_time))
                 print("Move time: %.6f seconds ---" % (time.time() - start_time))
+                self.write_to_log(legal_moves[move-1], counter)
                 # time.sleep(1)
 
     def draw_circle(self, color, x, y, radius, king = False, highlited = False):

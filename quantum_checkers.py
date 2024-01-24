@@ -56,6 +56,16 @@ class Move_id:
         if(self.target2_id != None):
             output += f" and [{self.target2_id}]"
         print(output)
+        return output
+    
+    def get_move(self, index = -1) -> None:
+        output = f"({self.player.name}, {self.movetype.name}) "
+        if(index != -1):
+            output = str(index) + ": "
+        output += f"[{self.source_id}] to [{self.target1_id}]"
+        if(self.target2_id != None):
+            output += f" and [{self.target2_id}]"
+        return output
 
 class Move_temp:
     def __init__(self, source_x: int, source_y: int, target1_x: int, target1_y: int, target2_x: int = None, target2_y: int = None) -> None:
@@ -112,7 +122,6 @@ class Checkers:
             exit()
         # Initialize empty board
         self.clear()
-
         # Test to take multipe pieces
         # id = 24
         # QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)])
@@ -129,18 +138,22 @@ class Checkers:
         # id = 8
         # QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # White
         # self.classical_squares[str(id)] = Piece(id, CheckersPlayer.WHITE, king=True)
-
         # Add initial pieces to board
         for y in range(self.num_vertical):
             for x in range(self.num_horizontal):
                 if(x % 2 == 1 and y % 2 == 0 or x % 2 == 0 and y % 2 == 1):
                     id = self.convert_xy_to_id(x, y)
-                    if(y <= self.num_vertical_pieces-1): # We are in the beginning rows, initalize black
+                    if(y <= self.num_vertical_pieces-1): # We are in the beginning rows, initialize black
                         QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # Black
-                        self.classical_squares[str(id)] = Piece(str(id), CheckersPlayer.BLACK)
+                        self.classical_squares[str(id)] = Piece(str(id+1), CheckersPlayer.BLACK)
                     elif(y >= self.num_vertical - self.num_vertical_pieces):
                         QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # White
                         self.classical_squares[str(id)] = Piece(str(id), CheckersPlayer.WHITE)
+
+    def write_to_log(self, string):
+        self.log = open("./log.txt", "a")
+        self.log.write(string)
+        self.log.close()
 
     def measure_square(self, id) -> CheckersSquare:
         """
@@ -359,8 +372,6 @@ class Checkers:
         """
         # First do quantum moves
         q_ids = list(itertools.chain.from_iterable(self.related_squares))
-        first_white = False
-        first_black = False
         exist_ids = [] # List that contain all ids that have been created. Used to initalize pieces
         for id in range(self.num_vertical*self.num_horizontal):
             if(str(id) in self.classical_squares and str(id) not in q_ids): # If there is a piece that is not in superposition
@@ -428,6 +439,20 @@ class Checkers:
         )
 
     def player_move(self, move: Move_id, player: CheckersPlayer = None):
+        output = ""
+        self.write_to_log(f"Related squares: {str(self.related_squares)}\n")
+        self.write_to_log(f"Classical squares: {str(self.classical_squares.keys())}\n")
+        for i in self.q_moves:
+            output += i.get_move()
+        self.write_to_log(f"Quantum moves: {output}\n")
+        output = ""
+        for qm in self.q_rel_moves:
+            output += "["
+            for m in qm:
+                output += m.get_move()
+                output += ", "
+            output += "] --- "
+        self.write_to_log(f"Quantum relative moves: {output}\n")
         # self.measure_square(1)
         prev_taken = False
         to_king = [] # list that holds moved pieces to check if they need to be kinged
@@ -583,7 +608,6 @@ class Checkers:
         if(peek[0][0] == CheckersSquare.FULL):
             pass # If
         # CheckersClassicMove(2, 1)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
-        # TODO: RECREATE BOARD INSTEAD OF DOING THE MOVE.
         self.classical_squares[str(move.target1_id)] = self.classical_squares[str(move.source_id)]
         self.classical_squares[str(move.target1_id)].id = move.target1_id
         # If we do a classical move on a piece in superposition, we need to append the new id to the correct list in related_squares
