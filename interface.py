@@ -81,21 +81,25 @@ class GameInterface:
         for idx in movable_pieces:
             self.highlighted_squares.append(idx)
         
-    def write_to_log(self, move, counter):
+    def write_to_log(self, move, counter, moves):
         self.log = open("./log.txt", "a")
         self.log.write("#########################\n")
         self.log.write(str(counter))
         self.log.write(self.game.get_board())
         st = move.print_move()
         self.log.write(st)
+        self.log.write("\n")
+        self.log.write(str(moves))
         self.log.write("\n\n")
         self.log.close()
 
     def play(self):
         counter = 0
-        # for i in [3, 3, 2, 5, 5, 1]:
+        moves = []
+        # for i in [9, 3, 7, 3, 5, 3, 9, 3, 9, 1, 4, 9, 6, 5, 2, 6, 1, 8, 1, 1, 2, 2, 4, 1, 1, 1, 4, 4, 4, 8, 3, 1, 3, 1, 11, 15, 5]:
         #     legal_moves = self.get_legal_moves()
         #     self.game.player_move(legal_moves[i-1], self.game.player)
+        #     self.print_board()
         while(self.status == CheckersResult.UNFINISHED and not self.quit):
             start_time = time.time()
             legal_moves = self.get_legal_moves()
@@ -130,6 +134,7 @@ class GameInterface:
                 print(f"Move number {counter}")
                 # move = self.get_move()
                 move = random.randint(1, len(legal_moves))
+                moves.append(move)
                 try:
                     move = int(move)
                 except:
@@ -145,7 +150,7 @@ class GameInterface:
                 print("Legal time: %.6f seconds ---" % (legal_time))
                 print("Print time: %.6f seconds ---" % (print_time))
                 print("Move time: %.6f seconds ---" % (time.time() - start_time))
-                self.write_to_log(legal_moves[move-1], counter)
+                self.write_to_log(legal_moves[move-1], counter, moves)
                 # time.sleep(1)
 
     def draw_circle(self, color, x, y, radius, king = False, highlited = False):

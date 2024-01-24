@@ -382,7 +382,7 @@ class Checkers:
             else: # If there is no piece in the square, we can just set it to empty
                 self.squares[str(id)] = QuantumObject(str(id), CheckersSquare.EMPTY)
 
-        # for each sequence of quantum moves, we have to initialize the first bit that starts the qm
+        # for each sequence of quantum moves, we have to initialize the first bit that starts the qm. # THIS DOESNT WORK IF TWO QUANTUM MOVES START FROM THE SAME POSITION
         for qm in self.q_rel_moves:
             self.squares[str(qm[0].source_id)] = QuantumObject(str(qm[0].source_id), CheckersSquare.FULL)
 
@@ -394,6 +394,7 @@ class Checkers:
         
         for qm in self.q_moves:
             if(qm.movetype == MoveType.SPLIT):
+                print(f"{qm.source_id}, {qm.target1_id}, {qm.target2_id}")
                 CheckersSplit(CheckersSquare.FULL, self.rules)(self.squares[str(qm.source_id)], self.squares[str(qm.target1_id)], self.squares[str(qm.target2_id)])
             # self.player_move(qm, qm.player)
             else:
@@ -504,6 +505,11 @@ class Checkers:
                         output += f" . {hist[idx][CheckersSquare.EMPTY]:3}"
                     elif(mark == CheckersPlayer.WHITE):
                         identifier = "w"
+                        if(hist[idx][CheckersSquare.FULL] > 0):
+                            print("Check1")
+                            print(index)
+                            print(self.classical_squares.keys())
+                            print(hist[idx][CheckersSquare.FULL])
                         if(hist[idx][CheckersSquare.FULL] > 0 and self.classical_squares[str(idx)].color == CheckersPlayer.WHITE):
                             if(self.classical_squares[str(idx)].king):
                                 identifier = "W"
@@ -673,14 +679,17 @@ class Checkers:
         return
     
     def concat_moves(self, move, index): # used to concatenate a classical move after a split move to make it one split move
-        # Id is the id that connect two moves. e.g. 21 -> 15 and 17; 15 -> 11
+        # ID is the id that connect two moves. e.g. 21 -> 15 and 17; 15 -> 11
+        # CANT OPTIMIZE IF
+        # MOVE GOES BACK TO ORIGNAL SOURCE ID
+        # MOVE GOES TO OTHER TARGET ID
         if(move.movetype == MoveType.CLASSIC):
-            for m in self.q_rel_moves[index]:
-                if (m.target1_id == move.source_id):
-                    m.target1_id = move.target1_id
+            for org_move in self.q_rel_moves[index]:
+                if (org_move.target1_id == move.source_id and move.target1_id != org_move.source_id and move.target1_id != org_move.target2_id):
+                    org_move.target1_id = move.target1_id
                     break
-                if(m.target2_id == move.source_id):
-                    m.target2_id = move.target1_id
+                if(org_move.target2_id == move.source_id and move.target1_id != org_move.source_id and move.target1_id != org_move.target1_id):
+                    org_move.target2_id = move.target1_id
                     break
             self.q_rel_moves[index].remove(move)
             self.q_moves.remove(move)
