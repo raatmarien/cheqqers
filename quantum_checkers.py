@@ -40,24 +40,21 @@ class Move_id:
     """
     Logic for doing moves using ids
     """
-    def __init__(self, movetype: MoveType , source_id: int, target1_id: int, target2_id: int = None) -> None:
+    def __init__(self, movetype: MoveType, player: CheckersPlayer, source_id: int, target1_id: int, target2_id: int = None) -> None:
         self.movetype = movetype
+        self.player = player
         self.source_id = source_id
         self.target1_id = target1_id
         self.target2_id = target2_id
             
     def print_move(self, index = -1) -> None:
-        output = f"({self.movetype.name}) "
+        output = f"({self.player.name}, {self.movetype.name}) "
         if(index != -1):
             output = str(index) + ": "
         output += f"[{self.source_id}] to [{self.target1_id}]"
         if(self.target2_id != None):
             output += f" and [{self.target2_id}]"
         print(output)
-
-class Advanced_Move_id(Move_id): # Maybe not used?
-    def __init__(self, movetype: MoveType , source_id: int, target1_id: int, target2_id: int = None) -> None:
-        Move_id.__init__(self, movetype , source_id, target1_id, target2_id)
 
 class Move_temp:
     def __init__(self, source_x: int, source_y: int, target1_x: int, target1_y: int, target2_x: int = None, target2_y: int = None) -> None:
@@ -254,7 +251,7 @@ class Checkers:
                 target2_id = self.convert_xy_to_id(move.target2_x, move.target2_y)
             # CLASSICAL MOVE    
             if(target1_id not in player_ids and target1_id not in opponent_ids and target2_id == None): # it is an empty square, so it is possible move there
-                legal_moves.append(Move_id(MoveType.CLASSIC, source_id, target1_id))
+                legal_moves.append(Move_id(MoveType.CLASSIC, self.player, source_id, target1_id))
                 # if(source_id not in legal_moves):
                 #    legal_moves[source_id] = [target1_id]
                 # elif(target1_id not in legal_moves[source_id]): # to prevent duplicates
@@ -262,7 +259,7 @@ class Checkers:
             
             # QUANTUM SPLIT MOVE
             elif(target1_id not in player_ids and target1_id not in opponent_ids and target2_id not in player_ids and target2_id not in opponent_ids):
-                legal_moves.append(Move_id(MoveType.SPLIT, source_id, target1_id, target2_id))
+                legal_moves.append(Move_id(MoveType.SPLIT, self.player, source_id, target1_id, target2_id))
                 # if(source_id not in legal_moves):
                 #    legal_moves[source_id] = [target1_id, target2_id]
                 # else:
@@ -278,12 +275,12 @@ class Checkers:
                 jump_x = move.target1_x+(move.target1_x-move.source_x)
                 jump_id = self.convert_xy_to_id(jump_x, jump_y)
                 if(self.on_board(jump_x, jump_y) and jump_id not in (player_ids+opponent_ids)): # we can jump over if the coordinates are on the board and the piece is empty
-                    legal_moves.append(Move_id(MoveType.TAKE, source_id, jump_id))
+                    legal_moves.append(Move_id(MoveType.TAKE, self.player, source_id, jump_id))
                     # if(source_id not in legal_moves):
                     #     legal_moves[source_id] = [jump_id]
                     # else:
                     #     legal_moves[source_id].append(jump_id)
-                    legal_take_moves.append(Move_id(MoveType.TAKE, source_id, jump_id))
+                    legal_take_moves.append(Move_id(MoveType.TAKE, self.player, source_id, jump_id))
                     # if(source_id not in legal_take_moves):
                     #     legal_take_moves[source_id] = [jump_id]
                     # else:
@@ -431,7 +428,7 @@ class Checkers:
         # If a move has been done we need to flip the player, IF they can not take another piece SHOULD CHECK IF THE PIECE YOU JUST USED CAN GO AGAIN
         if(prev_taken and self.can_take_piece(move.target1_id)): # If we took a piece and we can take another piece do not chance the player
             return
-        # self.player = CheckersPlayer.BLACK if self.player == CheckersPlayer.WHITE else CheckersPlayer.WHITE
+        self.player = CheckersPlayer.BLACK if self.player == CheckersPlayer.WHITE else CheckersPlayer.WHITE
         # for p in self.superposition_pieces:
         #     p.print_children()
         for i, qm in enumerate(self.q_rel_moves):
@@ -634,16 +631,12 @@ class Checkers:
     
     def concat_moves(self, move, index): # used to concatenate a classical move after a split move to make it one split move
         # Id is the id that connect two moves. e.g. 21 -> 15 and 17; 15 -> 11
-        print("Move given to concat_moves():")
-        move.print_move()
         if(move.movetype == MoveType.CLASSIC):
             for m in self.q_rel_moves[index]:
                 if (m.target1_id == move.source_id):
                     m.target1_id = move.target1_id
-                    print("HERE1")
                     break
                 if(m.target2_id == move.source_id):
-                    print("HERE2")
                     m.target2_id = move.target1_id
                     break
             self.q_rel_moves[index].remove(move)
