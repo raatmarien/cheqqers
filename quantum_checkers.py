@@ -147,21 +147,17 @@ class Checkers:
         Measures single square and returns CheckersSquare.EMPTY or CheckersSquare.FULL for ID
         """
         ids = self.remove_from_rel_squares(id)
-        print(f"MEASURING ID {id}")
-        print(f"ALL RELATED IDS: {ids}")
         # Check out all ids, for the one that remained, remove all others from classical squares
         for classical_id in ids:
             self.board.pop(objects=[self.squares[str(classical_id)]])
             # original_peek = (self.board.peek(objects=[self.squares[str(id)]])) # peek returns double list of all object peeked. For one object that looks like [[<CheckersSquare.WHITE: 1>]]
             peek = (self.board.peek(objects=[self.squares[str(classical_id)]]))
-            if(peek[0][0] == CheckersSquare.FULL): #######################
-                print(f"Full for ID {classical_id}")
+            if(peek[0][0] == CheckersSquare.FULL):
                 continue
             self.remove_piece(str(classical_id))
         return(self.board.peek(objects=[self.squares[str(id)]])[0][0]) # returns for original id
 
     def measure(self) -> None:
-        print("MEASURING ALL")  
         """Measures all squares on the Checkers board.
 
         Once the board is measured, a new board is created
@@ -357,11 +353,10 @@ class Checkers:
                 blind_moves.append(Move_temp(x,y,x-1,y+1,x+1,y+1))
         return blind_moves
     
-    def test_new_filled_board(self):
+    def alternate_classic_move(self):
         """
-        Test function for creating new board
+        Instead of doing a normal classic move, creates a new board, this is done to increase performance
         """
-        print("TESTING")
         # First do quantum moves
         q_ids = list(itertools.chain.from_iterable(self.related_squares))
         first_white = False
@@ -369,18 +364,15 @@ class Checkers:
         exist_ids = [] # List that contain all ids that have been created. Used to initalize pieces
         for id in range(self.num_vertical*self.num_horizontal):
             if(str(id) in self.classical_squares and str(id) not in q_ids): # If there is a piece that is not in superposition
-                print(f"ID {id} full")
                 # if(self.classical_squares[str(id)].superposition): #If it is in superposition, we dont want to initaliaze it to full (100 %)
                 #     continue
                 self.squares[str(id)] = QuantumObject(str(id), CheckersSquare.FULL)
                 exist_ids.append(str(id))
             else: # If there is no piece in the square, we can just set it to empty
-                print(f"ID {id} empty")
                 self.squares[str(id)] = QuantumObject(str(id), CheckersSquare.EMPTY)
 
         # for each sequence of quantum moves, we have to initialize the first bit that starts the qm
         for qm in self.q_rel_moves:
-            print(qm[0].source_id)
             self.squares[str(qm[0].source_id)] = QuantumObject(str(qm[0].source_id), CheckersSquare.FULL)
 
         # A quantumworld must first exits before we can do the quantum moves
@@ -455,24 +447,12 @@ class Checkers:
         for id in to_king:
             _, y = self.convert_id_to_xy(id)
             if((y == self.num_vertical-1 or y == 0) and self.classical_squares[str(id)].king == False):
-                # print(id, self.num_vertical-1, self.num_horizontal*self.num_vertical-self.num_vertical)
                 self.king(id)
 
         # If a move has been done we need to flip the player, IF they can not take another piece SHOULD CHECK IF THE PIECE YOU JUST USED CAN GO AGAIN
         if(prev_taken and self.can_take_piece(move.target1_id)): # If we took a piece and we can take another piece do not chance the player
             return
         self.player = CheckersPlayer.BLACK if self.player == CheckersPlayer.WHITE else CheckersPlayer.WHITE
-        # for p in self.superposition_pieces:
-        #     p.print_children()
-        for i, qm in enumerate(self.q_rel_moves):
-            print(f"{i}:")
-            for m in qm:
-                m.print_move()
-        print("Q moves order:")
-        for m in self.q_moves:
-            m.print_move()
-        print(self.classical_squares)
-        print(self.related_squares)
         return
 
     def get_board(self) -> str:
@@ -499,7 +479,6 @@ class Checkers:
                         output += f" . {hist[idx][CheckersSquare.EMPTY]:3}"
                     elif(mark == CheckersPlayer.WHITE):
                         identifier = "w"
-                        print(f"VALUE AT {idx} is {hist[idx][CheckersSquare.FULL]}")
                         if(hist[idx][CheckersSquare.FULL] > 0 and self.classical_squares[str(idx)].color == CheckersPlayer.WHITE):
                             if(self.classical_squares[str(idx)].king):
                                 identifier = "W"
@@ -616,7 +595,7 @@ class Checkers:
                 break
         self.remove_id_from_rel_squares(move, move.source_id) # possibly useless, since in measure the squares are already removed
         self.remove_piece(move.source_id)
-        self.test_new_filled_board()
+        self.alternate_classic_move()
         return taken, False
     
     def split_move(self, move: Move_id, mark: CheckersSquare):
@@ -644,8 +623,6 @@ class Checkers:
             if(str(move.source_id) in squares):
                 squares.append(str(move.target1_id))
                 squares.append(str(move.target2_id))
-                print("Appending move")
-                move.print_move()
                 self.q_rel_moves[i].append(move)
                 self.q_moves.append(move)
                 break
@@ -665,7 +642,6 @@ class Checkers:
         """
         if(type(id) is tuple):
             id = self.convert_xy_to_id(id[0], id[1])
-        print(f"REMOVING {id}")
         if(str(id) in self.classical_squares):
             self.classical_squares.pop(str(id))
             if(flip):
@@ -694,7 +670,6 @@ class Checkers:
         temp_list = deepcopy(self.related_squares)
         for index, squares in enumerate(temp_list):
             if(str(id) in squares):
-                print(f"ID: {id}")
                 i = self.related_squares[index].index(str(id)) # Get the index of the element we are removing
                 self.related_squares[index].remove(str(id))
                 self.concat_moves(move, index)
@@ -754,6 +729,7 @@ class Checkers:
 #TODO: Clean up calculating legal moves function with using only 1 for loop
 #TODO: Instead of first clearing the entire board and then flipping the pieces, just initialize the pieces immediately correctly
 #TODO: In measure_square() already removing the squares, but I also call it after a funciton
+#TODO: clean up left child, right child in Piece class (is unused)
     
 # if __name__ == '__main__':
     # Random test to see how python handles memory
