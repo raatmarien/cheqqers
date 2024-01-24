@@ -145,10 +145,10 @@ class Checkers:
                     id = self.convert_xy_to_id(x, y)
                     if(y <= self.num_vertical_pieces-1): # We are in the beginning rows, initialize black
                         QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # Black
-                        self.classical_squares[str(id)] = Piece(str(id+1), CheckersPlayer.BLACK)
+                        self.classical_squares[str(id)] = Piece(str(id+1), CheckersPlayer.BLACK, True)
                     elif(y >= self.num_vertical - self.num_vertical_pieces):
                         QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # White
-                        self.classical_squares[str(id)] = Piece(str(id), CheckersPlayer.WHITE)
+                        self.classical_squares[str(id)] = Piece(str(id), CheckersPlayer.WHITE, True)
 
     def write_to_log(self, string):
         self.log = open("./log.txt", "a")
@@ -493,42 +493,58 @@ class Checkers:
             ]
         )
         output = "\n"
-        for y in range(self.num_vertical):
-            for mark in [CheckersSquare.EMPTY, CheckersPlayer.WHITE, CheckersPlayer.BLACK]:
-                output += " "
-                for x in range(self.num_horizontal):
-                    idx = self.convert_xy_to_id(x,y)
-                    if(x % 2 == 0 and y % 2 == 0 or x % 2 == 1 and y % 2 == 1):
-                        output += " "
-                        output += f"-"*5
-                    elif(mark == CheckersSquare.EMPTY):
-                        output += f" . {hist[idx][CheckersSquare.EMPTY]:3}"
-                    elif(mark == CheckersPlayer.WHITE):
-                        identifier = "w"
-                        if(hist[idx][CheckersSquare.FULL] > 0):
-                            print("Check1")
-                            print(index)
-                            print(self.classical_squares.keys())
-                            print(hist[idx][CheckersSquare.FULL])
-                        if(hist[idx][CheckersSquare.FULL] > 0 and self.classical_squares[str(idx)].color == CheckersPlayer.WHITE):
-                            if(self.classical_squares[str(idx)].king):
-                                identifier = "W"
-                            output += f" {identifier} {hist[idx][CheckersSquare.FULL]:3}"
+        try:
+            for y in range(self.num_vertical):
+                for mark in [CheckersSquare.EMPTY, CheckersPlayer.WHITE, CheckersPlayer.BLACK]:
+                    output += " "
+                    for x in range(self.num_horizontal):
+                        idx = self.convert_xy_to_id(x,y)
+                        if(x % 2 == 0 and y % 2 == 0 or x % 2 == 1 and y % 2 == 1):
+                            output += " "
+                            output += f"-"*5
+                        elif(mark == CheckersSquare.EMPTY):
+                            output += f" . {hist[idx][CheckersSquare.EMPTY]:3}"
+                        elif(mark == CheckersPlayer.WHITE):
+                            identifier = "w"
+                            if(hist[idx][CheckersSquare.FULL] > 0):
+                                print("Check1")
+                                print(idx)
+                                print(self.classical_squares.keys())
+                                print(hist[idx][CheckersSquare.FULL])
+                            if(hist[idx][CheckersSquare.FULL] > 0 and self.classical_squares[str(idx)].color == CheckersPlayer.WHITE):
+                                if(self.classical_squares[str(idx)].king):
+                                    identifier = "W"
+                                output += f" {identifier} {hist[idx][CheckersSquare.FULL]:3}"
+                            else:
+                                output += f" {identifier} {0:3}"
                         else:
-                            output += f" {identifier} {0:3}"
-                    else:
-                        identifier = "b"
-                        if(hist[idx][CheckersSquare.FULL] > 0 and self.classical_squares[str(idx)].color == CheckersPlayer.BLACK):
-                            if(self.classical_squares[str(idx)].king):
-                                identifier = "B"
-                            output += f" {identifier} {hist[idx][CheckersSquare.FULL]:3}"
-                        else:
-                            output += f" {identifier} {0:3}"
-                    if x != self.num_horizontal-1:
-                        output += " |"
-                output += "\n"
-            if y != self.num_vertical-1:
-                output += "--------"*self.num_horizontal + "\n"
+                            identifier = "b"
+                            if(hist[idx][CheckersSquare.FULL] > 0 and self.classical_squares[str(idx)].color == CheckersPlayer.BLACK):
+                                if(self.classical_squares[str(idx)].king):
+                                    identifier = "B"
+                                output += f" {identifier} {hist[idx][CheckersSquare.FULL]:3}"
+                            else:
+                                output += f" {identifier} {0:3}"
+                        if x != self.num_horizontal-1:
+                            output += " |"
+                    output += "\n"
+                if y != self.num_vertical-1:
+                    output += "--------"*self.num_horizontal + "\n"
+        except Exception as error:
+            print(f"ERROR: {error}")
+            output = ""
+            for i in self.q_moves:
+                output += i.get_move()
+            print(output)
+            output = ""
+            for qm in self.q_rel_moves:
+                output += "["
+                for m in qm:
+                    output += m.get_move()
+                    output += ", "
+                output += "] --- "
+            print(output)
+            exit()
         return output
     
     def king(self, id: int):
@@ -687,12 +703,14 @@ class Checkers:
             for org_move in self.q_rel_moves[index]:
                 if (org_move.target1_id == move.source_id and move.target1_id != org_move.source_id and move.target1_id != org_move.target2_id):
                     org_move.target1_id = move.target1_id
-                    break
+                    self.q_rel_moves[index].remove(move)
+                    self.q_moves.remove(move)
+                    return
                 if(org_move.target2_id == move.source_id and move.target1_id != org_move.source_id and move.target1_id != org_move.target1_id):
                     org_move.target2_id = move.target1_id
-                    break
-            self.q_rel_moves[index].remove(move)
-            self.q_moves.remove(move)
+                    self.q_rel_moves[index].remove(move)
+                    self.q_moves.remove(move)
+                    return
         return
 
     def remove_id_from_rel_squares(self, move, id):

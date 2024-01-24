@@ -85,12 +85,12 @@ class GameInterface:
         self.log = open("./log.txt", "a")
         self.log.write("#########################\n")
         self.log.write(str(counter))
-        self.log.write(self.game.get_board())
         st = move.print_move()
         self.log.write(st)
         self.log.write("\n")
         self.log.write(str(moves))
         self.log.write("\n\n")
+        self.log.write(self.game.get_board())
         self.log.close()
 
     def play(self):
@@ -132,8 +132,8 @@ class GameInterface:
                 self.print_legal_moves(legal_moves) # Changes legal moves to be a list of Move classes for selecting a move
                 counter += 1
                 print(f"Move number {counter}")
-                # move = self.get_move()
-                move = random.randint(1, len(legal_moves))
+                move = self.get_move()
+                # move = random.randint(1, len(legal_moves))
                 moves.append(move)
                 try:
                     move = int(move)
@@ -144,7 +144,7 @@ class GameInterface:
                     print(f"Input has to be an integer between 1 and {len(legal_moves)}!")
                     continue
                 start_time = time.time()
-                print(f"Move is ({move}):", end="")
+                print(f"Move is ({move}): ", end="")
                 legal_moves[move-1].print_move()
                 self.game.player_move(legal_moves[move-1], self.game.player)
                 print("Legal time: %.6f seconds ---" % (legal_time))
