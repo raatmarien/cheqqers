@@ -431,7 +431,7 @@ class Checkers:
         # If a move has been done we need to flip the player, IF they can not take another piece SHOULD CHECK IF THE PIECE YOU JUST USED CAN GO AGAIN
         if(prev_taken and self.can_take_piece(move.target1_id)): # If we took a piece and we can take another piece do not chance the player
             return
-        self.player = CheckersPlayer.BLACK if self.player == CheckersPlayer.WHITE else CheckersPlayer.WHITE
+        # self.player = CheckersPlayer.BLACK if self.player == CheckersPlayer.WHITE else CheckersPlayer.WHITE
         # for p in self.superposition_pieces:
         #     p.print_children()
         for i, qm in enumerate(self.q_rel_moves):
@@ -607,6 +607,8 @@ class Checkers:
             if(str(move.source_id) in squares):
                 squares.append(str(move.target1_id))
                 squares.append(str(move.target2_id))
+                print("Appending move")
+                move.print_move()
                 self.q_rel_moves[i].append(move)
                 break
         else: # Is executed if break was never called
@@ -639,13 +641,13 @@ class Checkers:
                 if (m.target1_id == move.source_id):
                     m.target1_id = move.target1_id
                     print("HERE1")
-                    return
+                    break
                 if(m.target2_id == move.source_id):
                     print("HERE2")
                     m.target2_id = move.target1_id
-                    return
+                    break
+            self.q_rel_moves[index].remove(move)
         return
-
 
     def remove_id_from_rel_squares(self, move: Move_id):
         """
@@ -660,7 +662,7 @@ class Checkers:
                 i = self.related_squares[index].index(str(id)) # Get the index of the element we are removing
                 self.related_squares[index].remove(str(id))
                 self.concat_moves(move, index)
-                self.q_rel_moves[index].remove(move)
+                
                 if(len(self.related_squares[index]) <= 1): # If the length is one, we have returned to classical state (Basically if we did not just do a classical move)
                     self.related_squares.pop(index)
                     self.q_rel_moves.pop(index)
