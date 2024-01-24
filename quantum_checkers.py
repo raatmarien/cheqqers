@@ -143,21 +143,21 @@ class Checkers:
 
     def measure_square(self, id) -> CheckersSquare:
         """
-        Measures single square and returns CheckersSquare.EMPTY or CheckersSquare.FULL
+        Measures single square and returns CheckersSquare.EMPTY or CheckersSquare.FULL for ID
         """
-        print(f"MEASURING ID {id}")
-        self.board.pop(objects=[self.squares[str(id)]])
-        original_peek = (self.board.peek(objects=[self.squares[str(id)]])) # peek returns double list of all object peeked. For one object that looks like [[<CheckersSquare.WHITE: 1>]]
         ids = self.remove_from_rel_squares(id)
+        print(f"MEASURING ID {id}")
         print(f"ALL RELATED IDS: {ids}")
         # Check out all ids, for the one that remained, remove all others from classical squares
         for classical_id in ids:
+            self.board.pop(objects=[self.squares[str(classical_id)]])
+            # original_peek = (self.board.peek(objects=[self.squares[str(id)]])) # peek returns double list of all object peeked. For one object that looks like [[<CheckersSquare.WHITE: 1>]]
             peek = (self.board.peek(objects=[self.squares[str(classical_id)]]))
-            if(peek[0][0] == CheckersSquare.FULL):
+            if(peek[0][0] == CheckersSquare.FULL): #######################
                 print(f"Full for ID {classical_id}")
                 continue
             self.remove_piece(str(classical_id))
-        return(original_peek[0][0])
+        return(self.board.peek(objects=[self.squares[str(id)]])[0][0]) # returns for original id
 
     def measure(self) -> None:
         print("MEASURING ALL")  
@@ -409,6 +409,7 @@ class Checkers:
         )
 
     def player_move(self, move: Move_id, player: CheckersPlayer = None):
+        # self.measure_square(1)
         prev_taken = False
         to_king = [] # list that holds moved pieces to check if they need to be kinged
         if(player == None):
@@ -756,6 +757,7 @@ class Checkers:
     # l2[0].id = "4"
     # print(l)
     # print(l2[0].id, l[1].id)
+    
 
 
     

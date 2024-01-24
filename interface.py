@@ -82,9 +82,9 @@ class GameInterface:
         
     def play(self):
         counter = 0
-        for i in [3, 3, 2, 5, 5, 1]:
-            legal_moves = self.get_legal_moves()
-            self.game.player_move(legal_moves[i-1], self.game.player)
+        # for i in [3, 3, 2, 5, 5, 1]:
+        #     legal_moves = self.get_legal_moves()
+        #     self.game.player_move(legal_moves[i-1], self.game.player)
         while(self.status == CheckersResult.UNFINISHED and not self.quit):
             start_time = time.time()
             legal_moves = self.get_legal_moves()
