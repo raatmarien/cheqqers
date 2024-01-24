@@ -45,8 +45,7 @@ class Move_id:
         self.source_id = source_id
         self.target1_id = target1_id
         self.target2_id = target2_id
-        
-    
+            
     def print_move(self, index = -1) -> None:
         output = f"({self.movetype.name}) "
         if(index != -1):
@@ -55,6 +54,10 @@ class Move_id:
         if(self.target2_id != None):
             output += f" and [{self.target2_id}]"
         print(output)
+
+class Advanced_Move_id(Move_id): # Maybe not used?
+    def __init__(self, movetype: MoveType , source_id: int, target1_id: int, target2_id: int = None) -> None:
+        Move_id.__init__(self, movetype , source_id, target1_id, target2_id)
 
 class Move_temp:
     def __init__(self, source_x: int, source_y: int, target1_x: int, target1_y: int, target2_x: int = None, target2_y: int = None) -> None:
@@ -75,12 +78,20 @@ class Move_temp:
         print(output)
 
 class Piece():
-    def __init__(self, color: CheckersPlayer, king: bool = False, superposition: bool = False, left_child = None, right_child = None) -> None:
+    def __init__(self, id: int, color: CheckersPlayer, king: bool = False, superposition: bool = False, left_child = None, right_child = None) -> None:
+        self.id = id
         self.color = color
         self.king = king
         self.superposition = superposition
         self.left_child = left_child
         self.right_child = right_child
+    
+    def print_children(self):
+        print(self.id)
+        if(self.left_child != None):
+            self.left_child.print_children()
+        if(self.right_child != None):
+            self.right_child.print_children()
 
 class Checkers:
     def __init__(self, run_on_hardware = False, num_vertical = 5, num_horizontal = 5, num_vertical_pieces = 1, rules = CheckersRules.QUANTUM_V3) -> None:
@@ -92,7 +103,8 @@ class Checkers:
         self.num_horizontal = num_horizontal
         self.num_vertical_pieces = num_vertical_pieces # how many rows of one color need to be filled with pieces
         self.classical_squares = {} # Contains information about a square (e.g. white, king, etc...)
-        self.related_squares =[] # List of lists that keep track of squares in superpositions that are related to each other. This way if a square is measured we know the related squares of that square
+        self.related_squares = [] # List of lists that keep track of squares in superpositions that are related to each other. This way if a square is measured we know the related squares of that square
+        self.q_rel_moves = [] # parallel to related squares, but keeps track of quantum moves
         self.white_squares = {}
         self.black_squares = {}
         self.superposition_pieces = set() # contains a list of pieces that started the superposition. This is needed to recreate the board when a move has been done
@@ -126,23 +138,10 @@ class Checkers:
                     id = self.convert_xy_to_id(x, y)
                     if(y <= self.num_vertical_pieces-1): # We are in the beginning rows, initalize black
                         QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # Black
-                        self.classical_squares[str(id)] = Piece(CheckersPlayer.BLACK)
+                        self.classical_squares[str(id)] = Piece(str(id), CheckersPlayer.BLACK)
                     elif(y >= self.num_vertical - self.num_vertical_pieces):
                         QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # White
-                        self.classical_squares[str(id)] = Piece(CheckersPlayer.WHITE)
-
-        # for y in range(num_vertical_pieces):
-        #     for x in range(self.num_horizontal):
-        #         if(y%2==0 and x%2==1 or y%2!=0 and x%2!=1):
-        #             print("1")
-        #             id = self.convert_xy_to_id(x, y)
-        #             QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # Black
-        #             self.classical_squares[str(id)] = Piece(id, CheckersPlayer.BLACK)
-        #             print(id)
-        #             id = self.convert_xy_to_id(x, self.num_vertical-1-y)
-        #             QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # White
-        #             self.classical_squares[str(id)] = Piece(id, CheckersPlayer.WHITE)
-        #             print(id)
+                        self.classical_squares[str(id)] = Piece(str(id), CheckersPlayer.WHITE)
 
     def measure_square(self, id) -> CheckersSquare:
         """
@@ -156,8 +155,7 @@ class Checkers:
             peek = (self.board.peek(objects=[self.squares[str(classical_id)]]))
             if(peek[0][0] == CheckersSquare.FULL):
                 continue
-            else:
-                self.remove_piece(str(classical_id))
+            self.remove_piece(str(classical_id))
         return(original_peek[0][0])
 
     def measure(self) -> None:  
@@ -220,20 +218,6 @@ class Checkers:
                 white_king_ids.append(id) if (value.king) else white_ids.append(id)
             else:
                 black_king_ids.append(id) if(value.king) else black_ids.append(id)
-                
-        
-        
-        # for id in range(self.num_vertical*self.num_horizontal):
-        #     for mark in (CheckersSquare.BLACK, CheckersSquare.WHITE, CheckersSquare.WHITE_KING, CheckersSquare.BLACK_KING):
-        #         if(hist[id][mark] != 0): # For the current player (white or black). Check both for entanglement (if that will be implemented)
-        #             if(mark == CheckersSquare.WHITE):
-        #                 white_ids.append(id)
-        #             if(mark == CheckersSquare.WHITE_KING):
-        #                 white_king_ids.append(id)
-        #             if(mark == CheckersSquare.BLACK):
-        #                 black_ids.append(id)
-        #             if(mark == CheckersSquare.BLACK_KING):
-        #                 black_king_ids.append(id)
         if(player == CheckersPlayer.WHITE):
             return [white_ids, white_king_ids], [black_ids, black_king_ids]
         else:
@@ -448,6 +432,12 @@ class Checkers:
         if(prev_taken and self.can_take_piece(move.target1_id)): # If we took a piece and we can take another piece do not chance the player
             return
         self.player = CheckersPlayer.BLACK if self.player == CheckersPlayer.WHITE else CheckersPlayer.WHITE
+        # for p in self.superposition_pieces:
+        #     p.print_children()
+        for i, qm in enumerate(self.q_rel_moves):
+            print(f"{i}:")
+            for m in qm:
+                m.print_move()
         return
 
     def get_board(self) -> str:
@@ -580,21 +570,18 @@ class Checkers:
         CheckersClassicMove(2, 1)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
         # TODO: RECREATE BOARD INSTEAD OF DOING THE MOVE.
         self.classical_squares[str(move.target1_id)] = self.classical_squares[str(move.source_id)]
-        # If we do a classical move on a piece in superposition, we need to update the related squares list
-        for squares in self.related_squares:
+        self.classical_squares[str(move.target1_id)].id = move.target1_id
+        # If we do a classical move on a piece in superposition, we need to append the new id to the correct list in related_squares
+        for i, squares in enumerate(self.related_squares):
             if(str(move.source_id) in squares):
                 squares.append(str(move.target1_id))
+                self.q_rel_moves[i].append(move)
                 break
-        self.remove_id_from_rel_squares(move.source_id)
+        self.remove_id_from_rel_squares(move.source_id) # possibly useless, since in measure the squares are already removed
         self.remove_piece(move.source_id)
         # self.test_new_filled_board()
         return taken, False
     
-    ######### MOVE IN QUANTUM CHESS ########
-    # yield cirq.ISWAP(s, t) ** 0.5
-    # yield cirq.ISWAP(s, t) ** 0.5
-    ########################################
-
     def split_move(self, move: Move_id, mark: CheckersSquare):
         # source_id = self.convert_xy_to_id(move.source_x, move.source_y)
         # target1_id = self.convert_xy_to_id(move.target1_x, move.target1_y)
@@ -608,26 +595,27 @@ class Checkers:
         original_piece = self.classical_squares[str(move.source_id)]
         # Split(self.squares[str(move.source_id)], self.squares[str(move.target1_id)], self.squares[str(move.target2_id)])
         CheckersSplit(CheckersSquare.FULL, self.rules)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)], self.squares[str(move.target2_id)])
-        left_child = Piece(color=original_piece.color, king=original_piece.king, superposition=True)
-        right_child = Piece(color=original_piece.color, king=original_piece.king, superposition=True)
+        left_child = Piece(id=str(move.target1_id), color=original_piece.color, king=original_piece.king, superposition=True)
+        right_child = Piece(id=str(move.target2_id), color=original_piece.color, king=original_piece.king, superposition=True)
         self.classical_squares[str(move.target1_id)] = left_child
         self.classical_squares[str(move.target2_id)] = right_child
         self.classical_squares[str(move.source_id)].left_child = self.classical_squares[str(move.target1_id)]
         self.classical_squares[str(move.source_id)].right_child = self.classical_squares[str(move.target2_id)]
         
         # If the piece was already in superposition, we need to append this piece to the list
-        for squares in self.related_squares:
+        for i, squares in enumerate(self.related_squares):
             if(str(move.source_id) in squares):
                 squares.append(str(move.target1_id))
                 squares.append(str(move.target2_id))
+                self.q_rel_moves[i].append(move)
                 break
         else: # Is executed if break was never called
             # If we get here this the first time this piece goes in superposition, so we add a new list
             self.related_squares.append([str(move.target1_id), str(move.target2_id)])
+            self.q_rel_moves.append([move])
             self.superposition_pieces.add(original_piece)
         self.remove_id_from_rel_squares(move.source_id)
         self.remove_piece(move.source_id)
-        print(self.superposition_pieces)
         return       
 
     def remove_piece(self, id: int or (int,int), flip = False):
@@ -653,6 +641,7 @@ class Checkers:
                 self.related_squares[index].remove(str(id))
                 if(len(self.related_squares[index]) <= 1): # If the length is one, we have returned to classical state
                     self.related_squares.pop(index)
+                    self.q_rel_moves.pop(index)
                 return
 
     def remove_from_rel_squares(self, id):
@@ -662,6 +651,7 @@ class Checkers:
         temp_list = deepcopy(self.related_squares)
         for index, squares in enumerate(temp_list):
             if(str(id) in squares):
+                self.q_rel_moves.pop(index)
                 return self.related_squares.pop(index)
         return []
         
@@ -703,26 +693,33 @@ class Checkers:
 #TODO: Instead of first clearing the entire board and then flipping the pieces, just initialize the pieces immediately correctly
 #TODO: In measure_square() already removing the squares, but I also call it after a funciton
     
-if __name__ == '__main__':
-    s = set()
-    p1 = Piece(CheckersPlayer.WHITE)
-    p2 = Piece(CheckersPlayer.BLACK)
-    dic = {}
-    dic["1"] = p1
-    dic["2"] = p2
-    s.add(p1)
-    for key, value in dic.items():
-        print(key, value)
-    p1.left_child = dic["2"]
-    for key, value in dic.items():
-        print(key, value)
-    print(p1.left_child.color)
-    dic["3"] = dic["2"]
-    for key, value in dic.items():
-        print(key, value)
-    dic.pop("2")
-    for key, value in dic.items():
-        print(key, value)
-    print(p1.left_child.color)
+# if __name__ == '__main__':
+    # Random test to see how python handles memory
+    # s = set()
+    # p1 = Piece("1", CheckersPlayer.WHITE)
+    # p2 = Piece("2", CheckersPlayer.BLACK)
+    # # dic = {}
+    # # dic["1"] = p1
+    # # dic["2"] = p2
+    # # s.add(p1)
+    # # for key, value in dic.items():
+    # #     print(key, value)
+    # # p1.left_child = dic["2"]
+    # # for key, value in dic.items():
+    # #     print(key, value)
+    # # print(p1.left_child.color)
+    # # dic["3"] = dic["2"]
+    # # for key, value in dic.items():
+    # #     print(key, value)
+    # # dic.pop("2")
+    # # for key, value in dic.items():
+    # #     print(key, value)
+    # # print(p1.left_child.color)
+    # l = [p1, p2]
+    # l2 = [p2]
+    # l2[0].id = "4"
+    # print(l)
+    # print(l2[0].id, l[1].id)
+
 
     

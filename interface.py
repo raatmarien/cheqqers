@@ -88,6 +88,7 @@ class GameInterface:
             legal_time = time.time() - start_time
             if(len(legal_moves) == 0):
                 self.status = CheckersResult.DRAW
+                print("DRAW")
                 continue
             if(self.GUI):
                 for event in pygame.event.get(): 
@@ -112,7 +113,7 @@ class GameInterface:
                 move = self.get_move()
                 counter += 1
                 print(f"Move number {counter}")
-                move = random.randint(1, len(legal_moves))
+                # move = random.randint(1, len(legal_moves))
                 try:
                     move = int(move)
                 except:
@@ -126,7 +127,8 @@ class GameInterface:
                 print("Legal time: %.6f seconds ---" % (legal_time))
                 print("Print time: %.6f seconds ---" % (print_time))
                 print("Move time: %.6f seconds ---" % (time.time() - start_time))
-                time.sleep(1)
+                # time.sleep(1)
+
     def draw_circle(self, color, x, y, radius, king = False, highlited = False):
         if(color == RED):
             if(highlited):
