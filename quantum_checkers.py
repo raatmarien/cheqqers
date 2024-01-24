@@ -6,6 +6,7 @@ from enums import (
     MoveType
 )
 
+import itertools
 from typing import List, Dict
 from copy import deepcopy
 from unitary.alpha import QuantumObject, QuantumWorld, Move, Split, Flip
@@ -361,17 +362,43 @@ class Checkers:
         Test function for creating new board
         """
         print("TESTING")
+        # First do quantum moves
+        q_ids = list(itertools.chain.from_iterable(self.related_squares))
+        first_white = False
+        first_black = False
+        exist_ids = [] # List that contain all ids that have been created. Used to initalize pieces
         for id in range(self.num_vertical*self.num_horizontal):
-            if(str(id) in self.classical_squares): # If there is a piece
-                if(self.classical_squares[str(id)].superposition): #If it is in superposition, we dont want to initaliaze it to full (100 %)
-                    continue
+            if(str(id) in self.classical_squares and str(id) not in q_ids): # If there is a piece that is not in superposition
+                print(f"ID {id} full")
+                # if(self.classical_squares[str(id)].superposition): #If it is in superposition, we dont want to initaliaze it to full (100 %)
+                #     continue
                 self.squares[str(id)] = QuantumObject(str(id), CheckersSquare.FULL)
+                exist_ids.append(str(id))
             else: # If there is no piece in the square, we can just set it to empty
+                print(f"ID {id} empty")
                 self.squares[str(id)] = QuantumObject(str(id), CheckersSquare.EMPTY)
+
+        # for each sequence of quantum moves, we have to initialize the first bit that starts the qm
+        for qm in self.q_rel_moves:
+            print(qm[0].source_id)
+            self.squares[str(qm[0].source_id)] = QuantumObject(str(qm[0].source_id), CheckersSquare.FULL)
+
+        # A quantumworld must first exits before we can do the quantum moves
+        # self.create_new_filled_board()
         self.board = QuantumWorld(
             list(self.squares.values()), compile_to_qubits=self.run_on_hardware
         )
-        self.create_new_filled_board()
+        
+        for qm in self.q_moves:
+            if(qm.movetype == MoveType.SPLIT):
+                CheckersSplit(CheckersSquare.FULL, self.rules)(self.squares[str(qm.source_id)], self.squares[str(qm.target1_id)], self.squares[str(qm.target2_id)])
+            # self.player_move(qm, qm.player)
+            else:
+                CheckersClassicMove(2, 1)(self.squares[str(qm.source_id)], self.squares[str(qm.target1_id)])
+        # self.board = QuantumWorld(
+        #     list(self.squares.values()), compile_to_qubits=self.run_on_hardware
+        # )
+        
 
 
         # FOR SPLIT MOVES FORST INITALIZE RANDOM BIT AND THEN USE IT TO SPLIT TWO QBITS
@@ -444,6 +471,8 @@ class Checkers:
         print("Q moves order:")
         for m in self.q_moves:
             m.print_move()
+        print(self.classical_squares)
+        print(self.related_squares)
         return
 
     def get_board(self) -> str:
@@ -574,7 +603,7 @@ class Checkers:
         peek = (self.board.peek(objects=[self.squares[str(move.source_id)]]))
         if(peek[0][0] == CheckersSquare.FULL):
             pass # If
-        CheckersClassicMove(2, 1)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
+        # CheckersClassicMove(2, 1)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
         # TODO: RECREATE BOARD INSTEAD OF DOING THE MOVE.
         self.classical_squares[str(move.target1_id)] = self.classical_squares[str(move.source_id)]
         self.classical_squares[str(move.target1_id)].id = move.target1_id
@@ -587,7 +616,7 @@ class Checkers:
                 break
         self.remove_id_from_rel_squares(move, move.source_id) # possibly useless, since in measure the squares are already removed
         self.remove_piece(move.source_id)
-        # self.test_new_filled_board()
+        self.test_new_filled_board()
         return taken, False
     
     def split_move(self, move: Move_id, mark: CheckersSquare):
@@ -721,11 +750,7 @@ class Checkers:
         # else:
         #     return(CheckersResult.UNFINISHED)
         
-    
-#TODO: Change if elif in init function to be only if
 #TODO: Change calculating blind moves to use direction variable for black/white (+1/-1) instead of a very long if else statement
-#TODO: Add movetype to move_id when calculating possible moves to reduce extra calculations
-#TODO: Test Enum.CheckerRules values in split move
 #TODO: Clean up calculating legal moves function with using only 1 for loop
 #TODO: Instead of first clearing the entire board and then flipping the pieces, just initialize the pieces immediately correctly
 #TODO: In measure_square() already removing the squares, but I also call it after a funciton

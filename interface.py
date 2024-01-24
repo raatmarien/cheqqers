@@ -214,12 +214,12 @@ class GameInterface:
         second_id = self.get_id_from_mouse_pos(mouse_x, mouse_y)
         if(first_id == second_id):
             if(self.selected_id is not None and self.move_locations is not None and first_id in self.move_locations): # We want to move the piece to first id
-                self.do_game_move(Move_id(MoveType.CLASSIC, self.selected_id, first_id)) #classic move
+                self.do_game_move(Move_id(MoveType.CLASSIC, self.game.player, self.selected_id, first_id)) #classic move
                 return True
             self.selected_id = first_id
             return False
         elif(self.selected_id is not None and self.move_locations is not None and first_id in self.move_locations and second_id in self.move_locations):
-            self.do_game_move(Move_id(MoveType.SPLIT, self.selected_id, first_id, second_id)) #split move
+            self.do_game_move(Move_id(MoveType.SPLIT, self.game.player, self.selected_id, first_id, second_id)) #split move
             return True
 
     def print_board(self) -> str:
