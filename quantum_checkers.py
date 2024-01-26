@@ -6,6 +6,7 @@ from enums import (
     MoveType
 )
 
+import traceback
 import itertools
 from typing import List, Dict
 from copy import deepcopy
@@ -139,16 +140,17 @@ class Checkers:
         # QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # White
         # self.classical_squares[str(id)] = Piece(id, CheckersPlayer.WHITE, king=True)
         # Add initial pieces to board
+        king = False
         for y in range(self.num_vertical):
             for x in range(self.num_horizontal):
                 if(x % 2 == 1 and y % 2 == 0 or x % 2 == 0 and y % 2 == 1):
                     id = self.convert_xy_to_id(x, y)
                     if(y <= self.num_vertical_pieces-1): # We are in the beginning rows, initialize black
                         QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # Black
-                        self.classical_squares[str(id)] = Piece(str(id+1), CheckersPlayer.BLACK)
+                        self.classical_squares[str(id)] = Piece(str(id+1), CheckersPlayer.BLACK, king)
                     elif(y >= self.num_vertical - self.num_vertical_pieces):
                         QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # White
-                        self.classical_squares[str(id)] = Piece(str(id), CheckersPlayer.WHITE)
+                        self.classical_squares[str(id)] = Piece(str(id), CheckersPlayer.WHITE, king)
 
     def write_to_log(self, string):
         self.log = open("./log.txt", "a")
@@ -159,7 +161,11 @@ class Checkers:
         """
         Measures single square and returns CheckersSquare.EMPTY or CheckersSquare.FULL for ID
         """
+        st = f"Removing for id: {id}\n"
+        
         ids = self.remove_from_rel_squares(id)
+        st += f"Removed ids {ids}\n"
+        self.write_to_log(st)
         # Check out all ids, for the one that remained, remove all others from classical squares
         for classical_id in ids:
             self.board.pop(objects=[self.squares[str(classical_id)]])
@@ -372,17 +378,32 @@ class Checkers:
         """
         # First do quantum moves
         q_ids = list(itertools.chain.from_iterable(self.related_squares))
-        exist_ids = [] # List that contain all ids that have been created. Used to initalize pieces
+        t = f"Quantum ids in alternate move: {q_ids}\n"
+        self.write_to_log(t)
+        t = f"Classical squares in alternate move: {self.classical_squares.keys()}\n"
+        self.write_to_log(t)
+        # exist_ids = [] # List that contain all ids that have been created. Used to initalize pieces
+        # for id in range(self.num_vertical*self.num_horizontal):
+        #     if(str(id) in self.classical_squares and str(id) not in q_ids): # If there is a piece that is not in superposition
+        #         # if(self.classical_squares[str(id)].superposition): #If it is in superposition, we dont want to initaliaze it to full (100 %)
+        #         #     continue
+        #         self.squares[str(id)] = QuantumObject(str(id), CheckersSquare.FULL)
+        #         exist_ids.append(str(id))
+        #     else: # If there is no piece in the square, we can just set it to empty
+        #         self.squares[str(id)] = QuantumObject(str(id), CheckersSquare.EMPTY)
         for id in range(self.num_vertical*self.num_horizontal):
-            if(str(id) in self.classical_squares and str(id) not in q_ids): # If there is a piece that is not in superposition
-                # if(self.classical_squares[str(id)].superposition): #If it is in superposition, we dont want to initaliaze it to full (100 %)
-                #     continue
-                self.squares[str(id)] = QuantumObject(str(id), CheckersSquare.FULL)
-                exist_ids.append(str(id))
-            else: # If there is no piece in the square, we can just set it to empty
-                self.squares[str(id)] = QuantumObject(str(id), CheckersSquare.EMPTY)
+            self.squares[str(id)] = QuantumObject(str(id), CheckersSquare.EMPTY)
 
         # for each sequence of quantum moves, we have to initialize the first bit that starts the qm. # THIS DOESNT WORK IF TWO QUANTUM MOVES START FROM THE SAME POSITION
+        output = ""
+        for qm in self.q_rel_moves:
+            output += "["
+            for m in qm:
+                output += m.get_move()
+                output += ", "
+            output += "] --- "
+        t = f"Quantum relative moves in alternate function: {output}\n" 
+        self.write_to_log(t)
         for qm in self.q_rel_moves:
             self.squares[str(qm[0].source_id)] = QuantumObject(str(qm[0].source_id), CheckersSquare.FULL)
 
@@ -391,7 +412,11 @@ class Checkers:
         self.board = QuantumWorld(
             list(self.squares.values()), compile_to_qubits=self.run_on_hardware
         )
-        
+        output = ""
+        for i in self.q_moves:
+            output += i.get_move()
+        t = f"Quantum moves in alternate function: {output}\n"
+        self.write_to_log(t)
         for qm in self.q_moves:
             if(qm.movetype == MoveType.SPLIT):
                 print(f"{qm.source_id}, {qm.target1_id}, {qm.target2_id}")
@@ -399,6 +424,11 @@ class Checkers:
             # self.player_move(qm, qm.player)
             else:
                 CheckersClassicMove(2, 1)(self.squares[str(qm.source_id)], self.squares[str(qm.target1_id)])
+        
+        
+        for id in range(self.num_vertical*self.num_horizontal):
+            if(str(id) in self.classical_squares and str(id) not in q_ids): # If there is a piece that is not in superposition
+                QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)])
         # self.board = QuantumWorld(
         #     list(self.squares.values()), compile_to_qubits=self.run_on_hardware
         # )
@@ -526,13 +556,15 @@ class Checkers:
                 if y != self.num_vertical-1:
                     output += "--------"*self.num_horizontal + "\n"
         except Exception as error:
+            print(traceback.format_exc())
             print(f"ERROR: {error}")
-            output = ""
+            output = "Quantum moves: "
             for i in self.q_moves:
                 output += i.get_move()
                 output+= " --- "
             print(output)
-            output = ""
+            self.write_to_log(output)
+            output = "Quantum relative moves"
             for qm in self.q_rel_moves:
                 output += "["
                 for m in qm:
@@ -540,6 +572,8 @@ class Checkers:
                     output += ", "
                 output += "] --- "
             print(output)
+            self.write_to_log(output)
+            print(f"Classical squares: {self.classical_squares.keys()}")
             exit()
         return output
     
@@ -611,16 +645,16 @@ class Checkers:
         is_adjacent, jumped_id = self.is_adjacent(move.source_id, move.target1_id)
         if(not is_adjacent): # if ids are not adjacent we jumped over a piece and need to remove it
             # First check if the piece we are using is actually there
-            
             if(self.measure_square(move.source_id) == CheckersSquare.EMPTY): # If the piece is not there, turn is wasted
                 self.remove_piece(move.source_id)
                 return taken, True
 
             # Next check if the piece we are taking is actually there
             if(self.measure_square(jumped_id) == CheckersSquare.EMPTY): # if it empty our turn is wasted
-                self.remove_piece(jumped_id)
+                self.remove_piece(jumped_id) # We still measured so we have to remove it from the classical squares list
                 return taken, True    
             self.remove_piece(jumped_id, True)
+            self.remove_id_from_rel_squares(jumped_id)
             taken = True
         peek = (self.board.peek(objects=[self.squares[str(move.source_id)]]))
         if(peek[0][0] == CheckersSquare.FULL):
@@ -635,8 +669,8 @@ class Checkers:
                 self.q_rel_moves[i].append(move)
                 self.q_moves.append(move)
                 break
-        self.concat_moves(move, move.source_id)
-        # self.remove_id_from_rel_squares(move, move.source_id) # possibly useless, since in measure the squares are already removed
+        # self.concat_moves(move, move.source_id)
+        self.remove_id_from_rel_squares(move.source_id)
         self.remove_piece(move.source_id)
         self.alternate_classic_move()
         return taken, False
@@ -675,7 +709,7 @@ class Checkers:
             self.q_rel_moves.append([move])
             self.q_moves.append(move)
             self.superposition_pieces.add(original_piece)
-        self.remove_id_from_rel_squares(move, move.source_id)
+        self.remove_id_from_rel_squares(move.source_id)
         self.remove_piece(move.source_id)
         return       
 
@@ -715,7 +749,7 @@ class Checkers:
                         return
         return
 
-    def remove_id_from_rel_squares(self, move, id):
+    def remove_id_from_rel_squares(self, id):
         """
         If this piece was in superposition, all pieces that were in superposition need to be popped.
         """
@@ -782,6 +816,7 @@ class Checkers:
 #TODO: Instead of first clearing the entire board and then flipping the pieces, just initialize the pieces immediately correctly
 #TODO: In measure_square() already removing the squares, but I also call it after a funciton
 #TODO: clean up left child, right child in Piece class (is unused)
+#TODO: 50 percent of time is in the peek function, reduce it?
     
 # if __name__ == '__main__':
     # Random test to see how python handles memory

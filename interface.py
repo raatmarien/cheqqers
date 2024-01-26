@@ -85,12 +85,13 @@ class GameInterface:
         self.log = open("./log.txt", "a")
         self.log.write("#########################\n")
         self.log.write(str(counter))
+        st = ": "
         st = move.print_move()
         self.log.write(st)
         self.log.write("\n")
         self.log.write(str(moves))
         self.log.write("\n\n")
-        self.log.write(self.game.get_board())
+        # self.log.write(self.game.get_board())
         self.log.close()
 
     def play(self):
@@ -127,7 +128,7 @@ class GameInterface:
                     pygame.display.flip() # needs to be called outside draw function
             else:
                 start_time = time.time()
-                self.print_board()
+                # self.print_board()
                 print_time = time.time() - start_time
                 self.print_legal_moves(legal_moves) # Changes legal moves to be a list of Move classes for selecting a move
                 counter += 1
