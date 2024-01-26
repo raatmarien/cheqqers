@@ -1,16 +1,530 @@
-Related squares: [['26', '28']]
-Classical squares: dict_keys(['1', '3', '5', '7', '56', '58', '60', '62', '42', '26', '28'])
-Quantum moves: (BLACK, SPLIT) [19] to [26] and [28]
-Quantum relative moves: [(BLACK, SPLIT) [19] to [26] and [28], ] --- 
-Related squares: [['26', '28'], ['33', '35']]
-Classical squares: dict_keys(['1', '3', '5', '7', '56', '58', '60', '62', '26', '28', '33', '35'])
-Quantum moves: (BLACK, SPLIT) [19] to [26] and [28](WHITE, SPLIT) [42] to [33] and [35]
-Quantum relative moves: [(BLACK, SPLIT) [19] to [26] and [28], ] --- [(WHITE, SPLIT) [42] to [33] and [35], ] --- 
+Related squares: []
+Classical squares: dict_keys(['1', '3', '5', '7', '56', '58', '60', '62'])
+Quantum moves: 
+Quantum relative moves: 
+Quantum ids in alternate move: []
+Classical squares in alternate move: dict_keys(['1', '3', '5', '7', '56', '58', '60', '53'])
+Quantum relative moves in alternate function: 
+Quantum moves in alternate function: 
+Related squares: []
+Classical squares: dict_keys(['1', '3', '5', '7', '56', '58', '60', '53'])
+Quantum moves: 
+Quantum relative moves: 
+Quantum ids in alternate move: []
+Classical squares in alternate move: dict_keys(['1', '5', '7', '56', '58', '60', '53', '10'])
+Quantum relative moves in alternate function: 
+Quantum moves in alternate function: 
+Related squares: []
+Classical squares: dict_keys(['1', '5', '7', '56', '58', '60', '53', '10'])
+Quantum moves: 
+Quantum relative moves: 
+Quantum ids in alternate move: []
+Classical squares in alternate move: dict_keys(['1', '5', '7', '56', '60', '53', '10', '51'])
+Quantum relative moves in alternate function: 
+Quantum moves in alternate function: 
+Related squares: []
+Classical squares: dict_keys(['1', '5', '7', '56', '60', '53', '10', '51'])
+Quantum moves: 
+Quantum relative moves: 
+Related squares: [['17', '19']]
+Classical squares: dict_keys(['1', '5', '7', '56', '60', '53', '51', '17', '19'])
+Quantum moves: (BLACK, SPLIT) [10] to [17] and [19]
+Quantum relative moves: [(BLACK, SPLIT) [10] to [17] and [19], ] --- 
+Related squares: [['17', '19'], ['42', '44']]
+Classical squares: dict_keys(['1', '5', '7', '56', '60', '53', '17', '19', '42', '44'])
+Quantum moves: (BLACK, SPLIT) [10] to [17] and [19](WHITE, SPLIT) [51] to [42] and [44]
+Quantum relative moves: [(BLACK, SPLIT) [10] to [17] and [19], ] --- [(WHITE, SPLIT) [51] to [42] and [44], ] --- 
+Quantum ids in alternate move: ['17', '19', '42', '44']
+Classical squares in alternate move: dict_keys(['5', '7', '56', '60', '53', '17', '19', '42', '44', '10'])
+Quantum relative moves in alternate function: [(BLACK, SPLIT) [10] to [17] and [19], ] --- [(WHITE, SPLIT) [51] to [42] and [44], ] --- 
+Quantum moves in alternate function: (BLACK, SPLIT) [10] to [17] and [19](WHITE, SPLIT) [51] to [42] and [44]
+Related squares: [['17', '19'], ['42', '44']]
+Classical squares: dict_keys(['5', '7', '56', '60', '53', '17', '19', '42', '44', '10'])
+Quantum moves: (BLACK, SPLIT) [10] to [17] and [19](WHITE, SPLIT) [51] to [42] and [44]
+Quantum relative moves: [(BLACK, SPLIT) [10] to [17] and [19], ] --- [(WHITE, SPLIT) [51] to [42] and [44], ] --- 
+Related squares: [['17', '19'], ['42', '35', '37']]
+Classical squares: dict_keys(['5', '7', '56', '60', '53', '17', '19', '42', '10', '35', '37'])
+Quantum moves: (BLACK, SPLIT) [10] to [17] and [19](WHITE, SPLIT) [51] to [42] and [44](WHITE, SPLIT) [44] to [35] and [37]
+Quantum relative moves: [(BLACK, SPLIT) [10] to [17] and [19], ] --- [(WHITE, SPLIT) [51] to [42] and [44], (WHITE, SPLIT) [44] to [35] and [37], ] --- 
+Quantum ids in alternate move: ['19', '24', '42', '35', '37']
+Classical squares in alternate move: dict_keys(['5', '7', '56', '60', '53', '19', '42', '10', '35', '37', '24'])
+Quantum relative moves in alternate function: [(BLACK, SPLIT) [10] to [17] and [19], (BLACK, CLASSIC) [17] to [24], ] --- [(WHITE, SPLIT) [51] to [42] and [44], (WHITE, SPLIT) [44] to [35] and [37], ] --- 
+Quantum moves in alternate function: (BLACK, SPLIT) [10] to [17] and [19](WHITE, SPLIT) [51] to [42] and [44](WHITE, SPLIT) [44] to [35] and [37](BLACK, CLASSIC) [17] to [24]
+Related squares: [['19', '24'], ['42', '35', '37']]
+Classical squares: dict_keys(['5', '7', '56', '60', '53', '19', '42', '10', '35', '37', '24'])
+Quantum moves: (BLACK, SPLIT) [10] to [17] and [19](WHITE, SPLIT) [51] to [42] and [44](WHITE, SPLIT) [44] to [35] and [37](BLACK, CLASSIC) [17] to [24]
+Quantum relative moves: [(BLACK, SPLIT) [10] to [17] and [19], (BLACK, CLASSIC) [17] to [24], ] --- [(WHITE, SPLIT) [51] to [42] and [44], (WHITE, SPLIT) [44] to [35] and [37], ] --- 
+Quantum ids in alternate move: ['19', '24', '42', '35', '37']
+Classical squares in alternate move: dict_keys(['5', '7', '56', '60', '19', '42', '10', '35', '37', '24', '44'])
+Quantum relative moves in alternate function: [(BLACK, SPLIT) [10] to [17] and [19], (BLACK, CLASSIC) [17] to [24], ] --- [(WHITE, SPLIT) [51] to [42] and [44], (WHITE, SPLIT) [44] to [35] and [37], ] --- 
+Quantum moves in alternate function: (BLACK, SPLIT) [10] to [17] and [19](WHITE, SPLIT) [51] to [42] and [44](WHITE, SPLIT) [44] to [35] and [37](BLACK, CLASSIC) [17] to [24]
+Related squares: [['19', '24'], ['42', '35', '37']]
+Classical squares: dict_keys(['5', '7', '56', '60', '19', '42', '10', '35', '37', '24', '44'])
+Quantum moves: (BLACK, SPLIT) [10] to [17] and [19](WHITE, SPLIT) [51] to [42] and [44](WHITE, SPLIT) [44] to [35] and [37](BLACK, CLASSIC) [17] to [24]
+Quantum relative moves: [(BLACK, SPLIT) [10] to [17] and [19], (BLACK, CLASSIC) [17] to [24], ] --- [(WHITE, SPLIT) [51] to [42] and [44], (WHITE, SPLIT) [44] to [35] and [37], ] --- 
+Quantum ids in alternate move: ['19', '24', '42', '35', '37']
+Classical squares in alternate move: dict_keys(['5', '7', '56', '60', '19', '42', '35', '37', '24', '44', '17'])
+Quantum relative moves in alternate function: [(BLACK, SPLIT) [10] to [17] and [19], (BLACK, CLASSIC) [17] to [24], ] --- [(WHITE, SPLIT) [51] to [42] and [44], (WHITE, SPLIT) [44] to [35] and [37], ] --- 
+Quantum moves in alternate function: (BLACK, SPLIT) [10] to [17] and [19](WHITE, SPLIT) [51] to [42] and [44](WHITE, SPLIT) [44] to [35] and [37](BLACK, CLASSIC) [17] to [24]
+Related squares: [['19', '24'], ['42', '35', '37']]
+Classical squares: dict_keys(['5', '7', '56', '60', '19', '42', '35', '37', '24', '44', '17'])
+Quantum moves: (BLACK, SPLIT) [10] to [17] and [19](WHITE, SPLIT) [51] to [42] and [44](WHITE, SPLIT) [44] to [35] and [37](BLACK, CLASSIC) [17] to [24]
+Quantum relative moves: [(BLACK, SPLIT) [10] to [17] and [19], (BLACK, CLASSIC) [17] to [24], ] --- [(WHITE, SPLIT) [51] to [42] and [44], (WHITE, SPLIT) [44] to [35] and [37], ] --- 
+Related squares: [['19', '24'], ['42', '37', '26', '28']]
+Classical squares: dict_keys(['5', '7', '56', '60', '19', '42', '37', '24', '44', '17', '26', '28'])
+Quantum moves: (BLACK, SPLIT) [10] to [17] and [19](WHITE, SPLIT) [51] to [42] and [44](WHITE, SPLIT) [44] to [35] and [37](BLACK, CLASSIC) [17] to [24](WHITE, SPLIT) [35] to [26] and [28]
+Quantum relative moves: [(BLACK, SPLIT) [10] to [17] and [19], (BLACK, CLASSIC) [17] to [24], ] --- [(WHITE, SPLIT) [51] to [42] and [44], (WHITE, SPLIT) [44] to [35] and [37], (WHITE, SPLIT) [35] to [26] and [28], ] --- 
+Removing for id: 19
+Removed ids ['19', '24']
 Removing for id: 26
-Removed ids ['26', '28']
-Related squares: [['33', '35']]
-Classical squares: dict_keys(['1', '3', '5', '7', '56', '58', '60', '62', '28', '33', '35'])
-Quantum moves: (WHITE, SPLIT) [42] to [33] and [35]
-Quantum relative moves: [(WHITE, SPLIT) [42] to [33] and [35], ] --- 
-Removing for id: 35
-Removed ids ['33', '35']
+Removed ids ['42', '37', '26', '28']
+Related squares: []
+Classical squares: dict_keys(['5', '7', '56', '60', '19', '42', '44', '17'])
+Quantum moves: 
+Quantum relative moves: 
+Quantum ids in alternate move: []
+Classical squares in alternate move: dict_keys(['5', '7', '56', '60', '19', '42', '17', '37'])
+Quantum relative moves in alternate function: 
+Quantum moves in alternate function: 
+Related squares: []
+Classical squares: dict_keys(['5', '7', '56', '60', '19', '42', '17', '37'])
+Quantum moves: 
+Quantum relative moves: 
+Quantum ids in alternate move: []
+Classical squares in alternate move: dict_keys(['7', '56', '60', '19', '42', '17', '37', '14'])
+Quantum relative moves in alternate function: 
+Quantum moves in alternate function: 
+Related squares: []
+Classical squares: dict_keys(['7', '56', '60', '19', '42', '17', '37', '14'])
+Quantum moves: 
+Quantum relative moves: 
+Quantum ids in alternate move: []
+Classical squares in alternate move: dict_keys(['7', '56', '60', '19', '17', '37', '14', '33'])
+Quantum relative moves in alternate function: 
+Quantum moves in alternate function: 
+Related squares: []
+Classical squares: dict_keys(['7', '56', '60', '19', '17', '37', '14', '33'])
+Quantum moves: 
+Quantum relative moves: 
+Quantum ids in alternate move: []
+Classical squares in alternate move: dict_keys(['7', '56', '60', '19', '37', '14', '33', '26'])
+Quantum relative moves in alternate function: 
+Quantum moves in alternate function: 
+Related squares: []
+Classical squares: dict_keys(['7', '56', '60', '19', '37', '14', '33', '26'])
+Quantum moves: 
+Quantum relative moves: 
+Quantum ids in alternate move: []
+Classical squares in alternate move: dict_keys(['7', '56', '60', '19', '37', '14', '26', '24'])
+Quantum relative moves in alternate function: 
+Quantum moves in alternate function: 
+Related squares: []
+Classical squares: dict_keys(['7', '56', '60', '19', '37', '14', '26', '24'])
+Quantum moves: 
+Quantum relative moves: 
+Quantum ids in alternate move: []
+Classical squares in alternate move: dict_keys(['7', '56', '60', '19', '37', '14', '24', '35'])
+Quantum relative moves in alternate function: 
+Quantum moves in alternate function: 
+Related squares: []
+Classical squares: dict_keys(['7', '56', '60', '19', '37', '14', '24', '35'])
+Quantum moves: 
+Quantum relative moves: 
+Quantum ids in alternate move: []
+Classical squares in alternate move: dict_keys(['7', '56', '19', '37', '14', '24', '35', '51'])
+Quantum relative moves in alternate function: 
+Quantum moves in alternate function: 
+Related squares: []
+Classical squares: dict_keys(['7', '56', '19', '37', '14', '24', '35', '51'])
+Quantum moves: 
+Quantum relative moves: 
+Related squares: [['42', '44']]
+Classical squares: dict_keys(['7', '56', '19', '37', '14', '24', '51', '42', '44'])
+Quantum moves: (BLACK, SPLIT) [35] to [42] and [44]
+Quantum relative moves: [(BLACK, SPLIT) [35] to [42] and [44], ] --- 
+Removing for id: 51
+Removed ids []
+Removing for id: 42
+Removed ids ['42', '44']
+Related squares: []
+Classical squares: dict_keys(['7', '56', '19', '37', '14', '24', '51', '44'])
+Quantum moves: 
+Quantum relative moves: 
+Removing for id: 44
+Removed ids []
+Removing for id: 51
+Removed ids []
+Quantum ids in alternate move: []
+Classical squares in alternate move: dict_keys(['7', '56', '19', '37', '14', '24', '58'])
+Quantum relative moves in alternate function: 
+Quantum moves in alternate function: 
+Related squares: []
+Classical squares: dict_keys(['7', '56', '19', '37', '14', '24', '58'])
+Quantum moves: 
+Quantum relative moves: 
+Quantum ids in alternate move: []
+Classical squares in alternate move: dict_keys(['7', '56', '19', '14', '24', '58', '28'])
+Quantum relative moves in alternate function: 
+Quantum moves in alternate function: 
+Related squares: []
+Classical squares: dict_keys(['7', '56', '19', '14', '24', '58', '28'])
+Quantum moves: 
+Quantum relative moves: 
+Removing for id: 19
+Removed ids []
+Removing for id: 28
+Removed ids []
+Quantum ids in alternate move: []
+Classical squares in alternate move: dict_keys(['7', '56', '14', '24', '58', '37'])
+Quantum relative moves in alternate function: 
+Quantum moves in alternate function: 
+Related squares: []
+Classical squares: dict_keys(['7', '56', '14', '24', '58', '37'])
+Quantum moves: 
+Quantum relative moves: 
+Quantum ids in alternate move: []
+Classical squares in alternate move: dict_keys(['7', '14', '24', '58', '37', '49'])
+Quantum relative moves in alternate function: 
+Quantum moves in alternate function: 
+Related squares: []
+Classical squares: dict_keys(['7', '14', '24', '58', '37', '49'])
+Quantum moves: 
+Quantum relative moves: 
+Removing for id: 58
+Removed ids []
+Removing for id: 49
+Removed ids []
+Quantum ids in alternate move: []
+Classical squares in alternate move: dict_keys(['7', '14', '24', '37', '40'])
+Quantum relative moves in alternate function: 
+Quantum moves in alternate function: 
+Related squares: []
+Classical squares: dict_keys(['7', '14', '24', '37', '40'])
+Quantum moves: 
+Quantum relative moves: 
+Quantum ids in alternate move: []
+Classical squares in alternate move: dict_keys(['7', '14', '37', '40', '17'])
+Quantum relative moves in alternate function: 
+Quantum moves in alternate function: 
+Related squares: []
+Classical squares: dict_keys(['7', '14', '37', '40', '17'])
+Quantum moves: 
+Quantum relative moves: 
+Quantum ids in alternate move: []
+Classical squares in alternate move: dict_keys(['7', '14', '40', '17', '44'])
+Quantum relative moves in alternate function: 
+Quantum moves in alternate function: 
+Related squares: []
+Classical squares: dict_keys(['7', '14', '40', '17', '44'])
+Quantum moves: 
+Quantum relative moves: 
+Related squares: [['8', '10']]
+Classical squares: dict_keys(['7', '14', '40', '44', '8', '10'])
+Quantum moves: (WHITE, SPLIT) [17] to [8] and [10]
+Quantum relative moves: [(WHITE, SPLIT) [17] to [8] and [10], ] --- 
+Related squares: [['8', '10'], ['33', '49']]
+Classical squares: dict_keys(['7', '14', '44', '8', '10', '33', '49'])
+Quantum moves: (WHITE, SPLIT) [17] to [8] and [10](BLACK, SPLIT) [40] to [33] and [49]
+Quantum relative moves: [(WHITE, SPLIT) [17] to [8] and [10], ] --- [(BLACK, SPLIT) [40] to [33] and [49], ] --- 
+Quantum ids in alternate move: ['8', '3', '33', '49']
+Classical squares in alternate move: dict_keys(['7', '14', '44', '8', '33', '49', '3'])
+Quantum relative moves in alternate function: [(WHITE, SPLIT) [17] to [8] and [10], (WHITE, CLASSIC) [10] to [3], ] --- [(BLACK, SPLIT) [40] to [33] and [49], ] --- 
+Quantum moves in alternate function: (WHITE, SPLIT) [17] to [8] and [10](BLACK, SPLIT) [40] to [33] and [49](WHITE, CLASSIC) [10] to [3]
+Related squares: [['8', '3'], ['33', '49']]
+Classical squares: dict_keys(['7', '14', '44', '8', '33', '49', '3'])
+Quantum moves: (WHITE, SPLIT) [17] to [8] and [10](BLACK, SPLIT) [40] to [33] and [49](WHITE, CLASSIC) [10] to [3]
+Quantum relative moves: [(WHITE, SPLIT) [17] to [8] and [10], (WHITE, CLASSIC) [10] to [3], ] --- [(BLACK, SPLIT) [40] to [33] and [49], ] --- 
+Related squares: [['8', '3'], ['33', '42', '58']]
+Classical squares: dict_keys(['7', '14', '44', '8', '33', '3', '42', '58'])
+Quantum moves: (WHITE, SPLIT) [17] to [8] and [10](BLACK, SPLIT) [40] to [33] and [49](WHITE, CLASSIC) [10] to [3](BLACK, SPLIT) [49] to [42] and [58]
+Quantum relative moves: [(WHITE, SPLIT) [17] to [8] and [10], (WHITE, CLASSIC) [10] to [3], ] --- [(BLACK, SPLIT) [40] to [33] and [49], (BLACK, SPLIT) [49] to [42] and [58], ] --- 
+Related squares: [['8', '10', '12'], ['33', '42', '58']]
+Classical squares: dict_keys(['7', '14', '44', '8', '33', '42', '58', '10', '12'])
+Quantum moves: (WHITE, SPLIT) [17] to [8] and [10](BLACK, SPLIT) [40] to [33] and [49](WHITE, CLASSIC) [10] to [3](BLACK, SPLIT) [49] to [42] and [58](WHITE, SPLIT) [3] to [10] and [12]
+Quantum relative moves: [(WHITE, SPLIT) [17] to [8] and [10], (WHITE, CLASSIC) [10] to [3], (WHITE, SPLIT) [3] to [10] and [12], ] --- [(BLACK, SPLIT) [40] to [33] and [49], (BLACK, SPLIT) [49] to [42] and [58], ] --- 
+Quantum ids in alternate move: ['8', '10', '12', '33', '58', '51']
+Classical squares in alternate move: dict_keys(['7', '14', '44', '8', '33', '58', '10', '12', '51'])
+Quantum relative moves in alternate function: [(WHITE, SPLIT) [17] to [8] and [10], (WHITE, CLASSIC) [10] to [3], (WHITE, SPLIT) [3] to [10] and [12], ] --- [(BLACK, SPLIT) [40] to [33] and [49], (BLACK, SPLIT) [49] to [42] and [58], (BLACK, CLASSIC) [42] to [51], ] --- 
+Quantum moves in alternate function: (WHITE, SPLIT) [17] to [8] and [10](BLACK, SPLIT) [40] to [33] and [49](WHITE, CLASSIC) [10] to [3](BLACK, SPLIT) [49] to [42] and [58](WHITE, SPLIT) [3] to [10] and [12](BLACK, CLASSIC) [42] to [51]
+Related squares: [['8', '10', '12'], ['33', '58', '51']]
+Classical squares: dict_keys(['7', '14', '44', '8', '33', '58', '10', '12', '51'])
+Quantum moves: (WHITE, SPLIT) [17] to [8] and [10](BLACK, SPLIT) [40] to [33] and [49](WHITE, CLASSIC) [10] to [3](BLACK, SPLIT) [49] to [42] and [58](WHITE, SPLIT) [3] to [10] and [12](BLACK, CLASSIC) [42] to [51]
+Quantum relative moves: [(WHITE, SPLIT) [17] to [8] and [10], (WHITE, CLASSIC) [10] to [3], (WHITE, SPLIT) [3] to [10] and [12], ] --- [(BLACK, SPLIT) [40] to [33] and [49], (BLACK, SPLIT) [49] to [42] and [58], (BLACK, CLASSIC) [42] to [51], ] --- 
+Related squares: [['8', '10', '3', '5'], ['33', '58', '51']]
+Classical squares: dict_keys(['7', '14', '44', '8', '33', '58', '10', '51', '3', '5'])
+Quantum moves: (WHITE, SPLIT) [17] to [8] and [10](BLACK, SPLIT) [40] to [33] and [49](WHITE, CLASSIC) [10] to [3](BLACK, SPLIT) [49] to [42] and [58](WHITE, SPLIT) [3] to [10] and [12](BLACK, CLASSIC) [42] to [51](WHITE, SPLIT) [12] to [3] and [5]
+Quantum relative moves: [(WHITE, SPLIT) [17] to [8] and [10], (WHITE, CLASSIC) [10] to [3], (WHITE, SPLIT) [3] to [10] and [12], (WHITE, SPLIT) [12] to [3] and [5], ] --- [(BLACK, SPLIT) [40] to [33] and [49], (BLACK, SPLIT) [49] to [42] and [58], (BLACK, CLASSIC) [42] to [51], ] --- 
+Quantum ids in alternate move: ['8', '10', '3', '5', '58', '51', '24']
+Classical squares in alternate move: dict_keys(['7', '14', '44', '8', '58', '10', '51', '3', '5', '24'])
+Quantum relative moves in alternate function: [(WHITE, SPLIT) [17] to [8] and [10], (WHITE, CLASSIC) [10] to [3], (WHITE, SPLIT) [3] to [10] and [12], (WHITE, SPLIT) [12] to [3] and [5], ] --- [(BLACK, SPLIT) [40] to [33] and [49], (BLACK, SPLIT) [49] to [42] and [58], (BLACK, CLASSIC) [42] to [51], (BLACK, CLASSIC) [33] to [24], ] --- 
+Quantum moves in alternate function: (WHITE, SPLIT) [17] to [8] and [10](BLACK, SPLIT) [40] to [33] and [49](WHITE, CLASSIC) [10] to [3](BLACK, SPLIT) [49] to [42] and [58](WHITE, SPLIT) [3] to [10] and [12](BLACK, CLASSIC) [42] to [51](WHITE, SPLIT) [12] to [3] and [5](BLACK, CLASSIC) [33] to [24]
+Related squares: [['8', '10', '3', '5'], ['58', '51', '24']]
+Classical squares: dict_keys(['7', '14', '44', '8', '58', '10', '51', '3', '5', '24'])
+Quantum moves: (WHITE, SPLIT) [17] to [8] and [10](BLACK, SPLIT) [40] to [33] and [49](WHITE, CLASSIC) [10] to [3](BLACK, SPLIT) [49] to [42] and [58](WHITE, SPLIT) [3] to [10] and [12](BLACK, CLASSIC) [42] to [51](WHITE, SPLIT) [12] to [3] and [5](BLACK, CLASSIC) [33] to [24]
+Quantum relative moves: [(WHITE, SPLIT) [17] to [8] and [10], (WHITE, CLASSIC) [10] to [3], (WHITE, SPLIT) [3] to [10] and [12], (WHITE, SPLIT) [12] to [3] and [5], ] --- [(BLACK, SPLIT) [40] to [33] and [49], (BLACK, SPLIT) [49] to [42] and [58], (BLACK, CLASSIC) [42] to [51], (BLACK, CLASSIC) [33] to [24], ] --- 
+Removing for id: 5
+Removed ids ['8', '10', '3', '5']
+Related squares: [['58', '51', '24']]
+Classical squares: dict_keys(['7', '14', '44', '58', '10', '51', '24'])
+Quantum moves: (BLACK, SPLIT) [40] to [33] and [49](BLACK, SPLIT) [49] to [42] and [58](BLACK, CLASSIC) [42] to [51](BLACK, CLASSIC) [33] to [24]
+Quantum relative moves: [(BLACK, SPLIT) [40] to [33] and [49], (BLACK, SPLIT) [49] to [42] and [58], (BLACK, CLASSIC) [42] to [51], (BLACK, CLASSIC) [33] to [24], ] --- 
+Quantum ids in alternate move: ['58', '51', '24']
+Classical squares in alternate move: dict_keys(['7', '14', '58', '10', '51', '24', '53'])
+Quantum relative moves in alternate function: [(BLACK, SPLIT) [40] to [33] and [49], (BLACK, SPLIT) [49] to [42] and [58], (BLACK, CLASSIC) [42] to [51], (BLACK, CLASSIC) [33] to [24], ] --- 
+Quantum moves in alternate function: (BLACK, SPLIT) [40] to [33] and [49](BLACK, SPLIT) [49] to [42] and [58](BLACK, CLASSIC) [42] to [51](BLACK, CLASSIC) [33] to [24]
+Related squares: [['58', '51', '24']]
+Classical squares: dict_keys(['7', '14', '58', '10', '51', '24', '53'])
+Quantum moves: (BLACK, SPLIT) [40] to [33] and [49](BLACK, SPLIT) [49] to [42] and [58](BLACK, CLASSIC) [42] to [51](BLACK, CLASSIC) [33] to [24]
+Quantum relative moves: [(BLACK, SPLIT) [40] to [33] and [49], (BLACK, SPLIT) [49] to [42] and [58], (BLACK, CLASSIC) [42] to [51], (BLACK, CLASSIC) [33] to [24], ] --- 
+Quantum ids in alternate move: ['58', '51', '24']
+Classical squares in alternate move: dict_keys(['7', '14', '58', '51', '24', '53', '3'])
+Quantum relative moves in alternate function: [(BLACK, SPLIT) [40] to [33] and [49], (BLACK, SPLIT) [49] to [42] and [58], (BLACK, CLASSIC) [42] to [51], (BLACK, CLASSIC) [33] to [24], ] --- 
+Quantum moves in alternate function: (BLACK, SPLIT) [40] to [33] and [49](BLACK, SPLIT) [49] to [42] and [58](BLACK, CLASSIC) [42] to [51](BLACK, CLASSIC) [33] to [24]
+Related squares: [['58', '51', '24']]
+Classical squares: dict_keys(['7', '14', '58', '51', '24', '53', '3'])
+Quantum moves: (BLACK, SPLIT) [40] to [33] and [49](BLACK, SPLIT) [49] to [42] and [58](BLACK, CLASSIC) [42] to [51](BLACK, CLASSIC) [33] to [24]
+Quantum relative moves: [(BLACK, SPLIT) [40] to [33] and [49], (BLACK, SPLIT) [49] to [42] and [58], (BLACK, CLASSIC) [42] to [51], (BLACK, CLASSIC) [33] to [24], ] --- 
+Quantum ids in alternate move: ['58', '51', '17']
+Classical squares in alternate move: dict_keys(['7', '14', '58', '51', '53', '3', '17'])
+Quantum relative moves in alternate function: [(BLACK, SPLIT) [40] to [33] and [49], (BLACK, SPLIT) [49] to [42] and [58], (BLACK, CLASSIC) [42] to [51], (BLACK, CLASSIC) [33] to [24], (BLACK, CLASSIC) [24] to [17], ] --- 
+Quantum moves in alternate function: (BLACK, SPLIT) [40] to [33] and [49](BLACK, SPLIT) [49] to [42] and [58](BLACK, CLASSIC) [42] to [51](BLACK, CLASSIC) [33] to [24](BLACK, CLASSIC) [24] to [17]
+Related squares: [['58', '51', '17']]
+Classical squares: dict_keys(['7', '14', '58', '51', '53', '3', '17'])
+Quantum moves: (BLACK, SPLIT) [40] to [33] and [49](BLACK, SPLIT) [49] to [42] and [58](BLACK, CLASSIC) [42] to [51](BLACK, CLASSIC) [33] to [24](BLACK, CLASSIC) [24] to [17]
+Quantum relative moves: [(BLACK, SPLIT) [40] to [33] and [49], (BLACK, SPLIT) [49] to [42] and [58], (BLACK, CLASSIC) [42] to [51], (BLACK, CLASSIC) [33] to [24], (BLACK, CLASSIC) [24] to [17], ] --- 
+Quantum ids in alternate move: ['58', '51', '17']
+Classical squares in alternate move: dict_keys(['7', '14', '58', '51', '53', '17', '10'])
+Quantum relative moves in alternate function: [(BLACK, SPLIT) [40] to [33] and [49], (BLACK, SPLIT) [49] to [42] and [58], (BLACK, CLASSIC) [42] to [51], (BLACK, CLASSIC) [33] to [24], (BLACK, CLASSIC) [24] to [17], ] --- 
+Quantum moves in alternate function: (BLACK, SPLIT) [40] to [33] and [49](BLACK, SPLIT) [49] to [42] and [58](BLACK, CLASSIC) [42] to [51](BLACK, CLASSIC) [33] to [24](BLACK, CLASSIC) [24] to [17]
+Related squares: [['58', '51', '17']]
+Classical squares: dict_keys(['7', '14', '58', '51', '53', '17', '10'])
+Quantum moves: (BLACK, SPLIT) [40] to [33] and [49](BLACK, SPLIT) [49] to [42] and [58](BLACK, CLASSIC) [42] to [51](BLACK, CLASSIC) [33] to [24](BLACK, CLASSIC) [24] to [17]
+Quantum relative moves: [(BLACK, SPLIT) [40] to [33] and [49], (BLACK, SPLIT) [49] to [42] and [58], (BLACK, CLASSIC) [42] to [51], (BLACK, CLASSIC) [33] to [24], (BLACK, CLASSIC) [24] to [17], ] --- 
+Removing for id: 17
+Removed ids ['58', '51', '17']
+Related squares: []
+Classical squares: dict_keys(['7', '14', '58', '53', '10'])
+Quantum moves: 
+Quantum relative moves: 
+Related squares: [['3', '19']]
+Classical squares: dict_keys(['7', '14', '58', '53', '3', '19'])
+Quantum moves: (WHITE, SPLIT) [10] to [3] and [19]
+Quantum relative moves: [(WHITE, SPLIT) [10] to [3] and [19], ] --- 
+Quantum ids in alternate move: ['3', '19']
+Classical squares in alternate move: dict_keys(['7', '58', '53', '3', '19', '21'])
+Quantum relative moves in alternate function: [(WHITE, SPLIT) [10] to [3] and [19], ] --- 
+Quantum moves in alternate function: (WHITE, SPLIT) [10] to [3] and [19]
+Related squares: [['3', '19']]
+Classical squares: dict_keys(['7', '58', '53', '3', '19', '21'])
+Quantum moves: (WHITE, SPLIT) [10] to [3] and [19]
+Quantum relative moves: [(WHITE, SPLIT) [10] to [3] and [19], ] --- 
+Related squares: [['3', '12', '28']]
+Classical squares: dict_keys(['7', '58', '53', '3', '21', '12', '28'])
+Quantum moves: (WHITE, SPLIT) [10] to [3] and [19](WHITE, SPLIT) [19] to [12] and [28]
+Quantum relative moves: [(WHITE, SPLIT) [10] to [3] and [19], (WHITE, SPLIT) [19] to [12] and [28], ] --- 
+Removing for id: 21
+Removed ids []
+Removing for id: 28
+Removed ids ['3', '12', '28']
+Related squares: []
+Classical squares: dict_keys(['7', '58', '53', '3', '21'])
+Quantum moves: 
+Quantum relative moves: 
+Related squares: [['10', '12']]
+Classical squares: dict_keys(['7', '58', '53', '21', '10', '12'])
+Quantum moves: (WHITE, SPLIT) [3] to [10] and [12]
+Quantum relative moves: [(WHITE, SPLIT) [3] to [10] and [12], ] --- 
+Quantum ids in alternate move: ['10', '12']
+Classical squares in alternate move: dict_keys(['7', '58', '21', '10', '12', '60'])
+Quantum relative moves in alternate function: [(WHITE, SPLIT) [3] to [10] and [12], ] --- 
+Quantum moves in alternate function: (WHITE, SPLIT) [3] to [10] and [12]
+Related squares: [['10', '12']]
+Classical squares: dict_keys(['7', '58', '21', '10', '12', '60'])
+Quantum moves: (WHITE, SPLIT) [3] to [10] and [12]
+Quantum relative moves: [(WHITE, SPLIT) [3] to [10] and [12], ] --- 
+Removing for id: 12
+Removed ids ['10', '12']
+Related squares: []
+Classical squares: dict_keys(['7', '58', '21', '10', '60'])
+Quantum moves: 
+Quantum relative moves: 
+Quantum ids in alternate move: []
+Classical squares in alternate move: dict_keys(['7', '21', '10', '60', '49'])
+Quantum relative moves in alternate function: 
+Quantum moves in alternate function: 
+Related squares: []
+Classical squares: dict_keys(['7', '21', '10', '60', '49'])
+Quantum moves: 
+Quantum relative moves: 
+Quantum ids in alternate move: []
+Classical squares in alternate move: dict_keys(['7', '21', '60', '49', '3'])
+Quantum relative moves in alternate function: 
+Quantum moves in alternate function: 
+Related squares: []
+Classical squares: dict_keys(['7', '21', '60', '49', '3'])
+Quantum moves: 
+Quantum relative moves: 
+Quantum ids in alternate move: []
+Classical squares in alternate move: dict_keys(['7', '21', '60', '3', '40'])
+Quantum relative moves in alternate function: 
+Quantum moves in alternate function: 
+Related squares: []
+Classical squares: dict_keys(['7', '21', '60', '3', '40'])
+Quantum moves: 
+Quantum relative moves: 
+Related squares: [['10', '12']]
+Classical squares: dict_keys(['7', '21', '60', '40', '10', '12'])
+Quantum moves: (WHITE, SPLIT) [3] to [10] and [12]
+Quantum relative moves: [(WHITE, SPLIT) [3] to [10] and [12], ] --- 
+Related squares: [['10', '12'], ['33', '49']]
+Classical squares: dict_keys(['7', '21', '60', '10', '12', '33', '49'])
+Quantum moves: (WHITE, SPLIT) [3] to [10] and [12](BLACK, SPLIT) [40] to [33] and [49]
+Quantum relative moves: [(WHITE, SPLIT) [3] to [10] and [12], ] --- [(BLACK, SPLIT) [40] to [33] and [49], ] --- 
+Removing for id: 12
+Removed ids ['10', '12']
+Related squares: [['33', '49']]
+Classical squares: dict_keys(['7', '21', '60', '10', '33', '49'])
+Quantum moves: (BLACK, SPLIT) [40] to [33] and [49]
+Quantum relative moves: [(BLACK, SPLIT) [40] to [33] and [49], ] --- 
+Related squares: [['33', '56', '58']]
+Classical squares: dict_keys(['7', '21', '60', '10', '33', '56', '58'])
+Quantum moves: (BLACK, SPLIT) [40] to [33] and [49](BLACK, SPLIT) [49] to [56] and [58]
+Quantum relative moves: [(BLACK, SPLIT) [40] to [33] and [49], (BLACK, SPLIT) [49] to [56] and [58], ] --- 
+Related squares: [['33', '56', '58'], ['3', '19']]
+Classical squares: dict_keys(['7', '21', '60', '33', '56', '58', '3', '19'])
+Quantum moves: (BLACK, SPLIT) [40] to [33] and [49](BLACK, SPLIT) [49] to [56] and [58](WHITE, SPLIT) [10] to [3] and [19]
+Quantum relative moves: [(BLACK, SPLIT) [40] to [33] and [49], (BLACK, SPLIT) [49] to [56] and [58], ] --- [(WHITE, SPLIT) [10] to [3] and [19], ] --- 
+Quantum ids in alternate move: ['33', '56', '58', '3', '19']
+Classical squares in alternate move: dict_keys(['7', '21', '33', '56', '58', '3', '19', '53'])
+Quantum relative moves in alternate function: [(BLACK, SPLIT) [40] to [33] and [49], (BLACK, SPLIT) [49] to [56] and [58], ] --- [(WHITE, SPLIT) [10] to [3] and [19], ] --- 
+Quantum moves in alternate function: (BLACK, SPLIT) [40] to [33] and [49](BLACK, SPLIT) [49] to [56] and [58](WHITE, SPLIT) [10] to [3] and [19]
+Related squares: [['33', '56', '58'], ['3', '19']]
+Classical squares: dict_keys(['7', '21', '33', '56', '58', '3', '19', '53'])
+Quantum moves: (BLACK, SPLIT) [40] to [33] and [49](BLACK, SPLIT) [49] to [56] and [58](WHITE, SPLIT) [10] to [3] and [19]
+Quantum relative moves: [(BLACK, SPLIT) [40] to [33] and [49], (BLACK, SPLIT) [49] to [56] and [58], ] --- [(WHITE, SPLIT) [10] to [3] and [19], ] --- 
+Related squares: [['33', '56', '58'], ['3', '10', '26']]
+Classical squares: dict_keys(['7', '21', '33', '56', '58', '3', '53', '10', '26'])
+Quantum moves: (BLACK, SPLIT) [40] to [33] and [49](BLACK, SPLIT) [49] to [56] and [58](WHITE, SPLIT) [10] to [3] and [19](WHITE, SPLIT) [19] to [10] and [26]
+Quantum relative moves: [(BLACK, SPLIT) [40] to [33] and [49], (BLACK, SPLIT) [49] to [56] and [58], ] --- [(WHITE, SPLIT) [10] to [3] and [19], (WHITE, SPLIT) [19] to [10] and [26], ] --- 
+Removing for id: 33
+Removed ids ['33', '56', '58']
+Removing for id: 26
+Removed ids ['3', '10', '26']
+Related squares: []
+Classical squares: dict_keys(['7', '21', '33', '3', '53'])
+Quantum moves: 
+Quantum relative moves: 
+Related squares: [['10', '12']]
+Classical squares: dict_keys(['7', '21', '33', '53', '10', '12'])
+Quantum moves: (WHITE, SPLIT) [3] to [10] and [12]
+Quantum relative moves: [(WHITE, SPLIT) [3] to [10] and [12], ] --- 
+Related squares: [['10', '12'], ['44', '60']]
+Classical squares: dict_keys(['7', '21', '33', '10', '12', '44', '60'])
+Quantum moves: (WHITE, SPLIT) [3] to [10] and [12](BLACK, SPLIT) [53] to [44] and [60]
+Quantum relative moves: [(WHITE, SPLIT) [3] to [10] and [12], ] --- [(BLACK, SPLIT) [53] to [44] and [60], ] --- 
+Removing for id: 12
+Removed ids ['10', '12']
+Removing for id: 21
+Removed ids []
+Quantum ids in alternate move: ['44', '60']
+Classical squares in alternate move: dict_keys(['7', '33', '44', '60', '30'])
+Quantum relative moves in alternate function: [(BLACK, SPLIT) [53] to [44] and [60], ] --- 
+Quantum moves in alternate function: (BLACK, SPLIT) [53] to [44] and [60]
+Related squares: [['44', '60']]
+Classical squares: dict_keys(['7', '33', '44', '60', '30'])
+Quantum moves: (BLACK, SPLIT) [53] to [44] and [60]
+Quantum relative moves: [(BLACK, SPLIT) [53] to [44] and [60], ] --- 
+Related squares: [['60', '51', '53']]
+Classical squares: dict_keys(['7', '33', '60', '30', '51', '53'])
+Quantum moves: (BLACK, SPLIT) [53] to [44] and [60](BLACK, SPLIT) [44] to [51] and [53]
+Quantum relative moves: [(BLACK, SPLIT) [53] to [44] and [60], (BLACK, SPLIT) [44] to [51] and [53], ] --- 
+Quantum ids in alternate move: ['60', '51', '53']
+Classical squares in alternate move: dict_keys(['7', '33', '60', '51', '53', '37'])
+Quantum relative moves in alternate function: [(BLACK, SPLIT) [53] to [44] and [60], (BLACK, SPLIT) [44] to [51] and [53], ] --- 
+Quantum moves in alternate function: (BLACK, SPLIT) [53] to [44] and [60](BLACK, SPLIT) [44] to [51] and [53]
+Related squares: [['60', '51', '53']]
+Classical squares: dict_keys(['7', '33', '60', '51', '53', '37'])
+Quantum moves: (BLACK, SPLIT) [53] to [44] and [60](BLACK, SPLIT) [44] to [51] and [53]
+Quantum relative moves: [(BLACK, SPLIT) [53] to [44] and [60], (BLACK, SPLIT) [44] to [51] and [53], ] --- 
+Quantum ids in alternate move: ['60', '51', '53']
+Classical squares in alternate move: dict_keys(['7', '60', '51', '53', '37', '24'])
+Quantum relative moves in alternate function: [(BLACK, SPLIT) [53] to [44] and [60], (BLACK, SPLIT) [44] to [51] and [53], ] --- 
+Quantum moves in alternate function: (BLACK, SPLIT) [53] to [44] and [60](BLACK, SPLIT) [44] to [51] and [53]
+Related squares: [['60', '51', '53']]
+Classical squares: dict_keys(['7', '60', '51', '53', '37', '24'])
+Quantum moves: (BLACK, SPLIT) [53] to [44] and [60](BLACK, SPLIT) [44] to [51] and [53]
+Quantum relative moves: [(BLACK, SPLIT) [53] to [44] and [60], (BLACK, SPLIT) [44] to [51] and [53], ] --- 
+Related squares: [['60', '51', '53'], ['30', '46']]
+Classical squares: dict_keys(['7', '60', '51', '53', '24', '30', '46'])
+Quantum moves: (BLACK, SPLIT) [53] to [44] and [60](BLACK, SPLIT) [44] to [51] and [53](WHITE, SPLIT) [37] to [30] and [46]
+Quantum relative moves: [(BLACK, SPLIT) [53] to [44] and [60], (BLACK, SPLIT) [44] to [51] and [53], ] --- [(WHITE, SPLIT) [37] to [30] and [46], ] --- 
+Removing for id: 53
+Removed ids ['60', '51', '53']
+Removing for id: 46
+Removed ids ['30', '46']
+Related squares: []
+Classical squares: dict_keys(['7', '53', '24', '30'])
+Quantum moves: 
+Quantum relative moves: 
+Related squares: [['23', '39']]
+Classical squares: dict_keys(['7', '53', '24', '23', '39'])
+Quantum moves: (WHITE, SPLIT) [30] to [23] and [39]
+Quantum relative moves: [(WHITE, SPLIT) [30] to [23] and [39], ] --- 
+Related squares: [['23', '39'], ['60', '62']]
+Classical squares: dict_keys(['7', '24', '23', '39', '60', '62'])
+Quantum moves: (WHITE, SPLIT) [30] to [23] and [39](BLACK, SPLIT) [53] to [60] and [62]
+Quantum relative moves: [(WHITE, SPLIT) [30] to [23] and [39], ] --- [(BLACK, SPLIT) [53] to [60] and [62], ] --- 
+Quantum ids in alternate move: ['23', '46', '60', '62']
+Classical squares in alternate move: dict_keys(['7', '24', '23', '60', '62', '46'])
+Quantum relative moves in alternate function: [(WHITE, SPLIT) [30] to [23] and [39], (WHITE, CLASSIC) [39] to [46], ] --- [(BLACK, SPLIT) [53] to [60] and [62], ] --- 
+Quantum moves in alternate function: (WHITE, SPLIT) [30] to [23] and [39](BLACK, SPLIT) [53] to [60] and [62](WHITE, CLASSIC) [39] to [46]
+Related squares: [['23', '46'], ['60', '62']]
+Classical squares: dict_keys(['7', '24', '23', '60', '62', '46'])
+Quantum moves: (WHITE, SPLIT) [30] to [23] and [39](BLACK, SPLIT) [53] to [60] and [62](WHITE, CLASSIC) [39] to [46]
+Quantum relative moves: [(WHITE, SPLIT) [30] to [23] and [39], (WHITE, CLASSIC) [39] to [46], ] --- [(BLACK, SPLIT) [53] to [60] and [62], ] --- 
+Quantum ids in alternate move: ['23', '46', '60', '62']
+Classical squares in alternate move: dict_keys(['7', '23', '60', '62', '46', '17'])
+Quantum relative moves in alternate function: [(WHITE, SPLIT) [30] to [23] and [39], (WHITE, CLASSIC) [39] to [46], ] --- [(BLACK, SPLIT) [53] to [60] and [62], ] --- 
+Quantum moves in alternate function: (WHITE, SPLIT) [30] to [23] and [39](BLACK, SPLIT) [53] to [60] and [62](WHITE, CLASSIC) [39] to [46]
+Related squares: [['23', '46'], ['60', '62']]
+Classical squares: dict_keys(['7', '23', '60', '62', '46', '17'])
+Quantum moves: (WHITE, SPLIT) [30] to [23] and [39](BLACK, SPLIT) [53] to [60] and [62](WHITE, CLASSIC) [39] to [46]
+Quantum relative moves: [(WHITE, SPLIT) [30] to [23] and [39], (WHITE, CLASSIC) [39] to [46], ] --- [(BLACK, SPLIT) [53] to [60] and [62], ] --- 
+Related squares: [['23', '53', '55'], ['60', '62']]
+Classical squares: dict_keys(['7', '23', '60', '62', '17', '53', '55'])
+Quantum moves: (WHITE, SPLIT) [30] to [23] and [39](BLACK, SPLIT) [53] to [60] and [62](WHITE, CLASSIC) [39] to [46](WHITE, SPLIT) [46] to [53] and [55]
+Quantum relative moves: [(WHITE, SPLIT) [30] to [23] and [39], (WHITE, CLASSIC) [39] to [46], (WHITE, SPLIT) [46] to [53] and [55], ] --- [(BLACK, SPLIT) [53] to [60] and [62], ] --- 
+Removing for id: 62
+Removed ids ['60', '62']
+Related squares: [['23', '53', '55']]
+Classical squares: dict_keys(['7', '23', '60', '17', '53', '55'])
+Quantum moves: (WHITE, SPLIT) [30] to [23] and [39](WHITE, CLASSIC) [39] to [46](WHITE, SPLIT) [46] to [53] and [55]
+Quantum relative moves: [(WHITE, SPLIT) [30] to [23] and [39], (WHITE, CLASSIC) [39] to [46], (WHITE, SPLIT) [46] to [53] and [55], ] --- 
+Quantum ids in alternate move: ['23', '53', '46']
+Classical squares in alternate move: dict_keys(['7', '23', '60', '17', '53', '46'])
+Quantum relative moves in alternate function: [(WHITE, SPLIT) [30] to [23] and [39], (WHITE, CLASSIC) [39] to [46], (WHITE, SPLIT) [46] to [53] and [55], (WHITE, CLASSIC) [55] to [46], ] --- 
+Quantum moves in alternate function: (WHITE, SPLIT) [30] to [23] and [39](WHITE, CLASSIC) [39] to [46](WHITE, SPLIT) [46] to [53] and [55](WHITE, CLASSIC) [55] to [46]
+Related squares: [['23', '53', '46']]
+Classical squares: dict_keys(['7', '23', '60', '17', '53', '46'])
+Quantum moves: (WHITE, SPLIT) [30] to [23] and [39](WHITE, CLASSIC) [39] to [46](WHITE, SPLIT) [46] to [53] and [55](WHITE, CLASSIC) [55] to [46]
+Quantum relative moves: [(WHITE, SPLIT) [30] to [23] and [39], (WHITE, CLASSIC) [39] to [46], (WHITE, SPLIT) [46] to [53] and [55], (WHITE, CLASSIC) [55] to [46], ] --- 
+Related squares: [['23', '53', '46'], ['24', '26']]
+Classical squares: dict_keys(['7', '23', '60', '53', '46', '24', '26'])
+Quantum moves: (WHITE, SPLIT) [30] to [23] and [39](WHITE, CLASSIC) [39] to [46](WHITE, SPLIT) [46] to [53] and [55](WHITE, CLASSIC) [55] to [46](BLACK, SPLIT) [17] to [24] and [26]
+Quantum relative moves: [(WHITE, SPLIT) [30] to [23] and [39], (WHITE, CLASSIC) [39] to [46], (WHITE, SPLIT) [46] to [53] and [55], (WHITE, CLASSIC) [55] to [46], ] --- [(BLACK, SPLIT) [17] to [24] and [26], ] --- 
+Quantum ids in alternate move: ['53', '46', '14', '24', '26']
+Classical squares in alternate move: dict_keys(['7', '60', '53', '46', '24', '26', '14'])
+Quantum relative moves in alternate function: [(WHITE, SPLIT) [30] to [23] and [39], (WHITE, CLASSIC) [39] to [46], (WHITE, SPLIT) [46] to [53] and [55], (WHITE, CLASSIC) [55] to [46], (WHITE, CLASSIC) [23] to [14], ] --- [(BLACK, SPLIT) [17] to [24] and [26], ] --- 
+Quantum moves in alternate function: (WHITE, SPLIT) [30] to [23] and [39](WHITE, CLASSIC) [39] to [46](WHITE, SPLIT) [46] to [53] and [55](WHITE, CLASSIC) [55] to [46](BLACK, SPLIT) [17] to [24] and [26](WHITE, CLASSIC) [23] to [14]
+Related squares: [['53', '46', '14'], ['24', '26']]
+Classical squares: dict_keys(['7', '60', '53', '46', '24', '26', '14'])
+Quantum moves: (WHITE, SPLIT) [30] to [23] and [39](WHITE, CLASSIC) [39] to [46](WHITE, SPLIT) [46] to [53] and [55](WHITE, CLASSIC) [55] to [46](BLACK, SPLIT) [17] to [24] and [26](WHITE, CLASSIC) [23] to [14]
+Quantum relative moves: [(WHITE, SPLIT) [30] to [23] and [39], (WHITE, CLASSIC) [39] to [46], (WHITE, SPLIT) [46] to [53] and [55], (WHITE, CLASSIC) [55] to [46], (WHITE, CLASSIC) [23] to [14], ] --- [(BLACK, SPLIT) [17] to [24] and [26], ] --- 
+Removing for id: 7
+Removed ids []
+Removing for id: 14
+Removed ids ['53', '46', '14']
+Quantum ids in alternate move: ['24', '26']
+Classical squares in alternate move: dict_keys(['60', '24', '26', '21'])
+Quantum relative moves in alternate function: [(BLACK, SPLIT) [17] to [24] and [26], ] --- 
+Quantum moves in alternate function: (BLACK, SPLIT) [17] to [24] and [26]

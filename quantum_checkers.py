@@ -426,7 +426,6 @@ class Checkers:
         self.write_to_log(t)
         for qm in self.q_moves:
             if(qm.movetype == MoveType.SPLIT):
-                print(f"{qm.source_id}, {qm.target1_id}, {qm.target2_id}")
                 CheckersSplit(CheckersSquare.FULL, self.rules)(self.squares[str(qm.source_id)], self.squares[str(qm.target1_id)], self.squares[str(qm.target2_id)])
             # self.player_move(qm, qm.player)
             else:
