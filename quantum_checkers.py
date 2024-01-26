@@ -147,10 +147,17 @@ class Checkers:
                     id = self.convert_xy_to_id(x, y)
                     if(y <= self.num_vertical_pieces-1): # We are in the beginning rows, initialize black
                         QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # Black
-                        self.classical_squares[str(id)] = Piece(str(id+1), CheckersPlayer.BLACK, king)
+                        self.classical_squares[str(id)] = Piece(str(id), CheckersPlayer.BLACK, king)
                     elif(y >= self.num_vertical - self.num_vertical_pieces):
                         QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # White
                         self.classical_squares[str(id)] = Piece(str(id), CheckersPlayer.WHITE, king)
+        
+        # Random test stuff
+        # QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(19)])
+        # QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(42)])
+        # self.classical_squares[str(19)] = Piece(str(19), CheckersPlayer.BLACK, king)
+        # self.classical_squares[str(42)] = Piece(str(42), CheckersPlayer.WHITE, king)
+        # self.split_move(Move_id(MoveType.SPLIT, CheckersPlayer.BLACK, 19, 26, 28), CheckersSquare.FULL)
 
     def write_to_log(self, string):
         self.log = open("./log.txt", "a")
@@ -669,7 +676,7 @@ class Checkers:
                 self.q_rel_moves[i].append(move)
                 self.q_moves.append(move)
                 break
-        # self.concat_moves(move, move.source_id)
+        # self.concat_moves(move, move.source_id) # EXPERIMENTAL
         self.remove_id_from_rel_squares(move.source_id)
         self.remove_piece(move.source_id)
         self.alternate_classic_move()

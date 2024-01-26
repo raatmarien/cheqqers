@@ -3,6 +3,9 @@ from interface import GameInterface
 from quantum_checkers import Checkers
 import time
 
+import cProfile
+import pstats
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--num_rows', help='The number of rows of the checkboard. INT', default=8)
@@ -20,4 +23,14 @@ def main():
     game.play()
 
 if __name__ == "__main__":
+    # cProfile.run('main()')
+    # profiler = cProfile.Profile()
+    # profiler.enable()
     main()
+    # profiler.disable()
+    # stats = pstats.Stats(profiler).strip_dirs().sort_stats('ncalls')
+    # stats.print_stats()
+    # main()
+
+# Generate prof:  python3 -m cProfile -o main.prof main.py
+# Visualise prof: snakeviz main.prof

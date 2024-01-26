@@ -123,9 +123,13 @@ class GameInterface:
                             counter += 1
                             print(f"Move number {counter}")
                             legal_moves = self.get_legal_moves() # We have to calculate them again because the player has chanced for the highlight function
+                            self.print_board()
+                    # self.game.player_move(legal_moves[random.randint(1, len(legal_moves))-1], self.game.player)
+                    
                     self.highlight_squares(legal_moves)
                     self.draw_board()
                     pygame.display.flip() # needs to be called outside draw function
+                    # time.sleep(1)
             else:
                 start_time = time.time()
                 # self.print_board()
