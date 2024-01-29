@@ -70,8 +70,6 @@ class GameInterface:
             movable_pieces.append(move.source_id)
             if(move.source_id == self.selected_id):
                 self.move_locations.add(move.target1_id)
-            
-
         if(len(self.move_locations) > 0):
             self.highlighted_squares.append(self.selected_id)
             for i in self.move_locations:
@@ -102,9 +100,7 @@ class GameInterface:
         #     self.game.player_move(legal_moves[i-1], self.game.player)
         #     self.print_board()
         while(self.status == CheckersResult.UNFINISHED and not self.quit):
-            start_time = time.time()
             legal_moves = self.get_legal_moves()
-            legal_time = time.time() - start_time
             if(len(legal_moves) == 0):
                 self.status = CheckersResult.DRAW
                 print("DRAW")
@@ -132,14 +128,12 @@ class GameInterface:
                     pygame.display.flip() # needs to be called outside draw function
                     time.sleep(1)
             else:
-                start_time = time.time()
-                # self.print_board()
-                print_time = time.time() - start_time
+                self.print_board()
                 self.print_legal_moves(legal_moves) # Changes legal moves to be a list of Move classes for selecting a move
                 counter += 1
                 print(f"Move number {counter}")
-                # move = self.get_move()
-                move = random.randint(1, len(legal_moves))
+                # move = random.randint(1, len(legal_moves))
+                move = self.get_move()
                 moves.append(move)
                 try:
                     move = int(move)
@@ -149,13 +143,9 @@ class GameInterface:
                 if(move > len(legal_moves) or move < 1):
                     print(f"Input has to be an integer between 1 and {len(legal_moves)}!")
                     continue
-                start_time = time.time()
                 print(f"Move is ({move}): ", end="")
                 legal_moves[move-1].print_move()
                 self.game.player_move(legal_moves[move-1], self.game.player)
-                print("Legal time: %.6f seconds ---" % (legal_time))
-                print("Print time: %.6f seconds ---" % (print_time))
-                print("Move time: %.6f seconds ---" % (time.time() - start_time))
                 self.write_to_log(legal_moves[move-1], counter, moves)
                 # time.sleep(1)
 

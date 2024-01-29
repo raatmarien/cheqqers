@@ -87,11 +87,12 @@ class Move_temp:
         print(output)
 
 class Piece():
-    def __init__(self, id: int, color: CheckersPlayer, king: bool = False, superposition: bool = False) -> None:
+    def __init__(self, id: int, color: CheckersPlayer, king: bool = False, superposition: bool = False, chance:int = 100) -> None:
         self.id = id
         self.color = color
         self.king = king
         self.superposition = superposition
+        self.chance = chance
 
 class Checkers:
     def __init__(self, run_on_hardware = False, num_vertical = 5, num_horizontal = 5, num_vertical_pieces = 1, rules = CheckersRules.QUANTUM_V3) -> None:
@@ -572,20 +573,25 @@ class Checkers:
     def split_move(self, move: Move_id):
         if(move.target2_id == None):
             raise ValueError("No second target given")
-        
         original_piece = self.classical_squares[str(move.source_id)]
         CheckersSplit(CheckersSquare.FULL, self.rules)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)], self.squares[str(move.target2_id)])
-        
+        self.classical_squares[str(move.target1_id)] = Piece(id=str(move.target1_id), color=original_piece.color, king=original_piece.king, superposition=True)
+        self.classical_squares[str(move.target2_id)] = Piece(id=str(move.target2_id), color=original_piece.color, king=original_piece.king, superposition=True)
+
         # If the piece was already in superposition, we need to append this piece to the list
         for i, squares in enumerate(self.related_squares):
             if(str(move.source_id) in squares):
                 squares.append(str(move.target1_id))
                 squares.append(str(move.target2_id))
+                self.classical_squares[str(move.target1_id)].chance = self.classical_squares[str(move.target1_id)].chance/2
+                self.classical_squares[str(move.target2_id)].chance = self.classical_squares[str(move.target2_id)].chance/2
                 self.q_rel_moves[i].append(move)
                 self.q_moves.append(move)
                 break
         else: # Is executed if break was never called
             # If we get here this the first time this piece goes in superposition, so we add a new list
+            self.classical_squares[str(move.target1_id)].chance = 50
+            self.classical_squares[str(move.target2_id)].chance = 50
             self.related_squares.append([str(move.target1_id), str(move.target2_id)])
             self.q_rel_moves.append([move])
             self.q_moves.append(move)
