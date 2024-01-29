@@ -34,7 +34,7 @@ CROWN_IMG = pygame.image.load(os.path.join(os.path.dirname(__file__), "crown.png
 CROWN_IMG = pygame.transform.scale(CROWN_IMG, (int(SQUARE_W*0.65), int((CROWN_IMG.get_height()/(CROWN_IMG.get_width()/SQUARE_W))*0.65)))
   
 class GameInterface:
-    def __init__(self, game: Checkers, GUI = False) -> None:
+    def __init__(self, game: Checkers, white_player, black_player, GUI = False) -> None:
         self.game = game
         self.quit = False
         self.highlighted_squares = []
@@ -46,10 +46,9 @@ class GameInterface:
             self.GUI = True
             self.init_gui()
         else:
-            self.GUI = False       
-
-    def get_move(self):
-        return input(f'Player {self.game.player.name} to move: ')
+            self.GUI = False
+        self.white_player = white_player
+        self.black_player = black_player
     
     def init_gui(self):
         pygame.init()
@@ -133,20 +132,14 @@ class GameInterface:
                 counter += 1
                 print(f"Move number {counter}")
                 # move = random.randint(1, len(legal_moves))
-                move = self.get_move()
+                if(self.game.player == CheckersPlayer.WHITE):
+                    move = self.white_player.select_move(legal_moves)
+                else:
+                    move = self.black_player.select_move(legal_moves)
                 moves.append(move)
-                try:
-                    move = int(move)
-                except:
-                    print("Input has to be an integer!")
-                    continue
-                if(move > len(legal_moves) or move < 1):
-                    print(f"Input has to be an integer between 1 and {len(legal_moves)}!")
-                    continue
                 print(f"Move is ({move}): ", end="")
-                legal_moves[move-1].print_move()
-                self.game.player_move(legal_moves[move-1], self.game.player)
-                self.write_to_log(legal_moves[move-1], counter, moves)
+                self.game.player_move(move, self.game.player)
+                self.write_to_log(move, counter, moves)
                 # time.sleep(1)
 
     def draw_circle(self, color, x, y, radius, king = False, highlited = False):
