@@ -607,6 +607,16 @@ class Checkers:
         return
     
     def concat_moves(self, move, id): # used to concatenate a classical move after a split move to make it one split move
+        """
+        Experimental function to optimize the order of quantum moves when recreating the board.
+        e.g.
+            Split move: 1 -> 2 and 3
+            Classic move: 3 -> 6
+        Can be shortened by
+            1 -> 2 and 6
+        """
+        
+        
         # ID is the id that connect two moves. e.g. 21 -> 15 and 17; 15 -> 11
         # CANT OPTIMIZE IF
         # MOVE GOES BACK TO ORIGNAL SOURCE ID
