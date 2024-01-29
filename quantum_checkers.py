@@ -87,20 +87,11 @@ class Move_temp:
         print(output)
 
 class Piece():
-    def __init__(self, id: int, color: CheckersPlayer, king: bool = False, superposition: bool = False, left_child = None, right_child = None) -> None:
+    def __init__(self, id: int, color: CheckersPlayer, king: bool = False, superposition: bool = False) -> None:
         self.id = id
         self.color = color
         self.king = king
         self.superposition = superposition
-        self.left_child = left_child
-        self.right_child = right_child
-    
-    def print_children(self):
-        print(self.id)
-        if(self.left_child != None):
-            self.left_child.print_children()
-        if(self.right_child != None):
-            self.right_child.print_children()
 
 class Checkers:
     def __init__(self, run_on_hardware = False, num_vertical = 5, num_horizontal = 5, num_vertical_pieces = 1, rules = CheckersRules.QUANTUM_V3) -> None:
@@ -682,24 +673,11 @@ class Checkers:
         return taken, False
     
     def split_move(self, move: Move_id, mark: CheckersSquare):
-        # source_id = self.convert_xy_to_id(move.source_x, move.source_y)
-        # target1_id = self.convert_xy_to_id(move.target1_x, move.target1_y)
         if(move.target2_id == None):
             raise ValueError("No second target given")
-        # target2_id = self.convert_xy_to_id(move.target2_x, move.target2_y)
-
-        # player_ids, opponent_ids = self.get_positions(mark)
-        # if move.target1_id not in player_ids+opponent_ids:
-            # CheckersSplit(mark, self.rules)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)], self.squares[str(move.target2_id)])
+        
         original_piece = self.classical_squares[str(move.source_id)]
-        # Split(self.squares[str(move.source_id)], self.squares[str(move.target1_id)], self.squares[str(move.target2_id)])
         CheckersSplit(CheckersSquare.FULL, self.rules)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)], self.squares[str(move.target2_id)])
-        left_child = Piece(id=str(move.target1_id), color=original_piece.color, king=original_piece.king, superposition=True)
-        right_child = Piece(id=str(move.target2_id), color=original_piece.color, king=original_piece.king, superposition=True)
-        self.classical_squares[str(move.target1_id)] = left_child
-        self.classical_squares[str(move.target2_id)] = right_child
-        self.classical_squares[str(move.source_id)].left_child = self.classical_squares[str(move.target1_id)]
-        self.classical_squares[str(move.source_id)].right_child = self.classical_squares[str(move.target2_id)]
         
         # If the piece was already in superposition, we need to append this piece to the list
         for i, squares in enumerate(self.related_squares):
@@ -825,33 +803,4 @@ class Checkers:
 #TODO: 50 percent of time is in the peek function, reduce it?
     
 # if __name__ == '__main__':
-    # Random test to see how python handles memory
-    # s = set()
-    # p1 = Piece("1", CheckersPlayer.WHITE)
-    # p2 = Piece("2", CheckersPlayer.BLACK)
-    # # dic = {}
-    # # dic["1"] = p1
-    # # dic["2"] = p2
-    # # s.add(p1)
-    # # for key, value in dic.items():
-    # #     print(key, value)
-    # # p1.left_child = dic["2"]
-    # # for key, value in dic.items():
-    # #     print(key, value)
-    # # print(p1.left_child.color)
-    # # dic["3"] = dic["2"]
-    # # for key, value in dic.items():
-    # #     print(key, value)
-    # # dic.pop("2")
-    # # for key, value in dic.items():
-    # #     print(key, value)
-    # # print(p1.left_child.color)
-    # l = [p1, p2]
-    # l2 = [p2]
-    # l2[0].id = "4"
-    # print(l)
-    # print(l2[0].id, l[1].id)
-    
-
-
     
