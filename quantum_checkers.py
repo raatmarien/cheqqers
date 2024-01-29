@@ -87,7 +87,7 @@ class Move_temp:
         print(output)
 
 class Piece():
-    def __init__(self, id: int, color: CheckersPlayer, king: bool = False, superposition: bool = False, chance:int = 100) -> None:
+    def __init__(self, id: int, color: CheckersPlayer, king: bool = False, superposition: bool = False, chance:float = 100) -> None:
         self.id = id
         self.color = color
         self.king = king
@@ -147,6 +147,7 @@ class Checkers:
             # original_peek = (self.board.peek(objects=[self.squares[str(id)]])) # peek returns double list of all object peeked. For one object that looks like [[<CheckersSquare.WHITE: 1>]]
             peek = (self.board.peek(objects=[self.squares[str(classical_id)]]))
             if(peek[0][0] == CheckersSquare.FULL):
+                self.classical_squares[str(classical_id)].chance = 100
                 continue
             self.remove_piece(str(classical_id))
         return(self.board.peek(objects=[self.squares[str(id)]])[0][0]) # returns for original id
@@ -421,6 +422,8 @@ class Checkers:
             if((y == self.num_vertical-1 or y == 0) and self.classical_squares[str(id)].king == False):
                 self.king(id)
 
+        for key, value in self.classical_squares.items():
+            print(value.chance)
         # If a move has been done we need to flip the player, IF they can not take another piece SHOULD CHECK IF THE PIECE YOU JUST USED CAN GO AGAIN
         if(prev_taken and self.can_take_piece(move.target1_id)): # If we took a piece and we can take another piece do not chance the player
             return
@@ -583,8 +586,8 @@ class Checkers:
             if(str(move.source_id) in squares):
                 squares.append(str(move.target1_id))
                 squares.append(str(move.target2_id))
-                self.classical_squares[str(move.target1_id)].chance = self.classical_squares[str(move.target1_id)].chance/2
-                self.classical_squares[str(move.target2_id)].chance = self.classical_squares[str(move.target2_id)].chance/2
+                self.classical_squares[str(move.target1_id)].chance = original_piece.chance/2
+                self.classical_squares[str(move.target2_id)].chance = original_piece.chance/2
                 self.q_rel_moves[i].append(move)
                 self.q_moves.append(move)
                 break
