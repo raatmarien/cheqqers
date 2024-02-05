@@ -256,7 +256,7 @@ class GameInterface:
             self.selected_id = first_id
             return False, []
         elif(self.selected_id is not None and self.move_locations is not None and first_id in self.move_locations and second_id in self.move_locations):
-            self.do_game_move(Move_id(MoveType.SPLIT, self.game.player, self.selected_id, first_id, second_id)) #split move
+            legal_moves = self.do_game_move(Move_id(MoveType.SPLIT, self.game.player, self.selected_id, first_id, second_id)) #split move
             return True, legal_moves
         return False, []
 
