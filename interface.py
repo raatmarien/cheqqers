@@ -44,7 +44,7 @@ class GameInterface:
         self.selected_id = None # Square select by player, used for highlighting and moving pieces
         self.move_locations = set() # If a piece is selected, this variable will store the locations the piece can move to
         open('./log.txt', 'w').close()
-        if(GUI == "True"):
+        if(GUI.lower() == "true"):
             self.GUI = True
             self.init_gui()
         else:

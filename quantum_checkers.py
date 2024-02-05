@@ -96,9 +96,11 @@ class Piece():
         self.chance = chance
 
 class Checkers:
-    def __init__(self, run_on_hardware = False, num_vertical = 5, num_horizontal = 5, num_vertical_pieces = 1, rules = CheckersRules.QUANTUM_V3, SIMULATE_QUANTUM = True) -> None:
+    def __init__(self, run_on_hardware = False, num_vertical = 5, num_horizontal = 5, num_vertical_pieces = 1, rules = CheckersRules.QUANTUM_V3, SIMULATE_QUANTUM = False) -> None:
         self.rules = rules
-        self.SIMULATE_QUANTUM = SIMULATE_QUANTUM
+        self.SIMULATE_QUANTUM = False
+        if(SIMULATE_QUANTUM.lower() == "true"):
+            self.SIMULATE_QUANTUM = True
         self.player = CheckersPlayer.WHITE
         self.num_vertical = num_vertical
         self.run_on_hardware = run_on_hardware

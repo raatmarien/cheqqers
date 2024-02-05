@@ -12,6 +12,7 @@ def main():
     parser.add_argument('--num_rows', help='The number of rows of the checkboard. INT', default=5)
     parser.add_argument('--num_columns', help='The number of columns of the checkboard. INT', default=5)
     parser.add_argument('--num_vertical_pieces', help='The number of rows that are filled with checkerpieces. INT', default=1)
+    parser.add_argument('--sim_q', help='Simulating quantum or actually use quantum mechanics. TRUE if you want to simulate quantum.', default="False")
     parser.add_argument('--GUI', help='If GUI is enabled. True or False', default="True")
     parser.add_argument('--p1', help='Select agent for player 1 to use.', default=human_player())
     parser.add_argument('--p2', help='Select agent for player 2 to use.', default=human_player())
@@ -28,7 +29,7 @@ def main():
     for i in range(1):
         print(i)
         start_t = time.time()
-        game = GameInterface(Checkers(num_vertical=args.num_rows, num_horizontal=args.num_columns, num_vertical_pieces=args.num_vertical_pieces), white_player=p1, black_player=p2, GUI=args.GUI)
+        game = GameInterface(Checkers(num_vertical=args.num_rows, num_horizontal=args.num_columns, num_vertical_pieces=args.num_vertical_pieces, SIMULATE_QUANTUM=args.sim_q), white_player=p1, black_player=p2, GUI=args.GUI)
         game.play()
         times.append(time.time()-start_t)
     print(f"Average time: {sum(times)/len(times)}, minimum time: {min(times)}, max time: {max(times)}")
