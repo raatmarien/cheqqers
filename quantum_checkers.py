@@ -18,6 +18,7 @@ from quantum_split import CheckersSplit, CheckersClassicMove
 from unitary.alpha.qudit_gates import QuditXGate, QuditISwapPowGate
 # from cirq import ISWAP
 import cirq
+import random
 
 # GLOBAL GAME SETTINGS
 _forced_take = True
@@ -95,8 +96,9 @@ class Piece():
         self.chance = chance
 
 class Checkers:
-    def __init__(self, run_on_hardware = False, num_vertical = 5, num_horizontal = 5, num_vertical_pieces = 1, rules = CheckersRules.QUANTUM_V3) -> None:
+    def __init__(self, run_on_hardware = False, num_vertical = 5, num_horizontal = 5, num_vertical_pieces = 1, rules = CheckersRules.QUANTUM_V3, SIMULATE_QUANTUM = True) -> None:
         self.rules = rules
+        self.SIMULATE_QUANTUM = SIMULATE_QUANTUM
         self.player = CheckersPlayer.WHITE
         self.num_vertical = num_vertical
         self.run_on_hardware = run_on_hardware
@@ -137,20 +139,34 @@ class Checkers:
         Measures single square and returns CheckersSquare.EMPTY or CheckersSquare.FULL for ID
         """
         st = f"Removing for id: {id}\n"
-        
         ids = self.remove_from_rel_squares(id)
         st += f"Removed ids {ids}\n"
         self.write_to_log(st)
         # Check out all ids, for the one that remained, remove all others from classical squares
-        for classical_id in ids:
-            self.board.pop(objects=[self.squares[str(classical_id)]])
-            # original_peek = (self.board.peek(objects=[self.squares[str(id)]])) # peek returns double list of all object peeked. For one object that looks like [[<CheckersSquare.WHITE: 1>]]
-            peek = (self.board.peek(objects=[self.squares[str(classical_id)]]))
-            if(peek[0][0] == CheckersSquare.FULL):
-                self.classical_squares[str(classical_id)].chance = 100
-                continue
-            self.remove_piece(str(classical_id))
-        return(self.board.peek(objects=[self.squares[str(id)]])[0][0]) # returns for original id
+        if(not self.SIMULATE_QUANTUM):
+            for classical_id in ids:
+                self.board.pop(objects=[self.squares[str(classical_id)]])
+                # original_peek = (self.board.peek(objects=[self.squares[str(id)]])) # peek returns double list of all object peeked. For one object that looks like [[<CheckersSquare.WHITE: 1>]]
+                peek = (self.board.peek(objects=[self.squares[str(classical_id)]]))
+                if(peek[0][0] == CheckersSquare.FULL):
+                    self.classical_squares[str(classical_id)].chance = 100
+                    continue
+                self.remove_piece(str(classical_id))
+            return(self.board.peek(objects=[self.squares[str(id)]])[0][0]) # returns for original id
+        else: # If we are only simulating
+            # First select the id that remains
+            if(len(ids) == 0): # If its is a classical piece
+                return CheckersSquare.FULL
+            idx = random.randint(0, len(ids)-1)
+            print(f"[{ids[idx]}] at position [{idx}] is true")
+            self.classical_squares[str(ids[idx])].chance = 100
+            for i, classical_id in enumerate(ids):
+                if(i == idx):
+                    continue
+                self.remove_piece(str(classical_id))
+                print(f"Removed {classical_id}")
+                
+            return CheckersSquare.FULL if ids[idx] == id else CheckersSquare.EMPTY
 
     def on_board(self, x, y):
         """
@@ -341,7 +357,6 @@ class Checkers:
                 CheckersSplit(CheckersSquare.FULL, self.rules)(self.squares[str(qm.source_id)], self.squares[str(qm.target1_id)], self.squares[str(qm.target2_id)])
             else:
                 CheckersClassicMove(2, 1)(self.squares[str(qm.source_id)], self.squares[str(qm.target1_id)])
-        
         
         for id in range(self.num_vertical*self.num_horizontal):
             if(str(id) in self.classical_squares and str(id) not in q_ids): # If there is a piece that is not in superposition
