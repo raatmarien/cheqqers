@@ -152,23 +152,6 @@ class Checkers:
             self.remove_piece(str(classical_id))
         return(self.board.peek(objects=[self.squares[str(id)]])[0][0]) # returns for original id
 
-    def measure(self) -> None:
-        """Measures all squares on the Checkers board.
-
-        Once the board is measured, a new board is created
-        that is initialized to the measured state.
-        This should happen when no more squares are empty.
-        CURRENTLY NOT UP TO DATE, DOESNT UPDATE CLASSICAL SQUARES AND RELATED SQUARES
-        """
-        self.last_result = [
-            CheckersSquare.from_result(square) for square in self.board.pop()
-        ]
-        for id in range(self.num_horizontal*self.num_vertical):
-            # if self.last_result[idx] == CheckersSquare.EMPTY:
-            #     self.empty_squares.add(name)
-            self.squares[str(id)] = QuantumObject(str(id), self.last_result[id])
-        self.board = QuantumWorld(list(self.squares.values()))
-
     def on_board(self, x, y):
         """
         Checks if given location is on the board on not. 
