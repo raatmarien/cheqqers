@@ -388,7 +388,6 @@ class Checkers:
 
     def player_move(self, move: Move_id, player: CheckersPlayer = None):
         self.moves_since_take += 1
-        print(f"Number of moves since piece was taken: {self.moves_since_take}")
         output = ""
         self.write_to_log(f"Related squares: {str(self.related_squares)}\n")
         self.write_to_log(f"Classical squares: {str(self.classical_squares.keys())}\n")
@@ -712,14 +711,6 @@ class Checkers:
         if(self.moves_since_take >= 40):
             return CheckersResult.DRAW
         return CheckersResult.UNFINISHED
-        # if(len(self.board.calculate_all_possible_moves(CheckersSquare.WHITE))==0 and len(self.board.calculate_all_possible_moves(CheckersSquare.BLACK))==0):
-        #     return(CheckersResult.DRAW)
-        # elif(len(self.board.calculate_all_possible_moves(CheckersSquare.WHITE))==0):
-        #     return(CheckersResult.WHITE_WINS)
-        # elif(len(self.board.calculate_all_possible_moves(CheckersSquare.BLACK))==0):
-        #     return(CheckersResult.BLACK_WINS)
-        # else:
-        #     return(CheckersResult.UNFINISHED)
         
 #TODO: Change calculating blind moves to use direction variable for black/white (+1/-1) instead of a very long if else statement
 #TODO: Clean up calculating legal moves function with using only 1 for loop
