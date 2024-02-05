@@ -738,10 +738,7 @@ class Checkers:
 #TODO: Change calculating blind moves to use direction variable for black/white (+1/-1) instead of a very long if else statement
 #TODO: Clean up calculating legal moves function with using only 1 for loop
 #TODO: Instead of first clearing the entire board and then flipping the pieces, just initialize the pieces immediately correctly
-#TODO: In measure_square() already removing the squares, but I also call it after a funciton
-#TODO: clean up left child, right child in Piece class (is unused)
 #TODO: 50 percent of time is in the peek function, reduce it?
-#TODO: Make sure you can only take a piece after you jumped with the actual piece you used and not another piece!!
     
 # if __name__ == '__main__':
     
