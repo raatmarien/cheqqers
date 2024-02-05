@@ -113,6 +113,7 @@ class Checkers:
         self.white_squares = {}
         self.black_squares = {}
         self.superposition_pieces = set() # contains a list of pieces that started the superposition. This is needed to recreate the board when a move has been done
+        self.moves_since_take = 0 # Number of moves since a piece has been taken
         if(num_vertical_pieces*2 >= num_vertical):
             print(f"Too many rows ({num_vertical_pieces}) filled with pieces. Decrease this number for this size of board. [{num_vertical}]x[{num_horizontal}]")
             exit()
@@ -386,6 +387,8 @@ class Checkers:
         )
 
     def player_move(self, move: Move_id, player: CheckersPlayer = None):
+        self.moves_since_take += 1
+        print(f"Number of moves since piece was taken: {self.moves_since_take}")
         output = ""
         self.write_to_log(f"Related squares: {str(self.related_squares)}\n")
         self.write_to_log(f"Classical squares: {str(self.classical_squares.keys())}\n")
@@ -406,6 +409,8 @@ class Checkers:
             player = self.player
         if(move.target2_id == None):
             prev_taken, failed = self.classic_move(move)
+            if(prev_taken):
+                self.moves_since_take = 0
             if(not failed):
                 to_king.append(move.target1_id)
         else:
@@ -693,7 +698,7 @@ class Checkers:
     def convert_id_to_xy(self, id: int) -> (int, int):
         return (id % self.num_horizontal, id // self.num_horizontal)
 
-    def result(self):
+    def result(self, legal_moves):
         """
         returns:
             UNFINISHED = 0
@@ -702,6 +707,10 @@ class Checkers:
             DRAW = 3
             BOTH_WIN = 4
         """
+        if(len(legal_moves) == 0):
+            return CheckersResult.BLACK_WINS if self.player == CheckersPlayer.WHITE else CheckersResult.WHITE_WINS
+        if(self.moves_since_take >= 40):
+            return CheckersResult.DRAW
         return CheckersResult.UNFINISHED
         # if(len(self.board.calculate_all_possible_moves(CheckersSquare.WHITE))==0 and len(self.board.calculate_all_possible_moves(CheckersSquare.BLACK))==0):
         #     return(CheckersResult.DRAW)
@@ -716,6 +725,8 @@ class Checkers:
 #TODO: Clean up calculating legal moves function with using only 1 for loop
 #TODO: Instead of first clearing the entire board and then flipping the pieces, just initialize the pieces immediately correctly
 #TODO: 50 percent of time is in the peek function, reduce it?
+#TODO: ENTANGLEMENT?
+#TODO: prev_taken, failed = self.classic_move(move) --- Same thing right??
     
 # if __name__ == '__main__':
     
