@@ -1,4 +1,6 @@
 from quantum_checkers import Checkers, Move_id
+from players import human_player
+
 import pygame
 import random
 from enums import (
@@ -102,7 +104,6 @@ class GameInterface:
         while(self.status == CheckersResult.UNFINISHED and not self.quit):
             if(not prev_take):
                 legal_moves = self.get_legal_moves()
-            prev_take = False # Always reset
             if(len(legal_moves) == 0):
                 self.status = CheckersResult.DRAW
                 print("DRAW")
@@ -117,19 +118,41 @@ class GameInterface:
                         # self.handle_click(event.pos)
                     if event.type == pygame.MOUSEBUTTONUP:
                         # Detect swipes for quantum moves
-                        if(self.handle_click(down_pos, event.pos)):
-                            counter += 1
-                            print(f"Move number {counter}")
+                        moved, legal_moves = self.handle_click(down_pos, event.pos)
+                        if(moved):
+                            prev_take = False # reset when move is done
+                        if(moved and len(legal_moves) > 0):
+                            print("HERE")
+                            prev_take = True
+                        else:
                             legal_moves = self.get_legal_moves() # We have to calculate them again because the player has chanced for the highlight function
-                            self.print_board()
+                        # if(moved):
+                        #     counter += 1
+                        #     print(f"Move number {counter}")
+                        #     legal_moves = self.get_legal_moves() # We have to calculate them again because the player has chanced for the highlight function
+                        #     self.print_board()
+                        
                     # self.game.player_move(legal_moves[random.randint(1, len(legal_moves))-1], self.game.player)
-                    self.do_game_move(legal_moves[random.randint(1, len(legal_moves))-1])
-                    legal_moves = self.get_legal_moves()
+                    
+                    # If it is the humans turn the click event will handle everything
+                    if(self.game.player == CheckersPlayer.WHITE and not isinstance(self.white_player, human_player)):
+                        move = self.white_player.select_move(legal_moves)
+                        legal_moves = self.do_game_move(move)
+                        prev_take = False
+                        if(len(legal_moves) > 0):
+                            prev_take = True
+                    elif(not isinstance(self.black_player, human_player)):
+                        move = self.black_player.select_move(legal_moves)
+                        legal_moves = self.do_game_move(move)
+                        prev_take = False
+                        if(len(legal_moves) > 0):
+                            prev_take = True
                     self.highlight_squares(legal_moves)
                     self.draw_board()
                     pygame.display.flip() # needs to be called outside draw function
-                    time.sleep(1)
+                    # time.sleep(1)
             else:
+                prev_take = False # Always reset
                 self.print_board()
                 self.print_legal_moves(legal_moves)
                 counter += 1
@@ -211,11 +234,11 @@ class GameInterface:
         """
         Do a game move and reset values for GUI
         """
-        self.game.player_move(move, self.game.player)
+        legal_moves = self.game.player_move(move, self.game.player)
         self.selected_id = -1 # value used in highlight function to check if we need to return
         self.move_locations.clear()
         self.highlighted_squares = []
-        return
+        return legal_moves
 
     def handle_click(self, first_pos, second_pos):
         """
@@ -228,13 +251,14 @@ class GameInterface:
         second_id = self.get_id_from_mouse_pos(mouse_x, mouse_y)
         if(first_id == second_id):
             if(self.selected_id is not None and self.move_locations is not None and first_id in self.move_locations): # We want to move the piece to first id
-                self.do_game_move(Move_id(MoveType.CLASSIC, self.game.player, self.selected_id, first_id)) #classic move
-                return True
+                legal_moves = self.do_game_move(Move_id(MoveType.CLASSIC, self.game.player, self.selected_id, first_id)) #classic move
+                return True, legal_moves
             self.selected_id = first_id
-            return False
+            return False, []
         elif(self.selected_id is not None and self.move_locations is not None and first_id in self.move_locations and second_id in self.move_locations):
             self.do_game_move(Move_id(MoveType.SPLIT, self.game.player, self.selected_id, first_id, second_id)) #split move
-            return True
+            return True, legal_moves
+        return False, []
 
     def print_board(self) -> str:
         str_board = self.game.get_board()
