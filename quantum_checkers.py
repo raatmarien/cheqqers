@@ -158,15 +158,12 @@ class Checkers:
             if(len(ids) == 0): # If its is a classical piece
                 return CheckersSquare.FULL
             idx = random.randint(0, len(ids)-1)
-            print(f"[{ids[idx]}] at position [{idx}] is true")
             self.classical_squares[str(ids[idx])].chance = 100
             for i, classical_id in enumerate(ids):
                 if(i == idx):
                     continue
-                self.remove_piece(str(classical_id))
-                print(f"Removed {classical_id}")
-                
-            return CheckersSquare.FULL if ids[idx] == id else CheckersSquare.EMPTY
+                self.remove_piece(str(classical_id))                
+            return CheckersSquare.FULL if str(ids[idx]) == str(id) else CheckersSquare.EMPTY
 
     def on_board(self, x, y):
         """
@@ -570,14 +567,16 @@ class Checkers:
         # self.concat_moves(move, move.source_id) # EXPERIMENTAL
         self.remove_id_from_rel_squares(move.source_id)
         self.remove_piece(move.source_id)
-        self.alternate_classic_move()
+        if(not self.SIMULATE_QUANTUM):
+            self.alternate_classic_move()
         return taken, False
     
     def split_move(self, move: Move_id):
         if(move.target2_id == None):
             raise ValueError("No second target given")
         original_piece = self.classical_squares[str(move.source_id)]
-        CheckersSplit(CheckersSquare.FULL, self.rules)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)], self.squares[str(move.target2_id)])
+        if(not self.SIMULATE_QUANTUM):
+            CheckersSplit(CheckersSquare.FULL, self.rules)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)], self.squares[str(move.target2_id)])
         self.classical_squares[str(move.target1_id)] = Piece(id=str(move.target1_id), color=original_piece.color, king=original_piece.king, superposition=True)
         self.classical_squares[str(move.target2_id)] = Piece(id=str(move.target2_id), color=original_piece.color, king=original_piece.king, superposition=True)
 
@@ -611,7 +610,7 @@ class Checkers:
             id = self.convert_xy_to_id(id[0], id[1])
         if(str(id) in self.classical_squares):
             self.classical_squares.pop(str(id))
-            if(flip):
+            if(flip and not self.SIMULATE_QUANTUM):
                 QuditFlip(2, CheckersSquare.FULL.value, CheckersSquare.EMPTY.value)(self.squares[str(id)])
         return
     

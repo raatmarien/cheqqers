@@ -34,14 +34,7 @@ def main():
     print(f"Average time: {sum(times)/len(times)}, minimum time: {min(times)}, max time: {max(times)}")
 
 if __name__ == "__main__":
-    # cProfile.run('main()')
-    # profiler = cProfile.Profile()
-    # profiler.enable()
     main()
-    # profiler.disable()
-    # stats = pstats.Stats(profiler).strip_dirs().sort_stats('ncalls')
-    # stats.print_stats()
-    # main()
 
 # Generate prof:  python3 -m cProfile -o main.prof main.py
 # Visualise prof: snakeviz main.prof
