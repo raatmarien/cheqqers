@@ -116,16 +116,38 @@ class Checkers:
         self.clear()
         # Add initial pieces to board
         king = False
-        for y in range(self.num_vertical):
-            for x in range(self.num_horizontal):
-                if(x % 2 == 1 and y % 2 == 0 or x % 2 == 0 and y % 2 == 1):
-                    id = self.convert_xy_to_id(x, y)
-                    if(y <= self.num_vertical_pieces-1): # We are in the beginning rows, initialize black
-                        QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # Black
-                        self.classical_squares[str(id)] = Piece(str(id), CheckersPlayer.BLACK, king)
-                    elif(y >= self.num_vertical - self.num_vertical_pieces):
-                        QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # White
-                        self.classical_squares[str(id)] = Piece(str(id), CheckersPlayer.WHITE, king)
+
+        id = self.convert_xy_to_id(6, 7)
+        print(id)
+        QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # Black
+        self.classical_squares[str(id)] = Piece(str(id), CheckersPlayer.WHITE, king)
+
+        id = self.convert_xy_to_id(5, 6)
+        QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # Black
+        self.classical_squares[str(id)] = Piece(str(id), CheckersPlayer.BLACK, king)
+
+        id = self.convert_xy_to_id(3, 4)
+        QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # Black
+        self.classical_squares[str(id)] = Piece(str(id), CheckersPlayer.BLACK, king)
+
+        id = self.convert_xy_to_id(7, 2)
+        QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # Black
+        self.classical_squares[str(id)] = Piece(str(id), CheckersPlayer.WHITE, king)
+
+        id = self.convert_xy_to_id(6, 1)
+        QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # Black
+        self.classical_squares[str(id)] = Piece(str(id), CheckersPlayer.BLACK, king)
+
+        # for y in range(self.num_vertical):
+        #     for x in range(self.num_horizontal):
+        #         if(x % 2 == 1 and y % 2 == 0 or x % 2 == 0 and y % 2 == 1):
+        #             id = self.convert_xy_to_id(x, y)
+        #             if(y <= self.num_vertical_pieces-1): # We are in the beginning rows, initialize black
+        #                 QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # Black
+        #                 self.classical_squares[str(id)] = Piece(str(id), CheckersPlayer.BLACK, king)
+        #             elif(y >= self.num_vertical - self.num_vertical_pieces):
+        #                 QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # White
+        #                 self.classical_squares[str(id)] = Piece(str(id), CheckersPlayer.WHITE, king)
 
     def write_to_log(self, string):
         self.log = open("./log.txt", "a")
@@ -422,13 +444,12 @@ class Checkers:
             if((y == self.num_vertical-1 or y == 0) and self.classical_squares[str(id)].king == False):
                 self.king(id)
 
-        for key, value in self.classical_squares.items():
-            print(value.chance)
         # If a move has been done we need to flip the player, IF they can not take another piece SHOULD CHECK IF THE PIECE YOU JUST USED CAN GO AGAIN
-        if(prev_taken and self.can_take_piece(move.target1_id)): # If we took a piece and we can take another piece do not chance the player
-            return
+        can_take, legal_moves = self.can_take_piece(move.target1_id)
+        if(prev_taken and can_take): # If we took a piece and we can take another piece do not chance the player
+            return legal_moves
         self.player = CheckersPlayer.BLACK if self.player == CheckersPlayer.WHITE else CheckersPlayer.WHITE
-        return
+        return []
 
     def get_board(self) -> str:
         """Returns the Checkers board in ASCII form. Also returns dictionary with id as key.
@@ -519,6 +540,7 @@ class Checkers:
     def can_take_piece(self, id):
         """
         For a specific ID, checks if it can take pieces. Used for checking if you can take another piece after taking a piece
+        Returns true and the possible moves this piece can do if this piece can take a piece
         """
         blind_moves = self.calculate_blind_moves(id, self.player)
         player_ids, opponent_ids = self.get_positions(self.player)
@@ -526,6 +548,7 @@ class Checkers:
         # Concatenate all normal pieces and king pieces
         player_ids = player_ids[0] + player_ids[1]
         opponent_ids = opponent_ids[0] + opponent_ids[1]
+        legal_moves = []
         for move in blind_moves:
             target1_id = self.convert_xy_to_id(move.target1_x, move.target1_y)
             if(target1_id in opponent_ids and move.target2_x == None):                
@@ -533,9 +556,10 @@ class Checkers:
                 jump_x = move.target1_x+(move.target1_x-move.source_x)
                 jump_id = self.convert_xy_to_id(jump_x, jump_y)
                 if(self.on_board(jump_x, jump_y) and jump_id not in (player_ids+opponent_ids)): # we can jump over if the coordinates are on the board and the piece is empty
-                    # legal_moves.append(Move_id(source_id, jump_id))
-                    return True
-        return False
+                    legal_moves.append(Move_id(MoveType.TAKE, self.player, id, jump_id))
+        if(len(legal_moves) > 0):
+            return True, legal_moves
+        return False, []
 
     def classic_move(self, move: Move_id) -> [bool, bool]:
         """
@@ -717,6 +741,7 @@ class Checkers:
 #TODO: In measure_square() already removing the squares, but I also call it after a funciton
 #TODO: clean up left child, right child in Piece class (is unused)
 #TODO: 50 percent of time is in the peek function, reduce it?
+#TODO: Make sure you can only take a piece after you jumped with the actual piece you used and not another piece!!
     
 # if __name__ == '__main__':
     

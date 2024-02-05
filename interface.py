@@ -83,7 +83,7 @@ class GameInterface:
         self.log.write("#########################\n")
         self.log.write(str(counter))
         st = ": "
-        st = move.print_move()
+        # st = move.print_move()
         self.log.write(st)
         self.log.write("\n")
         self.log.write(str(moves))
@@ -94,12 +94,15 @@ class GameInterface:
     def play(self):
         counter = 0
         moves = []
+        prev_take = False # variable to check if a piece has been taken before
         # for i in [9, 3, 7, 3, 5, 3, 9, 3, 9, 1, 4, 9, 6, 5, 2, 6, 1, 8, 1, 1, 2, 2, 4, 1, 1, 1, 4, 4, 4, 8, 3, 1, 3, 1, 11, 15, 5]:
         #     legal_moves = self.get_legal_moves()
         #     self.game.player_move(legal_moves[i-1], self.game.player)
         #     self.print_board()
         while(self.status == CheckersResult.UNFINISHED and not self.quit):
-            legal_moves = self.get_legal_moves()
+            if(not prev_take):
+                legal_moves = self.get_legal_moves()
+            prev_take = False # Always reset
             if(len(legal_moves) == 0):
                 self.status = CheckersResult.DRAW
                 print("DRAW")
@@ -128,17 +131,18 @@ class GameInterface:
                     time.sleep(1)
             else:
                 self.print_board()
-                self.print_legal_moves(legal_moves) # Changes legal moves to be a list of Move classes for selecting a move
+                self.print_legal_moves(legal_moves)
                 counter += 1
-                print(f"Move number {counter}")
+                # print(f"Move number {counter}")
                 # move = random.randint(1, len(legal_moves))
                 if(self.game.player == CheckersPlayer.WHITE):
                     move = self.white_player.select_move(legal_moves)
                 else:
                     move = self.black_player.select_move(legal_moves)
                 moves.append(move)
-                print(f"Move is ({move}): ", end="")
-                self.game.player_move(move, self.game.player)
+                legal_moves = self.game.player_move(move, self.game.player)
+                if(len(legal_moves) > 0):
+                    prev_take = True
                 self.write_to_log(move, counter, moves)
                 # time.sleep(1)
 

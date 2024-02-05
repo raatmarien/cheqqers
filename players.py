@@ -28,4 +28,13 @@ class human_player(bot):
 class random_bot(bot):
     def select_move(self, possible_moves):
         return possible_moves[randint(0, len(possible_moves)-1)]
+    
+class exp_min_max(bot):
+    def select_move(self, possible_moves):
+        pass
+
+class monte_carlo(bot):
+    def select_move(self, possible_moves):
+        pass
+    
             
