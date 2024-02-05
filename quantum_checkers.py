@@ -116,38 +116,16 @@ class Checkers:
         self.clear()
         # Add initial pieces to board
         king = False
-
-        id = self.convert_xy_to_id(6, 7)
-        print(id)
-        QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # Black
-        self.classical_squares[str(id)] = Piece(str(id), CheckersPlayer.WHITE, king)
-
-        id = self.convert_xy_to_id(5, 6)
-        QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # Black
-        self.classical_squares[str(id)] = Piece(str(id), CheckersPlayer.BLACK, king)
-
-        id = self.convert_xy_to_id(3, 4)
-        QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # Black
-        self.classical_squares[str(id)] = Piece(str(id), CheckersPlayer.BLACK, king)
-
-        id = self.convert_xy_to_id(7, 2)
-        QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # Black
-        self.classical_squares[str(id)] = Piece(str(id), CheckersPlayer.WHITE, king)
-
-        id = self.convert_xy_to_id(6, 1)
-        QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # Black
-        self.classical_squares[str(id)] = Piece(str(id), CheckersPlayer.BLACK, king)
-
-        # for y in range(self.num_vertical):
-        #     for x in range(self.num_horizontal):
-        #         if(x % 2 == 1 and y % 2 == 0 or x % 2 == 0 and y % 2 == 1):
-        #             id = self.convert_xy_to_id(x, y)
-        #             if(y <= self.num_vertical_pieces-1): # We are in the beginning rows, initialize black
-        #                 QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # Black
-        #                 self.classical_squares[str(id)] = Piece(str(id), CheckersPlayer.BLACK, king)
-        #             elif(y >= self.num_vertical - self.num_vertical_pieces):
-        #                 QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # White
-        #                 self.classical_squares[str(id)] = Piece(str(id), CheckersPlayer.WHITE, king)
+        for y in range(self.num_vertical):
+            for x in range(self.num_horizontal):
+                if(x % 2 == 1 and y % 2 == 0 or x % 2 == 0 and y % 2 == 1):
+                    id = self.convert_xy_to_id(x, y)
+                    if(y <= self.num_vertical_pieces-1): # We are in the beginning rows, initialize black
+                        QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # Black
+                        self.classical_squares[str(id)] = Piece(str(id), CheckersPlayer.BLACK, king)
+                    elif(y >= self.num_vertical - self.num_vertical_pieces):
+                        QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # White
+                        self.classical_squares[str(id)] = Piece(str(id), CheckersPlayer.WHITE, king)
 
     def write_to_log(self, string):
         self.log = open("./log.txt", "a")
