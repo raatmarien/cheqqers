@@ -1,4 +1,5 @@
 from random import randint
+import traceback
 
 class bot():
     def __init__(self) -> None:
@@ -27,7 +28,13 @@ class human_player(bot):
 
 class random_bot(bot):
     def select_move(self, possible_moves):
-        return possible_moves[randint(0, len(possible_moves)-1)]
+        try:
+            if(len(possible_moves)-1 == 0):
+                return possible_moves[0]
+            return possible_moves[randint(0, len(possible_moves)-1)]
+        except Exception as error:
+            print(traceback.format_exc())
+            print(possible_moves)
     
 class exp_min_max(bot):
     def select_move(self, possible_moves):

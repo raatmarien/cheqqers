@@ -105,6 +105,8 @@ class GameInterface:
             if(not prev_take):
                 legal_moves = self.get_legal_moves()
             self.status = self.game.result(legal_moves)
+            if(self.status != CheckersResult.UNFINISHED):
+                break
             if(self.GUI):
                 for event in pygame.event.get(): 
                     if event.type == pygame.QUIT:
@@ -150,8 +152,8 @@ class GameInterface:
                     # time.sleep(1)
             else:
                 prev_take = False # Always reset
-                self.print_board()
-                self.print_legal_moves(legal_moves)
+                # self.print_board()
+                # self.print_legal_moves(legal_moves)
                 counter += 1
                 # print(f"Move number {counter}")
                 # move = random.randint(1, len(legal_moves))
@@ -166,6 +168,7 @@ class GameInterface:
                 self.write_to_log(move, counter, moves)
                 # time.sleep(1)
         print(f"Results: {self.status}")
+
     def draw_circle(self, color, x, y, radius, king = False, highlited = False):
         if(color == RED):
             if(highlited):
