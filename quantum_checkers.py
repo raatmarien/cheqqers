@@ -9,7 +9,7 @@ from enums import (
 import traceback
 import itertools
 from typing import List, Dict
-from copy import deepcopy
+from copy import deepcopy, copy
 from unitary.alpha import QuantumObject, QuantumWorld, Move, Split, Flip
 from unitary.alpha.qudit_effects import QuditFlip
 import unitary.alpha as alpha
@@ -127,10 +127,12 @@ class Checkers:
                 if(x % 2 == 1 and y % 2 == 0 or x % 2 == 0 and y % 2 == 1):
                     id = self.convert_xy_to_id(x, y)
                     if(y <= self.num_vertical_pieces-1): # We are in the beginning rows, initialize black
-                        QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # Black
+                        if(not SIMULATE_QUANTUM):
+                            QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # Black
                         self.classical_squares[str(id)] = Piece(str(id), CheckersPlayer.BLACK, king)
                     elif(y >= self.num_vertical - self.num_vertical_pieces):
-                        QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # White
+                        if(not SIMULATE_QUANTUM):
+                            QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # White
                         self.classical_squares[str(id)] = Piece(str(id), CheckersPlayer.WHITE, king)
         self.legal_moves = self.calculate_possible_moves(self.player)
 
@@ -551,17 +553,31 @@ class Checkers:
         Returns two booleans. First one is true if a piece has been taken. Second one is true if a move has failed
         """
         if(move.movetype != MoveType.TAKE):
-            raise RuntimeError(f"Not a take move: [{move.source_id} to {move.target1_id}]")
+            # raise RuntimeError(f"Not a take move: [{move.source_id} to {move.target1_id}]")
+            return []
         _, jumped_id = self.is_adjacent(move.source_id, move.target1_id)
-        new_state = deepcopy(self)
+        new_state = Checkers(self.run_on_hardware, self.num_vertical, self.num_horizontal, self.num_vertical_pieces, self.rules, "True")
+        new_state.classical_squares = self.classical_squares
+        new_state.related_squares = self.related_squares
+        new_state.q_moves = self.q_moves
+        new_state.q_rel_moves = self.q_rel_moves
         new_state.SIMULATE_QUANTUM = True
+        new_state.superposition_pieces = self.superposition_pieces
+        new_state.king_squares = self.king_squares
+        new_state.status = self.status
+        new_state.moves_since_take = self.moves_since_take
         source_ids = new_state.remove_from_rel_squares(move.source_id)
         jumped_ids = new_state.remove_from_rel_squares(jumped_id)
-
+        print(f"source_ids: {source_ids}")
+        print(f"jumped_ids: {jumped_ids}")
+        if(len(source_ids) == 0):
+            source_ids = [move.source_id]
+        if(len(jumped_ids) == 0):
+            jumped_ids = [jumped_id]
         states = []
         for sid in source_ids:
             for jid in jumped_ids:
-                temp_state = deepcopy(new_state)
+                temp_state = copy(new_state)
                 
                 if(sid == move.source_id and jid == jumped_id): # State where a piece is actually taken.
                     temp_state.remove_piece(jumped_id, True)
@@ -593,51 +609,8 @@ class Checkers:
                             continue
                         temp_state.remove_piece(str(i))
                     states.append(temp_state)
-                    
-
-
-        # First select the id that remains
-        if(len(ids) == 0): # If its is a classical piece
-            return CheckersSquare.FULL
-        idx = random.randint(0, len(ids)-1)
-        self.classical_squares[str(ids[idx])].chance = 100
-        for i, classical_id in enumerate(ids):
-            if(i == idx):
-                continue
-            self.remove_piece(str(classical_id))                
-        return CheckersSquare.FULL if str(ids[idx]) == str(id) else CheckersSquare.EMPTY
-
-
-        # First check if the piece we are using is actually there
-        if(self.measure_square(move.source_id) == CheckersSquare.EMPTY): # If the piece is not there, turn is wasted
-            self.remove_piece(move.source_id)
-            return taken, True
-
-        # Next check if the piece we are taking is actually there
-        if(self.measure_square(jumped_id) == CheckersSquare.EMPTY): # if it empty our turn is wasted
-            self.remove_piece(jumped_id) # We still measured so we have to remove it from the classical squares list
-            return taken, True    
-        self.remove_piece(jumped_id, True)
-        self.remove_id_from_rel_squares(jumped_id)
-        taken = True
-
-        
-        self.classical_squares[str(move.target1_id)] = self.classical_squares[str(move.source_id)]
-        self.classical_squares[str(move.target1_id)].id = move.target1_id
-        # If we do a classical move on a piece in superposition, we need to append the new id to the correct list in related_squares
-        for i, squares in enumerate(self.related_squares):
-            if(str(move.source_id) in squares):
-                squares.append(str(move.target1_id))
-                self.q_rel_moves[i].append(move)
-                self.q_moves.append(move)
-                break
-        # self.concat_moves(move, move.source_id) # EXPERIMENTAL
-        self.remove_id_from_rel_squares(move.source_id)
-        self.remove_piece(move.source_id)
-        if(not self.SIMULATE_QUANTUM):
-            self.alternate_classic_move()
-        return taken, False
-
+        print(f"LEN STATE: {len(states)}")
+        return states            
 
     def classic_move(self, move: Move_id) -> [bool, bool]:
         """
@@ -645,6 +618,7 @@ class Checkers:
         It also measures the piece itself or the piece it is taking if it is relevant.
         Returns two booleans. First one is true if a piece has been taken. Second one is true if a move has failed
         """
+        print(len(self.return_all_possible_states(move)))
         taken = False # To return if the move took a piece or not
         is_adjacent, jumped_id = self.is_adjacent(move.source_id, move.target1_id)
         if(not is_adjacent): # if ids are not adjacent we jumped over a piece and need to remove it
