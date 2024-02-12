@@ -156,7 +156,7 @@ class GameInterface:
                 else:
                     move = self.black_player.select_move(self.game.legal_moves)
                 moves.append(move)
-                _ = self.game.player_move(move, self.game.player)
+                self.game.player_move(move, self.game.player)
                 # if(len(self.game.legal_moves) > 0):
                 #     prev_take = True
                 self.write_to_log(move, counter, moves)
@@ -229,11 +229,10 @@ class GameInterface:
         """
         Do a game move and reset values for GUI
         """
-        legal_moves = self.game.player_move(move, self.game.player)
+        self.game.player_move(move, self.game.player)
         self.selected_id = -1 # value used in highlight function to check if we need to return
         self.move_locations.clear()
         self.highlighted_squares = []
-        return legal_moves
 
     def handle_click(self, first_pos, second_pos):
         """

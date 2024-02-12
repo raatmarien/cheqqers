@@ -429,11 +429,10 @@ class Checkers:
         can_take, legal_moves = self.can_take_piece(move.target1_id)
         if(prev_taken and can_take): # If we took a piece and we can take another piece do not chance the player
             self.legal_moves = legal_moves
-            return legal_moves
+            return
         self.player = CheckersPlayer.BLACK if self.player == CheckersPlayer.WHITE else CheckersPlayer.WHITE
         self.legal_moves = self.calculate_possible_moves(self.player)
         self.status = self.result(self.legal_moves)
-        return []
 
     def get_board(self) -> str:
         """Returns the Checkers board in ASCII form. Also returns dictionary with id as key.
@@ -545,6 +544,101 @@ class Checkers:
             return True, legal_moves
         return False, []
 
+    def return_all_possible_states(self, move: Move_id):
+        """
+        This function moves a piece from one square to another. If it jumps over a piece it also removes this piece.
+        It also measures the piece itself or the piece it is taking if it is relevant.
+        Returns two booleans. First one is true if a piece has been taken. Second one is true if a move has failed
+        """
+        if(move.movetype != MoveType.TAKE):
+            raise RuntimeError(f"Not a take move: [{move.source_id} to {move.target1_id}]")
+        _, jumped_id = self.is_adjacent(move.source_id, move.target1_id)
+        new_state = deepcopy(self)
+        new_state.SIMULATE_QUANTUM = True
+        source_ids = new_state.remove_from_rel_squares(move.source_id)
+        jumped_ids = new_state.remove_from_rel_squares(jumped_id)
+
+        states = []
+        for sid in source_ids:
+            for jid in jumped_ids:
+                temp_state = deepcopy(new_state)
+                
+                if(sid == move.source_id and jid == jumped_id): # State where a piece is actually taken.
+                    temp_state.remove_piece(jumped_id, True)
+                    temp_state.remove_id_from_rel_squares(jumped_id)
+                    temp_state.classical_squares[str(move.source_id)].chance = 100
+                    temp_state.classical_squares[str(move.target1_id)] = temp_state.classical_squares[str(move.source_id)]
+                    temp_state.classical_squares[str(move.target1_id)].id = move.target1_id
+                    temp_state.remove_id_from_rel_squares(move.source_id)
+                    temp_state.remove_piece(move.source_id)
+                    states.append(temp_state)
+
+                elif(sid == move.source_id and jid != jumped_id): # Only the original piece is there, and when we measure the other piece is not there.             
+                    temp_state.classical_squares[str(sid)].chance = 100
+                    temp_state.classical_squares[str(jid)].chance = 100
+                    for i in source_ids:
+                        if(i == move.source_id):
+                            continue
+                        temp_state.remove_piece(str(i))
+                    
+                    for j in jumped_ids:
+                        if(j == jid):
+                            continue
+                        temp_state.remove_piece(str(j))
+                    states.append(temp_state)
+                else: # The original piece isn't there, therefore we do not measure the jumped piece
+                    temp_state.classical_squares[str(sid)].chance = 100
+                    for i in source_ids:
+                        if(i == sid):
+                            continue
+                        temp_state.remove_piece(str(i))
+                    states.append(temp_state)
+                    
+
+
+        # First select the id that remains
+        if(len(ids) == 0): # If its is a classical piece
+            return CheckersSquare.FULL
+        idx = random.randint(0, len(ids)-1)
+        self.classical_squares[str(ids[idx])].chance = 100
+        for i, classical_id in enumerate(ids):
+            if(i == idx):
+                continue
+            self.remove_piece(str(classical_id))                
+        return CheckersSquare.FULL if str(ids[idx]) == str(id) else CheckersSquare.EMPTY
+
+
+        # First check if the piece we are using is actually there
+        if(self.measure_square(move.source_id) == CheckersSquare.EMPTY): # If the piece is not there, turn is wasted
+            self.remove_piece(move.source_id)
+            return taken, True
+
+        # Next check if the piece we are taking is actually there
+        if(self.measure_square(jumped_id) == CheckersSquare.EMPTY): # if it empty our turn is wasted
+            self.remove_piece(jumped_id) # We still measured so we have to remove it from the classical squares list
+            return taken, True    
+        self.remove_piece(jumped_id, True)
+        self.remove_id_from_rel_squares(jumped_id)
+        taken = True
+
+        
+        self.classical_squares[str(move.target1_id)] = self.classical_squares[str(move.source_id)]
+        self.classical_squares[str(move.target1_id)].id = move.target1_id
+        # If we do a classical move on a piece in superposition, we need to append the new id to the correct list in related_squares
+        for i, squares in enumerate(self.related_squares):
+            if(str(move.source_id) in squares):
+                squares.append(str(move.target1_id))
+                self.q_rel_moves[i].append(move)
+                self.q_moves.append(move)
+                break
+        # self.concat_moves(move, move.source_id) # EXPERIMENTAL
+        self.remove_id_from_rel_squares(move.source_id)
+        self.remove_piece(move.source_id)
+        if(not self.SIMULATE_QUANTUM):
+            self.alternate_classic_move()
+        return taken, False
+
+
     def classic_move(self, move: Move_id) -> [bool, bool]:
         """
         This function moves a piece from one square to another. If it jumps over a piece it also removes this piece.
@@ -576,6 +670,7 @@ class Checkers:
                 self.q_moves.append(move)
                 break
         # self.concat_moves(move, move.source_id) # EXPERIMENTAL
+        # The piece moved so we need to cleanup the original id
         self.remove_id_from_rel_squares(move.source_id)
         self.remove_piece(move.source_id)
         if(not self.SIMULATE_QUANTUM):
@@ -661,7 +756,7 @@ class Checkers:
 
     def remove_id_from_rel_squares(self, id):
         """
-        If this piece was in superposition, all pieces that were in superposition need to be popped.
+        Removes one specific id from a list of superpositions..
         """
         # Check if the id we need to remove used to be in a superposition.
         temp_list = deepcopy(self.related_squares)
