@@ -26,7 +26,7 @@ def main():
         print("#"*warning_len)
         time.sleep(5)
     times = []
-    for i in range(100):
+    for i in range(1):
         print(i)
         start_t = time.time()
         game = GameInterface(Checkers(num_vertical=args.num_rows, num_horizontal=args.num_columns, num_vertical_pieces=args.num_vertical_pieces, SIMULATE_QUANTUM=args.sim_q), white_player=p1, black_player=p2, GUI=args.GUI)

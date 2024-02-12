@@ -112,6 +112,7 @@ class Checkers:
         self.q_moves = [] # Just a list of al quantum moves so we can do them again when doing a new move
         self.white_squares = {}
         self.black_squares = {}
+        self.status = CheckersResult.UNFINISHED
         self.superposition_pieces = set() # contains a list of pieces that started the superposition. This is needed to recreate the board when a move has been done
         self.moves_since_take = 0 # Number of moves since a piece has been taken
         if(num_vertical_pieces*2 >= num_vertical):
@@ -131,6 +132,7 @@ class Checkers:
                     elif(y >= self.num_vertical - self.num_vertical_pieces):
                         QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # White
                         self.classical_squares[str(id)] = Piece(str(id), CheckersPlayer.WHITE, king)
+        self.legal_moves = self.calculate_possible_moves(self.player)
 
     def write_to_log(self, string):
         self.log = open("./log.txt", "a")
@@ -254,8 +256,8 @@ class Checkers:
                     legal_moves.append(Move_id(MoveType.TAKE, self.player, source_id, jump_id))
                     legal_take_moves.append(Move_id(MoveType.TAKE, self.player, source_id, jump_id))
         if(len(legal_take_moves) != 0 and _forced_take): # If we can take a piece and taking a piece is forced, return only the moves that can take a piece
-            return legal_take_moves, True
-        return legal_moves, False
+            return legal_take_moves
+        return legal_moves
     
     def calculate_blind_moves(self, id: int, player: CheckersPlayer, king: bool = False):
         """
@@ -426,8 +428,11 @@ class Checkers:
         # If a move has been done we need to flip the player, IF they can not take another piece SHOULD CHECK IF THE PIECE YOU JUST USED CAN GO AGAIN
         can_take, legal_moves = self.can_take_piece(move.target1_id)
         if(prev_taken and can_take): # If we took a piece and we can take another piece do not chance the player
+            self.legal_moves = legal_moves
             return legal_moves
         self.player = CheckersPlayer.BLACK if self.player == CheckersPlayer.WHITE else CheckersPlayer.WHITE
+        self.legal_moves = self.calculate_possible_moves(self.player)
+        self.status = self.result(self.legal_moves)
         return []
 
     def get_board(self) -> str:

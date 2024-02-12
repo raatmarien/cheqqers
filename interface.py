@@ -40,7 +40,6 @@ class GameInterface:
         self.game = game
         self.quit = False
         self.highlighted_squares = []
-        self.status = CheckersResult.UNFINISHED
         self.selected_id = None # Square select by player, used for highlighting and moving pieces
         self.move_locations = set() # If a piece is selected, this variable will store the locations the piece can move to
         open('./log.txt', 'w').close()
@@ -101,12 +100,7 @@ class GameInterface:
         #     legal_moves = self.get_legal_moves()
         #     self.game.player_move(legal_moves[i-1], self.game.player)
         #     self.print_board()
-        while(self.status == CheckersResult.UNFINISHED and not self.quit):
-            if(not prev_take):
-                legal_moves = self.get_legal_moves()
-            self.status = self.game.result(legal_moves)
-            if(self.status != CheckersResult.UNFINISHED):
-                break
+        while(self.game.status == CheckersResult.UNFINISHED and not self.quit):
             if(self.GUI):
                 for event in pygame.event.get(): 
                     if event.type == pygame.QUIT:
@@ -117,14 +111,14 @@ class GameInterface:
                         # self.handle_click(event.pos)
                     if event.type == pygame.MOUSEBUTTONUP:
                         # Detect swipes for quantum moves
-                        moved, legal_moves = self.handle_click(down_pos, event.pos)
-                        if(moved):
-                            prev_take = False # reset when move is done
-                        if(moved and len(legal_moves) > 0):
-                            print("HERE")
-                            prev_take = True
-                        else:
-                            legal_moves = self.get_legal_moves() # We have to calculate them again because the player has chanced for the highlight function
+                        moved, _ = self.handle_click(down_pos, event.pos)
+                        # if(moved):
+                        #     prev_take = False # reset when move is done
+                        # if(moved and len(legal_moves) > 0):
+                        #     print("HERE")
+                        #     prev_take = True
+                        # else:
+                        # legal_moves = self.get_legal_moves() # We have to calculate them again because the player has chanced for the highlight function
                         # if(moved):
                         #     counter += 1
                         #     print(f"Move number {counter}")
@@ -152,22 +146,23 @@ class GameInterface:
                     # time.sleep(1)
             else:
                 prev_take = False # Always reset
-                # self.print_board()
-                # self.print_legal_moves(legal_moves)
+                self.print_board()
+                self.print_legal_moves(self.game.legal_moves)
                 counter += 1
                 # print(f"Move number {counter}")
                 # move = random.randint(1, len(legal_moves))
                 if(self.game.player == CheckersPlayer.WHITE):
-                    move = self.white_player.select_move(legal_moves)
+                    move = self.white_player.select_move(self.game.legal_moves)
                 else:
-                    move = self.black_player.select_move(legal_moves)
+                    move = self.black_player.select_move(self.game.legal_moves)
                 moves.append(move)
-                legal_moves = self.game.player_move(move, self.game.player)
-                if(len(legal_moves) > 0):
-                    prev_take = True
+                _ = self.game.player_move(move, self.game.player)
+                # if(len(self.game.legal_moves) > 0):
+                #     prev_take = True
                 self.write_to_log(move, counter, moves)
                 # time.sleep(1)
-        print(f"Results: {self.status}")
+        self.print_board()
+        print(f"Results: {self.game.status}")
 
     def draw_circle(self, color, x, y, radius, king = False, highlited = False):
         if(color == RED):
@@ -266,7 +261,7 @@ class GameInterface:
         return str_board
     
     def get_legal_moves(self) -> list:
-        moves, _ = self.game.calculate_possible_moves(self.game.player)
+        moves = self.game.calculate_possible_moves(self.game.player)
         return moves
 
     def print_legal_moves(self, legal_moves = None) -> list:
