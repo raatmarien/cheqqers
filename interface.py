@@ -54,7 +54,7 @@ class GameInterface:
         self.white_player = white_player
         args = {
             'C': 1.41, # sqrt of 2
-            'num_searches': 100 # Budget per rollout
+            'num_searches': 10 # Budget per rollout
         }
         self.black_player = MCTS(self.game, args)
     

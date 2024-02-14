@@ -24,6 +24,7 @@ class MCTS():
         root = Node(self.game, self.args)
 
         for srch in range(self.args['num_searches']):
+            print(f"Search {srch}")
             node = root
             while node.is_fully_expanded():
                 node = node.select()
@@ -37,21 +38,25 @@ class MCTS():
             elif(result == CheckersResult.DRAW):
                 value = 0
             else: # game unfinished
-                node = node.expand()
-                value = node.simulate()
-            # backpropogation
-            node.backpropogate(value)
+                nodes = node.expand() # Can add multiple nodes if quantum state is measured
+                for node in nodes:
+                    # print(node.game.get_sim_board())
+                    value = node.simulate()
+                    # backpropogation
+                    node.backpropogate(value)
 
-        action_probs = np.zeros(len(root.game.legal_moves))
+        action_probs = np.zeros(len(root.children))
+        print(len(action_probs))
         for idx, child in enumerate(root.children):
             action_probs[idx] = child.visit_count
         action_probs /= np.sum(action_probs) # normalize
         return action_probs
 
 class Node():
-    def __init__(self, game, args, parent=None, weight = 1) -> None:
+    def __init__(self, game, args, move=None, parent=None, weight = 1) -> None:
         self.game = game
         self.args = args
+        self.move = move # the move done to get to this state
         self.parent = parent
         self.weight = weight
 
@@ -95,16 +100,17 @@ class Node():
             child_states, weights = self.game.return_all_possible_states(action)
             # child_state.player_move(action, child_state.player)
         else:
-            temp = Sim_Checkers(run_on_hardware=False, num_vertical=self.game.num_vertical, num_horizontal=self.game.num_horizontal, num_vertical_pieces=self.game.num_vertical_pieces, classical_squares=deepcopy(self.game.classical_squares), related_squares=deepcopy(self.game.related_squares), q_rel_moves=deepcopy(self.game.q_rel_moves), q_moves=deepcopy(self.game.q_moves), superposition_pieces=deepcopy(self.game.superposition_pieces), status=deepcopy(self.game.status), moves_since_take=deepcopy(self.game.moves_since_take), king_squares=deepcopy(self.game.king_squares), rules=self.game.rules)
+            temp = Sim_Checkers(run_on_hardware=False, num_vertical=self.game.num_vertical, num_horizontal=self.game.num_horizontal, num_vertical_pieces=self.game.num_vertical_pieces, classical_squares=deepcopy(self.game.classical_squares), related_squares=deepcopy(self.game.related_squares), q_rel_moves=deepcopy(self.game.q_rel_moves), q_moves=deepcopy(self.game.q_moves), superposition_pieces=deepcopy(self.game.superposition_pieces), status=deepcopy(self.game.status), moves_since_take=deepcopy(self.game.moves_since_take), king_squares=deepcopy(self.game.king_squares), legal_moves=deepcopy(self.game.legal_moves), rules=self.game.rules)
             temp.player_move(action)
             child_states = [temp]
             weights = [1]
         for i, child_state in enumerate(child_states):
-            child = Node(child_state, self.args, self, weights[i])
+            child = Node(child_state, self.args, action, self, weights[i])
             self.children.append(child)
+        return self.children
 
     def simulate(self):
-        sim_game = Sim_Checkers(run_on_hardware=False, num_vertical=self.game.num_vertical, num_horizontal=self.game.num_horizontal, num_vertical_pieces=self.game.num_vertical_pieces, classical_squares=deepcopy(self.game.classical_squares), related_squares=deepcopy(self.game.related_squares), q_rel_moves=deepcopy(self.game.q_rel_moves), q_moves=deepcopy(self.game.q_moves), superposition_pieces=deepcopy(self.game.superposition_pieces), status=deepcopy(self.game.status), moves_since_take=deepcopy(self.game.moves_since_take), king_squares=deepcopy(self.game.king_squares), rules=self.game.rules)
+        sim_game = Sim_Checkers(run_on_hardware=False, num_vertical=self.game.num_vertical, num_horizontal=self.game.num_horizontal, num_vertical_pieces=self.game.num_vertical_pieces, classical_squares=deepcopy(self.game.classical_squares), related_squares=deepcopy(self.game.related_squares), q_rel_moves=deepcopy(self.game.q_rel_moves), q_moves=deepcopy(self.game.q_moves), superposition_pieces=deepcopy(self.game.superposition_pieces), status=deepcopy(self.game.status), moves_since_take=deepcopy(self.game.moves_since_take), king_squares=deepcopy(self.game.king_squares), legal_moves=deepcopy(self.game.legal_moves),rules=self.game.rules)
         # sim_game.SIMULATE_QUANTUM = True
         rollout_player = sim_game.player 
         while True:
@@ -127,7 +133,7 @@ class Node():
     def backpropogate(self, value):
         self.value_sum += value
         self.visit_count += 1
-        if(self.game.player != self.parent.game.player):
+        if(self.parent != None and self.game.player != self.parent.game.player):
             value = value*-1
         if(self.parent != None):
             self.parent.backpropogate(value)

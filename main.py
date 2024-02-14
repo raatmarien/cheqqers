@@ -9,7 +9,7 @@ import pstats
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--num_rows', help='The number of rows of the checkboard. INT', default=7)
+    parser.add_argument('--num_rows', help='The number of rows of the checkboard. INT', default=5)
     parser.add_argument('--num_columns', help='The number of columns of the checkboard. INT', default=5)
     parser.add_argument('--num_vertical_pieces', help='The number of rows that are filled with checkerpieces. INT', default=1)
     parser.add_argument('--sim_q', help='Simulating quantum or actually use quantum mechanics. TRUE if you want to simulate quantum.', default="False")

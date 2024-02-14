@@ -213,7 +213,7 @@ class Checkers:
         else:
             return [black_ids, black_king_ids], [white_ids, white_king_ids]
 
-    def calculate_possible_moves(self, player: CheckersPlayer) -> list:
+    def calculate_possible_moves(self, player: CheckersPlayer = None) -> list:
         """
         Calculates all possible moves for 'player'
         Loop over all pieces, if there is a chance that there is a piece in the right color calculate legal moves for that piece
@@ -221,6 +221,8 @@ class Checkers:
         """
         legal_moves = [] # All legal moves
         legal_take_moves = [] # Only the moves which can take another player
+        if(player == None):
+            player = self.player
         player_ids, opponent_ids = self.get_positions(player)
         blind_moves = []
         for id in player_ids[0]: #all normal ids
@@ -629,7 +631,7 @@ class Checkers:
             checked = False
             for jid in jumped_ids:
                 # temp_state = deepcopy(new_state)
-                temp_state = Sim_Checkers(run_on_hardware=False, num_vertical=self.num_vertical, num_horizontal=self.num_horizontal, num_vertical_pieces=self.num_vertical_pieces, classical_squares=deepcopy(self.classical_squares), related_squares=deepcopy(self.related_squares), q_rel_moves=deepcopy(self.q_rel_moves), q_moves=deepcopy(self.q_moves), superposition_pieces=deepcopy(self.superposition_pieces), status=deepcopy(self.status), moves_since_take=deepcopy(self.moves_since_take), king_squares=deepcopy(self.king_squares), rules=self.rules)
+                temp_state = Sim_Checkers(run_on_hardware=False, num_vertical=self.num_vertical, num_horizontal=self.num_horizontal, num_vertical_pieces=self.num_vertical_pieces, classical_squares=deepcopy(self.classical_squares), related_squares=deepcopy(self.related_squares), q_rel_moves=deepcopy(self.q_rel_moves), q_moves=deepcopy(self.q_moves), superposition_pieces=deepcopy(self.superposition_pieces), status=deepcopy(self.status), moves_since_take=deepcopy(self.moves_since_take), king_squares=deepcopy(self.king_squares), legal_moves=deepcopy(self.legal_moves), rules=self.rules)
                 if(sid == str(move.source_id) and jid == str(jumped_id)): # State where a piece is actually taken.
                     # Weight is chance that sid is there times chance that jid is there
                     weights.append(self.classical_squares[str(sid)].chance/100 * self.classical_squares[str(jid)].chance/100)
@@ -690,10 +692,10 @@ class Checkers:
         It also measures the piece itself or the piece it is taking if it is relevant.
         Returns two booleans. First one is true if a piece has been taken. Second one is true if a move has failed
         """
-        states, weights = self.return_all_possible_states(move)
-        for i in states:
-            print(i.get_sim_board())
-        print(weights)
+        # states, weights = self.return_all_possible_states(move)
+        # for i in states:
+        #     print(i.get_sim_board())
+        # print(weights)
         taken = False # To return if the move took a piece or not
         is_adjacent, jumped_id = self.is_adjacent(move.source_id, move.target1_id)
         if(not is_adjacent): # if ids are not adjacent we jumped over a piece and need to remove it
@@ -872,7 +874,7 @@ class Checkers:
         return CheckersResult.UNFINISHED
 
 class Sim_Checkers(Checkers):
-    def __init__(self, run_on_hardware, num_vertical, num_horizontal, num_vertical_pieces, classical_squares, related_squares, q_rel_moves, q_moves, superposition_pieces, status, moves_since_take, king_squares, rules = CheckersRules.QUANTUM_V3) -> None:
+    def __init__(self, run_on_hardware, num_vertical, num_horizontal, num_vertical_pieces, classical_squares, related_squares, q_rel_moves, q_moves, superposition_pieces, status, moves_since_take, king_squares, rules = CheckersRules.QUANTUM_V3, legal_moves = []) -> None:
         self.rules = rules
         self.SIMULATE_QUANTUM = True
         self.player = CheckersPlayer.WHITE
@@ -890,6 +892,7 @@ class Sim_Checkers(Checkers):
         self.superposition_pieces = superposition_pieces # contains a list of pieces that started the superposition. This is needed to recreate the board when a move has been done
         self.moves_since_take = moves_since_take # Number of moves since a piece has been taken
         self.king_squares = king_squares
+        self.legal_moves = legal_moves
 #TODO: Change calculating blind moves to use direction variable for black/white (+1/-1) instead of a very long if else statement
 #TODO: Clean up calculating legal moves function with using only 1 for loop
 #TODO: Instead of first clearing the entire board and then flipping the pieces, just initialize the pieces immediately correctly
