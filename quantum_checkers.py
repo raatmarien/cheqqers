@@ -528,8 +528,6 @@ class Checkers:
                                 output += f" . {0:3}"
                         elif(mark == CheckersPlayer.WHITE):
                             identifier = "w"
-                            print(str(idx), self.classical_squares.keys())
-                            print(str(idx) in self.classical_squares.keys())
                             if(str(idx) in self.classical_squares.keys() and self.classical_squares[str(idx)].color == CheckersPlayer.WHITE):
                                 if(self.classical_squares[str(idx)].king):
                                     identifier = "W"
@@ -625,66 +623,60 @@ class Checkers:
             # raise RuntimeError(f"Not a take move: [{move.source_id} to {move.target1_id}]")
             return []
         _, jumped_id = self.is_adjacent(move.source_id, move.target1_id)
-        # new_state = Sim_Checkers(run_on_hardware=False, num_vertical=self.num_vertical, num_horizontal=self.num_horizontal, num_vertical_pieces=self.num_vertical_pieces, classical_squares=deepcopy(self.classical_squares), related_squares=deepcopy(self.related_squares), q_rel_moves=deepcopy(self.q_rel_moves), q_moves=deepcopy(self.q_moves), superposition_pieces=deepcopy(self.superposition_pieces), status=deepcopy(self.status), moves_since_take=deepcopy(self.moves_since_take), king_squares=deepcopy(self.king_squares), rules=self.rules)
-        # new_state.classical_squares = deepcopy(self.classical_squares)
-        # new_state.related_squares = deepcopy(self.related_squares)
-        # new_state.q_moves = deepcopy(self.q_moves)
-        # new_state.q_rel_moves = deepcopy(self.q_rel_moves)
-        # new_state.SIMULATE_QUANTUM = True
-        # new_state.superposition_pieces = deepcopy(self.superposition_pieces)
-        # new_state.king_squares = deepcopy(self.king_squares)
-        # new_state.status = deepcopy(self.status)
-        # new_state.moves_since_take = deepcopy(self.moves_since_take)
-
         source_ids = self.get_rel_squares(move.source_id)
         jumped_ids = self.get_rel_squares(jumped_id)
-        print(f"source_ids: {source_ids}")
-        print(f"jumped_ids: {jumped_ids}")
-        
         states = []
+        checked = False
         for sid in source_ids:
             for jid in jumped_ids:
-                print("Looped")
                 # temp_state = deepcopy(new_state)
                 temp_state = Sim_Checkers(run_on_hardware=False, num_vertical=self.num_vertical, num_horizontal=self.num_horizontal, num_vertical_pieces=self.num_vertical_pieces, classical_squares=deepcopy(self.classical_squares), related_squares=deepcopy(self.related_squares), q_rel_moves=deepcopy(self.q_rel_moves), q_moves=deepcopy(self.q_moves), superposition_pieces=deepcopy(self.superposition_pieces), status=deepcopy(self.status), moves_since_take=deepcopy(self.moves_since_take), king_squares=deepcopy(self.king_squares), rules=self.rules)
-                if(sid == move.source_id and jid == jumped_id): # State where a piece is actually taken.
-                    print(f"True1: {sid}, {jid}")
-                    temp_state.remove_piece(jumped_id, True)
-                    temp_state.remove_id_from_rel_squares(jumped_id)
+                if(sid == str(move.source_id) and jid == str(jumped_id)): # State where a piece is actually taken.
+                    temp_state.remove_piece(jumped_id, False)
+                    jumped_ids = temp_state.remove_from_rel_squares(jumped_id)
+                    # for i, classical_id in enumerate(ids):
+
                     temp_state.classical_squares[str(move.source_id)].chance = 100
                     temp_state.classical_squares[str(move.target1_id)] = temp_state.classical_squares[str(move.source_id)]
                     temp_state.classical_squares[str(move.target1_id)].id = move.target1_id
-                    temp_state.remove_id_from_rel_squares(move.source_id)
+                    temp_state.remove_from_rel_squares(move.source_id)
                     temp_state.remove_piece(move.source_id)
-                    states.append(temp_state)
-
-                elif(sid == move.source_id and jid != jumped_id): # Only the original piece is there, and when we measure the other piece is not there.             
-                    print(f"True2: {sid}, {jid}")
-                    print(temp_state.classical_squares.keys())
-                    temp_state.classical_squares[str(sid)].chance = 100
-                    temp_state.classical_squares[str(jid)].chance = 100
                     for i in source_ids:
-                        if(i == move.source_id):
+                        if(i == str(move.source_id)):
                             continue
                         temp_state.remove_piece(str(i))
                     
                     for j in jumped_ids:
-                        if(j == jid):
+                        if(j == str(jid)):
                             continue
                         temp_state.remove_piece(str(j))
                     states.append(temp_state)
-                else: # The original piece isn't there, therefore we do not measure the jumped piece
-                    print(f"True3: {sid}, {jid}")
+
+                elif(sid == str(move.source_id) and jid != str(jumped_id)): # Only the original piece is there, and when we measure the other piece is not there.             
+                    temp_state.classical_squares[str(sid)].chance = 100
+                    temp_state.classical_squares[str(jid)].chance = 100
+                    for i in source_ids:
+                        if(i == str(move.source_id)):
+                            continue
+                        temp_state.remove_piece(str(i))
+                    
+                    for j in jumped_ids:
+                        if(j == str(jid)):
+                            continue
+                        temp_state.remove_piece(str(j))
+                    states.append(temp_state)
+                elif(not checked): # The original piece isn't there, therefore we do not measure the jumped piece. This only needs to be checked one time
+                    checked = True
                     temp_state.classical_squares[str(sid)].chance = 100
                     for i in source_ids:
-                        if(i == sid):
+                        if(i == str(sid)):
                             continue
                         temp_state.remove_piece(str(i))
                     states.append(temp_state)
-        print(f"LEN STATE: {len(states)}")
-        for i in (states):
-            print("BOARD")
-            print(i.get_board())
+        # print(f"LEN STATE: {len(states)}")
+        # for i in (states):
+        #     print("BOARD")
+        #     print(i.get_sim_board())
         return states            
 
     def classic_move(self, move: Move_id) -> [bool, bool]:
@@ -844,7 +836,7 @@ class Checkers:
         for index, squares in enumerate(temp_list):
             if(str(id) in squares):
                 return self.related_squares[index]
-        return [id]
+        return [str(id)]
         
     def convert_xy_to_id(self, x, y) -> int:
         """
