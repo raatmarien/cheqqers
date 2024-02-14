@@ -1,5 +1,6 @@
 from random import randint
 import traceback
+from mcts import MCTS
 
 class bot():
     def __init__(self) -> None:
@@ -40,7 +41,15 @@ class exp_min_max(bot):
     def select_move(self, possible_moves):
         pass
 
-class monte_carlo(bot):
+class mcts_bot(bot):
+    def __init__(self, game) -> None:
+        args = {
+            'C': 1.41, # sqrt of 2
+            'num_searches': 100 #Budget per rollout
+        }
+        mcts = MCTS(game, args)
+        super().__init__()
+
     def select_move(self, possible_moves):
         pass
     

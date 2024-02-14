@@ -5,10 +5,11 @@ import math
 from enums import CheckersResult, CheckersPlayer, MoveType
 import random
 from copy import deepcopy
+from quantum_checkers import Sim_Checkers
 
 args = {
-    'C': 1.41,
-    'num_searches': 1000
+    'C': 1.41, # sqrt of 2
+    'num_searches': 100 #Budget per rollout
 }
 
 
@@ -18,9 +19,9 @@ class MCTS():
         game.SIMULATE_QUANTUM = True 
         self.args = args
 
-    def search(self, state):
+    def search(self):
         # Define root node
-        root = Node(self.game, self.args, state)
+        root = Node(self.game, self.args)
 
         for srch in range(self.args['num_searches']):
             node = root
@@ -48,12 +49,11 @@ class MCTS():
         return action_probs
 
 class Node():
-    def __init__(self, game, args, parent=None) -> None:
+    def __init__(self, game, args, parent=None, weight = 1) -> None:
         self.game = game
         self.args = args
-        self.state = state
         self.parent = parent
-        self.action_taken = action_taken
+        self.weight = weight
 
         self.children = []
         self.expandable_moves = self.game.legal_moves
@@ -61,7 +61,7 @@ class Node():
         self.value_sum = 0
 
     def is_fully_expanded(self):
-        return np.sum(self.expandable_moves) == 0 and len(self.children) > 0
+        return len(self.expandable_moves) == 0 and len(self.children) > 0
     
     def select(self):
         best_child = None
@@ -78,7 +78,9 @@ class Node():
     def get_ucb(self, child):
         # q_value is what child think of itself so we reverse it
         # TODO: fix with checkers being able to move twice in a row
-        q_value = 1 - (((child.value_sum / child.visit_count) + 1) / 2)
+        q_value = (((child.value_sum / child.visit_count) + 1) / 2)
+        if(child.game.player != self.game.player):
+            q_value = 1 - q_value
         return q_value + self.args['C'] * math.sqrt(math.log(self.visit_count / child.visit_count))
         
     def expand(self):
@@ -88,16 +90,21 @@ class Node():
         # child_state = self.state.copy()
         # child_state = self.game.get_next_state(child_state, action, 1)
         # Change player (if not handled?)
-        child_state = deepcopy(self.game)
+        # child_state = deepcopy(self.game)
         if(action.movetype == MoveType.TAKE):
-            # Multiple states can come from this move.
-        child_state.player_move(action, child_state.player)
-
-        child = Node(child_state, self.args, self)
-        self.children.append(child) # TODO: What if we measured? Different states from a move?
+            child_states, weights = self.game.return_all_possible_states(action)
+            # child_state.player_move(action, child_state.player)
+        else:
+            temp = Sim_Checkers(run_on_hardware=False, num_vertical=self.game.num_vertical, num_horizontal=self.game.num_horizontal, num_vertical_pieces=self.game.num_vertical_pieces, classical_squares=deepcopy(self.game.classical_squares), related_squares=deepcopy(self.game.related_squares), q_rel_moves=deepcopy(self.game.q_rel_moves), q_moves=deepcopy(self.game.q_moves), superposition_pieces=deepcopy(self.game.superposition_pieces), status=deepcopy(self.game.status), moves_since_take=deepcopy(self.game.moves_since_take), king_squares=deepcopy(self.game.king_squares), rules=self.game.rules)
+            temp.player_move(action)
+            child_states = [temp]
+            weights = [1]
+        for i, child_state in enumerate(child_states):
+            child = Node(child_state, self.args, self, weights[i])
+            self.children.append(child)
 
     def simulate(self):
-        sim_game = deepcopy(self.game)
+        sim_game = Sim_Checkers(run_on_hardware=False, num_vertical=self.game.num_vertical, num_horizontal=self.game.num_horizontal, num_vertical_pieces=self.game.num_vertical_pieces, classical_squares=deepcopy(self.game.classical_squares), related_squares=deepcopy(self.game.related_squares), q_rel_moves=deepcopy(self.game.q_rel_moves), q_moves=deepcopy(self.game.q_moves), superposition_pieces=deepcopy(self.game.superposition_pieces), status=deepcopy(self.game.status), moves_since_take=deepcopy(self.game.moves_since_take), king_squares=deepcopy(self.game.king_squares), rules=self.game.rules)
         # sim_game.SIMULATE_QUANTUM = True
         rollout_player = sim_game.player 
         while True:

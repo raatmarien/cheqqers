@@ -1,6 +1,7 @@
 from quantum_checkers import Checkers, Move_id
 from players import human_player
 
+import numpy as np
 import pygame
 import random
 from enums import (
@@ -14,6 +15,7 @@ import time
 # GUI
 import pygame
 import sys
+from mcts import MCTS
 # https://quantumchess.net/play/
 # https://entanglement-chess.netlify.app/qm
 # https://github.com/quantumlib/unitary/blob/main/docs/unitary/getting_started.ipynb
@@ -48,8 +50,13 @@ class GameInterface:
             self.init_gui()
         else:
             self.GUI = False
+        
         self.white_player = white_player
-        self.black_player = black_player
+        args = {
+            'C': 1.41, # sqrt of 2
+            'num_searches': 100 # Budget per rollout
+        }
+        self.black_player = MCTS(self.game, args)
     
     def init_gui(self):
         pygame.init()
@@ -153,8 +160,10 @@ class GameInterface:
                 # move = random.randint(1, len(legal_moves))
                 if(self.game.player == CheckersPlayer.WHITE):
                     move = self.white_player.select_move(self.game.legal_moves)
-                else:
-                    move = self.black_player.select_move(self.game.legal_moves)
+                else: # BLACK IS MCTS
+                    actions_probs = self.black_player.search()
+                    move = np.argmax(actions_probs)
+                    # move = self.black_player.select_move(self.game.legal_moves)
                 moves.append(move)
                 self.game.player_move(move, self.game.player)
                 # if(len(self.game.legal_moves) > 0):

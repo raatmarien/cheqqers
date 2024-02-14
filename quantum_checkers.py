@@ -434,7 +434,7 @@ class Checkers:
             return
         self.player = CheckersPlayer.BLACK if self.player == CheckersPlayer.WHITE else CheckersPlayer.WHITE
         self.legal_moves = self.calculate_possible_moves(self.player)
-        self.status = self.result(self.legal_moves)
+        self.status = self.result()
 
     def get_board(self) -> str:
         """Returns the Checkers board in ASCII form. Also returns dictionary with id as key.
@@ -856,7 +856,7 @@ class Checkers:
     def convert_id_to_xy(self, id: int) -> (int, int):
         return (id % self.num_horizontal, id // self.num_horizontal)
 
-    def result(self, legal_moves):
+    def result(self):
         """
         returns:
             UNFINISHED = 0
@@ -865,7 +865,7 @@ class Checkers:
             DRAW = 3
             BOTH_WIN = 4
         """
-        if(len(legal_moves) == 0):
+        if(len(self.legal_moves) == 0):
             return CheckersResult.BLACK_WINS if self.player == CheckersPlayer.WHITE else CheckersResult.WHITE_WINS
         if(self.moves_since_take >= 40):
             return CheckersResult.DRAW

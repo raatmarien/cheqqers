@@ -18,7 +18,7 @@ def main():
     parser.add_argument('--p2', help='Select agent for player 2 to use.', default=human_player())
     args = parser.parse_args()
     p1 = human_player()
-    p2 = human_player()
+    p2 = human_player() # Unused, is mcts
     if(args.num_columns % 2 == 1 and args.num_rows % 2 == 0):
         warning_len = len("# WARNING: If the number of columns is uneven and the number of rows is even the board is not symmetrical. #")
         print("#"*warning_len)
@@ -29,7 +29,9 @@ def main():
     for i in range(1):
         print(i)
         start_t = time.time()
-        game = GameInterface(Checkers(num_vertical=args.num_rows, num_horizontal=args.num_columns, num_vertical_pieces=args.num_vertical_pieces, SIMULATE_QUANTUM=args.sim_q), white_player=p1, black_player=p2, GUI=args.GUI)
+        checkers = Checkers(num_vertical=args.num_rows, num_horizontal=args.num_columns, num_vertical_pieces=args.num_vertical_pieces, SIMULATE_QUANTUM=args.sim_q)
+        game = GameInterface(checkers, white_player=p1, black_player=p2, GUI=args.GUI)
+
         game.play()
         times.append(time.time()-start_t)
     print(f"Average time: {sum(times)/len(times)}, minimum time: {min(times)}, max time: {max(times)}")
