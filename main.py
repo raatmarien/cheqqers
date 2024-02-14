@@ -18,7 +18,7 @@ def main():
     parser.add_argument('--p2', help='Select agent for player 2 to use.', default=human_player())
     args = parser.parse_args()
     p1 = human_player()
-    p2 = random_bot()
+    p2 = human_player()
     if(args.num_columns % 2 == 1 and args.num_rows % 2 == 0):
         warning_len = len("# WARNING: If the number of columns is uneven and the number of rows is even the board is not symmetrical. #")
         print("#"*warning_len)

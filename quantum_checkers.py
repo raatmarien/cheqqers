@@ -127,11 +127,11 @@ class Checkers:
                 if(x % 2 == 1 and y % 2 == 0 or x % 2 == 0 and y % 2 == 1):
                     id = self.convert_xy_to_id(x, y)
                     if(y <= self.num_vertical_pieces-1): # We are in the beginning rows, initialize black
-                        if(not SIMULATE_QUANTUM):
+                        if(not self.SIMULATE_QUANTUM):
                             QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # Black
                         self.classical_squares[str(id)] = Piece(str(id), CheckersPlayer.BLACK, king)
                     elif(y >= self.num_vertical - self.num_vertical_pieces):
-                        if(not SIMULATE_QUANTUM):
+                        if(not self.SIMULATE_QUANTUM):
                             QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # White
                         self.classical_squares[str(id)] = Piece(str(id), CheckersPlayer.WHITE, king)
         self.legal_moves = self.calculate_possible_moves(self.player)
@@ -439,7 +439,6 @@ class Checkers:
     def get_board(self) -> str:
         """Returns the Checkers board in ASCII form. Also returns dictionary with id as key.
         Function take from quantum tiq taq toe"""
-        
         results = self.board.peek(count=100)
         hist = _histogram(self.num_vertical, self.num_horizontal,
             [
@@ -502,6 +501,76 @@ class Checkers:
             exit()
         return output
     
+    def get_sim_board(self) -> str:
+        """Returns the simulated Checkers board in ASCII form. Also returns dictionary with id as key.
+        Function take from quantum tiq taq toe"""
+        # results = self.board.peek(count=100)
+        # hist = _histogram(self.num_vertical, self.num_horizontal,
+        #     [
+        #         [CheckersSquare.from_result(square) for square in result]
+        #         for result in results
+        #     ]
+        # )
+        output = "\n"
+        try: # Try except will be removed later, was used for debugging inconsistencies between quantum state and classical states
+            for y in range(self.num_vertical):
+                for mark in [CheckersSquare.EMPTY, CheckersPlayer.WHITE, CheckersPlayer.BLACK]:
+                    output += " "
+                    for x in range(self.num_horizontal):
+                        idx = self.convert_xy_to_id(x,y)
+                        if(x % 2 == 0 and y % 2 == 0 or x % 2 == 1 and y % 2 == 1):
+                            output += " "
+                            output += f"-"*5
+                        elif(mark == CheckersSquare.EMPTY):
+                            if(str(idx) not in self.classical_squares.keys()):
+                                output += f" . {100:3}"
+                            else:
+                                output += f" . {0:3}"
+                        elif(mark == CheckersPlayer.WHITE):
+                            identifier = "w"
+                            print(str(idx), self.classical_squares.keys())
+                            print(str(idx) in self.classical_squares.keys())
+                            if(str(idx) in self.classical_squares.keys() and self.classical_squares[str(idx)].color == CheckersPlayer.WHITE):
+                                if(self.classical_squares[str(idx)].king):
+                                    identifier = "W"
+                                output += f" {identifier} {int(self.classical_squares[str(idx)].chance):3}"
+                            else:
+                                output += f" {identifier} {0:3}"
+                        else:
+                            identifier = "b"
+                            if(str(idx) in self.classical_squares.keys() and self.classical_squares[str(idx)].color == CheckersPlayer.BLACK):
+                                if(self.classical_squares[str(idx)].king):
+                                    identifier = "B"
+                                output += f" {identifier} {int(self.classical_squares[str(idx)].chance):3}"
+                            else:
+                                output += f" {identifier} {0:3}"
+                        if x != self.num_horizontal-1:
+                            output += " |"
+                    output += "\n"
+                if y != self.num_vertical-1:
+                    output += "--------"*self.num_horizontal + "\n"
+        except Exception as error:
+            print(traceback.format_exc())
+            print(f"ERROR: {error}")
+            output = "Quantum moves: "
+            for i in self.q_moves:
+                output += i.get_move()
+                output+= " --- "
+            print(output)
+            self.write_to_log(output)
+            output = "Quantum relative moves"
+            for qm in self.q_rel_moves:
+                output += "["
+                for m in qm:
+                    output += m.get_move()
+                    output += ", "
+                output += "] --- "
+            print(output)
+            self.write_to_log(output)
+            print(f"Classical squares: {self.classical_squares.keys()}")
+            exit()
+        return output
+
     def king(self, id: int):
         self.classical_squares[str(id)].king = True
         return
@@ -556,30 +625,30 @@ class Checkers:
             # raise RuntimeError(f"Not a take move: [{move.source_id} to {move.target1_id}]")
             return []
         _, jumped_id = self.is_adjacent(move.source_id, move.target1_id)
-        new_state = Checkers(self.run_on_hardware, self.num_vertical, self.num_horizontal, self.num_vertical_pieces, self.rules, "True")
-        new_state.classical_squares = self.classical_squares
-        new_state.related_squares = self.related_squares
-        new_state.q_moves = self.q_moves
-        new_state.q_rel_moves = self.q_rel_moves
-        new_state.SIMULATE_QUANTUM = True
-        new_state.superposition_pieces = self.superposition_pieces
-        new_state.king_squares = self.king_squares
-        new_state.status = self.status
-        new_state.moves_since_take = self.moves_since_take
-        source_ids = new_state.remove_from_rel_squares(move.source_id)
-        jumped_ids = new_state.remove_from_rel_squares(jumped_id)
+        # new_state = Sim_Checkers(run_on_hardware=False, num_vertical=self.num_vertical, num_horizontal=self.num_horizontal, num_vertical_pieces=self.num_vertical_pieces, classical_squares=deepcopy(self.classical_squares), related_squares=deepcopy(self.related_squares), q_rel_moves=deepcopy(self.q_rel_moves), q_moves=deepcopy(self.q_moves), superposition_pieces=deepcopy(self.superposition_pieces), status=deepcopy(self.status), moves_since_take=deepcopy(self.moves_since_take), king_squares=deepcopy(self.king_squares), rules=self.rules)
+        # new_state.classical_squares = deepcopy(self.classical_squares)
+        # new_state.related_squares = deepcopy(self.related_squares)
+        # new_state.q_moves = deepcopy(self.q_moves)
+        # new_state.q_rel_moves = deepcopy(self.q_rel_moves)
+        # new_state.SIMULATE_QUANTUM = True
+        # new_state.superposition_pieces = deepcopy(self.superposition_pieces)
+        # new_state.king_squares = deepcopy(self.king_squares)
+        # new_state.status = deepcopy(self.status)
+        # new_state.moves_since_take = deepcopy(self.moves_since_take)
+
+        source_ids = self.get_rel_squares(move.source_id)
+        jumped_ids = self.get_rel_squares(jumped_id)
         print(f"source_ids: {source_ids}")
         print(f"jumped_ids: {jumped_ids}")
-        if(len(source_ids) == 0):
-            source_ids = [move.source_id]
-        if(len(jumped_ids) == 0):
-            jumped_ids = [jumped_id]
+        
         states = []
         for sid in source_ids:
             for jid in jumped_ids:
-                temp_state = copy(new_state)
-                
+                print("Looped")
+                # temp_state = deepcopy(new_state)
+                temp_state = Sim_Checkers(run_on_hardware=False, num_vertical=self.num_vertical, num_horizontal=self.num_horizontal, num_vertical_pieces=self.num_vertical_pieces, classical_squares=deepcopy(self.classical_squares), related_squares=deepcopy(self.related_squares), q_rel_moves=deepcopy(self.q_rel_moves), q_moves=deepcopy(self.q_moves), superposition_pieces=deepcopy(self.superposition_pieces), status=deepcopy(self.status), moves_since_take=deepcopy(self.moves_since_take), king_squares=deepcopy(self.king_squares), rules=self.rules)
                 if(sid == move.source_id and jid == jumped_id): # State where a piece is actually taken.
+                    print(f"True1: {sid}, {jid}")
                     temp_state.remove_piece(jumped_id, True)
                     temp_state.remove_id_from_rel_squares(jumped_id)
                     temp_state.classical_squares[str(move.source_id)].chance = 100
@@ -590,6 +659,8 @@ class Checkers:
                     states.append(temp_state)
 
                 elif(sid == move.source_id and jid != jumped_id): # Only the original piece is there, and when we measure the other piece is not there.             
+                    print(f"True2: {sid}, {jid}")
+                    print(temp_state.classical_squares.keys())
                     temp_state.classical_squares[str(sid)].chance = 100
                     temp_state.classical_squares[str(jid)].chance = 100
                     for i in source_ids:
@@ -603,6 +674,7 @@ class Checkers:
                         temp_state.remove_piece(str(j))
                     states.append(temp_state)
                 else: # The original piece isn't there, therefore we do not measure the jumped piece
+                    print(f"True3: {sid}, {jid}")
                     temp_state.classical_squares[str(sid)].chance = 100
                     for i in source_ids:
                         if(i == sid):
@@ -610,6 +682,9 @@ class Checkers:
                         temp_state.remove_piece(str(i))
                     states.append(temp_state)
         print(f"LEN STATE: {len(states)}")
+        for i in (states):
+            print("BOARD")
+            print(i.get_board())
         return states            
 
     def classic_move(self, move: Move_id) -> [bool, bool]:
@@ -760,6 +835,16 @@ class Checkers:
                 self.q_rel_moves.pop(index)
                 return self.related_squares.pop(index)
         return []
+    
+    def get_rel_squares(self, id):
+        """
+        Returns all related squares of an id
+        """
+        temp_list = deepcopy(self.related_squares)
+        for index, squares in enumerate(temp_list):
+            if(str(id) in squares):
+                return self.related_squares[index]
+        return [id]
         
     def convert_xy_to_id(self, x, y) -> int:
         """
@@ -785,7 +870,26 @@ class Checkers:
         if(self.moves_since_take >= 40):
             return CheckersResult.DRAW
         return CheckersResult.UNFINISHED
-        
+
+class Sim_Checkers(Checkers):
+    def __init__(self, run_on_hardware, num_vertical, num_horizontal, num_vertical_pieces, classical_squares, related_squares, q_rel_moves, q_moves, superposition_pieces, status, moves_since_take, king_squares, rules = CheckersRules.QUANTUM_V3) -> None:
+        self.rules = rules
+        self.SIMULATE_QUANTUM = True
+        self.player = CheckersPlayer.WHITE
+        self.num_vertical = num_vertical
+        self.run_on_hardware = run_on_hardware
+        self.num_horizontal = num_horizontal
+        self.num_vertical_pieces = num_vertical_pieces # how many rows of one color need to be filled with pieces
+        self.classical_squares = classical_squares # Contains information about a square (e.g. white, king, etc...)
+        self.related_squares = related_squares # List of lists that keep track of squares in superpositions that are related to each other. This way if a square is measured we know the related squares of that square
+        self.q_rel_moves = q_rel_moves # parallel to related squares, but keeps track of quantum moves
+        self.q_moves = q_moves # Just a list of al quantum moves so we can do them again when doing a new move
+        self.white_squares = {}
+        self.black_squares = {}
+        self.status = status
+        self.superposition_pieces = superposition_pieces # contains a list of pieces that started the superposition. This is needed to recreate the board when a move has been done
+        self.moves_since_take = moves_since_take # Number of moves since a piece has been taken
+        self.king_squares = king_squares
 #TODO: Change calculating blind moves to use direction variable for black/white (+1/-1) instead of a very long if else statement
 #TODO: Clean up calculating legal moves function with using only 1 for loop
 #TODO: Instead of first clearing the entire board and then flipping the pieces, just initialize the pieces immediately correctly
