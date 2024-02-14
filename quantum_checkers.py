@@ -615,23 +615,24 @@ class Checkers:
 
     def return_all_possible_states(self, move: Move_id):
         """
-        This function moves a piece from one square to another. If it jumps over a piece it also removes this piece.
-        It also measures the piece itself or the piece it is taking if it is relevant.
-        Returns two booleans. First one is true if a piece has been taken. Second one is true if a move has failed
+        This function returs all possible states/outcomes for a specific move
         """
         if(move.movetype != MoveType.TAKE):
             # raise RuntimeError(f"Not a take move: [{move.source_id} to {move.target1_id}]")
-            return []
+            return [], []
         _, jumped_id = self.is_adjacent(move.source_id, move.target1_id)
         source_ids = self.get_rel_squares(move.source_id)
         jumped_ids = self.get_rel_squares(jumped_id)
         states = []
-        checked = False
+        weights = []
         for sid in source_ids:
+            checked = False
             for jid in jumped_ids:
                 # temp_state = deepcopy(new_state)
                 temp_state = Sim_Checkers(run_on_hardware=False, num_vertical=self.num_vertical, num_horizontal=self.num_horizontal, num_vertical_pieces=self.num_vertical_pieces, classical_squares=deepcopy(self.classical_squares), related_squares=deepcopy(self.related_squares), q_rel_moves=deepcopy(self.q_rel_moves), q_moves=deepcopy(self.q_moves), superposition_pieces=deepcopy(self.superposition_pieces), status=deepcopy(self.status), moves_since_take=deepcopy(self.moves_since_take), king_squares=deepcopy(self.king_squares), rules=self.rules)
                 if(sid == str(move.source_id) and jid == str(jumped_id)): # State where a piece is actually taken.
+                    # Weight is chance that sid is there times chance that jid is there
+                    weights.append(self.classical_squares[str(sid)].chance/100 * self.classical_squares[str(jid)].chance/100)
                     temp_state.remove_piece(jumped_id, False)
                     jumped_ids = temp_state.remove_from_rel_squares(jumped_id)
                     # for i, classical_id in enumerate(ids):
@@ -653,6 +654,8 @@ class Checkers:
                     states.append(temp_state)
 
                 elif(sid == str(move.source_id) and jid != str(jumped_id)): # Only the original piece is there, and when we measure the other piece is not there.             
+                    # Weight is chance that sid is there times chance that jid is not there
+                    weights.append(self.classical_squares[str(sid)].chance/100 * self.classical_squares[str(jid)].chance/100)
                     temp_state.classical_squares[str(sid)].chance = 100
                     temp_state.classical_squares[str(jid)].chance = 100
                     for i in source_ids:
@@ -665,7 +668,9 @@ class Checkers:
                             continue
                         temp_state.remove_piece(str(j))
                     states.append(temp_state)
-                elif(not checked): # The original piece isn't there, therefore we do not measure the jumped piece. This only needs to be checked one time
+                elif(not checked): # The original piece isn't there, therefore we do not measure the jumped piece. This only needs to be checked for every sid
+                    # weights is chance that sid is there
+                    weights.append(self.classical_squares[str(sid)].chance/100)
                     checked = True
                     temp_state.classical_squares[str(sid)].chance = 100
                     for i in source_ids:
@@ -677,7 +682,7 @@ class Checkers:
         # for i in (states):
         #     print("BOARD")
         #     print(i.get_sim_board())
-        return states            
+        return states, weights
 
     def classic_move(self, move: Move_id) -> [bool, bool]:
         """
@@ -685,6 +690,10 @@ class Checkers:
         It also measures the piece itself or the piece it is taking if it is relevant.
         Returns two booleans. First one is true if a piece has been taken. Second one is true if a move has failed
         """
+        states, weights = self.return_all_possible_states(move)
+        for i in states:
+            print(i.get_sim_board())
+        print(weights)
         taken = False # To return if the move took a piece or not
         is_adjacent, jumped_id = self.is_adjacent(move.source_id, move.target1_id)
         if(not is_adjacent): # if ids are not adjacent we jumped over a piece and need to remove it
