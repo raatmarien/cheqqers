@@ -16,3 +16,8 @@ https://blog.paperspace.com/building-a-checkers-gaming-agent-using-neural-networ
 https://medium.com/applied-data-science/how-to-build-your-own-alphazero-ai-using-python-and-keras-7f664945c188
 
 open source monte carlo: https://github.com/suragnair/alpha-zero-general
+
+
+MCTS    [Draw: 0, White wins: 38, Black wins: 62] for 10 searches
+MCTS    [Draw: 2, White wins: 37, Black wins: 61] for 50 searches
+Random  [Draw: 1, White wins: 48, Black wins: 51]

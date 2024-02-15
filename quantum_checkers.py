@@ -165,7 +165,14 @@ class Checkers:
             if(len(ids) == 0): # If its is a classical piece
                 return CheckersSquare.FULL
             idx = random.randint(0, len(ids)-1)
+            # try:
             self.classical_squares[str(ids[idx])].chance = 100
+            # except Exception as error:
+            #     print("ERROR")
+            #     print(traceback.format_exc())
+            #     print(ids)
+            #     print(self.classical_squares.keys())
+            #     exit()
             for i, classical_id in enumerate(ids):
                 if(i == idx):
                     continue
@@ -653,6 +660,7 @@ class Checkers:
                         if(j == str(jid)):
                             continue
                         temp_state.remove_piece(str(j))
+                    temp_state.legal_moves = temp_state.calculate_possible_moves(self.player)
                     states.append(temp_state)
 
                 elif(sid == str(move.source_id) and jid != str(jumped_id)): # Only the original piece is there, and when we measure the other piece is not there.             
@@ -660,15 +668,20 @@ class Checkers:
                     weights.append(self.classical_squares[str(sid)].chance/100 * self.classical_squares[str(jid)].chance/100)
                     temp_state.classical_squares[str(sid)].chance = 100
                     temp_state.classical_squares[str(jid)].chance = 100
+                    
                     for i in source_ids:
                         if(i == str(move.source_id)):
                             continue
                         temp_state.remove_piece(str(i))
-                    
+                    temp_state.remove_from_rel_squares(sid)
+
                     for j in jumped_ids:
                         if(j == str(jid)):
                             continue
                         temp_state.remove_piece(str(j))
+                    
+                    temp_state.remove_from_rel_squares(jid)
+                    temp_state.legal_moves = temp_state.calculate_possible_moves(self.player)
                     states.append(temp_state)
                 elif(not checked): # The original piece isn't there, therefore we do not measure the jumped piece. This only needs to be checked for every sid
                     # weights is chance that sid is there
@@ -679,6 +692,8 @@ class Checkers:
                         if(i == str(sid)):
                             continue
                         temp_state.remove_piece(str(i))
+                    temp_state.remove_from_rel_squares(sid)
+                    temp_state.legal_moves = temp_state.calculate_possible_moves(self.player)
                     states.append(temp_state)
         # print(f"LEN STATE: {len(states)}")
         # for i in (states):
@@ -899,6 +914,7 @@ class Sim_Checkers(Checkers):
 #TODO: 50 percent of time is in the peek function, reduce it?
 #TODO: ENTANGLEMENT?
 #TODO: prev_taken, failed = self.classic_move(move) --- Same thing right??
+#TODO: check for mcts calculating legal_moves after taking another piece
     
 # if __name__ == '__main__':
     

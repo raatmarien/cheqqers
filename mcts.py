@@ -6,6 +6,7 @@ from enums import CheckersResult, CheckersPlayer, MoveType
 import random
 from copy import deepcopy
 from quantum_checkers import Sim_Checkers
+import traceback
 
 args = {
     'C': 1.41, # sqrt of 2
@@ -18,14 +19,14 @@ class MCTS():
         self.game = game
         game.SIMULATE_QUANTUM = True 
         self.args = args
+        self.root = Node(self.game, self.args)
 
     def search(self):
         # Define root node
-        root = Node(self.game, self.args)
-
         for srch in range(self.args['num_searches']):
-            print(f"Search {srch}")
-            node = root
+            # print(f"Search {srch}")
+            node = self.root
+            # print(f"Fully expandend: {node.is_fully_expanded()}")
             while node.is_fully_expanded():
                 node = node.select()
 
@@ -45,12 +46,19 @@ class MCTS():
                     # backpropogation
                     node.backpropogate(value)
 
-        action_probs = np.zeros(len(root.children))
-        print(len(action_probs))
-        for idx, child in enumerate(root.children):
+        action_probs = np.zeros(len(self.root.children))
+        for idx, child in enumerate(self.root.children):
             action_probs[idx] = child.visit_count
         action_probs /= np.sum(action_probs) # normalize
-        return action_probs
+        # self.root = # Chance root node to keep part of tree that has been simulated
+        # for idx, child in enumerate(self.root.children):
+        #     print(f"{action_probs[idx]:.2f}: ", end="")
+        #     child.move.print_move()
+        return self.root.children[np.argmax(action_probs)].move
+    
+    # def new_root(self, move):
+    #     self.root = node
+
 
 class Node():
     def __init__(self, game, args, move=None, parent=None, weight = 1) -> None:
@@ -86,7 +94,7 @@ class Node():
         q_value = (((child.value_sum / child.visit_count) + 1) / 2)
         if(child.game.player != self.game.player):
             q_value = 1 - q_value
-        return q_value + self.args['C'] * math.sqrt(math.log(self.visit_count / child.visit_count))
+        return child.weight * (q_value + self.args['C'] * math.sqrt(math.log(self.visit_count / child.visit_count)))
         
     def expand(self):
         action = random.choice(self.expandable_moves)
@@ -99,12 +107,15 @@ class Node():
         if(action.movetype == MoveType.TAKE):
             child_states, weights = self.game.return_all_possible_states(action)
             # child_state.player_move(action, child_state.player)
+            # print( "True")
         else:
-            temp = Sim_Checkers(run_on_hardware=False, num_vertical=self.game.num_vertical, num_horizontal=self.game.num_horizontal, num_vertical_pieces=self.game.num_vertical_pieces, classical_squares=deepcopy(self.game.classical_squares), related_squares=deepcopy(self.game.related_squares), q_rel_moves=deepcopy(self.game.q_rel_moves), q_moves=deepcopy(self.game.q_moves), superposition_pieces=deepcopy(self.game.superposition_pieces), status=deepcopy(self.game.status), moves_since_take=deepcopy(self.game.moves_since_take), king_squares=deepcopy(self.game.king_squares), legal_moves=deepcopy(self.game.legal_moves), rules=self.game.rules)
+            temp = Sim_Checkers(run_on_hardware=False, num_vertical=self.game.num_vertical, num_horizontal=self.game.num_horizontal, num_vertical_pieces=self.game.num_vertical_pieces, classical_squares=deepcopy(self.game.classical_squares), related_squares=deepcopy(self.game.related_squares), q_rel_moves=deepcopy(self.game.q_rel_moves), q_moves=deepcopy(self.game.q_moves), superposition_pieces=deepcopy(self.game.superposition_pieces), status=deepcopy(self.game.status), moves_since_take=deepcopy(self.game.moves_since_take), king_squares=deepcopy(self.game.king_squares), legal_moves=[], rules=self.game.rules)
             temp.player_move(action)
             child_states = [temp]
             weights = [1]
         for i, child_state in enumerate(child_states):
+            # print(f"Length of legal moves new child: {len(child_state.legal_moves)}")
+            # print(child_state.get_sim_board())
             child = Node(child_state, self.args, action, self, weights[i])
             self.children.append(child)
         return self.children
@@ -112,10 +123,35 @@ class Node():
     def simulate(self):
         sim_game = Sim_Checkers(run_on_hardware=False, num_vertical=self.game.num_vertical, num_horizontal=self.game.num_horizontal, num_vertical_pieces=self.game.num_vertical_pieces, classical_squares=deepcopy(self.game.classical_squares), related_squares=deepcopy(self.game.related_squares), q_rel_moves=deepcopy(self.game.q_rel_moves), q_moves=deepcopy(self.game.q_moves), superposition_pieces=deepcopy(self.game.superposition_pieces), status=deepcopy(self.game.status), moves_since_take=deepcopy(self.game.moves_since_take), king_squares=deepcopy(self.game.king_squares), legal_moves=deepcopy(self.game.legal_moves),rules=self.game.rules)
         # sim_game.SIMULATE_QUANTUM = True
-        rollout_player = sim_game.player 
+        rollout_player = sim_game.player
+        prev_board = sim_game.get_sim_board()
         while True:
-            if(sim_game.status == CheckersResult.UNFINISHED):
-                sim_game.player_move(random.choice(sim_game.legal_moves))
+            if(sim_game.result() == CheckersResult.UNFINISHED):
+                # print(len(sim_game.legal_moves))
+                # if(len(sim_game.legal_moves) == 0):
+                #     print(prev_board)
+                #     print(sim_game.get_sim_board())
+                #     print(len(sim_game.calculate_possible_moves()))
+                try: 
+                    move = random.choice(sim_game.legal_moves)
+                    sim_game.player_move(move)
+                except Exception as error:
+                    print("TEST")
+                    print(traceback.format_exc())
+                    print(len(sim_game.legal_moves))
+                    if(len(sim_game.legal_moves) > 0):
+                        move.print_move()
+                       
+                    leg2 = sim_game.calculate_possible_moves()
+                    print(len(leg2))
+                    if(len(leg2) > 0):
+                        leg2[0].print_move()
+                    # print(prev_board)
+                    print(sim_game.get_sim_board())
+                   
+                    print(sim_game.classical_squares.keys())
+                    print(sim_game.status)
+                    exit()
             elif(sim_game.status == CheckersResult.BLACK_WINS or sim_game.status == CheckersResult.WHITE_WINS):
                 if(rollout_player == CheckersPlayer.BLACK):
                     if(sim_game.status == CheckersResult.BLACK_WINS):
@@ -128,7 +164,8 @@ class Node():
                     else:
                         return -1
             else: #draw
-                return 0   
+                return 0 
+            prev_board = sim_game.get_sim_board()
 
     def backpropogate(self, value):
         self.value_sum += value

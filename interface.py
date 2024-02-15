@@ -52,11 +52,11 @@ class GameInterface:
             self.GUI = False
         
         self.white_player = white_player
-        args = {
+        self.args = {
             'C': 1.41, # sqrt of 2
-            'num_searches': 10 # Budget per rollout
+            'num_searches': 50 # Budget per rollout
         }
-        self.black_player = MCTS(self.game, args)
+        self.black_player = MCTS(self.game, self.args)
     
     def init_gui(self):
         pygame.init()
@@ -153,25 +153,31 @@ class GameInterface:
                     # time.sleep(1)
             else:
                 prev_take = False # Always reset
-                self.print_board()
-                self.print_legal_moves(self.game.legal_moves)
+                # self.print_board()
+                # self.print_legal_moves(self.game.legal_moves)
                 counter += 1
-                # print(f"Move number {counter}")
+                if(counter % 10 == 0):
+                    print(f"Move number {counter}")
                 # move = random.randint(1, len(legal_moves))
                 if(self.game.player == CheckersPlayer.WHITE):
                     move = self.white_player.select_move(self.game.legal_moves)
                 else: # BLACK IS MCTS
-                    actions_probs = self.black_player.search()
-                    move = np.argmax(actions_probs)
+                    move = self.white_player.select_move(self.game.legal_moves)
+                    # self.black_player = MCTS(self.game, self.args)
+                    # move = self.black_player.search()
+                    
+                    # move.print_move()
                     # move = self.black_player.select_move(self.game.legal_moves)
                 moves.append(move)
+                # move.print_move()
                 self.game.player_move(move, self.game.player)
                 # if(len(self.game.legal_moves) > 0):
                 #     prev_take = True
-                self.write_to_log(move, counter, moves)
+                # self.write_to_log(move, counter, moves)
                 # time.sleep(1)
-        self.print_board()
+        # self.print_board()
         print(f"Results: {self.game.status}")
+        return(self.game.status)
 
     def draw_circle(self, color, x, y, radius, king = False, highlited = False):
         if(color == RED):
