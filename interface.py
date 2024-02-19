@@ -54,7 +54,7 @@ class GameInterface:
         self.white_player = white_player
         self.args = {
             'C': 1.41, # sqrt of 2
-            'num_searches': 50 # Budget per rollout
+            'num_searches': 10 # Budget per rollout
         }
         self.black_player = MCTS(self.game, self.args)
     
@@ -109,14 +109,22 @@ class GameInterface:
         #     self.print_board()
         while(self.game.status == CheckersResult.UNFINISHED and not self.quit):
             if(self.GUI):
-                for event in pygame.event.get(): 
+                if(self.game.player == CheckersPlayer.WHITE and not isinstance(self.white_player, human_player)):
+                        move = self.white_player.select_move(self.game.legal_moves)
+                        self.do_game_move(move)
+                        prev_take = False
+                elif(self.game.player == CheckersPlayer.BLACK and not isinstance(self.black_player, human_player)):
+                    self.black_player = MCTS(self.game, self.args)
+                    move = self.black_player.search()
+                    self.do_game_move(move)
+                for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         pygame.quit()
                         sys.exit(0)
-                    if event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.type == pygame.MOUSEBUTTONDOWN and ((self.game.player == CheckersPlayer.WHITE and isinstance(self.white_player, human_player)) or (self.game.player == CheckersPlayer.BLACK and isinstance(self.black_player, human_player))):
                         down_pos = event.pos
                         # self.handle_click(event.pos)
-                    if event.type == pygame.MOUSEBUTTONUP:
+                    if event.type == pygame.MOUSEBUTTONUP and ((self.game.player == CheckersPlayer.WHITE and isinstance(self.white_player, human_player)) or (self.game.player == CheckersPlayer.BLACK and isinstance(self.black_player, human_player))):
                         # Detect swipes for quantum moves
                         moved, _ = self.handle_click(down_pos, event.pos)
                         # if(moved):
@@ -135,26 +143,15 @@ class GameInterface:
                     # self.game.player_move(legal_moves[random.randint(1, len(legal_moves))-1], self.game.player)
                     
                     # If it is the humans turn the click event will handle everything
-                    if(self.game.player == CheckersPlayer.WHITE and not isinstance(self.white_player, human_player)):
-                        move = self.white_player.select_move(legal_moves)
-                        legal_moves = self.do_game_move(move)
-                        prev_take = False
-                        if(len(legal_moves) > 0):
-                            prev_take = True
-                    elif(not isinstance(self.black_player, human_player)):
-                        move = self.black_player.select_move(legal_moves)
-                        legal_moves = self.do_game_move(move)
-                        prev_take = False
-                        if(len(legal_moves) > 0):
-                            prev_take = True
-                    self.highlight_squares(legal_moves)
+                    
+                    self.highlight_squares(self.game.legal_moves)
                     self.draw_board()
                     pygame.display.flip() # needs to be called outside draw function
                     # time.sleep(1)
             else:
                 prev_take = False # Always reset
-                # self.print_board()
-                # self.print_legal_moves(self.game.legal_moves)
+                self.print_board()
+                self.print_legal_moves(self.game.legal_moves)
                 counter += 1
                 if(counter % 10 == 0):
                     print(f"Move number {counter}")
@@ -162,9 +159,9 @@ class GameInterface:
                 if(self.game.player == CheckersPlayer.WHITE):
                     move = self.white_player.select_move(self.game.legal_moves)
                 else: # BLACK IS MCTS
-                    move = self.white_player.select_move(self.game.legal_moves)
-                    # self.black_player = MCTS(self.game, self.args)
-                    # move = self.black_player.search()
+                    # move = self.white_player.select_move(self.game.legal_moves)
+                    self.black_player = MCTS(self.game, self.args)
+                    move = self.black_player.search()
                     
                     # move.print_move()
                     # move = self.black_player.select_move(self.game.legal_moves)

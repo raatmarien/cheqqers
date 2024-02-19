@@ -18,7 +18,7 @@ def main():
     parser.add_argument('--p1', help='Select agent for player 1 to use.', default=human_player())
     parser.add_argument('--p2', help='Select agent for player 2 to use.', default=human_player())
     args = parser.parse_args()
-    p1 = random_bot()
+    p1 = human_player()
     p2 = human_player() # Unused, is mcts
     if(args.num_columns % 2 == 1 and args.num_rows % 2 == 0):
         warning_len = len("# WARNING: If the number of columns is uneven and the number of rows is even the board is not symmetrical. #")
@@ -28,7 +28,7 @@ def main():
         time.sleep(5)
     times = []
     results = []
-    for i in range(100):
+    for i in range(1):
         print(i)
         start_t = time.time()
         checkers = Checkers(num_vertical=args.num_rows, num_horizontal=args.num_columns, num_vertical_pieces=args.num_vertical_pieces, SIMULATE_QUANTUM=args.sim_q)
