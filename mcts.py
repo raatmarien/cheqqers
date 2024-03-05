@@ -110,7 +110,8 @@ class Node():
             # child_state.player_move(action, child_state.player)
             # print( "True")
         else:
-            temp = Sim_Checkers(run_on_hardware=False, num_vertical=self.game.num_vertical, num_horizontal=self.game.num_horizontal, num_vertical_pieces=self.game.num_vertical_pieces, classical_squares=deepcopy(self.game.classical_squares), related_squares=deepcopy(self.game.related_squares), q_rel_moves=deepcopy(self.game.q_rel_moves), q_moves=deepcopy(self.game.q_moves), superposition_pieces=deepcopy(self.game.superposition_pieces), status=deepcopy(self.game.status), moves_since_take=deepcopy(self.game.moves_since_take), king_squares=deepcopy(self.game.king_squares), legal_moves=[], rules=self.game.rules)
+            # temp = Sim_Checkers(run_on_hardware=False, num_vertical=self.game.num_vertical, num_horizontal=self.game.num_horizontal, num_vertical_pieces=self.game.num_vertical_pieces, classical_squares=deepcopy(self.game.classical_squares), related_squares=deepcopy(self.game.related_squares), q_rel_moves=deepcopy(self.game.q_rel_moves), q_moves=deepcopy(self.game.q_moves), superposition_pieces=deepcopy(self.game.superposition_pieces), status=deepcopy(self.game.status), moves_since_take=deepcopy(self.game.moves_since_take), king_squares=deepcopy(self.game.king_squares), legal_moves=[], rules=self.game.rules)
+            temp = deepcopy(self.game)
             temp.player_move(action)
             child_states = [temp]
             weights = [1]
