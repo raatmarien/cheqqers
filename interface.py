@@ -148,7 +148,7 @@ class GameInterface:
                     self.draw_board()
                     pygame.display.flip() # needs to be called outside draw function
                     # time.sleep(1)
-            else:
+            else: # ASCII BOARD
                 prev_take = False # Always reset
                 self.print_board()
                 self.print_legal_moves(self.game.legal_moves)
@@ -159,9 +159,9 @@ class GameInterface:
                 if(self.game.player == CheckersPlayer.WHITE):
                     move = self.white_player.select_move(self.game.legal_moves)
                 else: # BLACK IS MCTS
-                    # move = self.white_player.select_move(self.game.legal_moves)
-                    self.black_player = MCTS(self.game, self.args)
-                    move = self.black_player.search()
+                    move = self.white_player.select_move(self.game.legal_moves)
+                    # self.black_player = MCTS(self.game, self.args)
+                    # move = self.black_player.search()
                     
                     # move.print_move()
                     # move = self.black_player.select_move(self.game.legal_moves)

@@ -10,12 +10,13 @@ import traceback
 import itertools
 from typing import List, Dict
 from copy import deepcopy, copy
-from unitary.alpha import QuantumObject, QuantumWorld, Move, Split, Flip
+from unitary.alpha import QuantumObject, QuantumWorld, quantum_if, Move, Split, Flip
 from unitary.alpha.qudit_effects import QuditFlip
 import unitary.alpha as alpha
 from math import ceil
 from quantum_split import CheckersSplit, CheckersClassicMove
 from unitary.alpha.qudit_gates import QuditXGate, QuditISwapPowGate
+
 # from cirq import ISWAP
 import cirq
 import random
@@ -436,7 +437,7 @@ class Checkers:
             if((y == self.num_vertical-1 or y == 0) and self.classical_squares[str(id)].king == False):
                 self.king(id)
 
-        # If a move has been done we need to flip the player, IF they can not take another piece SHOULD CHECK IF THE PIECE YOU JUST USED CAN GO AGAIN
+        # If a move has been done we need to flip the player, IF they can not take another piece with the piece just used
         can_take, legal_moves = self.can_take_piece(move.target1_id)
         if(prev_taken and can_take): # If we took a piece and we can take another piece do not chance the player
             self.legal_moves = legal_moves
@@ -714,18 +715,22 @@ class Checkers:
         taken = False # To return if the move took a piece or not
         is_adjacent, jumped_id = self.is_adjacent(move.source_id, move.target1_id)
         if(not is_adjacent): # if ids are not adjacent we jumped over a piece and need to remove it
-            # First check if the piece we are using is actually there
-            if(self.measure_square(move.source_id) == CheckersSquare.EMPTY): # If the piece is not there, turn is wasted
-                self.remove_piece(move.source_id)
-                return taken, True
+            if(self.classical_squares[str(move.source_id)].chance < 100): # If a piece is in superposition
+                # First check if the piece we are using is actually there
+                if(self.measure_square(move.source_id) == CheckersSquare.EMPTY): # If the piece is not there, turn is wasted
+                    self.remove_piece(move.source_id)
+                    return taken, True
 
-            # Next check if the piece we are taking is actually there
-            if(self.measure_square(jumped_id) == CheckersSquare.EMPTY): # if it empty our turn is wasted
-                self.remove_piece(jumped_id) # We still measured so we have to remove it from the classical squares list
-                return taken, True    
-            self.remove_piece(jumped_id, True)
-            self.remove_id_from_rel_squares(jumped_id)
-            taken = True
+                # Next check if the piece we are taking is actually there
+                if(self.measure_square(jumped_id) == CheckersSquare.EMPTY): # if it empty our turn is wasted
+                    self.remove_piece(jumped_id) # We still measured so we have to remove it from the classical squares list
+                    return taken, True    
+                self.remove_piece(jumped_id, True)
+                self.remove_id_from_rel_squares(jumped_id)
+                taken = True
+            else: # ENTANGLEMENT
+                alpha.quantum_if(self.squares[str(jumped_id)]).equals(CheckersSquare.FULL).apply(CheckersClassicMove(2, 1))(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
+                # CheckersSplit(CheckersSquare.FULL, self.rules)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)], self.squares[str(move.target2_id)])
         self.classical_squares[str(move.target1_id)] = self.classical_squares[str(move.source_id)]
         self.classical_squares[str(move.target1_id)].id = move.target1_id
         # If we do a classical move on a piece in superposition, we need to append the new id to the correct list in related_squares
