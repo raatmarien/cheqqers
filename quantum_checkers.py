@@ -102,6 +102,7 @@ class Checkers:
         self.SIMULATE_QUANTUM = False
         if(SIMULATE_QUANTUM.lower() == "true"):
             self.SIMULATE_QUANTUM = True
+        print(f"SIMULATE: {self.SIMULATE_QUANTUM}")
         self.player = CheckersPlayer.WHITE
         self.num_vertical = num_vertical
         self.run_on_hardware = run_on_hardware
@@ -129,6 +130,7 @@ class Checkers:
                     id = self.convert_xy_to_id(x, y)
                     if(y <= self.num_vertical_pieces-1): # We are in the beginning rows, initialize black
                         if(not self.SIMULATE_QUANTUM):
+                            print("TRUE IN INIT")
                             QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # Black
                         self.classical_squares[str(id)] = Piece(str(id), CheckersPlayer.BLACK, king)
                     elif(y >= self.num_vertical - self.num_vertical_pieces):
@@ -508,6 +510,7 @@ class Checkers:
             print(output)
             self.write_to_log(output)
             print(f"Classical squares: {self.classical_squares.keys()}")
+            print(f"Chance is {hist[idx][CheckersSquare.FULL]} for id {idx}")
             exit()
         return output
     
@@ -752,6 +755,7 @@ class Checkers:
         if(move.target2_id == None):
             raise ValueError("No second target given")
         original_piece = self.classical_squares[str(move.source_id)]
+        print(f"Simulate: {self.SIMULATE_QUANTUM}")
         if(not self.SIMULATE_QUANTUM):
             CheckersSplit(CheckersSquare.FULL, self.rules)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)], self.squares[str(move.target2_id)])
         self.classical_squares[str(move.target1_id)] = Piece(id=str(move.target1_id), color=original_piece.color, king=original_piece.king, superposition=True)

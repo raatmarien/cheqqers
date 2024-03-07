@@ -16,8 +16,7 @@ args = {
 
 class MCTS():
     def __init__(self, game, args):
-        self.game = game
-        game.SIMULATE_QUANTUM = True 
+        self.game = Sim_Checkers(run_on_hardware=False, num_vertical=game.num_vertical, num_horizontal=game.num_horizontal, num_vertical_pieces=game.num_vertical_pieces, classical_squares=deepcopy(game.classical_squares), related_squares=deepcopy(game.related_squares), q_rel_moves=deepcopy(game.q_rel_moves), q_moves=deepcopy(game.q_moves), superposition_pieces=deepcopy(game.superposition_pieces), status=deepcopy(game.status), moves_since_take=deepcopy(game.moves_since_take), king_squares=deepcopy(game.king_squares), legal_moves=[], rules=game.rules)
         self.args = args
         self.root = Node(self.game, self.args)
 

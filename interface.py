@@ -267,7 +267,8 @@ class GameInterface:
         return False, []
 
     def print_board(self) -> str:
-        str_board = self.game.get_sim_board()
+        # str_board = self.game.get_sim_board()
+        str_board = self.game.get_board()
         print(str_board)
         return str_board
     
