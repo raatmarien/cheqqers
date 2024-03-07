@@ -102,7 +102,6 @@ class Checkers:
         self.SIMULATE_QUANTUM = False
         if(SIMULATE_QUANTUM.lower() == "true"):
             self.SIMULATE_QUANTUM = True
-        print(f"SIMULATE: {self.SIMULATE_QUANTUM}")
         self.player = CheckersPlayer.WHITE
         self.num_vertical = num_vertical
         self.run_on_hardware = run_on_hardware
@@ -130,7 +129,6 @@ class Checkers:
                     id = self.convert_xy_to_id(x, y)
                     if(y <= self.num_vertical_pieces-1): # We are in the beginning rows, initialize black
                         if(not self.SIMULATE_QUANTUM):
-                            print("TRUE IN INIT")
                             QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(id)]) # Black
                         self.classical_squares[str(id)] = Piece(str(id), CheckersPlayer.BLACK, king)
                     elif(y >= self.num_vertical - self.num_vertical_pieces):
@@ -731,8 +729,23 @@ class Checkers:
                 self.remove_piece(jumped_id, True)
                 self.remove_id_from_rel_squares(jumped_id)
                 taken = True
-            else: # ENTANGLEMENT
+            else: # ENTANGLEMENT. ALWAYS JUMPS OVER ENTANGLED PIECE
                 alpha.quantum_if(self.squares[str(jumped_id)]).equals(CheckersSquare.FULL).apply(CheckersClassicMove(2, 1))(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
+                original_piece = self.classical_squares[str(move.source_id)]
+                
+                self.classical_squares[str(move.target1_id)] = Piece(id=str(move.target1_id), color=original_piece.color, king=original_piece.king, superposition=True)
+
+                # Since we jump over a piece in superposition we need to add these two pieces to the correct superposition squares in related squares
+                self.classical_squares[str(move.target1_id)].chance = self.classical_squares[str(move.source_id)].chance/2
+                self.classical_squares[str(move.source_id)].chance = self.classical_squares[str(move.source_id)].chance/2
+                for i, rel_squares in enumerate(self.related_squares):
+                    if(str(jumped_id) in rel_squares):
+                        rel_squares.append(move.source_id)
+                        rel_squares.append(move.target1_id)
+                        self.q_rel_moves[i].append(move)
+                        self.q_moves.append(move)
+                self.superposition_pieces.add(original_piece)
+                return taken, False
                 # CheckersSplit(CheckersSquare.FULL, self.rules)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)], self.squares[str(move.target2_id)])
         self.classical_squares[str(move.target1_id)] = self.classical_squares[str(move.source_id)]
         self.classical_squares[str(move.target1_id)].id = move.target1_id
@@ -755,7 +768,6 @@ class Checkers:
         if(move.target2_id == None):
             raise ValueError("No second target given")
         original_piece = self.classical_squares[str(move.source_id)]
-        print(f"Simulate: {self.SIMULATE_QUANTUM}")
         if(not self.SIMULATE_QUANTUM):
             CheckersSplit(CheckersSquare.FULL, self.rules)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)], self.squares[str(move.target2_id)])
         self.classical_squares[str(move.target1_id)] = Piece(id=str(move.target1_id), color=original_piece.color, king=original_piece.king, superposition=True)
