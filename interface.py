@@ -103,10 +103,10 @@ class GameInterface:
         counter = 0
         moves = []
         prev_take = False # variable to check if a piece has been taken before
-        # for i in [9, 3, 7, 3, 5, 3, 9, 3, 9, 1, 4, 9, 6, 5, 2, 6, 1, 8, 1, 1, 2, 2, 4, 1, 1, 1, 4, 4, 4, 8, 3, 1, 3, 1, 11, 15, 5]:
-        #     legal_moves = self.get_legal_moves()
-        #     self.game.player_move(legal_moves[i-1], self.game.player)
-        #     self.print_board()
+        for i in [3, 2, 5, 1, 1]:
+            # legal_moves = self.get_legal_moves()
+            self.game.player_move(self.game.legal_moves[i-1], self.game.player)
+            self.print_board()
         while(self.game.status == CheckersResult.UNFINISHED and not self.quit):
             if(self.GUI):
                 if(self.game.player == CheckersPlayer.WHITE and not isinstance(self.white_player, human_player)):

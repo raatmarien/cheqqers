@@ -111,6 +111,7 @@ class Checkers:
         self.related_squares = [] # List of lists that keep track of squares in superpositions that are related to each other. This way if a square is measured we know the related squares of that square
         self.q_rel_moves = [] # parallel to related squares, but keeps track of quantum moves
         self.q_moves = [] # Just a list of al quantum moves so we can do them again when doing a new move
+        self.entangled_squares = [] # list of entangled squares
         self.white_squares = {}
         self.black_squares = {}
         self.status = CheckersResult.UNFINISHED
@@ -158,6 +159,11 @@ class Checkers:
                 peek = (self.board.peek(objects=[self.squares[str(classical_id)]]))
                 if(peek[0][0] == CheckersSquare.FULL):
                     self.classical_squares[str(classical_id)].chance = 100
+                    for i in self.entangled_squares: 
+                        if(str(classical_id) in i): # If the piece is in the entangled squares it has been jumped over an needs to be removed
+                            self.remove_piece(str(classical_id), True)
+                            self.entangled_squares.remove(i)
+                            continue
                     continue
                 self.remove_piece(str(classical_id))
             return(self.board.peek(objects=[self.squares[str(id)]])[0][0]) # returns for original id
@@ -403,19 +409,19 @@ class Checkers:
     def player_move(self, move: Move_id, player: CheckersPlayer = None):
         self.moves_since_take += 1
         output = ""
-        self.write_to_log(f"Related squares: {str(self.related_squares)}\n")
-        self.write_to_log(f"Classical squares: {str(self.classical_squares.keys())}\n")
-        for i in self.q_moves:
-            output += i.get_move()
-        self.write_to_log(f"Quantum moves: {output}\n")
-        output = ""
-        for qm in self.q_rel_moves:
-            output += "["
-            for m in qm:
-                output += m.get_move()
-                output += ", "
-            output += "] --- "
-        self.write_to_log(f"Quantum relative moves: {output}\n")
+        # self.write_to_log(f"Related squares: {str(self.related_squares)}\n")
+        # self.write_to_log(f"Classical squares: {str(self.classical_squares.keys())}\n")
+        # for i in self.q_moves:
+        #     output += i.get_move()
+        # self.write_to_log(f"Quantum moves: {output}\n")
+        # output = ""
+        # for qm in self.q_rel_moves:
+        #     output += "["
+        #     for m in qm:
+        #         output += m.get_move()
+        #         output += ", "
+        #     output += "] --- "
+        # self.write_to_log(f"Quantum relative moves: {output}\n")
         prev_taken = False
         to_king = [] # list that holds moved pieces to check if they need to be kinged
         if(player == None):
@@ -445,6 +451,9 @@ class Checkers:
         self.player = CheckersPlayer.BLACK if self.player == CheckersPlayer.WHITE else CheckersPlayer.WHITE
         self.legal_moves = self.calculate_possible_moves(self.player)
         self.status = self.result()
+        for i in self.classical_squares:
+            print(i, self.classical_squares[i].chance)
+        print(self.related_squares)
 
     def get_board(self) -> str:
         """Returns the Checkers board in ASCII form. Also returns dictionary with id as key.
@@ -724,20 +733,37 @@ class Checkers:
 
                 # Next check if the piece we are taking is actually there
                 if(self.measure_square(jumped_id) == CheckersSquare.EMPTY): # if it empty our turn is wasted
+                    # CHECK IF PIECE WAS ENTANGLED
+                    print("Jumped: ", jumped_id)
+                    # for count, i in enumerate(self.entangled_squares): # If we have jumped over a piece and it is entangled, we need to remove the piece it is entangled with
+                    #     print(i)
+                    #     for j in i:
+                    #         if(j == jumped_id):
+                    #             entangled = count
+                    #             print("ENTANGLED")
+                    #             break
+                    # if(entangled != -1):
+                    #     for i in self.entangled_squares[entangled]:
+                    #         self.remove_piece(i, True)
+                    #         self.remove_id_from_rel_squares(i)
+                    #         taken = True
+                    # else:
                     self.remove_piece(jumped_id) # We still measured so we have to remove it from the classical squares list
-                    return taken, True    
+                    return taken, True
+                              
                 self.remove_piece(jumped_id, True)
                 self.remove_id_from_rel_squares(jumped_id)
                 taken = True
-            else: # ENTANGLEMENT. ALWAYS JUMPS OVER ENTANGLED PIECE
+            else: # ENTANGLEMENT. ALWAYS JUMPS OVER SUPERPOSITION PIECES
                 alpha.quantum_if(self.squares[str(jumped_id)]).equals(CheckersSquare.FULL).apply(CheckersClassicMove(2, 1))(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
                 original_piece = self.classical_squares[str(move.source_id)]
                 
                 self.classical_squares[str(move.target1_id)] = Piece(id=str(move.target1_id), color=original_piece.color, king=original_piece.king, superposition=True)
 
                 # Since we jump over a piece in superposition we need to add these two pieces to the correct superposition squares in related squares
-                self.classical_squares[str(move.target1_id)].chance = self.classical_squares[str(move.source_id)].chance/2
-                self.classical_squares[str(move.source_id)].chance = self.classical_squares[str(move.source_id)].chance/2
+                self.classical_squares[str(move.target1_id)].chance = self.classical_squares[str(jumped_id)].chance
+                self.classical_squares[str(move.source_id)].chance = 100-self.classical_squares[str(jumped_id)].chance
+                self.entangled_squares.append([str(jumped_id)])
                 for i, rel_squares in enumerate(self.related_squares):
                     if(str(jumped_id) in rel_squares):
                         rel_squares.append(move.source_id)
@@ -756,6 +782,15 @@ class Checkers:
                 self.q_rel_moves[i].append(move)
                 self.q_moves.append(move)
                 break
+
+        # If we do a classical move on a piece that is entangled, we need to append the new id to the correct entangled list
+        for i, squares in enumerate(self.entangled_squares):
+            if(str(move.source_id) in squares):
+                squares.append(str(move.target1_id))
+                self.q_rel_moves[i].append(move)
+                self.q_moves.append(move)
+                squares.remove(move.source_id)
+
         # self.concat_moves(move, move.source_id) # EXPERIMENTAL
         # The piece moved so we need to cleanup the original id
         self.remove_id_from_rel_squares(move.source_id)
@@ -791,6 +826,14 @@ class Checkers:
             self.q_rel_moves.append([move])
             self.q_moves.append(move)
             self.superposition_pieces.add(original_piece)
+
+        # if the piece was entangled, we need to append it to the correct list
+        for i, squares in enumerate(self.entangled_squares):
+            if(str(move.source_id) in squares):
+                squares.append(str(move.target1_id))
+                squares.append(str(move.target2_id))
+                squares.remove(str(move.source_id))
+                break
         self.remove_id_from_rel_squares(move.source_id)
         self.remove_piece(move.source_id)
         return       
