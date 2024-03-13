@@ -16,6 +16,7 @@ class MoveType(Enum):
     CLASSIC = 0
     SPLIT = 1
     TAKE = 2
+    ENTANGLE = 3
 
 class CheckersRules(Enum):
     """The different rulesets for Quantum Checkers.
