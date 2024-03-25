@@ -36,7 +36,21 @@ RED = (180,2,1)
 BLUE = (0, 0, 255)
 CROWN_IMG = pygame.image.load(os.path.join(os.path.dirname(__file__), "crown.png"))
 CROWN_IMG = pygame.transform.scale(CROWN_IMG, (int(SQUARE_W*0.65), int((CROWN_IMG.get_height()/(CROWN_IMG.get_width()/SQUARE_W))*0.65)))
-  
+RED_IMG = pygame.image.load(os.path.join(os.path.dirname(__file__), "images/Damsteen-rood.png"))
+RED_IMG = pygame.transform.scale(RED_IMG, (int(SQUARE_W), int((RED_IMG.get_height()/(RED_IMG.get_width()/SQUARE_W)))))
+RED_SELECTED_IMG = pygame.image.load(os.path.join(os.path.dirname(__file__), "images/Damsteen-rood-geselecteerd.png"))
+RED_SELECTED_IMG = pygame.transform.scale(RED_SELECTED_IMG, (int(SQUARE_W), int((RED_SELECTED_IMG.get_height()/(RED_SELECTED_IMG.get_width()/SQUARE_W)))))
+
+BLACK_IMG = pygame.image.load(os.path.join(os.path.dirname(__file__), "images/Damsteen-zwart.png"))
+BLACK_IMG = pygame.transform.scale(BLACK_IMG, (int(SQUARE_W), int((BLACK_IMG.get_height()/(BLACK_IMG.get_width()/SQUARE_W)))))
+BLACK_SELECTED_IMG = pygame.image.load(os.path.join(os.path.dirname(__file__), "images/Damsteen-zwart-geselecteerd.png"))
+BLACK_SELECTED_IMG = pygame.transform.scale(BLACK_SELECTED_IMG, (int(SQUARE_W), int((BLACK_SELECTED_IMG.get_height()/(BLACK_SELECTED_IMG.get_width()/SQUARE_W)))))
+
+BLUE_IMG = pygame.image.load(os.path.join(os.path.dirname(__file__), "images/Damsteen-geest.png"))
+BLUE_IMG = pygame.transform.scale(BLUE_IMG, (int(SQUARE_W), int((BLUE_IMG.get_height()/(BLUE_IMG.get_width()/SQUARE_W)))))
+
+
+
 class GameInterface:
     def __init__(self, game: Checkers, white_player, black_player, GUI = False) -> None:
         self.game = game
@@ -56,7 +70,8 @@ class GameInterface:
             'C': 1.41, # sqrt of 2
             'num_searches': 10 # Budget per rollout
         }
-        self.black_player = MCTS(self.game, self.args)
+        self.black_player = black_player
+        # self.black_player = MCTS(self.game, self.args)
     
     def init_gui(self):
         pygame.init()
@@ -110,12 +125,13 @@ class GameInterface:
         while(self.game.status == CheckersResult.UNFINISHED and not self.quit):
             if(self.GUI):
                 if(self.game.player == CheckersPlayer.WHITE and not isinstance(self.white_player, human_player)):
-                        move = self.white_player.select_move(self.game.legal_moves)
-                        self.do_game_move(move)
-                        prev_take = False
+                    move = self.white_player.select_move(self.game.legal_moves)
+                    self.do_game_move(move)
+                    prev_take = False
                 elif(self.game.player == CheckersPlayer.BLACK and not isinstance(self.black_player, human_player)):
                     self.black_player = MCTS(self.game, self.args)
-                    move = self.black_player.search()
+                    # move = self.black_player.search()
+                    move = self.white_player.select_move(self.game.legal_moves)
                     self.do_game_move(move)
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
@@ -123,6 +139,7 @@ class GameInterface:
                         sys.exit(0)
                     if event.type == pygame.MOUSEBUTTONDOWN and ((self.game.player == CheckersPlayer.WHITE and isinstance(self.white_player, human_player)) or (self.game.player == CheckersPlayer.BLACK and isinstance(self.black_player, human_player))):
                         down_pos = event.pos
+                        print("MOUSDOWN")
                         # self.handle_click(event.pos)
                     if event.type == pygame.MOUSEBUTTONUP and ((self.game.player == CheckersPlayer.WHITE and isinstance(self.white_player, human_player)) or (self.game.player == CheckersPlayer.BLACK and isinstance(self.black_player, human_player))):
                         # Detect swipes for quantum moves
@@ -181,22 +198,29 @@ class GameInterface:
     def draw_circle(self, color, x, y, radius, king = False, highlited = False):
         if(color == RED):
             if(highlited):
-                highlight_color = YELLOW
+                # highlight_color = YELLOW
+                c = RED_SELECTED_IMG.get_rect(center=(x+SQUARE_W//2, y+SQUARE_H//2)) # centers the image
+                self.screen.blit(RED_SELECTED_IMG, c)
             else:
-                highlight_color = RED
-            gfxdraw.filled_circle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, highlight_color)
-            gfxdraw.filled_circle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius-int(radius*0.15), L_RED)
-            gfxdraw.aacircle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius-int(radius*0.15), L_RED)
-            gfxdraw.aacircle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, highlight_color)
+                # highlight_color = RED
+                c = RED_IMG.get_rect(center=(x+SQUARE_W//2, y+SQUARE_H//2)) # centers the image
+                self.screen.blit(RED_IMG, c)
+            # gfxdraw.filled_circle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, highlight_color)
+            # gfxdraw.filled_circle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius-int(radius*0.15), L_RED)
+            # gfxdraw.aacircle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius-int(radius*0.15), L_RED)
+            # gfxdraw.aacircle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, highlight_color)
         else:
             if(highlited):
-                highlight_color = YELLOW
+                c = BLACK_SELECTED_IMG.get_rect(center=(x+SQUARE_W//2, y+SQUARE_H//2)) # centers the image
+                self.screen.blit(BLACK_SELECTED_IMG, c)
             else:
-                highlight_color = BLACK
-            gfxdraw.filled_circle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, highlight_color)
-            gfxdraw.filled_circle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius-int(radius*0.15), GREY)
-            gfxdraw.aacircle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius-int(radius*0.15), GREY)
-            gfxdraw.aacircle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, highlight_color)
+                # highlight_color = RED
+                c = BLACK_IMG.get_rect(center=(x+SQUARE_W//2, y+SQUARE_H//2)) # centers the image
+                self.screen.blit(BLACK_IMG, c)
+            # gfxdraw.filled_circle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, highlight_color)
+            # gfxdraw.filled_circle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius-int(radius*0.15), GREY)
+            # gfxdraw.aacircle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius-int(radius*0.15), GREY)
+            # gfxdraw.aacircle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, highlight_color)
         if(king):
             c = CROWN_IMG.get_rect(center=(x+SQUARE_W//2, y+SQUARE_H//2)) # centers the image
             self.screen.blit(CROWN_IMG, c)
