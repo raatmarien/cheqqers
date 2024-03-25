@@ -139,7 +139,6 @@ class GameInterface:
                         sys.exit(0)
                     if event.type == pygame.MOUSEBUTTONDOWN and ((self.game.player == CheckersPlayer.WHITE and isinstance(self.white_player, human_player)) or (self.game.player == CheckersPlayer.BLACK and isinstance(self.black_player, human_player))):
                         down_pos = event.pos
-                        print("MOUSDOWN")
                         # self.handle_click(event.pos)
                     if event.type == pygame.MOUSEBUTTONUP and ((self.game.player == CheckersPlayer.WHITE and isinstance(self.white_player, human_player)) or (self.game.player == CheckersPlayer.BLACK and isinstance(self.black_player, human_player))):
                         # Detect swipes for quantum moves
@@ -257,6 +256,8 @@ class GameInterface:
             elif(id in self.highlighted_squares): # Highlight squares for where the selected piece can move
                 gfxdraw.circle(self.screen, screen_x+SQUARE_W//2, screen_y+SQUARE_H//2, int(SQUARE_W-0.15*SQUARE_W)//2, WHITE)
                 gfxdraw.aacircle(self.screen, screen_x+SQUARE_W//2, screen_y+SQUARE_H//2, int(SQUARE_W-0.15*SQUARE_W)//2, WHITE)
+                # c = BLUE_IMG.get_rect(center=(screen_x+SQUARE_W//2, screen_y+SQUARE_H//2)) # centers the image
+                # self.screen.blit(BLUE_IMG, c)
             
     def get_id_from_mouse_pos(self, x, y):
         x = x // SQUARE_W
