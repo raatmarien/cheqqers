@@ -133,6 +133,10 @@ class GameInterface:
                     # move = self.black_player.search()
                     move = self.white_player.select_move(self.game.legal_moves)
                     self.do_game_move(move)
+                # for(i in self.game.related_squares):
+                #     if(id in i):
+                #     pass
+
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         pygame.quit()
@@ -258,6 +262,27 @@ class GameInterface:
                 gfxdraw.aacircle(self.screen, screen_x+SQUARE_W//2, screen_y+SQUARE_H//2, int(SQUARE_W-0.15*SQUARE_W)//2, WHITE)
                 # c = BLUE_IMG.get_rect(center=(screen_x+SQUARE_W//2, screen_y+SQUARE_H//2)) # centers the image
                 # self.screen.blit(BLUE_IMG, c)
+        
+        #DRAW CONNECTED RELATED PIECES IF THE MOUSE IS HOVERING OVER AN ENTANGLED SQUARE 
+        x, y = pygame.mouse.get_pos()
+        id = self.game.convert_xy_to_id(int(x/SQUARE_W), int(y/SQUARE_H))
+        templist = []
+        for i in self.game.related_squares:
+            if str(id) in i:
+                templist = i
+                break
+        if(len(templist) > 0):
+            start_x, start_y = self.game.convert_id_to_xy(id)
+            start_x = start_x * SQUARE_W + SQUARE_W/2
+            start_y = start_y * SQUARE_H + SQUARE_H/2
+            for i in templist:
+                if i == str(id):
+                    continue
+                end_x, end_y = self.game.convert_id_to_xy(int(i))
+                end_x = end_x * SQUARE_W + SQUARE_W/2
+                end_y = end_y * SQUARE_H + SQUARE_H/2
+                pygame.draw.line(self.screen, BLUE, (start_x, start_y), (end_x, end_y))
+                print(f"From ({start_x}, {start_y}) to ({end_x}, {end_y})")
             
     def get_id_from_mouse_pos(self, x, y):
         x = x // SQUARE_W
