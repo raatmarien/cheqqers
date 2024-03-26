@@ -281,8 +281,7 @@ class GameInterface:
                 end_x, end_y = self.game.convert_id_to_xy(int(i))
                 end_x = end_x * SQUARE_W + SQUARE_W/2
                 end_y = end_y * SQUARE_H + SQUARE_H/2
-                pygame.draw.line(self.screen, BLUE, (start_x, start_y), (end_x, end_y))
-                print(f"From ({start_x}, {start_y}) to ({end_x}, {end_y})")
+                pygame.draw.line(self.screen, BLUE, (start_x, start_y), (end_x, end_y), 2)
             
     def get_id_from_mouse_pos(self, x, y):
         x = x // SQUARE_W
