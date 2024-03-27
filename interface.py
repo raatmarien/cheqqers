@@ -35,19 +35,19 @@ L_RED = (221, 0, 0)
 RED = (180,2,1)
 BLUE = (0, 0, 255)
 CROWN_IMG = pygame.image.load(os.path.join(os.path.dirname(__file__), "crown.png"))
-CROWN_IMG = pygame.transform.scale(CROWN_IMG, (int(SQUARE_W*0.65), int((CROWN_IMG.get_height()/(CROWN_IMG.get_width()/SQUARE_W))*0.65)))
+CROWN_IMG = pygame.transform.smoothscale(CROWN_IMG, (int(SQUARE_W*0.65), int((CROWN_IMG.get_height()/(CROWN_IMG.get_width()/SQUARE_W))*0.65)))
 RED_IMG = pygame.image.load(os.path.join(os.path.dirname(__file__), "images/Damsteen-rood.png"))
-RED_IMG = pygame.transform.scale(RED_IMG, (int(SQUARE_W), int((RED_IMG.get_height()/(RED_IMG.get_width()/SQUARE_W)))))
+RED_IMG = pygame.transform.smoothscale(RED_IMG, (int(SQUARE_W), int((RED_IMG.get_height()/(RED_IMG.get_width()/SQUARE_W)))))
 RED_SELECTED_IMG = pygame.image.load(os.path.join(os.path.dirname(__file__), "images/Damsteen-rood-geselecteerd.png"))
-RED_SELECTED_IMG = pygame.transform.scale(RED_SELECTED_IMG, (int(SQUARE_W), int((RED_SELECTED_IMG.get_height()/(RED_SELECTED_IMG.get_width()/SQUARE_W)))))
+RED_SELECTED_IMG = pygame.transform.smoothscale(RED_SELECTED_IMG, (int(SQUARE_W), int((RED_SELECTED_IMG.get_height()/(RED_SELECTED_IMG.get_width()/SQUARE_W)))))
 
 BLACK_IMG = pygame.image.load(os.path.join(os.path.dirname(__file__), "images/Damsteen-zwart.png"))
-BLACK_IMG = pygame.transform.scale(BLACK_IMG, (int(SQUARE_W), int((BLACK_IMG.get_height()/(BLACK_IMG.get_width()/SQUARE_W)))))
+BLACK_IMG = pygame.transform.smoothscale(BLACK_IMG, (int(SQUARE_W), int((BLACK_IMG.get_height()/(BLACK_IMG.get_width()/SQUARE_W)))))
 BLACK_SELECTED_IMG = pygame.image.load(os.path.join(os.path.dirname(__file__), "images/Damsteen-zwart-geselecteerd.png"))
-BLACK_SELECTED_IMG = pygame.transform.scale(BLACK_SELECTED_IMG, (int(SQUARE_W), int((BLACK_SELECTED_IMG.get_height()/(BLACK_SELECTED_IMG.get_width()/SQUARE_W)))))
+BLACK_SELECTED_IMG = pygame.transform.smoothscale(BLACK_SELECTED_IMG, (int(SQUARE_W), int((BLACK_SELECTED_IMG.get_height()/(BLACK_SELECTED_IMG.get_width()/SQUARE_W)))))
 
 BLUE_IMG = pygame.image.load(os.path.join(os.path.dirname(__file__), "images/Damsteen-geest.png"))
-BLUE_IMG = pygame.transform.scale(BLUE_IMG, (int(SQUARE_W), int((BLUE_IMG.get_height()/(BLUE_IMG.get_width()/SQUARE_W)))))
+BLUE_IMG = pygame.transform.smoothscale(BLUE_IMG, (int(SQUARE_W), int((BLUE_IMG.get_height()/(BLUE_IMG.get_width()/SQUARE_W)))))
 
 
 
@@ -147,25 +147,15 @@ class GameInterface:
                     if event.type == pygame.MOUSEBUTTONUP and ((self.game.player == CheckersPlayer.WHITE and isinstance(self.white_player, human_player)) or (self.game.player == CheckersPlayer.BLACK and isinstance(self.black_player, human_player))):
                         # Detect swipes for quantum moves
                         moved, _ = self.handle_click(down_pos, event.pos)
-                        # if(moved):
-                        #     prev_take = False # reset when move is done
-                        # if(moved and len(legal_moves) > 0):
-                        #     print("HERE")
-                        #     prev_take = True
-                        # else:
-                        # legal_moves = self.get_legal_moves() # We have to calculate them again because the player has chanced for the highlight function
-                        # if(moved):
-                        #     counter += 1
-                        #     print(f"Move number {counter}")
-                        #     legal_moves = self.get_legal_moves() # We have to calculate them again because the player has chanced for the highlight function
-                        #     self.print_board()
+                        if(moved):
+                            self.print_board()
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_c:
                             self.draw_chance = True if self.draw_chance == False else False
                     # self.game.player_move(legal_moves[random.randint(1, len(legal_moves))-1], self.game.player)
                     
                     # If it is the humans turn the click event will handle everything
-                    
+                    # self.print_board()
                     self.highlight_squares(self.game.legal_moves)
                     self.draw_board()
                     pygame.display.flip() # needs to be called outside draw function
@@ -310,6 +300,9 @@ class GameInterface:
         """
         Handles clicking on the board. Returns true if a move was done
         """
+        print("ALL LEGAL MOVES")
+        for i in self.game.legal_moves:
+            i.print_move()
         self.highlighted_squares = []
         mouse_x, mouse_y = first_pos[0], first_pos[1]
         first_id = self.get_id_from_mouse_pos(mouse_x, mouse_y)
@@ -317,12 +310,26 @@ class GameInterface:
         second_id = self.get_id_from_mouse_pos(mouse_x, mouse_y)
         if(first_id == second_id):
             if(self.selected_id is not None and self.move_locations is not None and first_id in self.move_locations): # We want to move the piece to first id
-                legal_moves = self.do_game_move(Move_id(MoveType.CLASSIC, self.game.player, self.selected_id, first_id)) #classic move
+                # Find the correct move so the backend handels everything correctly.
+                temp_move = None
+                for move in self.game.legal_moves:
+                    if move.source_id == self.selected_id and move.target1_id == first_id and move.target2_id == None:
+                        temp_move = move
+                        break
+                temp_move.print_move()
+                legal_moves = self.do_game_move(temp_move) #classic move
                 return True, legal_moves
             self.selected_id = first_id
             return False, []
         elif(self.selected_id is not None and self.move_locations is not None and first_id in self.move_locations and second_id in self.move_locations):
-            legal_moves = self.do_game_move(Move_id(MoveType.SPLIT, self.game.player, self.selected_id, first_id, second_id)) #split move
+            # Split move
+            temp_move = None
+            for move in self.game.legal_moves:
+                if move.source_id == self.selected_id and move.target1_id == first_id and move.target2_id == second_id:
+                    temp_move = move
+                    break
+            temp_move.print_move()
+            legal_moves = self.do_game_move(temp_move) #classic move
             return True, legal_moves
         return False, []
 

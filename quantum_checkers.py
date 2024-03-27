@@ -369,7 +369,6 @@ class Checkers:
         for qm in self.q_rel_moves:
             self.squares[str(qm[0].source_id)] = QuantumObject(str(qm[0].source_id), CheckersSquare.FULL)
             temp.append(qm[0].source_id)
-        print(f"Initialized ids: {temp}")
         # A quantumworld must first exist before we can do the quantum moves
         self.board = QuantumWorld(
             list(self.squares.values()), compile_to_qubits=self.run_on_hardware
@@ -380,7 +379,6 @@ class Checkers:
         t = f"Quantum moves in alternate function: {output}\n"
         self.write_to_log(t)
         for qm in self.q_moves:
-            print(f"DOING MOVE: {qm.get_move()}")
             if(qm.movetype == MoveType.SPLIT):
                 CheckersSplit(CheckersSquare.FULL, self.rules)(self.squares[str(qm.source_id)], self.squares[str(qm.target1_id)], self.squares[str(qm.target2_id)])
             elif(qm.movetype == MoveType.ENTANGLE):
@@ -464,10 +462,6 @@ class Checkers:
         self.player = CheckersPlayer.BLACK if self.player == CheckersPlayer.WHITE else CheckersPlayer.WHITE
         self.legal_moves = self.calculate_possible_moves(self.player)
         self.status = self.result()
-        for i in self.classical_squares:
-            print(i, self.classical_squares[i].chance)
-        print(f"Related squares: {self.related_squares}")
-        print(f"Entangled squares: {self.entangled_squares}")
 
     def get_board(self) -> str:
         """Returns the Checkers board in ASCII form. Also returns dictionary with id as key.
@@ -748,7 +742,6 @@ class Checkers:
                 # Next check if the piece we are taking is actually there
                 if(self.measure_square(jumped_id) == CheckersSquare.EMPTY): # if it empty our turn is wasted
                     # CHECK IF PIECE WAS ENTANGLED
-                    print("Jumped: ", jumped_id)
                     # for count, i in enumerate(self.entangled_squares): # If we have jumped over a piece and it is entangled, we need to remove the piece it is entangled with
                     #     print(i)
                     #     for j in i:
@@ -784,21 +777,14 @@ class Checkers:
                         rel_squares.append(str(move.target1_id))
                         self.q_rel_moves[i].append(move)
                         self.q_moves.append(move)
-                        print("APPENDED MOVE:")
-                        move.print_move()
                 self.superposition_pieces.add(original_piece)
                 return taken, False
                 # CheckersSplit(CheckersSquare.FULL, self.rules)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)], self.squares[str(move.target2_id)])
         self.classical_squares[str(move.target1_id)] = self.classical_squares[str(move.source_id)]
         self.classical_squares[str(move.target1_id)].id = move.target1_id
         # If we do a classical move on a piece in superposition, we need to append the new id to the correct list in related_squares
-        print(f"APPENDING TO RELATED SQUARES IF NECCESARY: {self.related_squares} and SOURCE ID {move.source_id}")
         for i, squares in enumerate(self.related_squares):
-            print(f"CHECKING {squares}")
-            print(f"{str(move.source_id)}")
-            print(f"True or false: {str(move.source_id) in squares}")
             if(str(move.source_id) in squares):
-                print("TRUE")
                 squares.append(str(move.target1_id))
                 self.q_rel_moves[i].append(move)
                 self.q_moves.append(move)
