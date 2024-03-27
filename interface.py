@@ -64,7 +64,7 @@ class GameInterface:
             self.init_gui()
         else:
             self.GUI = False
-        
+        self.draw_chance = False
         self.white_player = white_player
         self.args = {
             'C': 1.41, # sqrt of 2
@@ -159,7 +159,9 @@ class GameInterface:
                         #     print(f"Move number {counter}")
                         #     legal_moves = self.get_legal_moves() # We have to calculate them again because the player has chanced for the highlight function
                         #     self.print_board()
-                        
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_c:
+                            self.draw_chance = True if self.draw_chance == False else False
                     # self.game.player_move(legal_moves[random.randint(1, len(legal_moves))-1], self.game.player)
                     
                     # If it is the humans turn the click event will handle everything
@@ -198,7 +200,7 @@ class GameInterface:
         print(f"Results: {self.game.status}")
         return(self.game.status)
 
-    def draw_circle(self, color, x, y, radius, king = False, highlited = False):
+    def draw_circle(self, id, color, x, y, radius, king = False, highlited = False):
         if(color == RED):
             if(highlited):
                 # highlight_color = YELLOW
@@ -227,6 +229,13 @@ class GameInterface:
         if(king):
             c = CROWN_IMG.get_rect(center=(x+SQUARE_W//2, y+SQUARE_H//2)) # centers the image
             self.screen.blit(CROWN_IMG, c)
+        if(self.draw_chance):
+            # pygame.font.init() # you have to call this at the start, 
+                   # if you want to use this module.
+            my_font = pygame.font.SysFont('Comic Sans MS', 20)
+            text_surface = my_font.render(str(self.game.classical_squares[str(id)].chance), False, (255, 255, 255))
+            text_rect = text_surface.get_rect(center=(x+SQUARE_W//2, y+SQUARE_H//2)) # centers the image
+            self.screen.blit(text_surface, text_rect)
 
     def get_positions(self, player) -> [[list, list], [list, list]]:
         """
@@ -254,9 +263,9 @@ class GameInterface:
             highlight = True if (id in self.highlighted_squares) else False
             if(str(id) in black_pieces):
                 # pygame.draw.circle(self.screen, RED, (screen_x+SQUARE_W//2, screen_y+SQUARE_H//2), int(SQUARE_W-0.15*SQUARE_W)//2)
-                self.draw_circle(GREY, screen_x, screen_y, int(SQUARE_W-0.15*SQUARE_W)//2, black_pieces[str(id)].king, highlight)
+                self.draw_circle(id, GREY, screen_x, screen_y, int(SQUARE_W-0.15*SQUARE_W)//2, black_pieces[str(id)].king, highlight)
             elif(str(id) in white_pieces):
-                self.draw_circle(RED, screen_x, screen_y, int(SQUARE_W-0.15*SQUARE_W)//2, white_pieces[str(id)].king, highlight)
+                self.draw_circle(id, RED, screen_x, screen_y, int(SQUARE_W-0.15*SQUARE_W)//2, white_pieces[str(id)].king, highlight)
             elif(id in self.highlighted_squares): # Highlight squares for where the selected piece can move
                 gfxdraw.circle(self.screen, screen_x+SQUARE_W//2, screen_y+SQUARE_H//2, int(SQUARE_W-0.15*SQUARE_W)//2, WHITE)
                 gfxdraw.aacircle(self.screen, screen_x+SQUARE_W//2, screen_y+SQUARE_H//2, int(SQUARE_W-0.15*SQUARE_W)//2, WHITE)
