@@ -462,6 +462,7 @@ class Checkers:
         self.player = CheckersPlayer.BLACK if self.player == CheckersPlayer.WHITE else CheckersPlayer.WHITE
         self.legal_moves = self.calculate_possible_moves(self.player)
         self.status = self.result()
+        print(self.board.circuit)
 
     def get_board(self) -> str:
         """Returns the Checkers board in ASCII form. Also returns dictionary with id as key.
@@ -811,7 +812,9 @@ class Checkers:
             raise ValueError("No second target given")
         original_piece = self.classical_squares[str(move.source_id)]
         if(not self.SIMULATE_QUANTUM):
-            CheckersSplit(CheckersSquare.FULL, self.rules)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)], self.squares[str(move.target2_id)])
+            # CheckersSplit(CheckersSquare.FULL, self.rules)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)], self.squares[str(move.target2_id)])
+            split = alpha.Split()
+            split(self.squares[str(move.source_id)], self.squares[str(move.target1_id)], self.squares[str(move.target2_id)])
         self.classical_squares[str(move.target1_id)] = Piece(id=str(move.target1_id), color=original_piece.color, king=original_piece.king, superposition=True)
         self.classical_squares[str(move.target2_id)] = Piece(id=str(move.target2_id), color=original_piece.color, king=original_piece.king, superposition=True)
 
@@ -983,9 +986,10 @@ class Sim_Checkers(Checkers):
 #TODO: Clean up calculating legal moves function with using only 1 for loop
 #TODO: Instead of first clearing the entire board and then flipping the pieces, just initialize the pieces immediately correctly
 #TODO: 50 percent of time is in the peek function, reduce it?
-#TODO: ENTANGLEMENT?
 #TODO: prev_taken, failed = self.classic_move(move) --- Same thing right??
 #TODO: check for mcts calculating legal_moves after taking another piece
+
+#TODO: Take another piece after entangling
     
 # if __name__ == '__main__':
     
