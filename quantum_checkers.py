@@ -371,7 +371,7 @@ class Checkers:
             temp.append(qm[0].source_id)
         # A quantumworld must first exist before we can do the quantum moves
         self.board = QuantumWorld(
-            list(self.squares.values()), compile_to_qubits=self.run_on_hardware
+            list(self.squares.values()),  compile_to_qubits=self.run_on_hardware
         )
         output = ""
         for i in self.q_moves:

@@ -316,19 +316,31 @@ class GameInterface:
                     if move.source_id == self.selected_id and move.target1_id == first_id and move.target2_id == None:
                         temp_move = move
                         break
-                temp_move.print_move()
+                try:
+                    temp_move.print_move()
+                except:
+                    print("Move not found")
+                    print(move.source_id, move.target1_id, move.target2_id)
+                    print(self.selected_id, first_id, second_id)
                 legal_moves = self.do_game_move(temp_move) #classic move
                 return True, legal_moves
             self.selected_id = first_id
             return False, []
         elif(self.selected_id is not None and self.move_locations is not None and first_id in self.move_locations and second_id in self.move_locations):
             # Split move
+            if(int(first_id) > int(second_id)): # Swap them around for the move
+                first_id, second_id = second_id, first_id
             temp_move = None
             for move in self.game.legal_moves:
                 if move.source_id == self.selected_id and move.target1_id == first_id and move.target2_id == second_id:
                     temp_move = move
                     break
-            temp_move.print_move()
+            try:
+                temp_move.print_move()
+            except:
+                print("Move not found")
+                print(move.source_id, move.target1_id, move.target2_id)
+                print(self.selected_id, first_id, second_id)
             legal_moves = self.do_game_move(temp_move) #classic move
             return True, legal_moves
         return False, []
