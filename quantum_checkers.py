@@ -388,7 +388,7 @@ class Checkers:
             if(index <= len(self.q_rel_moves)-1 and self.q_rel_moves[index][0] == qm): # IF IT IS THE FIRST MOVE IN THE SEQUENCE OF QUANTUM MOVES IT NEEDS TO BE INITIALIZED
                 index += 1
                 QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(qm.source_id)])
-                print("TRUE #######################################################################################################################")
+                # print("TRUE #######################################################################################################################")
             if(qm.movetype == MoveType.SPLIT):
                 CheckersSplit(CheckersSquare.FULL, self.rules)(self.squares[str(qm.source_id)], self.squares[str(qm.target1_id)], self.squares[str(qm.target2_id)])
             elif(qm.movetype == MoveType.ENTANGLE):
