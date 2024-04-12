@@ -35,8 +35,22 @@ L_RED = (221, 0, 0)
 RED = (180,2,1)
 BLUE = (0, 0, 255)
 CROWN_IMG = pygame.image.load(os.path.join(os.path.dirname(__file__), "crown.png"))
-CROWN_IMG = pygame.transform.scale(CROWN_IMG, (int(SQUARE_W*0.65), int((CROWN_IMG.get_height()/(CROWN_IMG.get_width()/SQUARE_W))*0.65)))
-  
+CROWN_IMG = pygame.transform.smoothscale(CROWN_IMG, (int(SQUARE_W*0.65), int((CROWN_IMG.get_height()/(CROWN_IMG.get_width()/SQUARE_W))*0.65)))
+RED_IMG = pygame.image.load(os.path.join(os.path.dirname(__file__), "images/Damsteen-rood.png"))
+RED_IMG = pygame.transform.smoothscale(RED_IMG, (int(SQUARE_W), int((RED_IMG.get_height()/(RED_IMG.get_width()/SQUARE_W)))))
+RED_SELECTED_IMG = pygame.image.load(os.path.join(os.path.dirname(__file__), "images/Damsteen-rood-geselecteerd.png"))
+RED_SELECTED_IMG = pygame.transform.smoothscale(RED_SELECTED_IMG, (int(SQUARE_W), int((RED_SELECTED_IMG.get_height()/(RED_SELECTED_IMG.get_width()/SQUARE_W)))))
+
+BLACK_IMG = pygame.image.load(os.path.join(os.path.dirname(__file__), "images/Damsteen-zwart.png"))
+BLACK_IMG = pygame.transform.smoothscale(BLACK_IMG, (int(SQUARE_W), int((BLACK_IMG.get_height()/(BLACK_IMG.get_width()/SQUARE_W)))))
+BLACK_SELECTED_IMG = pygame.image.load(os.path.join(os.path.dirname(__file__), "images/Damsteen-zwart-geselecteerd.png"))
+BLACK_SELECTED_IMG = pygame.transform.smoothscale(BLACK_SELECTED_IMG, (int(SQUARE_W), int((BLACK_SELECTED_IMG.get_height()/(BLACK_SELECTED_IMG.get_width()/SQUARE_W)))))
+
+BLUE_IMG = pygame.image.load(os.path.join(os.path.dirname(__file__), "images/Damsteen-geest.png"))
+BLUE_IMG = pygame.transform.smoothscale(BLUE_IMG, (int(SQUARE_W), int((BLUE_IMG.get_height()/(BLUE_IMG.get_width()/SQUARE_W)))))
+
+
+
 class GameInterface:
     def __init__(self, game: Checkers, white_player, black_player, GUI = False) -> None:
         self.game = game
@@ -50,13 +64,14 @@ class GameInterface:
             self.init_gui()
         else:
             self.GUI = False
-        
+        self.draw_chance = False
         self.white_player = white_player
         self.args = {
             'C': 1.41, # sqrt of 2
             'num_searches': 10 # Budget per rollout
         }
-        self.black_player = MCTS(self.game, self.args)
+        self.black_player = black_player
+        # self.black_player = MCTS(self.game, self.args)
     
     def init_gui(self):
         pygame.init()
@@ -103,20 +118,25 @@ class GameInterface:
         counter = 0
         moves = []
         prev_take = False # variable to check if a piece has been taken before
-        # for i in [9, 3, 7, 3, 5, 3, 9, 3, 9, 1, 4, 9, 6, 5, 2, 6, 1, 8, 1, 1, 2, 2, 4, 1, 1, 1, 4, 4, 4, 8, 3, 1, 3, 1, 11, 15, 5]:
-        #     legal_moves = self.get_legal_moves()
-        #     self.game.player_move(legal_moves[i-1], self.game.player)
+        # for i in [3, 2, 5, 1, 1]:
+        #     # legal_moves = self.get_legal_moves()
+        #     self.game.player_move(self.game.legal_moves[i-1], self.game.player)
         #     self.print_board()
         while(self.game.status == CheckersResult.UNFINISHED and not self.quit):
             if(self.GUI):
                 if(self.game.player == CheckersPlayer.WHITE and not isinstance(self.white_player, human_player)):
-                        move = self.white_player.select_move(self.game.legal_moves)
-                        self.do_game_move(move)
-                        prev_take = False
+                    move = self.white_player.select_move(self.game.legal_moves)
+                    self.do_game_move(move)
+                    prev_take = False
                 elif(self.game.player == CheckersPlayer.BLACK and not isinstance(self.black_player, human_player)):
                     self.black_player = MCTS(self.game, self.args)
-                    move = self.black_player.search()
+                    # move = self.black_player.search()
+                    move = self.white_player.select_move(self.game.legal_moves)
                     self.do_game_move(move)
+                # for(i in self.game.related_squares):
+                #     if(id in i):
+                #     pass
+
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         pygame.quit()
@@ -127,28 +147,20 @@ class GameInterface:
                     if event.type == pygame.MOUSEBUTTONUP and ((self.game.player == CheckersPlayer.WHITE and isinstance(self.white_player, human_player)) or (self.game.player == CheckersPlayer.BLACK and isinstance(self.black_player, human_player))):
                         # Detect swipes for quantum moves
                         moved, _ = self.handle_click(down_pos, event.pos)
-                        # if(moved):
-                        #     prev_take = False # reset when move is done
-                        # if(moved and len(legal_moves) > 0):
-                        #     print("HERE")
-                        #     prev_take = True
-                        # else:
-                        # legal_moves = self.get_legal_moves() # We have to calculate them again because the player has chanced for the highlight function
-                        # if(moved):
-                        #     counter += 1
-                        #     print(f"Move number {counter}")
-                        #     legal_moves = self.get_legal_moves() # We have to calculate them again because the player has chanced for the highlight function
-                        #     self.print_board()
-                        
+                        if(moved):
+                            self.print_board()
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_c:
+                            self.draw_chance = True if self.draw_chance == False else False
                     # self.game.player_move(legal_moves[random.randint(1, len(legal_moves))-1], self.game.player)
                     
                     # If it is the humans turn the click event will handle everything
-                    
+                    # self.print_board()
                     self.highlight_squares(self.game.legal_moves)
                     self.draw_board()
                     pygame.display.flip() # needs to be called outside draw function
                     # time.sleep(1)
-            else:
+            else: # ASCII BOARD
                 prev_take = False # Always reset
                 self.print_board()
                 self.print_legal_moves(self.game.legal_moves)
@@ -159,14 +171,16 @@ class GameInterface:
                 if(self.game.player == CheckersPlayer.WHITE):
                     move = self.white_player.select_move(self.game.legal_moves)
                 else: # BLACK IS MCTS
-                    # move = self.white_player.select_move(self.game.legal_moves)
-                    self.black_player = MCTS(self.game, self.args)
-                    move = self.black_player.search()
+                    move = self.white_player.select_move(self.game.legal_moves)
+                    # self.black_player = MCTS(self.game, self.args)
+                    # move = self.black_player.search()
                     
                     # move.print_move()
                     # move = self.black_player.select_move(self.game.legal_moves)
                 moves.append(move)
                 # move.print_move()
+                print("Selected move: ", end="")
+                move.print_move()
                 self.game.player_move(move, self.game.player)
                 # if(len(self.game.legal_moves) > 0):
                 #     prev_take = True
@@ -176,28 +190,42 @@ class GameInterface:
         print(f"Results: {self.game.status}")
         return(self.game.status)
 
-    def draw_circle(self, color, x, y, radius, king = False, highlited = False):
+    def draw_circle(self, id, color, x, y, radius, king = False, highlited = False):
         if(color == RED):
             if(highlited):
-                highlight_color = YELLOW
+                # highlight_color = YELLOW
+                c = RED_SELECTED_IMG.get_rect(center=(x+SQUARE_W//2, y+SQUARE_H//2)) # centers the image
+                self.screen.blit(RED_SELECTED_IMG, c)
             else:
-                highlight_color = RED
-            gfxdraw.filled_circle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, highlight_color)
-            gfxdraw.filled_circle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius-int(radius*0.15), L_RED)
-            gfxdraw.aacircle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius-int(radius*0.15), L_RED)
-            gfxdraw.aacircle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, highlight_color)
+                # highlight_color = RED
+                c = RED_IMG.get_rect(center=(x+SQUARE_W//2, y+SQUARE_H//2)) # centers the image
+                self.screen.blit(RED_IMG, c)
+            # gfxdraw.filled_circle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, highlight_color)
+            # gfxdraw.filled_circle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius-int(radius*0.15), L_RED)
+            # gfxdraw.aacircle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius-int(radius*0.15), L_RED)
+            # gfxdraw.aacircle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, highlight_color)
         else:
             if(highlited):
-                highlight_color = YELLOW
+                c = BLACK_SELECTED_IMG.get_rect(center=(x+SQUARE_W//2, y+SQUARE_H//2)) # centers the image
+                self.screen.blit(BLACK_SELECTED_IMG, c)
             else:
-                highlight_color = BLACK
-            gfxdraw.filled_circle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, highlight_color)
-            gfxdraw.filled_circle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius-int(radius*0.15), GREY)
-            gfxdraw.aacircle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius-int(radius*0.15), GREY)
-            gfxdraw.aacircle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, highlight_color)
+                # highlight_color = RED
+                c = BLACK_IMG.get_rect(center=(x+SQUARE_W//2, y+SQUARE_H//2)) # centers the image
+                self.screen.blit(BLACK_IMG, c)
+            # gfxdraw.filled_circle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, highlight_color)
+            # gfxdraw.filled_circle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius-int(radius*0.15), GREY)
+            # gfxdraw.aacircle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius-int(radius*0.15), GREY)
+            # gfxdraw.aacircle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, highlight_color)
         if(king):
             c = CROWN_IMG.get_rect(center=(x+SQUARE_W//2, y+SQUARE_H//2)) # centers the image
             self.screen.blit(CROWN_IMG, c)
+        if(self.draw_chance):
+            # pygame.font.init() # you have to call this at the start, 
+                   # if you want to use this module.
+            my_font = pygame.font.SysFont('Comic Sans MS', 20)
+            text_surface = my_font.render(str(self.game.classical_squares[str(id)].chance), False, (255, 255, 255))
+            text_rect = text_surface.get_rect(center=(x+SQUARE_W//2, y+SQUARE_H//2)) # centers the image
+            self.screen.blit(text_surface, text_rect)
 
     def get_positions(self, player) -> [[list, list], [list, list]]:
         """
@@ -225,12 +253,34 @@ class GameInterface:
             highlight = True if (id in self.highlighted_squares) else False
             if(str(id) in black_pieces):
                 # pygame.draw.circle(self.screen, RED, (screen_x+SQUARE_W//2, screen_y+SQUARE_H//2), int(SQUARE_W-0.15*SQUARE_W)//2)
-                self.draw_circle(GREY, screen_x, screen_y, int(SQUARE_W-0.15*SQUARE_W)//2, black_pieces[str(id)].king, highlight)
+                self.draw_circle(id, GREY, screen_x, screen_y, int(SQUARE_W-0.15*SQUARE_W)//2, black_pieces[str(id)].king, highlight)
             elif(str(id) in white_pieces):
-                self.draw_circle(RED, screen_x, screen_y, int(SQUARE_W-0.15*SQUARE_W)//2, white_pieces[str(id)].king, highlight)
+                self.draw_circle(id, RED, screen_x, screen_y, int(SQUARE_W-0.15*SQUARE_W)//2, white_pieces[str(id)].king, highlight)
             elif(id in self.highlighted_squares): # Highlight squares for where the selected piece can move
                 gfxdraw.circle(self.screen, screen_x+SQUARE_W//2, screen_y+SQUARE_H//2, int(SQUARE_W-0.15*SQUARE_W)//2, WHITE)
                 gfxdraw.aacircle(self.screen, screen_x+SQUARE_W//2, screen_y+SQUARE_H//2, int(SQUARE_W-0.15*SQUARE_W)//2, WHITE)
+                # c = BLUE_IMG.get_rect(center=(screen_x+SQUARE_W//2, screen_y+SQUARE_H//2)) # centers the image
+                # self.screen.blit(BLUE_IMG, c)
+        
+        #DRAW CONNECTED RELATED PIECES IF THE MOUSE IS HOVERING OVER AN ENTANGLED SQUARE 
+        x, y = pygame.mouse.get_pos()
+        id = self.game.convert_xy_to_id(int(x/SQUARE_W), int(y/SQUARE_H))
+        templist = []
+        for i in self.game.related_squares:
+            if str(id) in i:
+                templist = i
+                break
+        if(len(templist) > 0):
+            start_x, start_y = self.game.convert_id_to_xy(id)
+            start_x = start_x * SQUARE_W + SQUARE_W/2
+            start_y = start_y * SQUARE_H + SQUARE_H/2
+            for i in templist:
+                if i == str(id):
+                    continue
+                end_x, end_y = self.game.convert_id_to_xy(int(i))
+                end_x = end_x * SQUARE_W + SQUARE_W/2
+                end_y = end_y * SQUARE_H + SQUARE_H/2
+                pygame.draw.line(self.screen, BLUE, (start_x, start_y), (end_x, end_y), 2)
             
     def get_id_from_mouse_pos(self, x, y):
         x = x // SQUARE_W
@@ -250,6 +300,9 @@ class GameInterface:
         """
         Handles clicking on the board. Returns true if a move was done
         """
+        print("ALL LEGAL MOVES")
+        for i in self.game.legal_moves:
+            i.print_move()
         self.highlighted_squares = []
         mouse_x, mouse_y = first_pos[0], first_pos[1]
         first_id = self.get_id_from_mouse_pos(mouse_x, mouse_y)
@@ -257,17 +310,44 @@ class GameInterface:
         second_id = self.get_id_from_mouse_pos(mouse_x, mouse_y)
         if(first_id == second_id):
             if(self.selected_id is not None and self.move_locations is not None and first_id in self.move_locations): # We want to move the piece to first id
-                legal_moves = self.do_game_move(Move_id(MoveType.CLASSIC, self.game.player, self.selected_id, first_id)) #classic move
+                # Find the correct move so the backend handels everything correctly.
+                temp_move = None
+                for move in self.game.legal_moves:
+                    if move.source_id == self.selected_id and move.target1_id == first_id and move.target2_id == None:
+                        temp_move = move
+                        break
+                try:
+                    temp_move.print_move()
+                except:
+                    print("Move not found")
+                    print(move.source_id, move.target1_id, move.target2_id)
+                    print(self.selected_id, first_id, second_id)
+                legal_moves = self.do_game_move(temp_move) #classic move
                 return True, legal_moves
             self.selected_id = first_id
             return False, []
         elif(self.selected_id is not None and self.move_locations is not None and first_id in self.move_locations and second_id in self.move_locations):
-            legal_moves = self.do_game_move(Move_id(MoveType.SPLIT, self.game.player, self.selected_id, first_id, second_id)) #split move
+            # Split move
+            if(int(first_id) > int(second_id)): # Swap them around for the move
+                first_id, second_id = second_id, first_id
+            temp_move = None
+            for move in self.game.legal_moves:
+                if move.source_id == self.selected_id and move.target1_id == first_id and move.target2_id == second_id:
+                    temp_move = move
+                    break
+            try:
+                temp_move.print_move()
+            except:
+                print("Move not found")
+                print(move.source_id, move.target1_id, move.target2_id)
+                print(self.selected_id, first_id, second_id)
+            legal_moves = self.do_game_move(temp_move) #classic move
             return True, legal_moves
         return False, []
 
     def print_board(self) -> str:
-        str_board = self.game.get_sim_board()
+        # str_board = self.game.get_sim_board()
+        str_board = self.game.get_board()
         print(str_board)
         return str_board
     
