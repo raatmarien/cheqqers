@@ -1,5 +1,5 @@
 import argparse
-from enums import CheckersResult
+from enums import CheckersResult, CheckersRules
 from interface import GameInterface
 from quantum_checkers import Checkers
 import time
@@ -19,7 +19,7 @@ def main():
     parser.add_argument('--p2', help='Select agent for player 2 to use.', default=human_player())
     args = parser.parse_args()
     p1 = human_player()
-    p2 = human_player() # Unused, is mcts
+    p2 = human_player()
     if(args.num_columns % 2 == 1 and args.num_rows % 2 == 0):
         warning_len = len("# WARNING: If the number of columns is uneven and the number of rows is even the board is not symmetrical. #")
         print("#"*warning_len)
@@ -31,7 +31,7 @@ def main():
     for i in range(10):
         print(i)
         start_t = time.time()
-        checkers = Checkers(num_vertical=args.num_rows, num_horizontal=args.num_columns, num_vertical_pieces=args.num_vertical_pieces, SIMULATE_QUANTUM=args.sim_q)
+        checkers = Checkers(num_vertical=args.num_rows, num_horizontal=args.num_columns, num_vertical_pieces=args.num_vertical_pieces, SIMULATE_QUANTUM=args.sim_q, rules=CheckersRules.CLASSICAL)
         game = GameInterface(checkers, white_player=p1, black_player=p2, GUI=args.GUI)
         results.append(game.play())
         times.append(time.time()-start_t)

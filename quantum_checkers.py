@@ -298,7 +298,7 @@ class Checkers:
             if(self.on_board(x+1, y-1)):
                 blind_moves.append(Move_temp(x,y,x+1,y-1))
                 right = True
-            if(left and right):
+            if(left and right and self.rules.value > CheckersRules.CLASSICAL.value):
                 blind_moves.append(Move_temp(x,y,x-1,y-1,x+1,y-1))
         elif player == CheckersPlayer.BLACK and not king: # Black piece that moves down -> y+1
             left = False
@@ -309,7 +309,7 @@ class Checkers:
             if(self.on_board(x+1, y+1)):
                 blind_moves.append(Move_temp(x,y,x+1,y+1))
                 right = True
-            if(left and right):
+            if(left and right and self.rules.value > CheckersRules.CLASSICAL.value):
                 blind_moves.append(Move_temp(x,y,x-1,y+1,x+1,y+1))
         else: # King piece that can move in all for directions
             bottom_left, bottom_right, top_left, top_right = False, False, False, False
@@ -326,6 +326,8 @@ class Checkers:
                 blind_moves.append(Move_temp(x,y,x+1,y+1))
                 bottom_right = True
             # TODO: fix this mess, currently checking all possible combinations. Can probably be done more optimally.
+            if(self.rules.value == CheckersRules.CLASSICAL.value):
+                return blind_moves
             if(top_left):
                 if(top_right):
                     blind_moves.append(Move_temp(x,y,x-1,y-1,x+1,y-1))
