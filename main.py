@@ -31,7 +31,7 @@ def main():
     for i in range(10):
         print(i)
         start_t = time.time()
-        checkers = Checkers(num_vertical=args.num_rows, num_horizontal=args.num_columns, num_vertical_pieces=args.num_vertical_pieces, SIMULATE_QUANTUM=args.sim_q, rules=CheckersRules.CLASSICAL)
+        checkers = Checkers(num_vertical=args.num_rows, num_horizontal=args.num_columns, num_vertical_pieces=args.num_vertical_pieces, SIMULATE_QUANTUM=args.sim_q, rules=CheckersRules.QUANTUM_V2)
         game = GameInterface(checkers, white_player=p1, black_player=p2, GUI=args.GUI)
         results.append(game.play())
         times.append(time.time()-start_t)

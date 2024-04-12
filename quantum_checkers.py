@@ -735,7 +735,7 @@ class Checkers:
         taken = False # To return if the move took a piece or not
         is_adjacent, jumped_id = self.is_adjacent(move.source_id, move.target1_id)
         if(not is_adjacent): # if ids are not adjacent we jumped over a piece and need to remove it
-            if(not(self.classical_squares[str(move.source_id)].chance == 100 and self.classical_squares[str(jumped_id)].chance < 100)): # If a the source piece is in superposition
+            if(self.rules.value <= CheckersRules.QUANTUM_V1.value or (not(self.classical_squares[str(move.source_id)].chance == 100 and self.classical_squares[str(jumped_id)].chance < 100))): # If a the source piece is in superposition
                 # First check if the piece we are using is actually there
                 if(self.measure_square(move.source_id) == CheckersSquare.EMPTY): # If the piece is not there, turn is wasted
                     self.remove_piece(move.source_id)
