@@ -368,8 +368,8 @@ class Checkers:
         t = f"Quantum relative moves in alternate function: {output}\n" 
         self.write_to_log(t)
         temp = []
-        for qm in self.q_rel_moves:
-            self.squares[str(qm[0].source_id)] = QuantumObject(str(qm[0].source_id), CheckersSquare.FULL)
+        for qm in self.q_rel_moves: # Temporary disabled
+            # self.squares[str(qm[0].source_id)] = QuantumObject(str(qm[0].source_id), CheckersSquare.FULL)
             temp.append(qm[0].source_id)
         # A quantumworld must first exist before we can do the quantum moves
         self.board = QuantumWorld(
@@ -380,7 +380,15 @@ class Checkers:
             output += i.get_move()
         t = f"Quantum moves in alternate function: {output}\n"
         self.write_to_log(t)
+        index = 0
         for qm in self.q_moves:
+            # print(self.q_rel_moves[index][0], qm)
+            # print(type(self.q_rel_moves[index][0]), type(qm))
+            # print((self.q_rel_moves[index][0] == qm))
+            if(index <= len(self.q_rel_moves)-1 and self.q_rel_moves[index][0] == qm): # IF IT IS THE FIRST MOVE IN THE SEQUENCE OF QUANTUM MOVES IT NEEDS TO BE INITIALIZED
+                index += 1
+                QuditFlip(2, 0, CheckersSquare.FULL.value)(self.squares[str(qm.source_id)])
+                print("TRUE #######################################################################################################################")
             if(qm.movetype == MoveType.SPLIT):
                 CheckersSplit(CheckersSquare.FULL, self.rules)(self.squares[str(qm.source_id)], self.squares[str(qm.target1_id)], self.squares[str(qm.target2_id)])
             elif(qm.movetype == MoveType.ENTANGLE):
