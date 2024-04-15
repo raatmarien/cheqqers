@@ -5,7 +5,7 @@ import math
 from enums import CheckersResult, CheckersPlayer, MoveType
 import random
 from copy import deepcopy
-from quantum_checkers import Sim_Checkers
+from quantum_checkers import Sim_Checkers, Checkers
 import traceback
 
 args = {
@@ -16,7 +16,8 @@ args = {
 
 class MCTS():
     def __init__(self, game, args):
-        self.game = Sim_Checkers(run_on_hardware=False, num_vertical=game.num_vertical, num_horizontal=game.num_horizontal, num_vertical_pieces=game.num_vertical_pieces, classical_squares=deepcopy(game.classical_squares), related_squares=deepcopy(game.related_squares), q_rel_moves=deepcopy(game.q_rel_moves), q_moves=deepcopy(game.q_moves), superposition_pieces=deepcopy(game.superposition_pieces), status=deepcopy(game.status), moves_since_take=deepcopy(game.moves_since_take), king_squares=deepcopy(game.king_squares), legal_moves=[], rules=game.rules)
+        # self.game = deepcopy(game)
+        self.game = Sim_Checkers(run_on_hardware=False, player=deepcopy(game.player), num_vertical=game.num_vertical, num_horizontal=game.num_horizontal, num_vertical_pieces=game.num_vertical_pieces, classical_squares=deepcopy(game.classical_squares), related_squares=deepcopy(game.related_squares), q_rel_moves=deepcopy(game.q_rel_moves), q_moves=deepcopy(game.q_moves), superposition_pieces=deepcopy(game.superposition_pieces), status=deepcopy(game.status), moves_since_take=deepcopy(game.moves_since_take), king_squares=deepcopy(game.king_squares), legal_moves=[], rules=game.rules)
         self.args = args
         self.root = Node(self.game, self.args)
 
@@ -109,7 +110,7 @@ class Node():
             # child_state.player_move(action, child_state.player)
             # print( "True")
         else:
-            temp = Sim_Checkers(run_on_hardware=False, num_vertical=self.game.num_vertical, num_horizontal=self.game.num_horizontal, num_vertical_pieces=self.game.num_vertical_pieces, classical_squares=deepcopy(self.game.classical_squares), related_squares=deepcopy(self.game.related_squares), q_rel_moves=deepcopy(self.game.q_rel_moves), q_moves=deepcopy(self.game.q_moves), superposition_pieces=deepcopy(self.game.superposition_pieces), status=deepcopy(self.game.status), moves_since_take=deepcopy(self.game.moves_since_take), king_squares=deepcopy(self.game.king_squares), legal_moves=[], rules=self.game.rules)
+            temp = Sim_Checkers(run_on_hardware=False, player=deepcopy(self.game.player), num_vertical=self.game.num_vertical, num_horizontal=self.game.num_horizontal, num_vertical_pieces=self.game.num_vertical_pieces, classical_squares=deepcopy(self.game.classical_squares), related_squares=deepcopy(self.game.related_squares), q_rel_moves=deepcopy(self.game.q_rel_moves), q_moves=deepcopy(self.game.q_moves), superposition_pieces=deepcopy(self.game.superposition_pieces), status=deepcopy(self.game.status), moves_since_take=deepcopy(self.game.moves_since_take), king_squares=deepcopy(self.game.king_squares), legal_moves=[], rules=self.game.rules)
             # temp = deepcopy(self.game)
             temp.player_move(action)
             child_states = [temp]
@@ -122,7 +123,7 @@ class Node():
         return self.children
 
     def simulate(self):
-        sim_game = Sim_Checkers(run_on_hardware=False, num_vertical=self.game.num_vertical, num_horizontal=self.game.num_horizontal, num_vertical_pieces=self.game.num_vertical_pieces, classical_squares=deepcopy(self.game.classical_squares), related_squares=deepcopy(self.game.related_squares), q_rel_moves=deepcopy(self.game.q_rel_moves), q_moves=deepcopy(self.game.q_moves), superposition_pieces=deepcopy(self.game.superposition_pieces), status=deepcopy(self.game.status), moves_since_take=deepcopy(self.game.moves_since_take), king_squares=deepcopy(self.game.king_squares), legal_moves=deepcopy(self.game.legal_moves),rules=self.game.rules)
+        sim_game = Sim_Checkers(run_on_hardware=False, player=deepcopy(self.game.player), num_vertical=self.game.num_vertical, num_horizontal=self.game.num_horizontal, num_vertical_pieces=self.game.num_vertical_pieces, classical_squares=deepcopy(self.game.classical_squares), related_squares=deepcopy(self.game.related_squares), q_rel_moves=deepcopy(self.game.q_rel_moves), q_moves=deepcopy(self.game.q_moves), superposition_pieces=deepcopy(self.game.superposition_pieces), status=deepcopy(self.game.status), moves_since_take=deepcopy(self.game.moves_since_take), king_squares=deepcopy(self.game.king_squares), legal_moves=[], rules=self.game.rules)
         # sim_game.SIMULATE_QUANTUM = True
         rollout_player = sim_game.player
         prev_board = sim_game.get_sim_board()

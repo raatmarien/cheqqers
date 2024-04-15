@@ -147,10 +147,6 @@ class Checkers:
         """
         Measures single square and returns CheckersSquare.EMPTY or CheckersSquare.FULL for ID
         """
-        st = f"Removing for id: {id}\n"
-        ids = self.remove_from_rel_squares(id)
-        st += f"Removed ids {ids}\n"
-        self.write_to_log(st)
         # Check out all ids, for the one that remained, remove all others from classical squares
         if(not self.SIMULATE_QUANTUM):
             for classical_id in ids:
@@ -350,23 +346,10 @@ class Checkers:
         """
         # First do quantum moves
         q_ids = list(itertools.chain.from_iterable(self.related_squares))
-        t = f"Quantum ids in alternate move: {q_ids}\n"
-        self.write_to_log(t)
-        t = f"Classical squares in alternate move: {self.classical_squares.keys()}\n"
-        self.write_to_log(t)
         for id in range(self.num_vertical*self.num_horizontal):
             self.squares[str(id)] = QuantumObject(str(id), CheckersSquare.EMPTY)
 
         # for each sequence of quantum moves, we have to initialize the first bit that starts the qm. # THIS DOESNT WORK IF TWO QUANTUM MOVES START FROM THE SAME POSITION
-        output = ""
-        for qm in self.q_rel_moves:
-            output += "["
-            for m in qm:
-                output += m.get_move()
-                output += ", "
-            output += "] --- "
-        t = f"Quantum relative moves in alternate function: {output}\n" 
-        self.write_to_log(t)
         temp = []
         for qm in self.q_rel_moves: # Temporary disabled
             # self.squares[str(qm[0].source_id)] = QuantumObject(str(qm[0].source_id), CheckersSquare.FULL)
@@ -375,11 +358,6 @@ class Checkers:
         self.board = QuantumWorld(
             list(self.squares.values()),  compile_to_qubits=self.run_on_hardware
         )
-        output = ""
-        for i in self.q_moves:
-            output += i.get_move()
-        t = f"Quantum moves in alternate function: {output}\n"
-        self.write_to_log(t)
         index = 0
         for qm in self.q_moves:
             # print(self.q_rel_moves[index][0], qm)
@@ -429,20 +407,6 @@ class Checkers:
 
     def player_move(self, move: Move_id, player: CheckersPlayer = None):
         self.moves_since_take += 1
-        output = ""
-        # self.write_to_log(f"Related squares: {str(self.related_squares)}\n")
-        # self.write_to_log(f"Classical squares: {str(self.classical_squares.keys())}\n")
-        # for i in self.q_moves:
-        #     output += i.get_move()
-        # self.write_to_log(f"Quantum moves: {output}\n")
-        # output = ""
-        # for qm in self.q_rel_moves:
-        #     output += "["
-        #     for m in qm:
-        #         output += m.get_move()
-        #         output += ", "
-        #     output += "] --- "
-        # self.write_to_log(f"Quantum relative moves: {output}\n")
         prev_taken = False
         to_king = [] # list that holds moved pieces to check if they need to be kinged
         if(player == None):
@@ -524,7 +488,6 @@ class Checkers:
                 output += i.get_move()
                 output+= " --- "
             print(output)
-            self.write_to_log(output)
             output = "Quantum relative moves"
             for qm in self.q_rel_moves:
                 output += "["
@@ -533,7 +496,6 @@ class Checkers:
                     output += ", "
                 output += "] --- "
             print(output)
-            self.write_to_log(output)
             print(f"Classical squares: {self.classical_squares.keys()}")
             print(f"Chance is {hist[idx][CheckersSquare.FULL]} for id {idx}")
             exit()
@@ -593,7 +555,6 @@ class Checkers:
                 output += i.get_move()
                 output+= " --- "
             print(output)
-            self.write_to_log(output)
             output = "Quantum relative moves"
             for qm in self.q_rel_moves:
                 output += "["
@@ -602,7 +563,6 @@ class Checkers:
                     output += ", "
                 output += "] --- "
             print(output)
-            self.write_to_log(output)
             print(f"Classical squares: {self.classical_squares.keys()}")
             exit()
         return output
@@ -972,10 +932,10 @@ class Checkers:
         return CheckersResult.UNFINISHED
 
 class Sim_Checkers(Checkers):
-    def __init__(self, run_on_hardware, num_vertical, num_horizontal, num_vertical_pieces, classical_squares, related_squares, q_rel_moves, q_moves, superposition_pieces, status, moves_since_take, king_squares, rules = CheckersRules.QUANTUM_V3, legal_moves = []) -> None:
+    def __init__(self, run_on_hardware, player, num_vertical, num_horizontal, num_vertical_pieces, classical_squares, related_squares, q_rel_moves, q_moves, superposition_pieces, status, moves_since_take, king_squares, rules = CheckersRules.QUANTUM_V3, legal_moves = []) -> None:
         self.rules = rules
-        self.SIMULATE_QUANTUM = True
-        self.player = CheckersPlayer.WHITE
+        self.SIMULATE_QUANTUM = False
+        self.player = player
         self.num_vertical = num_vertical
         self.run_on_hardware = run_on_hardware
         self.num_horizontal = num_horizontal

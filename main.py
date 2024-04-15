@@ -10,8 +10,8 @@ import pstats
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--num_rows', help='The number of rows of the checkboard. INT', default=5)
-    parser.add_argument('--num_columns', help='The number of columns of the checkboard. INT', default=5)
+    parser.add_argument('--num_rows', help='The number of rows of the checkboard. INT', default=8)
+    parser.add_argument('--num_columns', help='The number of columns of the checkboard. INT', default=8)
     parser.add_argument('--num_vertical_pieces', help='The number of rows that are filled with checkerpieces. INT', default=1)
     parser.add_argument('--sim_q', help='Simulating quantum or actually use quantum mechanics. TRUE if you want to simulate quantum.', default="False")
     parser.add_argument('--GUI', help='If GUI is enabled. True or False', default="False")
@@ -28,16 +28,23 @@ def main():
         time.sleep(5)
     times = []
     results = []
-    for i in range(100):
-        print(i)
+    number_of_moves = []
+    for i in range(1000):
+        if((i+1)%10 == 0):
+            print(i+1)
         start_t = time.time()
-        checkers = Checkers(num_vertical=args.num_rows, num_horizontal=args.num_columns, num_vertical_pieces=args.num_vertical_pieces, SIMULATE_QUANTUM=args.sim_q, rules=CheckersRules.QUANTUM_V2)
+        checkers = Checkers(num_vertical=args.num_rows, num_horizontal=args.num_columns, num_vertical_pieces=args.num_vertical_pieces, SIMULATE_QUANTUM=args.sim_q, rules=CheckersRules.QUANTUM_V1)
         game = GameInterface(checkers, white_player=p1, black_player=p2, GUI=args.GUI)
-        results.append(game.play())
+        result, num_moves = (game.play())
+        results.append(result)
+        number_of_moves.append(num_moves)
         times.append(time.time()-start_t)
-        if((i+1)%5 == 0):
+        if((i+1)%100 == 0):
             print(f"Draw: {results.count(CheckersResult.DRAW)}, White wins: {results.count(CheckersResult.WHITE_WINS)}, Black wins: {results.count(CheckersResult.BLACK_WINS)}")
+            print(f"Average number of moves: {sum(number_of_moves)/len(number_of_moves)}")
+    print("#"*100)
     print(f"Average time: {sum(times)/len(times)}, minimum time: {min(times)}, max time: {max(times)}")
+    print(f"Average number of moves: {sum(number_of_moves)/len(number_of_moves)}")
     print(f"Draw: {results.count(CheckersResult.DRAW)}, White wins: {results.count(CheckersResult.WHITE_WINS)}, Black wins: {results.count(CheckersResult.BLACK_WINS)}")
 
 if __name__ == "__main__":

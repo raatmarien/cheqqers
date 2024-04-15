@@ -1,0 +1,44 @@
+Over 1000 games
+
+Classic:
+5x5
+Average time: 0.08510347199440002, minimum time: 0.0410001277923584, max time: 0.31799983978271484
+Average number of moves: 14.446
+Draw: 1, White wins: 403, Black wins: 596
+
+6x6
+Average time: 0.14253475427627563, minimum time: 0.06000089645385742, max time: 0.41299891471862793
+Average number of moves: 25.647
+Draw: 17, White wins: 474, Black wins: 509
+
+7x7
+Average time: 0.20322018456459046, minimum time: 0.06499814987182617, max time: 1.438767671585083
+Average number of moves: 34.162
+Draw: 92, White wins: 440, Black wins: 468
+
+8x8
+Average time: 0.31478718066215516, minimum time: 0.11300039291381836, max time: 1.0620193481445312
+Average number of moves: 48.338
+Draw: 203, White wins: 429, Black wins: 368
+
+
+SUPERPOSITIONS
+5x5
+Average time: 0.19610779333114625, minimum time: 0.04099869728088379, max time: 0.9539978504180908
+Average number of moves: 18.229
+Draw: 18, White wins: 410, Black wins: 572
+
+6x6
+####################################################################################################
+Average time: 0.34225855660438537, minimum time: 0.0550081729888916, max time: 2.0114243030548096
+Average number of moves: 29.979
+Draw: 86, White wins: 439, Black wins: 475
+
+7x7
+Average time: 0.2630674602985382, minimum time: 0.04000067710876465, max time: 1.145320177078247
+Average number of moves: 41.514
+Draw: 273, White wins: 335, Black wins: 392
+
+8x8
+
+

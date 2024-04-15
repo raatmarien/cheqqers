@@ -162,11 +162,11 @@ class GameInterface:
                     # time.sleep(1)
             else: # ASCII BOARD
                 prev_take = False # Always reset
-                self.print_board()
-                self.print_legal_moves(self.game.legal_moves)
+                # self.print_board()
+                # self.print_legal_moves(self.game.legal_moves)
                 counter += 1
-                if(counter % 10 == 0):
-                    print(f"Move number {counter}")
+                # if(counter % 10 == 0):
+                #     print(f"Move number {counter}")
                 # move = random.randint(1, len(legal_moves))
                 if(self.game.player == CheckersPlayer.WHITE):
                     move = self.white_player.select_move(self.game.legal_moves)
@@ -179,16 +179,16 @@ class GameInterface:
                     # move = self.black_player.select_move(self.game.legal_moves)
                 moves.append(move)
                 # move.print_move()
-                print("Selected move: ", end="")
-                move.print_move()
+                # print("Selected move: ", end="")
+                # move.print_move()
                 self.game.player_move(move, self.game.player)
                 # if(len(self.game.legal_moves) > 0):
                 #     prev_take = True
                 # self.write_to_log(move, counter, moves)
                 # time.sleep(1)
         # self.print_board()
-        print(f"Results: {self.game.status}")
-        return(self.game.status)
+        # print(f"Results: {self.game.status}")
+        return(self.game.status, counter)
 
     def draw_circle(self, id, color, x, y, radius, king = False, highlited = False):
         if(color == RED):
