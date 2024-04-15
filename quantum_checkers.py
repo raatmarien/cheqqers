@@ -147,6 +147,7 @@ class Checkers:
         """
         Measures single square and returns CheckersSquare.EMPTY or CheckersSquare.FULL for ID
         """
+        ids = self.remove_from_rel_squares(id)
         # Check out all ids, for the one that remained, remove all others from classical squares
         if(not self.SIMULATE_QUANTUM):
             for classical_id in ids:
