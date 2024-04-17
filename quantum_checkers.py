@@ -926,7 +926,7 @@ class Checkers:
                 temp_rel_list = deepcopy(removed_rel_squares)
                 temp_uniq_rel_list = deepcopy(self.unique_related_squares)
                 to_be_removed = set()
-                # Very ugly way to fix this
+                # Very ugly way to fix this.
                 for count1, i in enumerate(temp_rel_list):
                     for count2, j in enumerate(temp_uniq_rel_list):
                         if(i in j):
