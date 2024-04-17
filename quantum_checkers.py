@@ -110,6 +110,7 @@ class Checkers:
         self.num_vertical_pieces = num_vertical_pieces # how many rows of one color need to be filled with pieces
         self.classical_squares = {} # Contains information about a square (e.g. white, king, etc...)
         self.related_squares = [] # List of lists that keep track of squares in superpositions that are related to each other. This way if a square is measured we know the related squares of that square
+        self.unique_related_squares = [] # Contains information about 1 piece and its related squares. 
         self.q_rel_moves = [] # parallel to related squares, but keeps track of quantum moves
         self.q_moves = [] # Just a list of al quantum moves so we can do them again when doing a new move
         self.entangled_squares = [] # list of entangled squares
@@ -438,6 +439,10 @@ class Checkers:
         self.player = CheckersPlayer.BLACK if self.player == CheckersPlayer.WHITE else CheckersPlayer.WHITE
         self.legal_moves = self.calculate_possible_moves(self.player)
         self.status = self.result()
+        print("########")
+        print("RELATED SQUARES")
+        print(self.related_squares)
+        print(self.unique_related_squares)
 
     def get_board(self) -> str:
         """Returns the Checkers board in ASCII form. Also returns dictionary with id as key.
@@ -745,6 +750,7 @@ class Checkers:
                 self.entangled_squares.append([str(jumped_id)])
                 for i, rel_squares in enumerate(self.related_squares):
                     if(str(jumped_id) in rel_squares):
+                        self.unique_related_squares.append([str(move.source_id), str(move.target1_id)])
                         rel_squares.append(str(move.source_id))
                         rel_squares.append(str(move.target1_id))
                         self.q_rel_moves[i].append(move)
@@ -760,6 +766,12 @@ class Checkers:
                 squares.append(str(move.target1_id))
                 self.q_rel_moves[i].append(move)
                 self.q_moves.append(move)
+                break
+        
+        for i, squares in enumerate(self.unique_related_squares):
+            if(str(move.source_id) in squares):
+                squares.append(str(move.target1_id))
+                squares.remove(str(move.source_id))
                 break
 
         # If we do a classical move on a piece that is entangled, we need to append the new id to the correct entangled list
@@ -789,6 +801,12 @@ class Checkers:
         self.classical_squares[str(move.target1_id)] = Piece(id=str(move.target1_id), color=original_piece.color, king=original_piece.king, superposition=True)
         self.classical_squares[str(move.target2_id)] = Piece(id=str(move.target2_id), color=original_piece.color, king=original_piece.king, superposition=True)
 
+        for i, squares in enumerate(self.unique_related_squares):
+            if(str(move.source_id) in squares):
+                squares.append(str(move.target1_id))
+                squares.append(str(move.target2_id))
+                break
+
         # If the piece was already in superposition, we need to append this piece to the list
         for i, squares in enumerate(self.related_squares):
             if(str(move.source_id) in squares):
@@ -804,6 +822,7 @@ class Checkers:
             self.classical_squares[str(move.target1_id)].chance = 50
             self.classical_squares[str(move.target2_id)].chance = 50
             self.related_squares.append([str(move.target1_id), str(move.target2_id)])
+            self.unique_related_squares.append([str(move.target1_id), str(move.target2_id)])
             self.q_rel_moves.append([move])
             self.q_moves.append(move)
             self.superposition_pieces.add(original_piece)
@@ -869,13 +888,21 @@ class Checkers:
         """
         Removes one specific id from a list of superpositions..
         """
+        temp_list = deepcopy(self.unique_related_squares)
+        for index, squares in enumerate(temp_list):
+            if(str(id) in squares):
+                i = self.unique_related_squares[index].index(str(id)) # Get the index of the element we are removing
+                self.unique_related_squares[index].remove(str(id))
+                if(len(self.unique_related_squares[index]) <= 1): # If the length is one, we have returned to classical state (Basically if we did not just do a classical move)
+                    self.unique_related_squares.pop(index)
+                return
+            
         # Check if the id we need to remove used to be in a superposition.
         temp_list = deepcopy(self.related_squares)
         for index, squares in enumerate(temp_list):
             if(str(id) in squares):
                 i = self.related_squares[index].index(str(id)) # Get the index of the element we are removing
                 self.related_squares[index].remove(str(id))
-                
                 if(len(self.related_squares[index]) <= 1): # If the length is one, we have returned to classical state (Basically if we did not just do a classical move)
                     self.related_squares.pop(index)
                     for mv in self.q_rel_moves[index]:
@@ -895,7 +922,18 @@ class Checkers:
                     if(mv in self.q_moves):
                         self.q_moves.remove(mv)
                 self.q_rel_moves.pop(index)
-                return self.related_squares.pop(index)
+                removed_rel_squares = self.related_squares.pop(index)
+                temp_rel_list = deepcopy(removed_rel_squares)
+                temp_uniq_rel_list = deepcopy(self.unique_related_squares)
+                to_be_removed = set()
+                for count1, i in enumerate(temp_rel_list):
+                    for count2, j in enumerate(temp_uniq_rel_list):
+                        if(i in j):
+                            to_be_removed.add(count2)
+                for i in to_be_removed:
+                    self.unique_related_squares.remove(temp_uniq_rel_list[i])
+                return removed_rel_squares
+
         return []
     
     def get_rel_squares(self, id):
