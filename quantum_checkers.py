@@ -20,6 +20,7 @@ from unitary.alpha.qudit_gates import QuditXGate, QuditISwapPowGate
 # from cirq import ISWAP
 import cirq
 import random
+import numpy as np
 
 # GLOBAL GAME SETTINGS
 _forced_take = True
@@ -157,7 +158,7 @@ class Checkers:
                 if(peek[0][0] == CheckersSquare.FULL):
                     self.classical_squares[str(classical_id)].chance = 100
                     for i in self.entangled_squares: 
-                        if(str(classical_id) in i): # If the piece is in the entangled squares it has been jumped over an needs to be removed
+                        if(str(classical_id) in i): # If the piece is in the entangled squares it has been jumped over and needs to be removed
                             self.remove_piece(str(classical_id), True)
                             self.entangled_squares.remove(i)
                             continue
@@ -960,6 +961,11 @@ class Sim_Checkers(Checkers):
 #TODO: check for mcts calculating legal_moves after taking another piece
 
 #TODO: Take another piece after entangling
-    
+#TODO: MONTE CARLO:
+# INSTEAD OF GETTING ALL POSSIBLE STATES WHEN COLLAPSING, ALREADY TAKE THE POSSIBLE STATES WHEN DOING SUPERPOSITIONS AND ENTANGLEMENT.
+# THIS FIXES THE PROBLEM OF NOT KNOWING HOW TO RESOVLE ENTANGLEMENT
+
+ 
+
 # if __name__ == '__main__':
     
