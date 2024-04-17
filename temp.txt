@@ -1,45 +1,53 @@
 ####################################################################################################
 Size: 10x10, Rule: CheckersRules.CLASSICAL
-Average time: 0.28115068435668944, minimum time: 0.11499977111816406, max time: 0.9899997711181641
-Average number of moves: 104.48
-Draw: 0, White wins: 43, Black wins: 57
+Average time: 0.2521408271789551, minimum time: 0.10195636749267578, max time: 0.6540360450744629
+Average number of moves: 75.331
+Draw: 521, White wins: 271, Black wins: 208
 ####################################################################################################
 Size: 12x12, Rule: CheckersRules.CLASSICAL
-Average time: 0.742310152053833, minimum time: 0.20299816131591797, max time: 3.315047025680542
-Average number of moves: 242.91
-Draw: 0, White wins: 42, Black wins: 58
+Average time: 0.3035942249298096, minimum time: 0.06504249572753906, max time: 1.2530553340911865
+Average number of moves: 88.895
+Draw: 734, White wins: 138, Black wins: 128
 ####################################################################################################
 Size: 14x14, Rule: CheckersRules.CLASSICAL
-Average time: 1.1754703831672668, minimum time: 0.3089745044708252, max time: 3.468000888824463
-Average number of moves: 333.04
-Draw: 0, White wins: 45, Black wins: 55
+Average time: 0.14099960064888, minimum time: 0.0809633731842041, max time: 0.7379975318908691
+Average number of moves: 54.488
+Draw: 969, White wins: 14, Black wins: 17
 ####################################################################################################
 Size: 10x10, Rule: CheckersRules.QUANTUM_V1
-Average time: 4.7787405252456665, minimum time: 0.23204565048217773, max time: 20.116029977798462
-Average number of moves: 238.53
-Draw: 0, White wins: 50, Black wins: 50
+Average time: 0.7547452170848846, minimum time: 0.0930013656616211, max time: 2.5899524688720703
+Average number of moves: 85.256
+Draw: 699, White wins: 143, Black wins: 158
 ####################################################################################################
 Size: 12x12, Rule: CheckersRules.QUANTUM_V1
-Average time: 12.199728529453278, minimum time: 0.48295140266418457, max time: 52.385478019714355
-Average number of moves: 384.66
-Draw: 0, White wins: 45, Black wins: 55
+Average time: 0.8206615824699401, minimum time: 0.12195038795471191, max time: 4.0059754848480225
+Average number of moves: 64.086
+Draw: 927, White wins: 33, Black wins: 40
 ####################################################################################################
 Size: 14x14, Rule: CheckersRules.QUANTUM_V1
-Average time: 124.16093977212905, minimum time: 1.495046854019165, max time: 2663.558981657028
-Average number of moves: 977.69
-Draw: 0, White wins: 50, Black wins: 50
+Average time: 0.3748221697807312, minimum time: 0.12900495529174805, max time: 6.299026012420654
+Average number of moves: 42.869
+Draw: 997, White wins: 0, Black wins: 3
 ####################################################################################################
 Size: 10x10, Rule: CheckersRules.QUANTUM_V2
-Average time: 3.0269003748893737, minimum time: 0.4089994430541992, max time: 10.915950775146484
-Average number of moves: 170.17
-Draw: 0, White wins: 58, Black wins: 42
+Average time: 0.922622899055481, minimum time: 0.24904751777648926, max time: 2.945955514907837
+Average number of moves: 75.591
+Draw: 699, White wins: 145, Black wins: 156
 ####################################################################################################
 Size: 12x12, Rule: CheckersRules.QUANTUM_V2
-Average time: 9.077003552913666, minimum time: 0.6839990615844727, max time: 49.3340277671814
-Average number of moves: 322.11
-Draw: 0, White wins: 56, Black wins: 44
+Average time: 0.7101380033493042, minimum time: 0.11300277709960938, max time: 4.236046552658081
+Average number of moves: 58.445
+Draw: 941, White wins: 27, Black wins: 32
 ####################################################################################################
 Size: 14x14, Rule: CheckersRules.QUANTUM_V2
-Average time: 62.786820361614225, minimum time: 1.8700025081634521, max time: 1496.4423809051514
-Average number of moves: 610.4
-Draw: 0, White wins: 44, Black wins: 56
+Average time: 0.3562785074710846, minimum time: 0.13399934768676758, max time: 3.9780046939849854
+Average number of moves: 42.49
+Draw: 997, White wins: 1, Black wins: 2
+####################################################################################################
+Size: 10x10, Rule: CheckersRules.CLASSICAL
+####################################################################################################
+Size: 5x5, Rule: CheckersRules.QUANTUM_V2
+####################################################################################################
+Size: 5x5, Rule: CheckersRules.QUANTUM_V2
+####################################################################################################
+Size: 5x5, Rule: CheckersRules.QUANTUM_V2

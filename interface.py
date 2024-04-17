@@ -162,8 +162,9 @@ class GameInterface:
                     # time.sleep(1)
             else: # ASCII BOARD
                 prev_take = False # Always reset
-                # self.print_board()
-                # self.print_legal_moves(self.game.legal_moves)
+                self.print_board(False)
+                self.print_board(True)
+                self.print_legal_moves(self.game.legal_moves)
                 counter += 1
                 # if(counter % 10 == 0):
                 #     print(f"Move number {counter}")
@@ -345,9 +346,12 @@ class GameInterface:
             return True, legal_moves
         return False, []
 
-    def print_board(self) -> str:
+    def print_board(self, simulated: bool) -> str:
         # str_board = self.game.get_sim_board()
-        str_board = self.game.get_board()
+        if(not simulated):
+            str_board = self.game.get_board()
+        else:
+            str_board = self.game.get_sim_board()
         print(str_board)
         return str_board
     

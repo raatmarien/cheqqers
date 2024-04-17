@@ -18,6 +18,7 @@ class human_player(bot):
                 move = int(move)
             except:
                 print("Input has to be an integer!")
+                continue
             if(move > len(possible_moves) or move < 1):
                 print(f"Input has to be an integer between 1 and {len(possible_moves)}!")
                 continue
