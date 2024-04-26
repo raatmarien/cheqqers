@@ -27,4 +27,5 @@ Average time: 0.07999924561977387, minimum time: 0.03025197982788086, max time: 
 Draw: 4, White wins: 3841, Black wins: 6155
 10.000 games
 
+A survey of quantum games
 https://www.sciencedirect.com/science/article/pii/S0167923608001292

@@ -107,16 +107,26 @@ class Entangled():
 
     def update_entangled(self, org_id: str, new_ids: list):
         if(org_id in self.all_ids):
-            self.all_ids.remove(org_id)
-            self.all_ids += new_ids
+            if(org_id in self.is_taken):
+                self.is_taken.remove(org_id)
+                self.is_taken += new_ids
+            elif(org_id in self.not_taken):
+                self.not_taken.remove(org_id)
+                self.not_taken += new_ids
+            elif(org_id in self.successfully_takes):
+                self.successfully_takes.remove(org_id)
+                self.successfully_takes += new_ids
+            elif(org_id in self.unsuccessfully_takes):
+                self.unsuccessfully_takes.remove(org_id)
+                self.unsuccessfully_takes += new_ids
     
     def measurement(self, id: str):
         """
         This function is called when a measurement is taking place. It returns all ids that are related to the id that is measured.
         """
         if(id in self.all_ids):
-            return self.all_ids
-        return []
+            return True
+        return False
     
     def print_all(self):
         print(f"Related squares: {self.all_ids}")
@@ -179,6 +189,13 @@ class Checkers:
         Measures single square and returns CheckersSquare.EMPTY or CheckersSquare.FULL for ID
         """
         ids = self.remove_from_rel_squares(id)
+        # ALl entangleds objects related to these ids also need to be removed
+        to_be_removed = []
+        for i in self.entangled_objects:
+            if(ids == i.all_ids):
+                to_be_removed.append(i)
+        for i in to_be_removed:
+            self.entangled_objects.remove(i)
         # Check out all ids, for the one that remained, remove all others from classical squares
         if(not self.SIMULATE_QUANTUM):
             for classical_id in ids:
@@ -744,6 +761,7 @@ class Checkers:
         if(not is_adjacent): # if ids are not adjacent we jumped over a piece and need to remove it
             if(self.rules.value <= CheckersRules.QUANTUM_V1.value or (not(self.classical_squares[str(move.source_id)].chance == 100 and self.classical_squares[str(jumped_id)].chance < 100))): # If a the source piece is in superposition
                 # First check if the piece we are using is actually there
+                entangled_objects = []
                 if(self.measure_square(move.source_id) == CheckersSquare.EMPTY): # If the piece is not there, turn is wasted
                     self.remove_piece(move.source_id)
                     return taken, True
@@ -810,6 +828,9 @@ class Checkers:
                 squares.remove(str(move.source_id))
                 break
 
+        for i in self.entangled_objects:
+            i.update_entangled(str(move.source_id), [str(move.target1_id)])
+
         # If we do a classical move on a piece that is entangled, we need to append the new id to the correct entangled list
         for i, squares in enumerate(self.entangled_squares):
             if(str(move.source_id) in squares):
@@ -836,6 +857,9 @@ class Checkers:
             # split(self.squares[str(move.source_id)], self.squares[str(move.target1_id)], self.squares[str(move.target2_id)])
         self.classical_squares[str(move.target1_id)] = Piece(id=str(move.target1_id), color=original_piece.color, king=original_piece.king, superposition=True)
         self.classical_squares[str(move.target2_id)] = Piece(id=str(move.target2_id), color=original_piece.color, king=original_piece.king, superposition=True)
+
+        for i in self.entangled_objects:
+            i.update_entangled(str(move.source_id), [str(move.target1_id)])
 
         for i, squares in enumerate(self.unique_related_squares):
             if(str(move.source_id) in squares):
