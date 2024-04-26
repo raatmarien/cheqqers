@@ -97,6 +97,34 @@ class Piece():
         self.superposition = superposition
         self.chance = chance
 
+class Entangled():
+    def __init__(self, related_squares: list, is_taken: list, not_taken: list, successfully_takes: list, unsuccessfully_takes: list) -> None:
+        self.all_ids = related_squares # All ids
+        self.is_taken = is_taken # The piece that is being taken by another piece which causes entanglement
+        self.not_taken = not_taken # The pieces that are related to the piece that is taken
+        self.successfully_takes = successfully_takes # The piece that is (maybe) successfull in taking another piece
+        self.unsuccessfully_takes = unsuccessfully_takes # # The piece that was (maybe) unsuccessfull in taking another piece
+
+    def update_entangled(self, org_id: str, new_ids: list):
+        if(org_id in self.all_ids):
+            self.all_ids.remove(org_id)
+            self.all_ids += new_ids
+    
+    def measurement(self, id: str):
+        """
+        This function is called when a measurement is taking place. It returns all ids that are related to the id that is measured.
+        """
+        if(id in self.all_ids):
+            return self.all_ids
+        return []
+    
+    def print_all(self):
+        print(f"Related squares: {self.all_ids}")
+        print(f"Is taken: {self.is_taken}")
+        print(f"Not taken: {self.not_taken}")
+        print(f"Successfully takes: {self.successfully_takes}")
+        print(f"Unsuccessfully takes: {self.unsuccessfully_takes}")
+
 class Checkers:
     def __init__(self, run_on_hardware = False, num_vertical = 5, num_horizontal = 5, num_vertical_pieces = 1, rules = CheckersRules.QUANTUM_V3, SIMULATE_QUANTUM = False) -> None:
         self.rules = rules
@@ -114,6 +142,7 @@ class Checkers:
         self.q_rel_moves = [] # parallel to related squares, but keeps track of quantum moves
         self.q_moves = [] # Just a list of al quantum moves so we can do them again when doing a new move
         self.entangled_squares = [] # list of entangled squares
+        self.entangled_objects = [] # list of entangled objects
         self.white_squares = {}
         self.black_squares = {}
         self.status = CheckersResult.UNFINISHED
@@ -443,7 +472,10 @@ class Checkers:
         print("RELATED SQUARES")
         print(self.related_squares)
         print(self.unique_related_squares)
-
+        print("&&&&&&&&&&&&&&&&ENTANGLED OBJECTS&&&&&&&&&&&&&&&&")
+        for i in self.entangled_objects:
+            i.print_all()
+        print("&&&&&&&&&&&&&&&&")
     def get_board(self) -> str:
         """Returns the Checkers board in ASCII form. Also returns dictionary with id as key.
         Function take from quantum tiq taq toe"""
@@ -751,10 +783,14 @@ class Checkers:
                 for i, rel_squares in enumerate(self.related_squares):
                     if(str(jumped_id) in rel_squares):
                         self.unique_related_squares.append([str(move.source_id), str(move.target1_id)])
+                        rest = deepcopy(rel_squares) # All related id's that are not being jumped over
+                        rest.remove(str(jumped_id)) 
                         rel_squares.append(str(move.source_id))
                         rel_squares.append(str(move.target1_id))
                         self.q_rel_moves[i].append(move)
                         self.q_moves.append(move)
+                        entangled_obj = Entangled(rel_squares, [jumped_id], rest, [str(move.target1_id)], [str(move.source_id)])
+                        self.entangled_objects.append(entangled_obj)
                 self.superposition_pieces.add(original_piece)
                 return taken, False
                 # CheckersSplit(CheckersSquare.FULL, self.rules)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)], self.squares[str(move.target2_id)])
