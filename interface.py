@@ -118,7 +118,7 @@ class GameInterface:
         counter = 0
         moves = []
         prev_take = False # variable to check if a piece has been taken before
-        # for i in [3, 2, 5, 1, 1]:
+        # for i in [3, 2, 2, 1, 1, 2, 2, 1]:
         #     # legal_moves = self.get_legal_moves()
         #     self.game.player_move(self.game.legal_moves[i-1], self.game.player)
         #     self.print_board()
@@ -163,7 +163,7 @@ class GameInterface:
             else: # ASCII BOARD
                 prev_take = False # Always reset
                 self.print_board(False)
-                self.print_board(True)
+                # self.print_board(True)
                 self.print_legal_moves(self.game.legal_moves)
                 counter += 1
                 # if(counter % 10 == 0):

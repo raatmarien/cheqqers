@@ -128,6 +128,18 @@ class Entangled():
             return True
         return False
     
+    def return_all_possible_states(self):
+        """
+        Returns all possible states of the entangled object
+        """
+        states = []
+        for i in self.successfully_takes:
+            states.append([str(i)])
+        for i in self.unsuccessfully_takes:
+            for j in self.not_taken:
+                states.append([str(i), str(j)])
+        return states
+    
     def print_all(self):
         print(f"Related squares: {self.all_ids}")
         print(f"Is taken: {self.is_taken}")
@@ -492,6 +504,8 @@ class Checkers:
         print("&&&&&&&&&&&&&&&&ENTANGLED OBJECTS&&&&&&&&&&&&&&&&")
         for i in self.entangled_objects:
             i.print_all()
+            temp =i.return_all_possible_states()
+            print(temp)
         print("&&&&&&&&&&&&&&&&")
     def get_board(self) -> str:
         """Returns the Checkers board in ASCII form. Also returns dictionary with id as key.
