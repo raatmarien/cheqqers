@@ -128,15 +128,30 @@ class Entangled():
             return True
         return False
     
-    def return_all_possible_states(self):
+    def return_all_possible_states(self, new_all_ids = None):
         """
         Returns all possible states of the entangled object
         """
+        new_successfully_takes = self.successfully_takes
+        new_is_taken = self.is_taken
+        new_not_taken = self.not_taken
+        new_unsuccessfully_takes = self.unsuccessfully_takes
+        if(new_all_ids != None): # Used to calculate all possible states of the entangled object
+            for i in self.all_ids:
+                if i not in new_all_ids:
+                    if i in new_is_taken:
+                        new_is_taken.remove(i)
+                    if i in new_successfully_takes:
+                        new_successfully_takes.remove(i)
+                    if i in new_not_taken:
+                        new_not_taken.remove(i)
+                    if i in new_unsuccessfully_takes:
+                        new_unsuccessfully_takes.remove(i)
         states = []
-        for i in self.successfully_takes:
+        for i in new_successfully_takes:
             states.append([str(i)])
-        for i in self.unsuccessfully_takes:
-            for j in self.not_taken:
+        for i in new_unsuccessfully_takes:
+            for j in new_not_taken:
                 states.append([str(i), str(j)])
         return states
     
@@ -466,6 +481,38 @@ class Checkers:
             list(self.squares.values()), compile_to_qubits=self.run_on_hardware
         )
 
+    def recursive_cal_rel_state(self, related_objects: list, new_all_ids: list, curr: int):
+        print("CURR: ", curr)
+        if(curr == len(related_objects)):
+            return []
+        if(new_all_ids == None):
+            new_all_ids = related_objects[curr].all_ids
+        # Calculate all possible states
+        states = related_objects[curr].return_all_possible_states(new_all_ids)
+
+        ids = related_objects[curr].is_taken + related_objects[curr].not_taken + related_objects[curr].successfully_takes + related_objects[curr].unsuccessfully_takes
+        
+        # For each state, remove the ids that are not in there
+        # E.g. if we go for the state where a piece is taken, the ids where the piece is not taken need to be removed
+        return_states = []
+        for i in states:
+            temp_ids = deepcopy(ids)
+            temp_new_all_ids = deepcopy(new_all_ids)
+            for j in i: # Remove the current state ids from the list
+                temp_ids.remove(j)
+            for j in temp_ids: # Remove the remainder to calculate all possible states
+                print(j)
+                print(temp_new_all_ids)
+                temp_new_all_ids.remove(j)
+            new_states = self.recursive_cal_rel_state(related_objects, temp_new_all_ids, curr+1)
+            return_states.append(new_states+i)
+        return return_states
+
+    def calculate_related_states(self, related_objects: list):
+        print("CALCULATING RELATED STATES")
+        temp = self.recursive_cal_rel_state(related_objects, None, 0)
+        print(temp)
+
     def player_move(self, move: Move_id, player: CheckersPlayer = None):
         self.moves_since_take += 1
         prev_taken = False
@@ -504,8 +551,9 @@ class Checkers:
         print("&&&&&&&&&&&&&&&&ENTANGLED OBJECTS&&&&&&&&&&&&&&&&")
         for i in self.entangled_objects:
             i.print_all()
-            temp =i.return_all_possible_states()
+            temp = i.return_all_possible_states()
             print(temp)
+        print(self.calculate_related_states(self.entangled_objects))
         print("&&&&&&&&&&&&&&&&")
     def get_board(self) -> str:
         """Returns the Checkers board in ASCII form. Also returns dictionary with id as key.
@@ -821,7 +869,7 @@ class Checkers:
                         rel_squares.append(str(move.target1_id))
                         self.q_rel_moves[i].append(move)
                         self.q_moves.append(move)
-                        entangled_obj = Entangled(rel_squares, [jumped_id], rest, [str(move.target1_id)], [str(move.source_id)])
+                        entangled_obj = Entangled(rel_squares, [str(jumped_id)], rest, [str(move.target1_id)], [str(move.source_id)])
                         self.entangled_objects.append(entangled_obj)
                 self.superposition_pieces.add(original_piece)
                 return taken, False
