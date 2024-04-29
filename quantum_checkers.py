@@ -154,6 +154,18 @@ class Entangled():
             for j in new_not_taken:
                 states.append([str(i), str(j)])
         return states
+
+    def return_possible_states(self):
+        """
+        Returns all possible states of the entangled object when entangled objects can not be more entangled with each other
+        """
+        states = []
+        for i in self.successfully_takes:
+            states.append([str(i)])
+        for i in self.unsuccessfully_takes:
+            for j in self.not_taken:
+                states.append([str(i), str(j)])
+        return states
     
     def print_all(self):
         print(f"Related squares: {self.all_ids}")
@@ -210,6 +222,12 @@ class Checkers:
         self.log = open("./log.txt", "a")
         self.log.write(string)
         self.log.close()
+
+    def is_entangled(self, id: str):
+        for i in self.entangled_objects:
+            if(id in i.all_ids):
+                return True
+        return False
 
     def measure_square(self, id) -> CheckersSquare:
         """
@@ -344,12 +362,15 @@ class Checkers:
                 jump_id = self.convert_xy_to_id(jump_x, jump_y)
                 if(self.on_board(jump_x, jump_y) and jump_id not in (player_ids+opponent_ids)): # we can jump over if the coordinates are on the board and the piece is empty
                     move_type = MoveType.TAKE
-                    if(self.classical_squares[str(source_id)].chance == 100 and self.classical_squares[str(target1_id)].chance < 100):
+                    if(self.classical_squares[str(source_id)].chance == 100 and self.classical_squares[str(target1_id)].chance < 100 and (self.rules == CheckersRules.QUANTUM_V3 or not self.is_entangled(str(target1_id)))):
+                        print("TRUE FOR")
+                        print(source_id, target1_id)
+                        print(self.is_entangled(str(target1_id)))
                         move_type = MoveType.ENTANGLE
                     
                     legal_moves.append(Move_id(move_type, self.player, source_id, jump_id))
                     legal_take_moves.append(Move_id(move_type, self.player, source_id, jump_id))
-
+                    legal_moves[-1].print_move()
         if(len(legal_take_moves) != 0 and _forced_take): # If we can take a piece and taking a piece is forced, return only the moves that can take a piece
             return legal_take_moves
         return legal_moves
@@ -548,13 +569,11 @@ class Checkers:
         print("RELATED SQUARES")
         print(self.related_squares)
         print(self.unique_related_squares)
-        print("&&&&&&&&&&&&&&&&ENTANGLED OBJECTS&&&&&&&&&&&&&&&&")
-        for i in self.entangled_objects:
-            i.print_all()
-            temp = i.return_all_possible_states()
-            print(temp)
-        print(self.calculate_related_states(self.entangled_objects))
+        print(self.entangled_squares)
+        for i in self.classical_squares.keys():
+            print(i, self.is_entangled(i))
         print("&&&&&&&&&&&&&&&&")
+
     def get_board(self) -> str:
         """Returns the Checkers board in ASCII form. Also returns dictionary with id as key.
         Function take from quantum tiq taq toe"""
@@ -821,7 +840,9 @@ class Checkers:
         taken = False # To return if the move took a piece or not
         is_adjacent, jumped_id = self.is_adjacent(move.source_id, move.target1_id)
         if(not is_adjacent): # if ids are not adjacent we jumped over a piece and need to remove it
-            if(self.rules.value <= CheckersRules.QUANTUM_V1.value or (not(self.classical_squares[str(move.source_id)].chance == 100 and self.classical_squares[str(jumped_id)].chance < 100))): # If a the source piece is in superposition
+            print("MEASURING FOR MOVE")
+            print(move.print_move())
+            if(move.movetype == MoveType.TAKE): # If a the source piece is in superposition
                 # First check if the piece we are using is actually there
                 entangled_objects = []
                 if(self.measure_square(move.source_id) == CheckersSquare.EMPTY): # If the piece is not there, turn is wasted
