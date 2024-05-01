@@ -167,6 +167,36 @@ class Entangled():
                 states.append([str(i), str(j)])
         return states
     
+    def return_random_state(self):
+        """
+        Returns one possible state as a list of lists for all ids that are related to each other.
+        Format is [[id1, Checkersquare.FULL], [id2, Checkersquare.EMPTY], ...]
+        """
+        chance = random.randint(1, 2)
+        # 1 is the piece is being taken
+        # 2 is the the piece is not taken
+        state = []
+        for i in self.all_ids:
+            state.append([str(i), CheckersSquare.EMPTY]) # Initalize all qubits to empty
+        if(chance == 1):
+            # Select random ID from successfully_takes that is true.
+            idx = random.randint(0, len(self.successfully_takes)-1)
+            for i in state:
+                if i[0] == str(self.successfully_takes[idx]):
+                    i[1] = CheckersSquare.FULL
+        elif(chance == 2):
+            # Select random ID from unsuccessfully_takes that is true.
+            idx = random.randint(0, len(self.unsuccessfully_takes)-1)
+            for i in state:
+                if i[0] == str(self.unsuccessfully_takes[idx]):
+                    i[1] = CheckersSquare.FULL
+            # Select random ID from not_taken that is true.
+            idx = random.randint(0, len(self.not_taken)-1)
+            for i in state:
+                if i[0] == str(self.not_taken[idx]):
+                    i[1] = CheckersSquare.FULL
+        return state
+
     def print_all(self):
         print(f"Related squares: {self.all_ids}")
         print(f"Is taken: {self.is_taken}")
@@ -177,7 +207,7 @@ class Entangled():
 class Checkers:
     def __init__(self, run_on_hardware = False, num_vertical = 5, num_horizontal = 5, num_vertical_pieces = 1, rules = CheckersRules.QUANTUM_V3, SIMULATE_QUANTUM = False) -> None:
         self.rules = rules
-        self.SIMULATE_QUANTUM = False
+        self.SIMULATE_QUANTUM = True
         if(SIMULATE_QUANTUM.lower() == "true"):
             self.SIMULATE_QUANTUM = True
         self.player = CheckersPlayer.WHITE
@@ -233,16 +263,17 @@ class Checkers:
         """
         Measures single square and returns CheckersSquare.EMPTY or CheckersSquare.FULL for ID
         """
+        temp_uniq_rel_list = deepcopy(self.unique_related_squares)
         ids = self.remove_from_rel_squares(id)
         # ALl entangleds objects related to these ids also need to be removed
         to_be_removed = []
         for i in self.entangled_objects:
             if(ids == i.all_ids):
                 to_be_removed.append(i)
-        for i in to_be_removed:
-            self.entangled_objects.remove(i)
         # Check out all ids, for the one that remained, remove all others from classical squares
         if(not self.SIMULATE_QUANTUM):
+            for i in to_be_removed:
+                self.entangled_objects.remove(i)
             for classical_id in ids:
                 self.board.pop(objects=[self.squares[str(classical_id)]])
                 # original_peek = (self.board.peek(objects=[self.squares[str(id)]])) # peek returns double list of all object peeked. For one object that looks like [[<CheckersSquare.WHITE: 1>]]
@@ -258,9 +289,29 @@ class Checkers:
                 self.remove_piece(str(classical_id))
             return(self.board.peek(objects=[self.squares[str(id)]])[0][0]) # returns for original id
         else: # If we are only simulating
-            # First select the id that remains
             if(len(ids) == 0): # If its is a classical piece
                 return CheckersSquare.FULL
+            #TODO: ADD ENTANGLEMENT
+            # There can only be one entangled object
+            if(len(to_be_removed) == 1): # Entanglement
+                idx = -1 
+                random_state = i.return_random_state()
+                self.entangled_objects.remove(to_be_removed[0])
+                for i in random_state:
+                    if(i[1] == CheckersSquare.FULL):
+                        self.classical_squares[str(i[0])].chance = 100
+                        idx = i[0]
+                    else:
+                        self.remove_piece(i[0])
+                return CheckersSquare.FULL if str(idx) == str(id) else CheckersSquare.EMPTY
+            elif(len(to_be_removed) > 1):  
+                print("ERROR: More than one entangled object")
+                exit()
+                    
+            # First select the id that remains
+            
+
+
             idx = random.randint(0, len(ids)-1)
             # try:
             self.classical_squares[str(ids[idx])].chance = 100
@@ -273,7 +324,7 @@ class Checkers:
             for i, classical_id in enumerate(ids):
                 if(i == idx):
                     continue
-                self.remove_piece(str(classical_id))                
+                self.remove_piece(str(classical_id))
             return CheckersSquare.FULL if str(ids[idx]) == str(id) else CheckersSquare.EMPTY
 
     def on_board(self, x, y):
@@ -362,7 +413,7 @@ class Checkers:
                 jump_id = self.convert_xy_to_id(jump_x, jump_y)
                 if(self.on_board(jump_x, jump_y) and jump_id not in (player_ids+opponent_ids)): # we can jump over if the coordinates are on the board and the piece is empty
                     move_type = MoveType.TAKE
-                    if(self.classical_squares[str(source_id)].chance == 100 and self.classical_squares[str(target1_id)].chance < 100 and (self.rules == CheckersRules.QUANTUM_V3 or not self.is_entangled(str(target1_id)))):
+                    if(self.rules.value >= CheckersRules.QUANTUM_V2.value  and self.classical_squares[str(source_id)].chance == 100 and self.classical_squares[str(target1_id)].chance < 100 and (self.rules == CheckersRules.QUANTUM_V3 or not self.is_entangled(str(target1_id)))):
                         print("TRUE FOR")
                         print(source_id, target1_id)
                         print(self.is_entangled(str(target1_id)))
@@ -872,7 +923,8 @@ class Checkers:
                 self.remove_id_from_rel_squares(jumped_id)
                 taken = True
             else: # ENTANGLEMENT. ALWAYS JUMPS OVER SUPERPOSITION PIECES
-                alpha.quantum_if(self.squares[str(jumped_id)]).equals(CheckersSquare.FULL).apply(CheckersClassicMove(2, 1))(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
+                if(not self.SIMULATE_QUANTUM):
+                    alpha.quantum_if(self.squares[str(jumped_id)]).equals(CheckersSquare.FULL).apply(CheckersClassicMove(2, 1))(self.squares[str(move.source_id)], self.squares[str(move.target1_id)])
                 original_piece = self.classical_squares[str(move.source_id)]
                 
                 self.classical_squares[str(move.target1_id)] = Piece(id=str(move.target1_id), color=original_piece.color, king=original_piece.king, superposition=True)
@@ -1076,8 +1128,7 @@ class Checkers:
                             to_be_removed.add(count2)
                 for i in to_be_removed:
                     self.unique_related_squares.remove(temp_uniq_rel_list[i])
-                return removed_rel_squares 
-
+                return removed_rel_squares
         return []
     
     def get_rel_squares(self, id):
@@ -1116,9 +1167,9 @@ class Checkers:
         return CheckersResult.UNFINISHED
 
 class Sim_Checkers(Checkers):
-    def __init__(self, run_on_hardware, player, num_vertical, num_horizontal, num_vertical_pieces, classical_squares, related_squares, q_rel_moves, q_moves, superposition_pieces, status, moves_since_take, king_squares, rules = CheckersRules.QUANTUM_V3, legal_moves = []) -> None:
+    def __init__(self, run_on_hardware, player, num_vertical, num_horizontal, num_vertical_pieces, classical_squares, related_squares, q_rel_moves, q_moves, superposition_pieces, status, moves_since_take, king_squares, legal_moves, entangled_squares, entangled_objects, unique_related_squares, squares, rules = CheckersRules.QUANTUM_V3) -> None:
         self.rules = rules
-        self.SIMULATE_QUANTUM = False
+        self.SIMULATE_QUANTUM = True
         self.player = player
         self.num_vertical = num_vertical
         self.run_on_hardware = run_on_hardware
@@ -1130,6 +1181,9 @@ class Sim_Checkers(Checkers):
         self.q_moves = q_moves # Just a list of al quantum moves so we can do them again when doing a new move
         self.white_squares = {}
         self.black_squares = {}
+        self.entangled_squares = entangled_squares
+        self.entangled_objects = entangled_objects
+        self.unique_related_squares = unique_related_squares
         self.status = status
         self.superposition_pieces = superposition_pieces # contains a list of pieces that started the superposition. This is needed to recreate the board when a move has been done
         self.moves_since_take = moves_since_take # Number of moves since a piece has been taken

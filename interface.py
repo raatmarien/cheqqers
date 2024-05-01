@@ -52,7 +52,7 @@ BLUE_IMG = pygame.transform.smoothscale(BLUE_IMG, (int(SQUARE_W), int((BLUE_IMG.
 
 
 class GameInterface:
-    def __init__(self, game: Checkers, white_player, black_player, GUI = False) -> None:
+    def __init__(self, game: Checkers, white_player, black_player, GUI = False, mcts = False) -> None:
         self.game = game
         self.quit = False
         self.highlighted_squares = []
@@ -68,9 +68,10 @@ class GameInterface:
         self.white_player = white_player
         self.args = {
             'C': 1.41, # sqrt of 2
-            'num_searches': 10 # Budget per rollout
+            'num_searches': 100 # Budget per rollout
         }
         self.black_player = black_player
+        self.mcts = mcts
         # self.black_player = MCTS(self.game, self.args)
     
     def init_gui(self):
@@ -162,7 +163,7 @@ class GameInterface:
                     # time.sleep(1)
             else: # ASCII BOARD
                 prev_take = False # Always reset
-                self.print_board(False)
+                self.print_board(True)
                 # self.print_board(True)
                 self.print_legal_moves(self.game.legal_moves)
                 counter += 1
@@ -172,9 +173,11 @@ class GameInterface:
                 if(self.game.player == CheckersPlayer.WHITE):
                     move = self.white_player.select_move(self.game.legal_moves)
                 else: # BLACK IS MCTS
-                    move = self.white_player.select_move(self.game.legal_moves)
-                    # self.black_player = MCTS(self.game, self.args)
-                    # move = self.black_player.search()
+                    if(not self.mcts):
+                        move = self.black_player.select_move(self.game.legal_moves)
+                    else:
+                        self.black_player = MCTS(self.game, self.args)
+                        move = self.black_player.search()
                     
                     # move.print_move()
                     # move = self.black_player.select_move(self.game.legal_moves)
