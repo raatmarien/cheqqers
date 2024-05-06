@@ -66,6 +66,7 @@ class GameInterface:
             self.GUI = False
         self.draw_chance = False
         self.white_player = white_player
+        self.print = False
         self.args = {
             'C': 1.41, # sqrt of 2
             'num_searches': 100000 # Budget per rollout
@@ -163,8 +164,9 @@ class GameInterface:
                     # time.sleep(1)
             else: # ASCII BOARD
                 prev_take = False # Always reset
-                self.print_board(True)
-                self.print_legal_moves(self.game.legal_moves)
+                if(self.print):
+                    self.print_board(True)
+                    self.print_legal_moves(self.game.legal_moves)
                 counter += 1
                 # if(counter % 10 == 0):
                 #     print(f"Move number {counter}")
@@ -181,8 +183,9 @@ class GameInterface:
                     # move.print_move()
                     # move = self.black_player.select_move(self.game.legal_moves)
                 moves.append(move)
-                print("Selected move: ", end="")
-                move.print_move()
+                if(self.print):
+                    print("Selected move: ", end="")
+                    move.print_move()
                 self.game.player_move(move, self.game.player)
                 # if(len(self.game.legal_moves) > 0):
                 #     prev_take = True
