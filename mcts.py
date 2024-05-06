@@ -133,7 +133,7 @@ class Node():
         # Change player (if not handled?)
         # child_state = deepcopy(self.game)
         if(action.movetype == MoveType.TAKE):
-            child_states, weights = self.game.return_all_possible_states(action)
+            # child_states, weights = self.game.return_all_possible_states(action)
             temp = self.game.get_copy()
             temp.player_move(action)
             child_states = [temp]

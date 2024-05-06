@@ -52,13 +52,15 @@ def main():
     file.write("#"*100 + "\n")
     file.write(f"Size: {size}x{size}, Rule: {rule}\n")
     print(f"Size: {size}x{size}, Rule: {rule}")
-    for i in range(100):
+    for i in range(50):
         # if((i+1)%50 == 0):
         print(f"Game {i+1}")
         start_t = time.time()
         checkers = Checkers(num_vertical=size, num_horizontal=size, num_vertical_pieces=args.num_vertical_pieces, SIMULATE_QUANTUM=args.sim_q, rules=rule)
         game = GameInterface(checkers, white_player=p1, black_player=p2, GUI=args.GUI, mcts=True, print=False, attempt=i)
         result, num_moves = (game.play())
+        if(result == CheckersResult.WHITE_WINS):
+            print("White wins &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
         results.append(result)
         number_of_moves.append(num_moves)
         times.append(time.time()-start_t)
@@ -78,3 +80,6 @@ if __name__ == "__main__":
 
 # Generate prof:  python3 -m cProfile -o main.prof main.py
 # Visualise prof: snakeviz main.prof
+
+# TODO:
+# RETURN ALL POSSIBLE STATES WERKT NIET
