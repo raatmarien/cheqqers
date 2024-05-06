@@ -68,7 +68,7 @@ class GameInterface:
         self.white_player = white_player
         self.args = {
             'C': 1.41, # sqrt of 2
-            'num_searches': 1 # Budget per rollout
+            'num_searches': 100000 # Budget per rollout
         }
         self.black_player = black_player
         self.mcts = mcts
@@ -164,7 +164,6 @@ class GameInterface:
             else: # ASCII BOARD
                 prev_take = False # Always reset
                 self.print_board(True)
-                # self.print_board(True)
                 self.print_legal_moves(self.game.legal_moves)
                 counter += 1
                 # if(counter % 10 == 0):
@@ -182,9 +181,8 @@ class GameInterface:
                     # move.print_move()
                     # move = self.black_player.select_move(self.game.legal_moves)
                 moves.append(move)
-                # move.print_move()
-                # print("Selected move: ", end="")
-                # move.print_move()
+                print("Selected move: ", end="")
+                move.print_move()
                 self.game.player_move(move, self.game.player)
                 # if(len(self.game.legal_moves) > 0):
                 #     prev_take = True
