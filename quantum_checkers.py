@@ -167,6 +167,39 @@ class Entangled():
                 states.append([str(i), str(j)])
         return states
     
+    def return_possible_states_adv(self):
+        """
+        Returns one possible state as a list of lists for all ids that are related to each other.
+        Format is [[[id1, Checkersquare.EMPTY], [id2, Checkersquare.FULL], ...]], [[id1, Checkersquare.FULL], [id2, Checkersquare.EMPTY], ...]]
+        """
+        all_states = []
+
+        # Needs to be repeated for each possible state
+        for i in self.successfully_takes:
+            state = []
+            for j in self.all_ids:
+                if(i == j):
+                    state.append([str(j), CheckersSquare.FULL])
+                else:
+                    state.append([str(j), CheckersSquare.EMPTY])
+            all_states.append(state)
+        for i in self.unsuccessfully_takes:
+            for j in self.not_taken:
+                state = []
+                for k in self.all_ids:
+                    if(i == k):
+                        state.append([str(k), CheckersSquare.FULL])
+                    elif(j == k):
+                        state.append([str(k), CheckersSquare.FULL])
+                    else:
+                        state.append([str(k), CheckersSquare.EMPTY])
+                all_states.append(state)
+        return all_states
+        # state = []
+        # for i in self.all_ids:
+        #     state.append([str(i), CheckersSquare.EMPTY]) # Initalize all qubits to empty
+        
+
     def return_random_state(self):
         """
         Returns one possible state as a list of lists for all ids that are related to each other.
@@ -291,7 +324,6 @@ class Checkers:
         else: # If we are only simulating
             if(len(ids) == 0): # If its is a classical piece
                 return CheckersSquare.FULL
-            #TODO: ADD ENTANGLEMENT
             # There can only be one entangled object
             if(len(to_be_removed) == 1): # Entanglement
                 idx = -1 
@@ -311,7 +343,7 @@ class Checkers:
             # First select the id that remains
             
 
-
+            # IF the id is not entangled, just choose one random idea since it is in superposition
             idx = random.randint(0, len(ids)-1)
             # try:
             self.classical_squares[str(ids[idx])].chance = 100
