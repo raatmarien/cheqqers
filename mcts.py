@@ -51,10 +51,10 @@ class MCTS():
             action_probs[idx] = child.visit_count
         action_probs /= np.sum(action_probs) # normalize
         # self.root = # Chance root node to keep part of tree that has been simulated
-        print("All moves: ")
-        for idx, child in enumerate(self.root.children):
-            print(f"{action_probs[idx]:.2f}: ", end="")
-            child.move.print_move()
+        # print("All moves: ")
+        # for idx, child in enumerate(self.root.children):
+        #     print(f"{action_probs[idx]:.2f}: ", end="")
+        #     child.move.print_move()
         return self.root.children[np.argmax(action_probs)].move
     
     # def new_root(self, move):
@@ -70,8 +70,8 @@ class Node():
         self.weight = weight
 
         self.children = []
-        print(f"Legal moves: {(self.game.legal_moves)}")
-        print(self.game.get_sim_board())
+        # print(f"Legal moves: {(self.game.legal_moves)}")
+        # print(self.game.get_sim_board())
         self.expandable_moves = self.game.legal_moves
         self.visit_count = 0
         self.value_sum = 0

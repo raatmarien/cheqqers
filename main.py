@@ -30,7 +30,7 @@ def main():
     # for rule in [CheckersRules.CLASSICAL, CheckersRules.QUANTUM_V1, CheckersRules.QUANTUM_V2]:
     #     for size in [10, 12, 14]:
     size = 5
-    rule = CheckersRules.QUANTUM_V2
+    rule = CheckersRules.CLASSICAL
     times = []
     results = []
     number_of_moves = []
@@ -42,7 +42,7 @@ def main():
             print(i+1)
         start_t = time.time()
         checkers = Checkers(num_vertical=size, num_horizontal=size, num_vertical_pieces=args.num_vertical_pieces, SIMULATE_QUANTUM=args.sim_q, rules=rule)
-        game = GameInterface(checkers, white_player=p1, black_player=p2, GUI=args.GUI)
+        game = GameInterface(checkers, white_player=p1, black_player=p2, GUI=args.GUI, mcts=True)
         result, num_moves = (game.play())
         results.append(result)
         number_of_moves.append(num_moves)

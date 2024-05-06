@@ -157,7 +157,7 @@ class Entangled():
 
     def return_possible_states(self):
         """
-        Returns all possible states of the entangled object when entangled objects can not be more entangled with each other
+        Returns all possible states of the entangled object when entangled objects can not be more entangled with each other. Only returns which IDS remains
         """
         states = []
         for i in self.successfully_takes:
@@ -446,14 +446,14 @@ class Checkers:
                 if(self.on_board(jump_x, jump_y) and jump_id not in (player_ids+opponent_ids)): # we can jump over if the coordinates are on the board and the piece is empty
                     move_type = MoveType.TAKE
                     if(self.rules.value >= CheckersRules.QUANTUM_V2.value  and self.classical_squares[str(source_id)].chance == 100 and self.classical_squares[str(target1_id)].chance < 100 and (self.rules == CheckersRules.QUANTUM_V3 or not self.is_entangled(str(target1_id)))):
-                        print("TRUE FOR")
-                        print(source_id, target1_id)
-                        print(self.is_entangled(str(target1_id)))
+                        # print("TRUE FOR")
+                        # print(source_id, target1_id)
+                        # print(self.is_entangled(str(target1_id)))
                         move_type = MoveType.ENTANGLE
                     
                     legal_moves.append(Move_id(move_type, self.player, source_id, jump_id))
                     legal_take_moves.append(Move_id(move_type, self.player, source_id, jump_id))
-                    legal_moves[-1].print_move()
+                    # legal_moves[-1].print_move()
         if(len(legal_take_moves) != 0 and _forced_take): # If we can take a piece and taking a piece is forced, return only the moves that can take a piece
             return legal_take_moves
         return legal_moves
@@ -648,14 +648,16 @@ class Checkers:
         self.player = CheckersPlayer.BLACK if self.player == CheckersPlayer.WHITE else CheckersPlayer.WHITE
         self.legal_moves = self.calculate_possible_moves(self.player)
         self.status = self.result()
-        print("########")
-        print("RELATED SQUARES")
-        print(self.related_squares)
-        print(self.unique_related_squares)
-        print(self.entangled_squares)
-        for i in self.classical_squares.keys():
-            print(i, self.is_entangled(i))
-        print("&&&&&&&&&&&&&&&&")
+        
+        # DEBUG STUFF
+        # print("########")
+        # print("RELATED SQUARES")
+        # print(self.related_squares)
+        # print(self.unique_related_squares)
+        # print(self.entangled_squares)
+        # for i in self.classical_squares.keys():
+        #     print(i, self.is_entangled(i))
+        # print("&&&&&&&&&&&&&&&&")
 
     def get_board(self) -> str:
         """Returns the Checkers board in ASCII form. Also returns dictionary with id as key.
@@ -847,7 +849,7 @@ class Checkers:
             checked = False
             for jid in jumped_ids:
                 # temp_state = deepcopy(new_state)
-                temp_state = Sim_Checkers(run_on_hardware=False, num_vertical=self.num_vertical, num_horizontal=self.num_horizontal, num_vertical_pieces=self.num_vertical_pieces, classical_squares=deepcopy(self.classical_squares), related_squares=deepcopy(self.related_squares), q_rel_moves=deepcopy(self.q_rel_moves), q_moves=deepcopy(self.q_moves), superposition_pieces=deepcopy(self.superposition_pieces), status=deepcopy(self.status), moves_since_take=deepcopy(self.moves_since_take), king_squares=deepcopy(self.king_squares), legal_moves=deepcopy(self.legal_moves), rules=self.rules)
+                temp_state = Sim_Checkers(run_on_hardware=False, num_vertical=self.num_vertical, num_horizontal=self.num_horizontal, num_vertical_pieces=self.num_vertical_pieces, classical_squares=deepcopy(self.classical_squares), related_squares=deepcopy(self.related_squares), q_rel_moves=deepcopy(self.q_rel_moves), q_moves=deepcopy(self.q_moves), superposition_pieces=deepcopy(self.superposition_pieces), status=deepcopy(self.status), moves_since_take=deepcopy(self.moves_since_take), king_squares=deepcopy(self.king_squares), legal_moves=deepcopy(self.legal_moves), rules=self.rules, player=deepcopy(self.player), entangled_squares=deepcopy(self.entangled_squares), entangled_objects=deepcopy(self.entangled_objects), unique_related_squares=deepcopy(self.unique_related_squares))
                 if(sid == str(move.source_id) and jid == str(jumped_id)): # State where a piece is actually taken.
                     # Weight is chance that sid is there times chance that jid is there
                     weights.append(self.classical_squares[str(sid)].chance/100 * self.classical_squares[str(jid)].chance/100)
@@ -908,6 +910,9 @@ class Checkers:
         # for i in (states):
         #     print("BOARD")
         #     print(i.get_sim_board())
+        # print("#"*100)
+        # print("Length of states", len(states))
+        # print("#"*100)
         return states, weights
 
     def classic_move(self, move: Move_id) -> [bool, bool]:
@@ -923,8 +928,8 @@ class Checkers:
         taken = False # To return if the move took a piece or not
         is_adjacent, jumped_id = self.is_adjacent(move.source_id, move.target1_id)
         if(not is_adjacent): # if ids are not adjacent we jumped over a piece and need to remove it
-            print("MEASURING FOR MOVE")
-            print(move.print_move())
+            # print("MEASURING FOR MOVE")
+            # print(move.print_move())
             if(move.movetype == MoveType.TAKE): # If a the source piece is in superposition
                 # First check if the piece we are using is actually there
                 entangled_objects = []
@@ -1199,7 +1204,7 @@ class Checkers:
         return CheckersResult.UNFINISHED
 
 class Sim_Checkers(Checkers):
-    def __init__(self, run_on_hardware, player, num_vertical, num_horizontal, num_vertical_pieces, classical_squares, related_squares, q_rel_moves, q_moves, superposition_pieces, status, moves_since_take, king_squares, legal_moves, entangled_squares, entangled_objects, unique_related_squares, squares, rules = CheckersRules.QUANTUM_V3) -> None:
+    def __init__(self, run_on_hardware, player, num_vertical, num_horizontal, num_vertical_pieces, classical_squares, related_squares, q_rel_moves, q_moves, superposition_pieces, status, moves_since_take, king_squares, legal_moves, entangled_squares, entangled_objects, unique_related_squares, rules = CheckersRules.QUANTUM_V3) -> None:
         self.rules = rules
         self.SIMULATE_QUANTUM = True
         self.player = player

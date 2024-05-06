@@ -68,7 +68,7 @@ class GameInterface:
         self.white_player = white_player
         self.args = {
             'C': 1.41, # sqrt of 2
-            'num_searches': 100 # Budget per rollout
+            'num_searches': 1 # Budget per rollout
         }
         self.black_player = black_player
         self.mcts = mcts
@@ -194,9 +194,9 @@ class GameInterface:
         # print(f"Results: {self.game.status}")
         return(self.game.status, counter)
 
-    def draw_circle(self, id, color, x, y, radius, king = False, highlited = False):
+    def draw_circle(self, id, color, x, y, radius, king = False, highlighted = False):
         if(color == RED):
-            if(highlited):
+            if(highlighted):
                 # highlight_color = YELLOW
                 c = RED_SELECTED_IMG.get_rect(center=(x+SQUARE_W//2, y+SQUARE_H//2)) # centers the image
                 self.screen.blit(RED_SELECTED_IMG, c)
@@ -209,7 +209,7 @@ class GameInterface:
             # gfxdraw.aacircle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius-int(radius*0.15), L_RED)
             # gfxdraw.aacircle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, highlight_color)
         else:
-            if(highlited):
+            if(highlighted):
                 c = BLACK_SELECTED_IMG.get_rect(center=(x+SQUARE_W//2, y+SQUARE_H//2)) # centers the image
                 self.screen.blit(BLACK_SELECTED_IMG, c)
             else:
