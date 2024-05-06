@@ -7,6 +7,7 @@ import random
 from copy import deepcopy
 from quantum_checkers import Sim_Checkers, Checkers
 import traceback
+from time import sleep
 
 args = { # Not used here, just an example
     'C': 1.41, # sqrt of 2
@@ -21,7 +22,7 @@ def write_to_file(file_name, text):
 class MCTS():
     def __init__(self, game, args):
         # self.game = deepcopy(game)
-        self.game = Sim_Checkers(run_on_hardware=False, player=deepcopy(game.player), num_vertical=game.num_vertical, num_horizontal=game.num_horizontal, num_vertical_pieces=game.num_vertical_pieces, classical_squares=deepcopy(game.classical_squares), related_squares=deepcopy(game.related_squares), q_rel_moves=deepcopy(game.q_rel_moves), q_moves=deepcopy(game.q_moves), superposition_pieces=deepcopy(game.superposition_pieces), status=deepcopy(game.status), moves_since_take=deepcopy(game.moves_since_take), king_squares=deepcopy(game.king_squares), legal_moves=game.calculate_possible_moves(), rules=game.rules, entangled_squares=game.entangled_squares, entangled_objects=game.entangled_objects, unique_related_squares=game.unique_related_squares)
+        self.game = game.get_copy()
         self.args = args
         self.root = Node(self.game, self.args)
 
@@ -29,11 +30,12 @@ class MCTS():
         # Define root node
         for srch in range(self.args['num_searches']):
             # print(f"Search {srch}")
-            node = self.root
+            node = self.root            
             # print(f"Fully expandend: {node.is_fully_expanded()}")
             while node.is_fully_expanded():
                 node = node.select()
             result = node.game.result()
+            # If it is a leaf node
             if(result != CheckersResult.DRAW and result != CheckersResult.UNFINISHED):
                 if(self.game.player == CheckersPlayer.BLACK):
                     if(result == CheckersResult.BLACK_WINS):
@@ -57,11 +59,11 @@ class MCTS():
                     # print(node.game.get_sim_board())
                     value = node.simulate()
                     # backpropogation
-                    node.backpropogate(value)
+            node.backpropogate(value)
 
         action_probs = np.zeros(len(self.root.children))
         for idx, child in enumerate(self.root.children):
-            action_probs[idx] = child.value_sum
+            action_probs[idx] = child.visit_count
         # print(action_probs)
         # action_probs /= np.sum(action_probs) # normalize
         # print(action_probs)
@@ -132,10 +134,13 @@ class Node():
         # child_state = deepcopy(self.game)
         if(action.movetype == MoveType.TAKE):
             child_states, weights = self.game.return_all_possible_states(action)
-            # child_state.player_move(action, child_state.player)
+            temp = self.game.get_copy()
+            temp.player_move(action)
+            child_states = [temp]
+            weights = [1]
             # print( "True")
         else:
-            temp = Sim_Checkers(run_on_hardware=False, player=deepcopy(self.game.player), num_vertical=self.game.num_vertical, num_horizontal=self.game.num_horizontal, num_vertical_pieces=self.game.num_vertical_pieces, classical_squares=deepcopy(self.game.classical_squares), related_squares=deepcopy(self.game.related_squares), q_rel_moves=deepcopy(self.game.q_rel_moves), q_moves=deepcopy(self.game.q_moves), superposition_pieces=deepcopy(self.game.superposition_pieces), status=deepcopy(self.game.status), moves_since_take=deepcopy(self.game.moves_since_take), king_squares=deepcopy(self.game.king_squares), legal_moves=self.game.calculate_possible_moves(), rules=self.game.rules, entangled_squares=self.game.entangled_squares, entangled_objects=self.game.entangled_objects, unique_related_squares=self.game.unique_related_squares)
+            temp = self.game.get_copy()
             # temp = deepcopy(self.game)
             temp.player_move(action)
             child_states = [temp]
@@ -148,7 +153,7 @@ class Node():
         return self.children
 
     def simulate(self):
-        sim_game = Sim_Checkers(run_on_hardware=False, player=deepcopy(self.game.player), num_vertical=self.game.num_vertical, num_horizontal=self.game.num_horizontal, num_vertical_pieces=self.game.num_vertical_pieces, classical_squares=deepcopy(self.game.classical_squares), related_squares=deepcopy(self.game.related_squares), q_rel_moves=deepcopy(self.game.q_rel_moves), q_moves=deepcopy(self.game.q_moves), superposition_pieces=deepcopy(self.game.superposition_pieces), status=deepcopy(self.game.status), moves_since_take=deepcopy(self.game.moves_since_take), king_squares=deepcopy(self.game.king_squares), legal_moves=self.game.calculate_possible_moves(), rules=self.game.rules, entangled_squares=self.game.entangled_squares, entangled_objects=self.game.entangled_objects, unique_related_squares=self.game.unique_related_squares)
+        sim_game = self.game.get_copy()
         # sim_game.SIMULATE_QUANTUM = True
         rollout_player = sim_game.player
         prev_board = sim_game.get_sim_board()
@@ -180,7 +185,7 @@ class Node():
                     print(sim_game.status)
                     exit()
             elif(sim_game.status == CheckersResult.BLACK_WINS or sim_game.status == CheckersResult.WHITE_WINS):
-                if(rollout_player == CheckersPlayer.BLACK):
+                if(rollout_player == CheckersPlayer.BLACK): # because player just changed to other player
                     if(sim_game.status == CheckersResult.BLACK_WINS):
                         return 1
                     else:

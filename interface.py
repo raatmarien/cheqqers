@@ -72,7 +72,7 @@ class GameInterface:
         self.print = print
         self.args = {
             'C': 1.41, # sqrt of 2
-            'num_searches': 10000, # Budget per rollout
+            'num_searches': 100, # Budget per rollout
             'attempt': self.attempt
         }
         self.black_player = black_player

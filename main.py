@@ -52,7 +52,7 @@ def main():
     file.write("#"*100 + "\n")
     file.write(f"Size: {size}x{size}, Rule: {rule}\n")
     print(f"Size: {size}x{size}, Rule: {rule}")
-    for i in range(10):
+    for i in range(100):
         # if((i+1)%50 == 0):
         print(f"Game {i+1}")
         start_t = time.time()
