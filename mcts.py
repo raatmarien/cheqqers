@@ -13,6 +13,10 @@ args = { # Not used here, just an example
     'num_searches': 100 #Budget per rollout
 }
 
+def write_to_file(file_name, text):
+    temp = open(file_name, "a")
+    temp.write(text)
+    temp.close()
 
 class MCTS():
     def __init__(self, game, args):
@@ -29,13 +33,22 @@ class MCTS():
             # print(f"Fully expandend: {node.is_fully_expanded()}")
             while node.is_fully_expanded():
                 node = node.select()
-
             result = node.game.result()
             if(result != CheckersResult.DRAW and result != CheckersResult.UNFINISHED):
-                if(node.game.player == self.game.player): # player can move twice in a row
-                    value = 1
-                elif(node.game.player != self.game.player):
-                    value = -1
+                if(self.game.player == CheckersPlayer.BLACK):
+                    if(result == CheckersResult.BLACK_WINS):
+                        value = 1
+                    else:
+                        value = -1
+                else:
+                    if(result == CheckersResult.WHITE_WINS):
+                        value = 1
+                    else:
+                        value = -1
+                # if(node.game.player == self.game.player): # player can move twice in a row
+                #     value = -1
+                # elif(node.game.player != self.game.player):
+                #     value = 1
             elif(result == CheckersResult.DRAW):
                 value = 0
             else: # game unfinished
@@ -48,13 +61,23 @@ class MCTS():
 
         action_probs = np.zeros(len(self.root.children))
         for idx, child in enumerate(self.root.children):
-            action_probs[idx] = child.visit_count
-        action_probs /= np.sum(action_probs) # normalize
+            action_probs[idx] = child.value_sum
+        # print(action_probs)
+        # action_probs /= np.sum(action_probs) # normalize
+        # print(action_probs)
         # self.root = # Chance root node to keep part of tree that has been simulated
         # print("All moves: ")
         # for idx, child in enumerate(self.root.children):
         #     print(f"{action_probs[idx]:.2f}: ", end="")
         #     child.move.print_move()
+
+        str = "All moves: \n"
+        for idx, child in enumerate(self.root.children):
+            str += f"{action_probs[idx]:.2f}: "
+            str += child.move.get_move()
+            str += "\n"
+        file_name = f"attempts/log_{self.args['attempt']}.txt"
+        write_to_file(file_name, str + "\n")
         return self.root.children[np.argmax(action_probs)].move
     
     # def new_root(self, move):
@@ -168,8 +191,7 @@ class Node():
                     else:
                         return -1
             else: #draw
-                return 0 
-            prev_board = sim_game.get_sim_board()
+                return 0
 
     def backpropogate(self, value):
         self.value_sum += value

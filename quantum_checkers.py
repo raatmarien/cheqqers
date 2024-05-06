@@ -281,6 +281,12 @@ class Checkers:
                         self.classical_squares[str(id)] = Piece(str(id), CheckersPlayer.WHITE, king)
         self.legal_moves = self.calculate_possible_moves(self.player)
 
+    def get_copy(self):
+        """
+        Returns a simulated deepcopy of the current board
+        """
+        return Sim_Checkers(run_on_hardware=False, player=deepcopy(self.player), num_vertical=self.num_vertical, num_horizontal=self.num_horizontal, num_vertical_pieces=self.num_vertical_pieces, classical_squares=deepcopy(self.classical_squares), related_squares=deepcopy(self.related_squares), q_rel_moves=deepcopy(self.q_rel_moves), q_moves=deepcopy(self.q_moves), superposition_pieces=deepcopy(self.superposition_pieces), status=deepcopy(self.status), moves_since_take=deepcopy(self.moves_since_take), king_squares=deepcopy(self.king_squares), legal_moves=self.calculate_possible_moves(), rules=self.rules, entangled_squares=self.entangled_squares, entangled_objects=self.entangled_objects, unique_related_squares=self.unique_related_squares)
+
     def write_to_log(self, string):
         self.log = open("./log.txt", "a")
         self.log.write(string)
@@ -1187,6 +1193,25 @@ class Checkers:
     
     def convert_id_to_xy(self, id: int) -> (int, int):
         return (id % self.num_horizontal, id // self.num_horizontal)
+
+    def won(self, player: CheckersPlayer):
+        """
+        Checks if a player has won
+        """
+        res = self.result()
+        if(res == CheckersResult.WHITE_WINS and player == CheckersPlayer.WHITE):
+            return True
+        if(res == CheckersResult.BLACK_WINS and player == CheckersPlayer.BLACK):
+            return True
+        return False
+    
+    def lost(self, player: CheckersPlayer):
+        res = self.result()
+        if(res == CheckersResult.WHITE_WINS and player == CheckersPlayer.BLACK):
+            return True
+        if(res == CheckersResult.BLACK_WINS and player == CheckersPlayer.WHITE):
+            return True
+        return False
 
     def result(self):
         """

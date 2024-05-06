@@ -4,6 +4,7 @@ from players import human_player
 import numpy as np
 import pygame
 import random
+from time import sleep
 from enums import (
     CheckersResult,
     CheckersPlayer,
@@ -16,6 +17,7 @@ import time
 import pygame
 import sys
 from mcts import MCTS
+from copy import deepcopy
 # https://quantumchess.net/play/
 # https://entanglement-chess.netlify.app/qm
 # https://github.com/quantumlib/unitary/blob/main/docs/unitary/getting_started.ipynb
@@ -49,16 +51,17 @@ BLACK_SELECTED_IMG = pygame.transform.smoothscale(BLACK_SELECTED_IMG, (int(SQUAR
 BLUE_IMG = pygame.image.load(os.path.join(os.path.dirname(__file__), "images/Damsteen-geest.png"))
 BLUE_IMG = pygame.transform.smoothscale(BLUE_IMG, (int(SQUARE_W), int((BLUE_IMG.get_height()/(BLUE_IMG.get_width()/SQUARE_W)))))
 
-
-
 class GameInterface:
-    def __init__(self, game: Checkers, white_player, black_player, GUI = False, mcts = False) -> None:
+    def __init__(self, game: Checkers, white_player, black_player, GUI = False, mcts = False, print = True, attempt=99999999) -> None:
         self.game = game
         self.quit = False
         self.highlighted_squares = []
         self.selected_id = None # Square select by player, used for highlighting and moving pieces
         self.move_locations = set() # If a piece is selected, this variable will store the locations the piece can move to
         open('./log.txt', 'w').close()
+        self.attempt = attempt
+        self.file_name = f"./attempts/log_{attempt}.txt"
+        open(self.file_name, 'w').close()
         if(GUI.lower() == "true"):
             self.GUI = True
             self.init_gui()
@@ -66,10 +69,11 @@ class GameInterface:
             self.GUI = False
         self.draw_chance = False
         self.white_player = white_player
-        self.print = False
+        self.print = print
         self.args = {
             'C': 1.41, # sqrt of 2
-            'num_searches': 100000 # Budget per rollout
+            'num_searches': 10000, # Budget per rollout
+            'attempt': self.attempt
         }
         self.black_player = black_player
         self.mcts = mcts
@@ -102,7 +106,12 @@ class GameInterface:
         # no piece selected that is able to move TODO
         for idx in movable_pieces:
             self.highlighted_squares.append(idx)
-        
+    
+    def write_attempt(self, attempt_str):
+        temp = open(self.file_name, "a")
+        temp.write(attempt_str)
+        temp.close()
+
     def write_to_log(self, move, counter, moves):
         self.log = open("./log.txt", "a")
         self.log.write("#########################\n")
@@ -164,6 +173,8 @@ class GameInterface:
                     # time.sleep(1)
             else: # ASCII BOARD
                 prev_take = False # Always reset
+                attempt_str = ""
+                attempt_str = self.game.get_sim_board()
                 if(self.print):
                     self.print_board(True)
                     self.print_legal_moves(self.game.legal_moves)
@@ -179,13 +190,17 @@ class GameInterface:
                     else:
                         self.black_player = MCTS(self.game, self.args)
                         move = self.black_player.search()
-                    
                     # move.print_move()
                     # move = self.black_player.select_move(self.game.legal_moves)
                 moves.append(move)
                 if(self.print):
                     print("Selected move: ", end="")
                     move.print_move()
+                attempt_str += '\n'
+                attempt_str += "Selected move: "
+                attempt_str += move.get_move()
+                attempt_str += '\n'
+                self.write_attempt(attempt_str)
                 self.game.player_move(move, self.game.player)
                 # if(len(self.game.legal_moves) > 0):
                 #     prev_take = True
@@ -193,6 +208,7 @@ class GameInterface:
                 # time.sleep(1)
         # self.print_board()
         # print(f"Results: {self.game.status}")
+        self.write_attempt(f"Results: {self.game.status}")
         return(self.game.status, counter)
 
     def draw_circle(self, id, color, x, y, radius, king = False, highlighted = False):

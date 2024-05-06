@@ -9,6 +9,13 @@ import glob
 import math
 import cProfile
 import pstats
+import os
+import glob
+
+def empty_attempts_folder():
+    files = glob.glob('./attempts/*')
+    for f in files:
+        os.remove(f)
 
 def empty_attempts():
     files = glob.glob('./attempts/*')
@@ -16,7 +23,7 @@ def empty_attempts():
         os.remove(f)
 
 def main():
-    empty_attempts()
+    empty_attempts_folder()
     parser = argparse.ArgumentParser()
     parser.add_argument('--num_rows', help='The number of rows of the checkboard. INT', default=8)
     parser.add_argument('--num_columns', help='The number of columns of the checkboard. INT', default=8)
@@ -47,10 +54,10 @@ def main():
     print(f"Size: {size}x{size}, Rule: {rule}")
     for i in range(10):
         # if((i+1)%50 == 0):
-        print(f"Game: {i+1}")
+        print(f"Game {i+1}")
         start_t = time.time()
         checkers = Checkers(num_vertical=size, num_horizontal=size, num_vertical_pieces=args.num_vertical_pieces, SIMULATE_QUANTUM=args.sim_q, rules=rule)
-        game = GameInterface(checkers, white_player=p1, black_player=p2, GUI=args.GUI, mcts=True)
+        game = GameInterface(checkers, white_player=p1, black_player=p2, GUI=args.GUI, mcts=True, print=False, attempt=i)
         result, num_moves = (game.play())
         results.append(result)
         number_of_moves.append(num_moves)
