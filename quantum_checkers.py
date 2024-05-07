@@ -846,6 +846,8 @@ class Checkers:
         if(move.movetype != MoveType.TAKE):
             return [], []
         _, jumped_id = self.is_adjacent(move.source_id, move.target1_id)
+        states = []
+        weights = []
         source_ids = self.get_rel_squares(move.source_id)
         jumped_ids = self.get_rel_squares(jumped_id)
         # First check if we are dealing with entanglement, just superposition or a classic move.
@@ -856,8 +858,11 @@ class Checkers:
             # Superposition
             pass
         else:
-            # Classic move
-            pass
+            cp = self.get_copy()
+            cp.player_move(move)
+            states.append(cp)
+            weights.append(1)
+        return states, weights
 
 
     def return_all_possible_states(self, move: Move_id):

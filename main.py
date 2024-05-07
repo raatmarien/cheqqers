@@ -11,6 +11,7 @@ import cProfile
 import pstats
 import os
 import glob
+import random
 
 def empty_attempts_folder():
     files = glob.glob('./attempts/*')
@@ -60,6 +61,8 @@ def main():
         game = GameInterface(checkers, white_player=p1, black_player=p2, GUI=args.GUI, white_mcts=False, black_mcts=True, print=False, attempt=i)
         result, num_moves = (game.play())
         results.append(result)
+        if(result == CheckersResult.WHITE_WINS):
+            print(f"########################### White wins at {i}")
         number_of_moves.append(num_moves)
         times.append(time.time()-start_t)
         #if((i+1)%100 == 0):
@@ -73,6 +76,7 @@ def main():
     file.write(f"Average number of moves: {sum(number_of_moves)/len(number_of_moves)}\n")
     file.write(f"Draw: {results.count(CheckersResult.DRAW)}, White wins: {results.count(CheckersResult.WHITE_WINS)}, Black wins: {results.count(CheckersResult.BLACK_WINS)}\n")
     file.close()
+
 if __name__ == "__main__":
     main()
 

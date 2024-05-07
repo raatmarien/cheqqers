@@ -59,7 +59,7 @@ class MCTS():
                     # print(node.game.get_sim_board())
                     value = node.simulate()
                     # backpropogation
-            node.backpropogate(value)
+                    node.backpropogate(value)
 
         action_probs = np.zeros(len(self.root.children))
         for idx, child in enumerate(self.root.children):
@@ -78,6 +78,9 @@ class MCTS():
             str += f"{action_probs[idx]:.2f}: "
             str += child.move.get_move()
             str += "\n"
+            str += f"{child.visit_count} visits\n"
+            str += f"{child.value_sum} value\n"
+            str+= f"{child.weight} weight\n"
         file_name = f"attempts/log_{self.args['attempt']}.txt"
         write_to_file(file_name, str + "\n")
         return self.root.children[np.argmax(action_probs)].move
@@ -105,16 +108,17 @@ class Node():
         return len(self.expandable_moves) == 0 and len(self.children) > 0
     
     def select(self):
-        best_child = None
+        best_children = []
         best_ucb = -np.inf
-
         for child in self.children:
             ucb = self.get_ucb(child)
             if ucb > best_ucb:
-                best_child = child
+                best_children.append(child)
                 best_ucb = ucb
+            elif(ucb == best_ucb):
+                best_children.append(child)
         
-        return best_child
+        return random.choice(best_children)
     
     def get_ucb(self, child):
         # q_value is what child think of itself so we reverse it
@@ -122,7 +126,7 @@ class Node():
         q_value = (((child.value_sum / child.visit_count) + 1) / 2)
         if(child.game.player != self.game.player):
             q_value = 1 - q_value
-        return child.weight * (q_value + self.args['C'] * math.sqrt(math.log(self.visit_count / child.visit_count)))
+        return child.weight * (q_value + self.args['C'] * math.sqrt(math.log(self.visit_count) / child.visit_count))
         
     def expand(self):
         action = random.choice(self.expandable_moves)
@@ -133,11 +137,11 @@ class Node():
         # Change player (if not handled?)
         # child_state = deepcopy(self.game)
         if(action.movetype == MoveType.TAKE):
-            # child_states, weights = self.game.return_all_possible_states(action)
-            temp = self.game.get_copy()
-            temp.player_move(action)
-            child_states = [temp]
-            weights = [1]
+            child_states, weights = self.game.return_all_possible_states(action)
+            # temp = self.game.get_copy()
+            # temp.player_move(action)
+            # child_states = [temp]
+            # weights = [1]
             # print( "True")
         else:
             temp = self.game.get_copy()
