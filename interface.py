@@ -52,7 +52,7 @@ BLUE_IMG = pygame.image.load(os.path.join(os.path.dirname(__file__), "images/Dam
 BLUE_IMG = pygame.transform.smoothscale(BLUE_IMG, (int(SQUARE_W), int((BLUE_IMG.get_height()/(BLUE_IMG.get_width()/SQUARE_W)))))
 
 class GameInterface:
-    def __init__(self, game: Checkers, white_player, black_player, GUI = False, mcts = False, print = True, attempt=99999999) -> None:
+    def __init__(self, game: Checkers, white_player, black_player, GUI = False, white_mcts = False, black_mcts = False, print = True, attempt=99999999) -> None:
         self.game = game
         self.quit = False
         self.highlighted_squares = []
@@ -72,11 +72,12 @@ class GameInterface:
         self.print = print
         self.args = {
             'C': 1.41, # sqrt of 2
-            'num_searches': 100, # Budget per rollout
+            'num_searches': 50, # Budget per rollout
             'attempt': self.attempt
         }
         self.black_player = black_player
-        self.mcts = mcts
+        self.white_mcts = white_mcts
+        self.black_mcts = black_mcts
         # self.black_player = MCTS(self.game, self.args)
     
     def init_gui(self):
@@ -183,9 +184,13 @@ class GameInterface:
                 #     print(f"Move number {counter}")
                 # move = random.randint(1, len(legal_moves))
                 if(self.game.player == CheckersPlayer.WHITE):
-                    move = self.white_player.select_move(self.game.legal_moves)
-                else: # BLACK IS MCTS
-                    if(not self.mcts):
+                    if(not self.white_mcts):
+                        move = self.white_player.select_move(self.game.legal_moves)
+                    else:
+                        self.white_player = MCTS(self.game, self.args)
+                        move = self.white_player.search()
+                else:
+                    if(not self.black_mcts):
                         move = self.black_player.select_move(self.game.legal_moves)
                     else:
                         self.black_player = MCTS(self.game, self.args)

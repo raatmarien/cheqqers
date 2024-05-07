@@ -591,3 +591,58 @@ Size: 5x5, Rule: CheckersRules.CLASSICAL
 Average time: 1.5046124792098998, minimum time: 0.2547109127044678, max time: 4.248362302780151
 Average number of moves: 27.42
 Draw: 0, White wins: 1, Black wins: 49
+####################################################################################################
+Size: 5x5, Rule: CheckersRules.CLASSICAL
+####################################################################################################
+Size: 5x5, Rule: CheckersRules.CLASSICAL
+Average time: 1.5682332849502563, minimum time: 0.2545630931854248, max time: 3.2275545597076416
+Average number of moves: 28.32
+Draw: 3, White wins: 0, Black wins: 47
+####################################################################################################
+Size: 5x5, Rule: CheckersRules.CLASSICAL
+####################################################################################################
+Size: 5x5, Rule: CheckersRules.CLASSICAL
+Average time: 1.411385726928711, minimum time: 0.3464467525482178, max time: 3.3121869564056396
+Average number of moves: 22.6
+Draw: 2, White wins: 46, Black wins: 2
+####################################################################################################
+Size: 5x5, Rule: CheckersRules.CLASSICAL
+Average time: 17.76574351787567, minimum time: 4.455979824066162, max time: 22.224247217178345
+Average number of moves: 42.9
+Draw: 9, White wins: 0, Black wins: 1
+####################################################################################################
+Size: 5x5, Rule: CheckersRules.CLASSICAL
+Average time: 0.015831565856933592, minimum time: 0.008997917175292969, max time: 0.030297279357910156
+Average number of moves: 11.5
+Draw: 0, White wins: 2, Black wins: 8
+####################################################################################################
+Size: 5x5, Rule: CheckersRules.CLASSICAL
+Average time: 16.606461930274964, minimum time: 3.9135396480560303, max time: 34.40609073638916
+Average number of moves: 30.0
+Draw: 2, White wins: 8, Black wins: 0
+####################################################################################################
+Size: 5x5, Rule: CheckersRules.CLASSICAL
+####################################################################################################
+Size: 5x5, Rule: CheckersRules.CLASSICAL
+Average time: 0.03012824058532715, minimum time: 0.014456033706665039, max time: 0.06009244918823242
+Average number of moves: 12.3
+Draw: 0, White wins: 5, Black wins: 5
+####################################################################################################
+Size: 5x5, Rule: CheckersRules.CLASSICAL
+####################################################################################################
+Size: 5x5, Rule: CheckersRules.CLASSICAL
+####################################################################################################
+Size: 5x5, Rule: CheckersRules.CLASSICAL
+Average time: 0.10309755802154541, minimum time: 0.050406455993652344, max time: 0.2489914894104004
+Average number of moves: 11.3
+Draw: 0, White wins: 0, Black wins: 10
+####################################################################################################
+Size: 5x5, Rule: CheckersRules.CLASSICAL
+Average time: 0.1576981282234192, minimum time: 0.058409929275512695, max time: 0.6388368606567383
+Average number of moves: 14.88
+Draw: 0, White wins: 11, Black wins: 89
+####################################################################################################
+Size: 5x5, Rule: CheckersRules.CLASSICAL
+Average time: 0.9030801749229431, minimum time: 0.16373658180236816, max time: 2.5685794353485107
+Average number of moves: 25.06
+Draw: 1, White wins: 1, Black wins: 98
