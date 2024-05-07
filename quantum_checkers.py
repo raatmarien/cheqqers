@@ -841,6 +841,27 @@ class Checkers:
 
     def return_all_possible_states(self, move: Move_id):
         """
+        This function returs all possible states/outcomes for a specific move. Version 2
+        """
+        if(move.movetype != MoveType.TAKE):
+            return [], []
+        _, jumped_id = self.is_adjacent(move.source_id, move.target1_id)
+        source_ids = self.get_rel_squares(move.source_id)
+        jumped_ids = self.get_rel_squares(jumped_id)
+        # First check if we are dealing with entanglement, just superposition or a classic move.
+        if(self.is_entangled(str(move.source_id)) or self.is_entangled(str(jumped_id))):
+            # Entanglement
+            pass
+        elif(len(source_ids) > 1 or len(jumped_ids) > 1):
+            # Superposition
+            pass
+        else:
+            # Classic move
+            pass
+
+
+    def return_all_possible_states(self, move: Move_id):
+        """
         This function returs all possible states/outcomes for a specific move
         """
         if(move.movetype != MoveType.TAKE):
