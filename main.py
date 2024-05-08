@@ -42,7 +42,7 @@ def main():
         print("# WARNING: If the number of columns is uneven and the number of rows is even the board is not symmetrical. #\n# To assure an equal number of pieces, set the number of vertical pieces to an even value.                 #")
         print("#"*warning_len)
         time.sleep(5)
-    file = open("./temp.txt", "a")
+    # file = open("./temp.txt", "a")
     # for rule in [CheckersRules.CLASSICAL, CheckersRules.QUANTUM_V1, CheckersRules.QUANTUM_V2]:
     #     for size in [10, 12, 14]:
     size = 5
@@ -50,10 +50,11 @@ def main():
     times = []
     results = []
     number_of_moves = []
-    file.write("#"*100 + "\n")
-    file.write(f"Size: {size}x{size}, Rule: {rule}\n")
+    # file.write("#"*100 + "\n")
+    # file.write(f"Size: {size}x{size}, Rule: {rule}\n")
     print(f"Size: {size}x{size}, Rule: {rule}")
-    for i in range(100):
+    for i in range(10):
+        random.seed(i)
         # if((i+1)%50 == 0):
         print(f"Game {i+1}")
         start_t = time.time()
@@ -63,6 +64,7 @@ def main():
         results.append(result)
         if(result == CheckersResult.WHITE_WINS):
             print(f"########################### White wins at {i}")
+            # exit()
         number_of_moves.append(num_moves)
         times.append(time.time()-start_t)
         #if((i+1)%100 == 0):
@@ -72,10 +74,10 @@ def main():
     print(f"Average time: {sum(times)/len(times)}, minimum time: {min(times)}, max time: {max(times)}")
     print(f"Average number of moves: {sum(number_of_moves)/len(number_of_moves)}")
     print(f"Draw: {results.count(CheckersResult.DRAW)}, White wins: {results.count(CheckersResult.WHITE_WINS)}, Black wins: {results.count(CheckersResult.BLACK_WINS)}")
-    file.write(f"Average time: {sum(times)/len(times)}, minimum time: {min(times)}, max time: {max(times)}\n")
-    file.write(f"Average number of moves: {sum(number_of_moves)/len(number_of_moves)}\n")
-    file.write(f"Draw: {results.count(CheckersResult.DRAW)}, White wins: {results.count(CheckersResult.WHITE_WINS)}, Black wins: {results.count(CheckersResult.BLACK_WINS)}\n")
-    file.close()
+    # file.write(f"Average time: {sum(times)/len(times)}, minimum time: {min(times)}, max time: {max(times)}\n")
+    # file.write(f"Average number of moves: {sum(number_of_moves)/len(number_of_moves)}\n")
+    # file.write(f"Draw: {results.count(CheckersResult.DRAW)}, White wins: {results.count(CheckersResult.WHITE_WINS)}, Black wins: {results.count(CheckersResult.BLACK_WINS)}\n")
+    # file.close()
 
 if __name__ == "__main__":
     main()

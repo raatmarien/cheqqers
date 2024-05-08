@@ -30,14 +30,16 @@ class MCTS():
         # Define root node
         for srch in range(self.args['num_searches']):
             # print(f"Search {srch}")
-            node = self.root            
+            node = self.root
             # print(f"Fully expandend: {node.is_fully_expanded()}")
             while node.is_fully_expanded():
                 node = node.select()
-            result = node.game.result()
+            result = node.game.status
+
             # If it is a leaf node
             if(result != CheckersResult.DRAW and result != CheckersResult.UNFINISHED):
-                if(self.game.player == CheckersPlayer.BLACK):
+                # print(node.game.status)
+                if(node.game.player == CheckersPlayer.BLACK):
                     if(result == CheckersResult.BLACK_WINS):
                         value = 1
                     else:
@@ -51,6 +53,7 @@ class MCTS():
                 #     value = -1
                 # elif(node.game.player != self.game.player):
                 #     value = 1
+                # print(value)
                 node.backpropogate(value)
             elif(result == CheckersResult.DRAW):
                 value = 0
@@ -76,6 +79,7 @@ class MCTS():
         #     child.move.print_move()
 
         str = "All moves: \n"
+        str += f"Own visits: {self.root.visit_count}\n"
         for idx, child in enumerate(self.root.children):
             str += f"{action_probs[idx]:.2f}: "
             str += child.move.get_move()
@@ -83,6 +87,8 @@ class MCTS():
             str += f"{child.visit_count} visits\n"
             str += f"{child.value_sum} value\n"
             str+= f"{child.weight} weight\n"
+            ucb = self.root.get_ucb(child)
+            str+= f"{ucb} ucb\n"
         file_name = f"attempts/log_{self.args['attempt']}.txt"
         write_to_file(file_name, str + "\n")
         return self.root.children[np.argmax(action_probs)].move
@@ -126,10 +132,11 @@ class Node():
         # q_value is what child think of itself so we reverse it
         # TODO: fix with checkers being able to move twice in a row
         # q_value = (((child.value_sum / child.visit_count) + 1) / 2)
-        # if(child.game.player != self.game.player):
-        #     q_value = 1 - q_value
-        return (child.value_sum / child.visit_count) + self.args['C'] * math.sqrt(math.log(self.visit_count) / child.visit_count)
-        return child.weight * (q_value + self.args['C'] * math.sqrt(math.log(self.visit_count) / child.visit_count))
+        q_value = (child.value_sum / child.visit_count)
+        if(child.game.player != self.game.player):
+            q_value = 1 - q_value
+        # return (child.value_sum / child.visit_count) + self.args['C'] * (math.sqrt(math.log(self.visit_count) / child.visit_count))
+        return child.weight * (q_value + self.args['C'] *(math.sqrt(math.log(self.visit_count) / child.visit_count)))
         
     def expand(self):
         action = random.choice(self.expandable_moves)
@@ -152,20 +159,23 @@ class Node():
             temp.player_move(action)
             child_states = [temp]
             weights = [1]
+        to_backprop = []
         for i, child_state in enumerate(child_states):
             # print(f"Length of legal moves new child: {len(child_state.legal_moves)}")
             # print(child_state.get_sim_board())
             child = Node(child_state, self.args, action, self, weights[i])
             self.children.append(child)
-        return self.children
+            to_backprop.append(child)
+        return to_backprop
 
     def simulate(self):
+        # Simulate is from the persepective of the parent node
         sim_game = self.game.get_copy()
         # sim_game.SIMULATE_QUANTUM = True
         rollout_player = sim_game.player
         prev_board = sim_game.get_sim_board()
         while True:
-            if(sim_game.result() == CheckersResult.UNFINISHED):
+            if(sim_game.status == CheckersResult.UNFINISHED):
                 # print(len(sim_game.legal_moves))
                 # if(len(sim_game.legal_moves) == 0):
                 #     print(prev_board)
@@ -192,16 +202,16 @@ class Node():
                     print(sim_game.status)
                     exit()
             elif(sim_game.status == CheckersResult.BLACK_WINS or sim_game.status == CheckersResult.WHITE_WINS):
-                if(rollout_player == CheckersPlayer.BLACK): # because player just changed to other player
+                if(rollout_player == CheckersPlayer.BLACK): # because player just changed to other player. If black finished the last game by winning, the player changed to white just before the game finished
                     if(sim_game.status == CheckersResult.BLACK_WINS):
-                        return 1
-                    else:
                         return 0
+                    else:
+                        return 1
                 else:
                     if(sim_game.status == CheckersResult.WHITE_WINS):
-                        return 1
-                    else:
                         return 0
+                    else:
+                        return 1
             else: #draw
                 return 0
 
