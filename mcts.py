@@ -41,18 +41,20 @@ class MCTS():
                     if(result == CheckersResult.BLACK_WINS):
                         value = 1
                     else:
-                        value = -1
+                        value = 0
                 else:
                     if(result == CheckersResult.WHITE_WINS):
                         value = 1
                     else:
-                        value = -1
+                        value = 0
                 # if(node.game.player == self.game.player): # player can move twice in a row
                 #     value = -1
                 # elif(node.game.player != self.game.player):
                 #     value = 1
+                node.backpropogate(value)
             elif(result == CheckersResult.DRAW):
                 value = 0
+                node.backpropogate(value)
             else: # game unfinished
                 nodes = node.expand() # Can add multiple nodes if quantum state is measured
                 for node in nodes:
@@ -123,9 +125,10 @@ class Node():
     def get_ucb(self, child):
         # q_value is what child think of itself so we reverse it
         # TODO: fix with checkers being able to move twice in a row
-        q_value = (((child.value_sum / child.visit_count) + 1) / 2)
-        if(child.game.player != self.game.player):
-            q_value = 1 - q_value
+        # q_value = (((child.value_sum / child.visit_count) + 1) / 2)
+        # if(child.game.player != self.game.player):
+        #     q_value = 1 - q_value
+        return (child.value_sum / child.visit_count) + self.args['C'] * math.sqrt(math.log(self.visit_count) / child.visit_count)
         return child.weight * (q_value + self.args['C'] * math.sqrt(math.log(self.visit_count) / child.visit_count))
         
     def expand(self):
@@ -193,20 +196,20 @@ class Node():
                     if(sim_game.status == CheckersResult.BLACK_WINS):
                         return 1
                     else:
-                        return -1
+                        return 0
                 else:
                     if(sim_game.status == CheckersResult.WHITE_WINS):
                         return 1
                     else:
-                        return -1
+                        return 0
             else: #draw
                 return 0
 
     def backpropogate(self, value):
         self.value_sum += value
         self.visit_count += 1
-        if(self.parent != None and self.game.player != self.parent.game.player):
-            value = value*-1
+        # if(self.parent != None and self.game.player != self.parent.game.player):
+        value = 1 - value
         if(self.parent != None):
             self.parent.backpropogate(value)
 

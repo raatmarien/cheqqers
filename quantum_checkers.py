@@ -865,87 +865,87 @@ class Checkers:
         return states, weights
 
 
-    def return_all_possible_states(self, move: Move_id):
-        """
-        This function returs all possible states/outcomes for a specific move
-        """
-        if(move.movetype != MoveType.TAKE):
-            # raise RuntimeError(f"Not a take move: [{move.source_id} to {move.target1_id}]")
-            return [], []
-        _, jumped_id = self.is_adjacent(move.source_id, move.target1_id)
-        source_ids = self.get_rel_squares(move.source_id)
-        jumped_ids = self.get_rel_squares(jumped_id)
-        states = []
-        weights = []
-        for sid in source_ids:
-            checked = False
-            for jid in jumped_ids:
-                # temp_state = deepcopy(new_state)
-                temp_state = Sim_Checkers(run_on_hardware=False, num_vertical=self.num_vertical, num_horizontal=self.num_horizontal, num_vertical_pieces=self.num_vertical_pieces, classical_squares=deepcopy(self.classical_squares), related_squares=deepcopy(self.related_squares), q_rel_moves=deepcopy(self.q_rel_moves), q_moves=deepcopy(self.q_moves), superposition_pieces=deepcopy(self.superposition_pieces), status=deepcopy(self.status), moves_since_take=deepcopy(self.moves_since_take), king_squares=deepcopy(self.king_squares), legal_moves=deepcopy(self.legal_moves), rules=self.rules, player=deepcopy(self.player), entangled_squares=deepcopy(self.entangled_squares), entangled_objects=deepcopy(self.entangled_objects), unique_related_squares=deepcopy(self.unique_related_squares))
-                if(sid == str(move.source_id) and jid == str(jumped_id)): # State where a piece is actually taken.
-                    # Weight is chance that sid is there times chance that jid is there
-                    weights.append(self.classical_squares[str(sid)].chance/100 * self.classical_squares[str(jid)].chance/100)
-                    temp_state.remove_piece(jumped_id, False)
-                    jumped_ids = temp_state.remove_from_rel_squares(jumped_id)
-                    # for i, classical_id in enumerate(ids):
+    # def return_all_possible_states(self, move: Move_id):
+    #     """
+    #     This function returs all possible states/outcomes for a specific move
+    #     """
+    #     if(move.movetype != MoveType.TAKE):
+    #         # raise RuntimeError(f"Not a take move: [{move.source_id} to {move.target1_id}]")
+    #         return [], []
+    #     _, jumped_id = self.is_adjacent(move.source_id, move.target1_id)
+    #     source_ids = self.get_rel_squares(move.source_id)
+    #     jumped_ids = self.get_rel_squares(jumped_id)
+    #     states = []
+    #     weights = []
+    #     for sid in source_ids:
+    #         checked = False
+    #         for jid in jumped_ids:
+    #             # temp_state = deepcopy(new_state)
+    #             temp_state = Sim_Checkers(run_on_hardware=False, num_vertical=self.num_vertical, num_horizontal=self.num_horizontal, num_vertical_pieces=self.num_vertical_pieces, classical_squares=deepcopy(self.classical_squares), related_squares=deepcopy(self.related_squares), q_rel_moves=deepcopy(self.q_rel_moves), q_moves=deepcopy(self.q_moves), superposition_pieces=deepcopy(self.superposition_pieces), status=deepcopy(self.status), moves_since_take=deepcopy(self.moves_since_take), king_squares=deepcopy(self.king_squares), legal_moves=deepcopy(self.legal_moves), rules=self.rules, player=deepcopy(self.player), entangled_squares=deepcopy(self.entangled_squares), entangled_objects=deepcopy(self.entangled_objects), unique_related_squares=deepcopy(self.unique_related_squares))
+    #             if(sid == str(move.source_id) and jid == str(jumped_id)): # State where a piece is actually taken.
+    #                 # Weight is chance that sid is there times chance that jid is there
+    #                 weights.append(self.classical_squares[str(sid)].chance/100 * self.classical_squares[str(jid)].chance/100)
+    #                 temp_state.remove_piece(jumped_id, False)
+    #                 jumped_ids = temp_state.remove_from_rel_squares(jumped_id)
+    #                 # for i, classical_id in enumerate(ids):
 
-                    temp_state.classical_squares[str(move.source_id)].chance = 100
-                    temp_state.classical_squares[str(move.target1_id)] = temp_state.classical_squares[str(move.source_id)]
-                    temp_state.classical_squares[str(move.target1_id)].id = move.target1_id
-                    temp_state.remove_from_rel_squares(move.source_id)
-                    temp_state.remove_piece(move.source_id)
-                    for i in source_ids:
-                        if(i == str(move.source_id)):
-                            continue
-                        temp_state.remove_piece(str(i))
+    #                 temp_state.classical_squares[str(move.source_id)].chance = 100
+    #                 temp_state.classical_squares[str(move.target1_id)] = temp_state.classical_squares[str(move.source_id)]
+    #                 temp_state.classical_squares[str(move.target1_id)].id = move.target1_id
+    #                 temp_state.remove_from_rel_squares(move.source_id)
+    #                 temp_state.remove_piece(move.source_id)
+    #                 for i in source_ids:
+    #                     if(i == str(move.source_id)):
+    #                         continue
+    #                     temp_state.remove_piece(str(i))
                     
-                    for j in jumped_ids:
-                        if(j == str(jid)):
-                            continue
-                        temp_state.remove_piece(str(j))
-                    temp_state.legal_moves = temp_state.calculate_possible_moves(self.player)
-                    states.append(temp_state)
+    #                 for j in jumped_ids:
+    #                     if(j == str(jid)):
+    #                         continue
+    #                     temp_state.remove_piece(str(j))
+    #                 temp_state.legal_moves = temp_state.calculate_possible_moves(self.player)
+    #                 states.append(temp_state)
 
-                elif(sid == str(move.source_id) and jid != str(jumped_id)): # Only the original piece is there, and when we measure the other piece is not there.             
-                    # Weight is chance that sid is there times chance that jid is not there
-                    weights.append(self.classical_squares[str(sid)].chance/100 * self.classical_squares[str(jid)].chance/100)
-                    temp_state.classical_squares[str(sid)].chance = 100
-                    temp_state.classical_squares[str(jid)].chance = 100
+    #             elif(sid == str(move.source_id) and jid != str(jumped_id)): # Only the original piece is there, and when we measure the other piece is not there.             
+    #                 # Weight is chance that sid is there times chance that jid is not there
+    #                 weights.append(self.classical_squares[str(sid)].chance/100 * self.classical_squares[str(jid)].chance/100)
+    #                 temp_state.classical_squares[str(sid)].chance = 100
+    #                 temp_state.classical_squares[str(jid)].chance = 100
                     
-                    for i in source_ids:
-                        if(i == str(move.source_id)):
-                            continue
-                        temp_state.remove_piece(str(i))
-                    temp_state.remove_from_rel_squares(sid)
+    #                 for i in source_ids:
+    #                     if(i == str(move.source_id)):
+    #                         continue
+    #                     temp_state.remove_piece(str(i))
+    #                 temp_state.remove_from_rel_squares(sid)
 
-                    for j in jumped_ids:
-                        if(j == str(jid)):
-                            continue
-                        temp_state.remove_piece(str(j))
+    #                 for j in jumped_ids:
+    #                     if(j == str(jid)):
+    #                         continue
+    #                     temp_state.remove_piece(str(j))
                     
-                    temp_state.remove_from_rel_squares(jid)
-                    temp_state.legal_moves = temp_state.calculate_possible_moves(self.player)
-                    states.append(temp_state)
-                elif(not checked): # The original piece isn't there, therefore we do not measure the jumped piece. This only needs to be checked for every sid
-                    # weights is chance that sid is there
-                    weights.append(self.classical_squares[str(sid)].chance/100)
-                    checked = True
-                    temp_state.classical_squares[str(sid)].chance = 100
-                    for i in source_ids:
-                        if(i == str(sid)):
-                            continue
-                        temp_state.remove_piece(str(i))
-                    temp_state.remove_from_rel_squares(sid)
-                    temp_state.legal_moves = temp_state.calculate_possible_moves(self.player)
-                    states.append(temp_state)
-        # print(f"LEN STATE: {len(states)}")
-        # for i in (states):
-        #     print("BOARD")
-        #     print(i.get_sim_board())
-        # print("#"*100)
-        # print("Length of states", len(states))
-        # print("#"*100)
-        return states, weights
+    #                 temp_state.remove_from_rel_squares(jid)
+    #                 temp_state.legal_moves = temp_state.calculate_possible_moves(self.player)
+    #                 states.append(temp_state)
+    #             elif(not checked): # The original piece isn't there, therefore we do not measure the jumped piece. This only needs to be checked for every sid
+    #                 # weights is chance that sid is there
+    #                 weights.append(self.classical_squares[str(sid)].chance/100)
+    #                 checked = True
+    #                 temp_state.classical_squares[str(sid)].chance = 100
+    #                 for i in source_ids:
+    #                     if(i == str(sid)):
+    #                         continue
+    #                     temp_state.remove_piece(str(i))
+    #                 temp_state.remove_from_rel_squares(sid)
+    #                 temp_state.legal_moves = temp_state.calculate_possible_moves(self.player)
+    #                 states.append(temp_state)
+    #     # print(f"LEN STATE: {len(states)}")
+    #     # for i in (states):
+    #     #     print("BOARD")
+    #     #     print(i.get_sim_board())
+    #     # print("#"*100)
+    #     # print("Length of states", len(states))
+    #     # print("#"*100)
+    #     return states, weights
 
     def classic_move(self, move: Move_id) -> [bool, bool]:
         """
