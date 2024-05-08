@@ -61,7 +61,6 @@ class MCTS():
             else: # game unfinished
                 nodes = node.expand() # Can add multiple nodes if quantum state is measured
                 for node in nodes:
-                    # print(node.game.get_sim_board())
                     value = node.simulate()
                     # backpropogation
                     node.backpropogate(value)
@@ -121,11 +120,10 @@ class Node():
         for child in self.children:
             ucb = self.get_ucb(child)
             if ucb > best_ucb:
-                best_children.append(child)
+                best_children = [child]  # Reset the list if found a better child
                 best_ucb = ucb
-            elif(ucb == best_ucb):
-                best_children.append(child)
-        
+            elif ucb == best_ucb:
+                best_children.append(child)  # Add to the list if it's tied
         return random.choice(best_children)
     
     def get_ucb(self, child):
@@ -133,8 +131,8 @@ class Node():
         # TODO: fix with checkers being able to move twice in a row
         # q_value = (((child.value_sum / child.visit_count) + 1) / 2)
         q_value = (child.value_sum / child.visit_count)
-        if(child.game.player != self.game.player):
-            q_value = 1 - q_value
+        # if(child.game.player != self.game.player):
+        #     q_value = 1 - q_value
         # return (child.value_sum / child.visit_count) + self.args['C'] * (math.sqrt(math.log(self.visit_count) / child.visit_count))
         return child.weight * (q_value + self.args['C'] *(math.sqrt(math.log(self.visit_count) / child.visit_count)))
         

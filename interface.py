@@ -71,8 +71,8 @@ class GameInterface:
         self.white_player = white_player
         self.print = print
         self.args = {
-            'C': 1.41, # sqrt of 2
-            'num_searches': 100, # Budget per rollout
+            'C': 0.5, # sqrt of 2
+            'num_searches': 50, # Budget per rollout
             'attempt': self.attempt
         }
         self.black_player = black_player
