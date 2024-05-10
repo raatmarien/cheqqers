@@ -60,7 +60,7 @@ def main():
     print(f"Size: {size}x{size}, Rule: {rule}")
     for i in range(1000):
         sd = random.randint(0, 100000000000000000)
-        # sd = 48650805053448973
+        # sd = 74053787197429770
         random.seed(sd)
         seed_str = f"Seed: {sd}\n"
         write_attempt(i, seed_str)
@@ -73,15 +73,15 @@ def main():
         results.append(result)
         if(result == CheckersResult.WHITE_WINS):
             print(f"########################### White wins at {i}")
-            # exit()
+            exit()
         if(result == CheckersResult.DRAW):
             print(f"########################### Draw at {i}")
             # exit()
         number_of_moves.append(num_moves)
         times.append(time.time()-start_t)
-        #if((i+1)%100 == 0):
-        #    print(f"Draw: {results.count(CheckersResult.DRAW)}, White wins: {results.count(CheckersResult.WHITE_WINS)}, Black wins: {results.count(CheckersResult.BLACK_WINS)}")
-        #    print(f"Average number of moves: {sum(number_of_moves)/len(number_of_moves)}")
+        if((i+1)%100 == 0):
+           print(f"Draw: {results.count(CheckersResult.DRAW)}, White wins: {results.count(CheckersResult.WHITE_WINS)}, Black wins: {results.count(CheckersResult.BLACK_WINS)}")
+           print(f"Average number of moves: {sum(number_of_moves)/len(number_of_moves)}")
     print("#"*100)
     print(f"Average time: {sum(times)/len(times)}, minimum time: {min(times)}, max time: {max(times)}")
     print(f"Average number of moves: {sum(number_of_moves)/len(number_of_moves)}")

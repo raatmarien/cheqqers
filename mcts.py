@@ -59,7 +59,7 @@ class MCTS():
                 for node in nodes:
                     value = 0
                     for i in range(self.args['num_simulations']):
-                        value+= node.simulate()
+                        value += node.simulate()
                     # backpropogation
                     node.backpropogate(value)
 
@@ -215,7 +215,8 @@ class Node():
         self.value_sum += value
         self.visit_count += 1
         # if(self.parent != None and self.game.player != self.parent.game.player):
-        value = 1 - value
+        if(self.parent != None and self.parent.game.player != self.game.player):
+            value = 1 - value
         # value = value * -1
         if(self.parent != None):
             self.parent.backpropogate(value)
