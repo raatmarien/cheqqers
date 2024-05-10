@@ -210,6 +210,9 @@ class GameInterface:
                 attempt_str += move.get_move()
                 attempt_str += '\n'
                 self.write_attempt(attempt_str)
+                states, weights = self.game.return_all_possible_states(move)
+                for idx, state in enumerate(states):
+                    print(f"STATE: {state.get_sim_board()}, WEIGHT: {weights[idx]}")
                 self.game.player_move(move, self.game.player)
                 # if(len(self.game.legal_moves) > 0):
                 #     prev_take = True

@@ -874,15 +874,68 @@ class Checkers:
             # Superposition
             # Find the related id's list the source and jumped id are in
             # Calculate all possible ids by first
-            #   Two scenario's
-            #   1. The source id is actually there
-            #       Two more scenario's
-            #       1.1 The jumped id is there
-            #       1.2 The jumped id is not there
+            for sid in source_ids:
+                if(str(sid) == str(move.source_id)):
+                    for jid in jumped_ids:
+                        cp = self.get_copy()
+        #   Two scenario's
+        #   1. The source id is actually there
+        #       Two more scenario's
+        #       1.1 The jumped id is there
+                        if(str(jid) == str(jumped_id)):
+                            weights.append(self.classical_squares[str(sid)].chance/100 * self.classical_squares[str(jid)].chance/100)
+                            cp.remove_piece(jumped_id, False)
+                            
+                            # Update source id
+                            cp.classical_squares[str(move.source_id)].chance = 100
+                            cp.classical_squares[str(move.target1_id)] = cp.classical_squares[str(move.source_id)]
+                            cp.classical_squares[str(move.target1_id)].id = move.target1_id
+                            cp_source_ids = cp.remove_from_rel_squares(move.source_id)
+                            cp.remove_piece(move.source_id)
 
-            #   2. The source id is not there
-            #       We don't have to check jumped id, since the source id is not there  
-            pass
+                            # Remove all other pieces
+                            cp_jumped_ids = cp.remove_from_rel_squares(jid)
+                            for i in cp_source_ids:
+                                if(i == str(move.source_id)):
+                                    continue
+                                cp.remove_piece(str(i))
+                            for j in cp_jumped_ids:
+                                if(j == str(jid)):
+                                    continue
+                                cp.remove_piece(str(j))
+                            cp.legal_moves = cp.calculate_possible_moves(self.player)
+                            states.append(cp)
+        #       1.2 The jumped id is not there (therefore source id stays in same place)
+                        else: # jid != move.jumped id
+                            weights.append(self.classical_squares[str(sid)].chance/100 * self.classical_squares[str(jid)].chance/100)
+                            cp.classical_squares[str(sid)].chance = 100
+                            cp.classical_squares[str(jid)].chance = 100
+                            cp_source_ids = cp.remove_from_rel_squares(sid)
+                            cp_jumped_ids = cp.remove_from_rel_squares(jid)
+                            for i in cp_source_ids:
+                                if(i == str(sid)):
+                                    continue
+                                cp.remove_piece(str(i))
+                            for j in cp_jumped_ids:
+                                if(j == str(jid)):
+                                    continue
+                                cp.remove_piece(str(j))
+                            cp.legal_moves = cp.calculate_possible_moves(self.player)
+                            states.append(cp)
+        #   2. The source id is not there
+                else: # sid != move.source id
+                    cp=self.get_copy()
+                    weights.append(self.classical_squares[str(sid)].chance/100)
+                    cp.classical_squares[str(sid)].chance = 100
+                    cp_source_ids = cp.remove_from_rel_squares(sid)
+                    for i in cp_source_ids:
+                        if(i == str(sid)):
+                            continue
+                        cp.remove_piece(str(i))
+                    cp.legal_moves = cp.calculate_possible_moves(self.player)
+                    states.append(cp)
+        #       We don't have to check jumped id, since the source id is not there
+            return states, weights
         else:
             cp = self.get_copy()
             cp.player_move(move)
