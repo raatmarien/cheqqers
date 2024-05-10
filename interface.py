@@ -215,7 +215,8 @@ class GameInterface:
                 # self.write_to_log(move, counter, moves)
                 # time.sleep(1)
         # self.print_board()
-        # print(f"Results: {self.game.status}")
+        if(print):
+            print(f"Results: {self.game.status}")
         self.write_attempt(f"Results: {self.game.status}")
         return(self.game.status, counter)
 

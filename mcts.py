@@ -131,8 +131,8 @@ class Node():
         # TODO: fix with checkers being able to move twice in a row
         # q_value = (((child.value_sum / child.visit_count) + 1) / 2)
         q_value = (child.value_sum / child.visit_count)
-        # if(child.game.player != self.game.player):
-        #     q_value = 1 - q_value
+        if(child.game.player == self.game.player):
+            q_value = 1 - q_value
         # return (child.value_sum / child.visit_count) + self.args['C'] * (math.sqrt(math.log(self.visit_count) / child.visit_count))
         return child.weight * (q_value + self.args['C'] *(math.sqrt(math.log(self.visit_count) / child.visit_count)))
         
