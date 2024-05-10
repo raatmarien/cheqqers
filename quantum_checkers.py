@@ -872,6 +872,16 @@ class Checkers:
             pass
         elif(len(source_ids) > 1 or len(jumped_ids) > 1):
             # Superposition
+            # Find the related id's list the source and jumped id are in
+            # Calculate all possible ids by first
+            #   Two scenario's
+            #   1. The source id is actually there
+            #       Two more scenario's
+            #       1.1 The jumped id is there
+            #       1.2 The jumped id is not there
+
+            #   2. The source id is not there
+            #       We don't have to check jumped id, since the source id is not there  
             pass
         else:
             cp = self.get_copy()
