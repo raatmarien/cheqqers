@@ -9,11 +9,6 @@ from quantum_checkers import Sim_Checkers, Checkers
 import traceback
 from time import sleep
 
-args = { # Not used here, just an example
-    'C': 1.41, # sqrt of 2
-    'num_searches': 100 #Budget per rollout
-}
-
 def write_to_file(file_name, text):
     temp = open(file_name, "a")
     temp.write(text)
@@ -27,6 +22,7 @@ class MCTS():
         self.root = Node(self.game, self.args)
 
     def search(self):
+        # input("Press enter to start search")
         # Define root node
         for srch in range(self.args['num_searches']):
             # print(f"Search {srch}")
@@ -41,14 +37,14 @@ class MCTS():
                 # print(node.game.status)
                 if(node.game.player == CheckersPlayer.BLACK):
                     if(result == CheckersResult.BLACK_WINS):
-                        value = 1
-                    else:
                         value = 0
+                    else:
+                        value = 1
                 else:
                     if(result == CheckersResult.WHITE_WINS):
-                        value = 1
-                    else:
                         value = 0
+                    else:
+                        value = 1
                 # if(node.game.player == self.game.player): # player can move twice in a row
                 #     value = -1
                 # elif(node.game.player != self.game.player):
@@ -61,7 +57,9 @@ class MCTS():
             else: # game unfinished
                 nodes = node.expand() # Can add multiple nodes if quantum state is measured
                 for node in nodes:
-                    value = node.simulate()
+                    value = 0
+                    for i in range(self.args['num_simulations']):
+                        value+= node.simulate()
                     # backpropogation
                     node.backpropogate(value)
 
@@ -218,6 +216,7 @@ class Node():
         self.visit_count += 1
         # if(self.parent != None and self.game.player != self.parent.game.player):
         value = 1 - value
+        # value = value * -1
         if(self.parent != None):
             self.parent.backpropogate(value)
 

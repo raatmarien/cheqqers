@@ -73,6 +73,7 @@ class GameInterface:
         self.args = {
             'C': 0.5, # sqrt of 2
             'num_searches': 50, # Budget per rollout
+            'num_simulations': 1, # Budget for simulations
             'attempt': self.attempt
         }
         self.black_player = black_player
@@ -215,7 +216,7 @@ class GameInterface:
                 # self.write_to_log(move, counter, moves)
                 # time.sleep(1)
         # self.print_board()
-        if(print):
+        if(self.print):
             print(f"Results: {self.game.status}")
         self.write_attempt(f"Results: {self.game.status}")
         return(self.game.status, counter)
