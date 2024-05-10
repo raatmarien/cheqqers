@@ -169,7 +169,7 @@ class Entangled():
     
     def return_possible_states_adv(self):
         """
-        Returns one possible state as a list of lists for all ids that are related to each other.
+        Returns all possible states as a list of lists for all ids that are related to each other.
         Format is [[[id1, Checkersquare.EMPTY], [id2, Checkersquare.FULL], ...]], [[id1, Checkersquare.FULL], [id2, Checkersquare.EMPTY], ...]]
         """
         all_states = []
@@ -291,6 +291,12 @@ class Checkers:
         self.log = open("./log.txt", "a")
         self.log.write(string)
         self.log.close()
+
+    def get_id_entangled(self, id: str):
+        for i in self.entangled_objects:
+            if(id in i.all_ids):
+                return i
+        return None
 
     def is_entangled(self, id: str):
         for i in self.entangled_objects:
@@ -867,10 +873,18 @@ class Checkers:
         source_ids = self.get_rel_squares(move.source_id)
         jumped_ids = self.get_rel_squares(jumped_id)
         # First check if we are dealing with entanglement, just superposition or a classic move.
-        if(self.is_entangled(str(move.source_id)) or self.is_entangled(str(jumped_id))):
+        if(self.is_entangled(str(move.source_id)) or self.is_entangled(str(jumped_id))): # Entanglement
+            ent_s = self.get_id_entangled(str(move.source_id))
+            ent_j = self.get_id_entangled(str(jumped_id))
+            all_poss_s_states = ent_s.return_possible_states_adv()
+            all_poss_j_states = []
+            if(ent_s != ent_j):
+                all_poss_j_states = ent_j.return_possible_states_adv()
+            
+            
             # Entanglement
             pass
-        elif(len(source_ids) > 1 or len(jumped_ids) > 1):
+        elif(len(source_ids) > 1 or len(jumped_ids) > 1): # Only superposition, no entanglement
             # Superposition
             # Find the related id's list the source and jumped id are in
             # Calculate all possible ids by first
@@ -904,6 +918,7 @@ class Checkers:
                                     continue
                                 cp.remove_piece(str(j))
                             cp.legal_moves = cp.calculate_possible_moves(self.player)
+                            cp.status = cp.result()
                             states.append(cp)
         #       1.2 The jumped id is not there (therefore source id stays in same place)
                         else: # jid != move.jumped id
@@ -921,6 +936,7 @@ class Checkers:
                                     continue
                                 cp.remove_piece(str(j))
                             cp.legal_moves = cp.calculate_possible_moves(self.player)
+                            cp.status = cp.result()
                             states.append(cp)
         #   2. The source id is not there
                 else: # sid != move.source id
@@ -933,10 +949,11 @@ class Checkers:
                             continue
                         cp.remove_piece(str(i))
                     cp.legal_moves = cp.calculate_possible_moves(self.player)
+                    cp.status = cp.result()
                     states.append(cp)
         #       We don't have to check jumped id, since the source id is not there
             return states, weights
-        else:
+        else: # Classical move
             cp = self.get_copy()
             cp.player_move(move)
             states.append(cp)

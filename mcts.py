@@ -186,7 +186,7 @@ class Node():
                     print(len(sim_game.legal_moves))
                     if(len(sim_game.legal_moves) > 0):
                         move.print_move()
-                       
+                    print(sim_game.status)
                     leg2 = sim_game.calculate_possible_moves()
                     print(len(leg2))
                     if(len(leg2) > 0):
