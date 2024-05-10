@@ -23,6 +23,11 @@ def empty_attempts():
     for f in files:
         os.remove(f)
 
+def write_attempt(idx, attempt_str):
+        temp = open(f"./attempts/log_{idx}.txt", "a")
+        temp.write(attempt_str)
+        temp.close()
+
 def main():
     empty_attempts_folder()
     parser = argparse.ArgumentParser()
@@ -46,20 +51,23 @@ def main():
     # for rule in [CheckersRules.CLASSICAL, CheckersRules.QUANTUM_V1, CheckersRules.QUANTUM_V2]:
     #     for size in [10, 12, 14]:
     size = 5
-    rule = CheckersRules.CLASSICAL
+    rule = CheckersRules.QUANTUM_V1
     times = []
     results = []
     number_of_moves = []
     # file.write("#"*100 + "\n")
     # file.write(f"Size: {size}x{size}, Rule: {rule}\n")
     print(f"Size: {size}x{size}, Rule: {rule}")
-    for i in range(100):
-        # random.seed(i*100)
+    for i in range(1000):
+        sd = random.randint(0, 1000000000000)
+        random.seed(sd)
+        seed_str = f"Seed: {sd}\n"
+        write_attempt(i, seed_str)
         # if((i+1)%50 == 0):
         print(f"Game {i+1}")
         start_t = time.time()
         checkers = Checkers(num_vertical=size, num_horizontal=size, num_vertical_pieces=args.num_vertical_pieces, SIMULATE_QUANTUM=args.sim_q, rules=rule)
-        game = GameInterface(checkers, white_player=p1, black_player=p2, GUI=args.GUI, white_mcts=False, black_mcts=True, print=False, attempt=i)
+        game = GameInterface(checkers, white_player=p1, black_player=p2, GUI=args.GUI, white_mcts=False, black_mcts=False, print=False, attempt=i)
         result, num_moves = (game.play())
         results.append(result)
         if(result == CheckersResult.WHITE_WINS):

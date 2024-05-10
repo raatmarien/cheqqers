@@ -240,7 +240,7 @@ class Entangled():
 class Checkers:
     def __init__(self, run_on_hardware = False, num_vertical = 5, num_horizontal = 5, num_vertical_pieces = 1, rules = CheckersRules.QUANTUM_V3, SIMULATE_QUANTUM = False) -> None:
         self.rules = rules
-        self.SIMULATE_QUANTUM = True
+        self.SIMULATE_QUANTUM = False
         if(SIMULATE_QUANTUM.lower() == "true"):
             self.SIMULATE_QUANTUM = True
         self.player = CheckersPlayer.WHITE
@@ -623,7 +623,23 @@ class Checkers:
         temp = self.recursive_cal_rel_state(related_objects, None, 0)
         print(temp)
 
+    def verify_uniq_and_rel(self):
+        for i in self.related_squares:
+            for id in i:
+                found = False
+                for j in self.unique_related_squares:
+                    if(id in j):
+                        found = True
+                        break
+                if(not found):
+                    print(f"COULD NOT FIND ID {id} IN UNIQUE RELATED SQUARES")
+                    print(self.related_squares)
+                    print(self.unique_related_squares)
+                    exit()
+
+
     def player_move(self, move: Move_id, player: CheckersPlayer = None):
+        # self.verify_uniq_and_rel() # used to find bug where related squares were not in unique related squares, which caused buggy behaviour
         self.moves_since_take += 1
         prev_taken = False
         to_king = [] # list that holds moved pieces to check if they need to be kinged
@@ -1148,10 +1164,7 @@ class Checkers:
                         return
         return
 
-    def remove_id_from_rel_squares(self, id):
-        """
-        Removes one specific id from a list of superpositions..
-        """
+    def remove_id_from_unique_rel_squares(self, id):
         temp_list = deepcopy(self.unique_related_squares)
         for index, squares in enumerate(temp_list):
             if(str(id) in squares):
@@ -1160,7 +1173,11 @@ class Checkers:
                 if(len(self.unique_related_squares[index]) <= 1): # If the length is one, we have returned to classical state (Basically if we did not just do a classical move)
                     self.unique_related_squares.pop(index)
                 return
-            
+
+    def remove_id_from_rel_squares(self, id):
+        """
+        Removes one specific id from a list of superpositions..
+        """
         # Check if the id we need to remove used to be in a superposition.
         temp_list = deepcopy(self.related_squares)
         for index, squares in enumerate(temp_list):
@@ -1173,6 +1190,8 @@ class Checkers:
                         if(mv in self.q_moves):
                             self.q_moves.remove(mv)
                     self.q_rel_moves.pop(index)
+                # If we have removed something from related squares, we need to remove it from unique related squares
+                self.remove_id_from_unique_rel_squares(id)
                 return
 
     def remove_from_rel_squares(self, id):

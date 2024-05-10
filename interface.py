@@ -61,7 +61,7 @@ class GameInterface:
         open('./log.txt', 'w').close()
         self.attempt = attempt
         self.file_name = f"./attempts/log_{attempt}.txt"
-        open(self.file_name, 'w').close()
+        # open(self.file_name, 'w').close()
         if(GUI.lower() == "true"):
             self.GUI = True
             self.init_gui()
@@ -177,7 +177,10 @@ class GameInterface:
                 attempt_str = ""
                 attempt_str = self.game.get_sim_board()
                 if(self.print):
-                    self.print_board(True)
+                    # print("Simulated board")
+                    # self.print_board(True)
+                    print("Real board")
+                    self.print_board(False)
                     self.print_legal_moves(self.game.legal_moves)
                 counter += 1
                 # if(counter % 10 == 0):
