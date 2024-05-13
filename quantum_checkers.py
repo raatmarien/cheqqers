@@ -904,6 +904,7 @@ class Checkers:
                                     cp.remove_piece(id[0])
                             if(cp.classical_squares[str(sid)].chance == 100 and cp.classical_squares[str(jid).chance == 100]): # If both ids are there it means the source id can take the jumped id and therefore we need to remove the jumped id and move the source id
                                 cp.remove_piece(jumped_id)
+
                                 # Update source id
                                 cp.classical_squares[str(move.target1_id)] = cp.classical_squares[str(move.source_id)]
                                 cp.classical_squares[str(move.target1_id)].id = move.target1_id
@@ -913,11 +914,44 @@ class Checkers:
                             cp.legal_moves = cp.calculate_possible_moves(self.player)
                             cp.status = cp.result()
                             states.append(cp)
-
             elif(len(sup_jid) > 1): # jid is in superposition
-                pass
-
-                
+                poss_states = ent_sid.return_possible_states_adv()
+                for jid in sup_jid: 
+                    for state in poss_states:
+                        cp = self.get_copy()
+                        cp_jids = cp.remove_from_rel_squares(jid)
+                        cp_sids = cp.remove_from_rel_squares(sid)
+                        # Two scenario's
+                        # The jumped id is actually there
+                        if(str(jid) == str(jumped_id)):
+                            for id in state:
+                                if(id[1] == CheckersSquare.FULL):
+                                    cp.classical_squares[str(id[0])].chance = 100
+                                else:
+                                    cp.remove_piece(id[0])
+                            if(cp.classical_squares[str(move.source_id)].chance == 100):
+                                cp.remove_piece(jumped_id)
+                                cp.classical_squares[str(move.target1_id)] = cp.classical_squares[str(move.source_id)]
+                                cp.classical_squares[str(move.target1_id)].id = move.target1_id
+                                cp.remove_piece(move.source_id)
+                                for i in cp_jids:
+                                    if(i == str(jumped_id)):
+                                        continue
+                                    cp.remove_piece(str(i))
+                        else: # jid != jumped id
+                            cp.classical_squares[str(jid)].chance = 100
+                            for j in cp_jids:
+                                if(j == str(jid)):
+                                    continue
+                                cp.remove_piece(str(j))
+                            for id in state:
+                                if(id[1] == CheckersSquare.FULL):
+                                    cp.classical_squares[str(id[0])].chance = 100
+                                else:
+                                    cp.remove_piece(id[0])
+                        cp.legal_moves = cp.calculate_possible_moves(self.player)
+                        cp.status = cp.result()
+                        states.append(cp)
             else: # jid is classical
                 pass
         else: # sid is not entangled, therefore jid must be
@@ -925,6 +959,7 @@ class Checkers:
                 pass
             else: # sid is classical
                 pass
+        return states
 
 
     def return_all_possible_states(self, move: Move_id):
