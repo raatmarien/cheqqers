@@ -39,6 +39,8 @@ def main():
     parser.add_argument('--p1', help='Select agent for player 1 to use.', default=human_player())
     parser.add_argument('--p2', help='Select agent for player 2 to use.', default=human_player())
     args = parser.parse_args()
+    p1 = random_bot()
+    p2 = random_bot()
     p1 = human_player()
     p2 = human_player()
     if(args.num_columns % 2 == 1 and args.num_rows % 2 == 0):
@@ -58,7 +60,7 @@ def main():
     # file.write("#"*100 + "\n")
     # file.write(f"Size: {size}x{size}, Rule: {rule}\n")
     print(f"Size: {size}x{size}, Rule: {rule}")
-    for i in range(100):
+    for i in range(10):
         sd = random.randint(0, 100000000000000000)
         # sd = 74053787197429770
         random.seed(sd)

@@ -59,6 +59,7 @@ class Move_id:
         output += f"[{self.source_id}] to [{self.target1_id}]"
         if(self.target2_id != None):
             output += f" and [{self.target2_id}]"
+        output += f" = [{self.movetype}]"
         print(output)
         return output
     
@@ -119,7 +120,7 @@ class Entangled():
             elif(org_id in self.unsuccessfully_takes):
                 self.unsuccessfully_takes.remove(org_id)
                 self.unsuccessfully_takes += new_ids
-    
+
     def measurement(self, id: str):
         """
         This function is called when a measurement is taking place. It returns all ids that are related to the id that is measured.
@@ -128,7 +129,7 @@ class Entangled():
             return True
         return False
     
-    def return_all_possible_states(self, new_all_ids = None):
+    def return_all_possible_states2(self, new_all_ids = None):
         """
         Returns all possible states of the entangled object
         """
@@ -172,6 +173,7 @@ class Entangled():
         Returns all possible states as a list of lists for all ids that are related to each other.
         Format is [[[id1, Checkersquare.EMPTY], [id2, Checkersquare.FULL], ...]], [[id1, Checkersquare.FULL], [id2, Checkersquare.EMPTY], ...]]
         """
+        print(classical_squares)
         all_states = []
         weights = []
         # Needs to be repeated for each possible state
@@ -295,6 +297,9 @@ class Checkers:
         self.log.close()
 
     def get_id_entangled(self, id: str):
+        """
+        Returns entangled object for given id
+        """
         for i in self.entangled_objects:
             if(id in i.all_ids):
                 return i
@@ -606,7 +611,7 @@ class Checkers:
         if(new_all_ids == None):
             new_all_ids = related_objects[curr].all_ids
         # Calculate all possible states
-        states = related_objects[curr].return_all_possible_states(new_all_ids)
+        states = related_objects[curr].return_all_possible_states2(new_all_ids)
 
         ids = related_objects[curr].is_taken + related_objects[curr].not_taken + related_objects[curr].successfully_takes + related_objects[curr].unsuccessfully_takes
         
@@ -678,7 +683,6 @@ class Checkers:
         self.player = CheckersPlayer.BLACK if self.player == CheckersPlayer.WHITE else CheckersPlayer.WHITE
         self.legal_moves = self.calculate_possible_moves(self.player)
         self.status = self.result()
-        
         # DEBUG STUFF
         # print("########")
         # print("RELATED SQUARES")
@@ -863,7 +867,26 @@ class Checkers:
             return True, legal_moves
         return False, []
 
+    def clean_ent_objects(self, ent_objs: list):
+        for obj in ent_objs:
+            self.entangled_objects.remove(obj)
+        tbr = [] # to be removed
+        for i in self.entangled_squares:
+            if(self.classical_squares[str(i)] == 0 or self.classical_squares[str(i)] == 0):
+                tbr.append(i)
+        for i in tbr:
+            self.entangled_squares.remove(i)
+
     def calc_ent_states(self, move: Move_id):
+        print("############# DEBUG ################")
+        print(self.get_sim_board())
+        print("MOVE:")
+        move.print_move()
+        print("ENT OBJS")
+        for i in self.entangled_objects:
+            print("&&&")
+            i.print_all()
+        print("&&&")
         _, jumped_id = self.is_adjacent(move.source_id, move.target1_id)
         # sid = move.source_id
         # jid = jumped_id
@@ -872,9 +895,10 @@ class Checkers:
         states = []
         weights = []
         if(self.is_entangled(move.source_id)):
-            ent_sid = self.get_id_entangled(move.source_id)
+            ent_sid = self.get_id_entangled(str(move.source_id))
             if(self.is_entangled(jumped_id)): # jid is also entangled, either with the sid or different entanglement
-                if(ent_sid == self.get_id_entangled(jumped_id)): # Both are entangled with the same object
+                if(ent_sid == self.get_id_entangled(str(jumped_id))): # Both are entangled with the same object
+                    print("scenario 1")
                     poss_states, poss_weights = ent_sid.return_possible_states_adv(self.classical_squares)
                     for state in poss_states:
                         cp = self.get_copy()
@@ -885,12 +909,14 @@ class Checkers:
                                 cp.remove_piece(id[0])
                         cp.remove_from_rel_squares(move.source_id)
                         cp.remove_from_rel_squares(jumped_id) # should be redundant, since they are in the same list
+                        cp.clean_ent_objects([ent_sid])
                         cp.legal_moves = cp.calculate_possible_moves(self.player)
                         cp.status = cp.result()
                         states.append(cp)
                         weights.append(poss_weights)
                 else: # Both are entangled with different objects
-                    ent_jid = self.get_id_entangled(move.source_id)
+                    print("scenario 2")
+                    ent_jid = self.get_id_entangled(str(move.source_id))
                     poss_sid_states, poss_sid_weights = ent_sid.return_possible_states_adv(self.classical_squares)
                     poss_jid_states, poss_jid_weights = ent_jid.return_possible_states_adv(self.classical_squares)
                     for sid_counter, state_sid in enumerate(poss_sid_states): # For all possible sid states
@@ -915,11 +941,13 @@ class Checkers:
                                 cp.remove_piece(move.source_id)
                             cp.remove_from_rel_squares(move.source_id)
                             cp.remove_from_rel_squares(jumped_id)
+                            cp.clean_ent_objects([ent_sid, ent_jid])
                             cp.legal_moves = cp.calculate_possible_moves(self.player)
                             cp.status = cp.result()
                             states.append(cp)
                             weights.append(poss_sid_weights[sid_counter]*poss_jid_weights[jid_counter])
             elif(len(sup_jid) > 1): # jid is in superposition
+                print("Scenario 3")
                 poss_states, poss_weights = ent_sid.return_possible_states_adv(self.classical_squares)
                 for jid in sup_jid:
                     jid_chance = self.classical_squares[str(jid)].chance
@@ -951,11 +979,13 @@ class Checkers:
                                 if(j == str(jid)):
                                     continue
                                 cp.remove_piece(str(j))
+                        cp.clean_ent_objects([ent_sid])
                         cp.legal_moves = cp.calculate_possible_moves(self.player)
                         cp.status = cp.result()
                         states.append(cp)
                         weights.append(poss_weights[counter]*jid_chance)
             else: # jid is classical
+                print("Scenario 4")
                 poss_states, poss_weights = ent_sid.return_possible_states_adv(self.classical_squares)
                 for counter, state in enumerate(poss_states):
                     cp = self.get_copy()
@@ -971,12 +1001,19 @@ class Checkers:
                         cp.remove_piece(str(move.source_id))
                     cp.remove_from_rel_squares(move.source_id)
                     cp.remove_from_rel_squares(jumped_id) # should be redundant, since they are in the same list
+                    cp.clean_ent_objects([ent_sid])
                     cp.legal_moves = cp.calculate_possible_moves(self.player)
                     cp.status = cp.result()
                     states.append(cp)
                     weights.append(poss_weights[counter])
         else: # sid is not entangled, therefore jid must be
+            ent_jid = self.get_id_entangled(str(jumped_id))
+            ent_jid.print_all()
+            for i in self.entangled_objects:
+                print(i.all_ids)
+            print(self.get_sim_board())
             if(len(sup_sid) > 1): # Sid is in superposition
+                print("scenario 5")
                 # same as above, but now sid is in superposition
                 poss_states, poss_weights = ent_jid.return_possible_states_adv(self.classical_squares)
                 for sid in sup_sid:
@@ -986,6 +1023,7 @@ class Checkers:
                         cp_jids = cp.remove_from_rel_squares(jumped_id)
                         cp_sids = cp.remove_from_rel_squares(sid)
                         for id in state:
+                            print(id)
                             if(id[1] == CheckersSquare.FULL):
                                 cp.classical_squares[str(id[0])].chance = 100
                             else:
@@ -1009,11 +1047,13 @@ class Checkers:
                                 if(s == str(sid)):
                                     continue
                                 cp.remove_piece(str(s))
+                        cp.clean_ent_objects([ent_jid])
                         cp.legal_moves = cp.calculate_possible_moves(self.player)
                         cp.status = cp.result()
                         states.append(cp)
                         weights.append(poss_weights[counter]*sid_chance)
             else: # sid is classical
+                print("Scenario 6")
                 poss_states, poss_weights = ent_jid.return_possible_states_adv(self.classical_squares)
                 for counter, state in enumerate(poss_states):
                     cp = self.get_copy()
@@ -1029,6 +1069,7 @@ class Checkers:
                         cp.remove_piece(move.source_id)
                     cp.remove_from_rel_squares(move.source_id)
                     cp.remove_from_rel_squares(jumped_id) # should be redundant, since they are in the same list
+                    cp.clean_ent_objects([ent_jid])
                     cp.legal_moves = cp.calculate_possible_moves(self.player)
                     cp.status = cp.result()
                     states.append(cp)
@@ -1049,6 +1090,12 @@ class Checkers:
         jumped_ids = self.get_rel_squares(jumped_id)
         # First check if we are dealing with entanglement, just superposition or a classic move.
         if(self.is_entangled(str(move.source_id)) or self.is_entangled(str(jumped_id))): # Entanglement
+            print("DEBUG")
+            print(f"Source id is entangled: {self.is_entangled(str(move.source_id))}")
+            print(f"Jumped id is entangled: {self.is_entangled(str(jumped_id))}")
+            # print(self.get_board())
+            print(self.get_sim_board())
+            print("++++++++++")
             states, weights = self.calc_ent_states(move)
 
         elif(len(source_ids) > 1 or len(jumped_ids) > 1): # Only superposition, no entanglement
@@ -1199,6 +1246,9 @@ class Checkers:
         self.classical_squares[str(move.target1_id)] = self.classical_squares[str(move.source_id)]
         self.classical_squares[str(move.target1_id)].id = move.target1_id
         # If we do a classical move on a piece in superposition, we need to append the new id to the correct list in related_squares
+        for i in self.entangled_objects:
+            i.update_entangled(str(move.source_id), [str(move.target1_id)])
+        
         for i, squares in enumerate(self.related_squares):
             if(str(move.source_id) in squares):
                 squares.append(str(move.target1_id))
@@ -1211,9 +1261,6 @@ class Checkers:
                 squares.append(str(move.target1_id))
                 squares.remove(str(move.source_id))
                 break
-
-        for i in self.entangled_objects:
-            i.update_entangled(str(move.source_id), [str(move.target1_id)])
 
         # If we do a classical move on a piece that is entangled, we need to append the new id to the correct entangled list
         for i, squares in enumerate(self.entangled_squares):

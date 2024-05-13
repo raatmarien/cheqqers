@@ -143,7 +143,13 @@ class Node():
         # Change player (if not handled?)
         # child_state = deepcopy(self.game)
         if(action.movetype == MoveType.TAKE):
-            child_states, weights = self.game.return_all_possible_states(action)
+            try:
+                child_states, weights = self.game.return_all_possible_states(action)
+            except Exception as error:
+                print("Error in expand")
+                print(traceback.format_exc())
+                print(self.game.get_sim_board())
+                exit()
             # temp = self.game.get_copy()
             # temp.player_move(action)
             # child_states = [temp]
