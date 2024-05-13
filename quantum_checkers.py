@@ -167,13 +167,13 @@ class Entangled():
                 states.append([str(i), str(j)])
         return states
     
-    def return_possible_states_adv(self):
+    def return_possible_states_adv(self, classical_squares):
         """
         Returns all possible states as a list of lists for all ids that are related to each other.
         Format is [[[id1, Checkersquare.EMPTY], [id2, Checkersquare.FULL], ...]], [[id1, Checkersquare.FULL], [id2, Checkersquare.EMPTY], ...]]
         """
         all_states = []
-
+        weights = []
         # Needs to be repeated for each possible state
         for i in self.successfully_takes:
             state = []
@@ -183,6 +183,7 @@ class Entangled():
                 else:
                     state.append([str(j), CheckersSquare.EMPTY])
             all_states.append(state)
+            weights.append(classical_squares[str(i)].chance)
         for i in self.unsuccessfully_takes:
             for j in self.not_taken:
                 state = []
@@ -194,6 +195,7 @@ class Entangled():
                     else:
                         state.append([str(k), CheckersSquare.EMPTY])
                 all_states.append(state)
+                weights.append(classical_squares[str(i)].chance*classical_squares[str(j)].chance)
         return all_states
         # state = []
         # for i in self.all_ids:
@@ -868,11 +870,12 @@ class Checkers:
         sup_sid = self.get_rel_squares(move.source_id)
         sup_jid = self.get_rel_squares(jumped_id)
         states = []
+        weights = []
         if(self.is_entangled(move.source_id)):
             ent_sid = self.get_id_entangled(move.source_id)
             if(self.is_entangled(jumped_id)): # jid is also entangled, either with the sid or different entanglement
                 if(ent_sid == self.get_id_entangled(jumped_id)): # Both are entangled with the same object
-                    poss_states = ent_sid.return_possible_states_adv()
+                    poss_states, poss_weights = ent_sid.return_possible_states_adv(self.classical_squares)
                     for state in poss_states:
                         cp = self.get_copy()
                         for id in state:
@@ -885,12 +888,13 @@ class Checkers:
                         cp.legal_moves = cp.calculate_possible_moves(self.player)
                         cp.status = cp.result()
                         states.append(cp)
+                        weights.append(poss_weights)
                 else: # Both are entangled with different objects
                     ent_jid = self.get_id_entangled(move.source_id)
-                    poss_sid_states = ent_sid.return_possible_states_adv()
-                    poss_jid_states = ent_jid.return_possible_states_adv()
-                    for state_sid in poss_sid_states: # For all possible sid states
-                        for state_jid in poss_jid_states: # For all possible jid states
+                    poss_sid_states, poss_sid_weights = ent_sid.return_possible_states_adv(self.classical_squares)
+                    poss_jid_states, poss_jid_weights = ent_jid.return_possible_states_adv(self.classical_squares)
+                    for sid_counter, state_sid in enumerate(poss_sid_states): # For all possible sid states
+                        for jid_counter, state_jid in enumerate(poss_jid_states): # For all possible jid states
                             cp = self.get_copy() # Create a copy of the game
                             for id in state_sid: # Update all ids to the correct value for this state
                                 if(id[1] == CheckersSquare.FULL):
@@ -914,21 +918,24 @@ class Checkers:
                             cp.legal_moves = cp.calculate_possible_moves(self.player)
                             cp.status = cp.result()
                             states.append(cp)
+                            weights.append(poss_sid_weights[sid_counter]*poss_jid_weights[jid_counter])
             elif(len(sup_jid) > 1): # jid is in superposition
-                poss_states = ent_sid.return_possible_states_adv()
-                for jid in sup_jid: 
-                    for state in poss_states:
+                poss_states, poss_weights = ent_sid.return_possible_states_adv(self.classical_squares)
+                for jid in sup_jid:
+                    jid_chance = self.classical_squares[str(jid)].chance
+                    for counter, state in enumerate(poss_states):
                         cp = self.get_copy()
                         cp_jids = cp.remove_from_rel_squares(jid)
                         cp_sids = cp.remove_from_rel_squares(move.source_id)
+                        for id in state:
+                            if(id[1] == CheckersSquare.FULL):
+                                cp.classical_squares[str(id[0])].chance = 100
+                            else:
+                                cp.remove_piece(id[0])
+                        
                         # Two scenario's
                         # The jumped id is actually there
                         if(str(jid) == str(jumped_id)):
-                            for id in state:
-                                if(id[1] == CheckersSquare.FULL):
-                                    cp.classical_squares[str(id[0])].chance = 100
-                                else:
-                                    cp.remove_piece(id[0])
                             if(cp.classical_squares[str(move.source_id)].chance == 100):
                                 cp.remove_piece(jid)
                                 cp.classical_squares[str(move.target1_id)] = cp.classical_squares[str(move.source_id)]
@@ -944,17 +951,13 @@ class Checkers:
                                 if(j == str(jid)):
                                     continue
                                 cp.remove_piece(str(j))
-                            for id in state:
-                                if(id[1] == CheckersSquare.FULL):
-                                    cp.classical_squares[str(id[0])].chance = 100
-                                else:
-                                    cp.remove_piece(id[0])
                         cp.legal_moves = cp.calculate_possible_moves(self.player)
                         cp.status = cp.result()
                         states.append(cp)
+                        weights.append(poss_weights[counter]*jid_chance)
             else: # jid is classical
-                poss_states = ent_sid.return_possible_states_adv()
-                for state in poss_states:
+                poss_states, poss_weights = ent_sid.return_possible_states_adv(self.classical_squares)
+                for counter, state in enumerate(poss_states):
                     cp = self.get_copy()
                     for id in state:
                         if(id[1] == CheckersSquare.FULL):
@@ -971,24 +974,26 @@ class Checkers:
                     cp.legal_moves = cp.calculate_possible_moves(self.player)
                     cp.status = cp.result()
                     states.append(cp)
+                    weights.append(poss_weights[counter])
         else: # sid is not entangled, therefore jid must be
             if(len(sup_sid) > 1): # Sid is in superposition
                 # same as above, but now sid is in superposition
-                poss_states = ent_jid.return_possible_states_adv()
-                for sid in sup_sid: 
-                    for state in poss_states:
+                poss_states, poss_weights = ent_jid.return_possible_states_adv(self.classical_squares)
+                for sid in sup_sid:
+                    sid_chance = self.classical_squares[str(sid)].chance 
+                    for counter, state in enumerate(poss_states):
                         cp = self.get_copy()
                         cp_jids = cp.remove_from_rel_squares(jumped_id)
                         cp_sids = cp.remove_from_rel_squares(sid)
+                        for id in state:
+                            if(id[1] == CheckersSquare.FULL):
+                                cp.classical_squares[str(id[0])].chance = 100
+                            else:
+                                cp.remove_piece(id[0])
                         # Two scenario's
                         # The source id is actually there
                         if(str(sid) == str(move.source_id)):
                             cp.classical_squares[str(sid)].chance = 100
-                            for id in state:
-                                if(id[1] == CheckersSquare.FULL):
-                                    cp.classical_squares[str(id[0])].chance = 100
-                                else:
-                                    cp.remove_piece(id[0])
                             if(cp.classical_squares[str(jumped_id)].chance == 100): # if in this state the jumped is there, we need to remove it
                                 cp.remove_piece(jid)
                                 cp.classical_squares[str(move.target1_id)] = cp.classical_squares[str(move.source_id)]
@@ -1004,17 +1009,13 @@ class Checkers:
                                 if(s == str(sid)):
                                     continue
                                 cp.remove_piece(str(s))
-                            for id in state:
-                                if(id[1] == CheckersSquare.FULL):
-                                    cp.classical_squares[str(id[0])].chance = 100
-                                else:
-                                    cp.remove_piece(id[0])
                         cp.legal_moves = cp.calculate_possible_moves(self.player)
                         cp.status = cp.result()
                         states.append(cp)
+                        weights.append(poss_weights[counter]*sid_chance)
             else: # sid is classical
-                poss_states = ent_jid.return_possible_states_adv()
-                for state in poss_states:
+                poss_states, poss_weights = ent_jid.return_possible_states_adv(self.classical_squares)
+                for counter, state in enumerate(poss_states):
                     cp = self.get_copy()
                     for id in state:
                         if(id[1] == CheckersSquare.FULL):
@@ -1031,7 +1032,8 @@ class Checkers:
                     cp.legal_moves = cp.calculate_possible_moves(self.player)
                     cp.status = cp.result()
                     states.append(cp)
-        return states
+                    weights.append(poss_weights[counter])
+        return states, weights
 
 
     def return_all_possible_states(self, move: Move_id):
@@ -1047,17 +1049,8 @@ class Checkers:
         jumped_ids = self.get_rel_squares(jumped_id)
         # First check if we are dealing with entanglement, just superposition or a classic move.
         if(self.is_entangled(str(move.source_id)) or self.is_entangled(str(jumped_id))): # Entanglement
-            states = self.calc_ent_states(move)
-            # ent_s = self.get_id_entangled(str(move.source_id))
-            # ent_j = self.get_id_entangled(str(jumped_id))
-            # if(ent_s != None):
-            #     all_poss_s_states = ent_s.return_possible_states_adv()
-            #     all_poss_j_states = []
-            #     if(ent_j != None and ent_s != ent_j):
-            #         all_poss_j_states = ent_j.return_possible_states_adv()
-            
-            
-            pass
+            states, weights = self.calc_ent_states(move)
+
         elif(len(source_ids) > 1 or len(jumped_ids) > 1): # Only superposition, no entanglement
             # Superposition
             # Find the related id's list the source and jumped id are in
