@@ -863,15 +863,15 @@ class Checkers:
 
     def calc_ent_states(self, move: Move_id):
         _, jumped_id = self.is_adjacent(move.source_id, move.target1_id)
-        sid = move.source_id
-        jid = jumped_id
+        # sid = move.source_id
+        # jid = jumped_id
         sup_sid = self.get_rel_squares(move.source_id)
         sup_jid = self.get_rel_squares(jumped_id)
         states = []
-        if(self.is_entangled(sid)):
-            ent_sid = self.get_id_entangled(sid)
-            if(self.is_entangled(jid)): # jid is also entangled, either with the sid or different entanglement
-                if(ent_sid == self.get_id_entangled(jid)): # Both are entangled with the same object
+        if(self.is_entangled(move.source_id)):
+            ent_sid = self.get_id_entangled(move.source_id)
+            if(self.is_entangled(jumped_id)): # jid is also entangled, either with the sid or different entanglement
+                if(ent_sid == self.get_id_entangled(jumped_id)): # Both are entangled with the same object
                     poss_states = ent_sid.return_possible_states_adv()
                     for state in poss_states:
                         cp = self.get_copy()
@@ -880,13 +880,13 @@ class Checkers:
                                 cp.classical_squares[str(id[0])].chance = 100
                             else:
                                 cp.remove_piece(id[0])
-                        cp.remove_from_rel_squares(sid)
-                        cp.remove_from_rel_squares(jid) # should be redundant, since they are in the same list
+                        cp.remove_from_rel_squares(move.source_id)
+                        cp.remove_from_rel_squares(jumped_id) # should be redundant, since they are in the same list
                         cp.legal_moves = cp.calculate_possible_moves(self.player)
                         cp.status = cp.result()
                         states.append(cp)
                 else: # Both are entangled with different objects
-                    ent_jid = self.get_id_entangled(sid)
+                    ent_jid = self.get_id_entangled(move.source_id)
                     poss_sid_states = ent_sid.return_possible_states_adv()
                     poss_jid_states = ent_jid.return_possible_states_adv()
                     for state_sid in poss_sid_states: # For all possible sid states
@@ -902,15 +902,15 @@ class Checkers:
                                     cp.classical_squares[str(id[0])].chance = 100
                                 else:
                                     cp.remove_piece(id[0])
-                            if(cp.classical_squares[str(sid)].chance == 100 and cp.classical_squares[str(jid).chance == 100]): # If both ids are there it means the source id can take the jumped id and therefore we need to remove the jumped id and move the source id
-                                cp.remove_piece(jumped_id)
+                            if(cp.classical_squares[str(move.source_id)].chance == 100 and cp.classical_squares[str(jumped_id).chance == 100]): # If both ids are there it means the source id can take the jumped id and therefore we need to remove the jumped id and move the source id
+                                cp.remove_piece(str(jumped_id))
 
                                 # Update source id
                                 cp.classical_squares[str(move.target1_id)] = cp.classical_squares[str(move.source_id)]
                                 cp.classical_squares[str(move.target1_id)].id = move.target1_id
                                 cp.remove_piece(move.source_id)
-                            cp.remove_from_rel_squares(sid)
-                            cp.remove_from_rel_squares(jid)
+                            cp.remove_from_rel_squares(move.source_id)
+                            cp.remove_from_rel_squares(jumped_id)
                             cp.legal_moves = cp.calculate_possible_moves(self.player)
                             cp.status = cp.result()
                             states.append(cp)
@@ -920,7 +920,7 @@ class Checkers:
                     for state in poss_states:
                         cp = self.get_copy()
                         cp_jids = cp.remove_from_rel_squares(jid)
-                        cp_sids = cp.remove_from_rel_squares(sid)
+                        cp_sids = cp.remove_from_rel_squares(move.source_id)
                         # Two scenario's
                         # The jumped id is actually there
                         if(str(jid) == str(jumped_id)):
@@ -930,7 +930,7 @@ class Checkers:
                                 else:
                                     cp.remove_piece(id[0])
                             if(cp.classical_squares[str(move.source_id)].chance == 100):
-                                cp.remove_piece(jumped_id)
+                                cp.remove_piece(jid)
                                 cp.classical_squares[str(move.target1_id)] = cp.classical_squares[str(move.source_id)]
                                 cp.classical_squares[str(move.target1_id)].id = move.target1_id
                                 cp.remove_piece(move.source_id)
@@ -961,21 +961,76 @@ class Checkers:
                             cp.classical_squares[str(id[0])].chance = 100
                         else:
                             cp.remove_piece(id[0])
-                    if(cp.classical_squares[str(sid)].chance == 100):
+                    if(cp.classical_squares[str(move.source_id)].chance == 100):
                         cp.remove_piece(jumped_id)
                         cp.classical_squares[str(move.target1_id)] = cp.classical_squares[str(move.source_id)]
                         cp.classical_squares[str(move.target1_id)].id = move.target1_id
-                        cp.remove_piece(move.source_id)
-                    cp.remove_from_rel_squares(sid)
-                    cp.remove_from_rel_squares(jid) # should be redundant, since they are in the same list
+                        cp.remove_piece(str(move.source_id))
+                    cp.remove_from_rel_squares(move.source_id)
+                    cp.remove_from_rel_squares(jumped_id) # should be redundant, since they are in the same list
                     cp.legal_moves = cp.calculate_possible_moves(self.player)
                     cp.status = cp.result()
                     states.append(cp)
         else: # sid is not entangled, therefore jid must be
             if(len(sup_sid) > 1): # Sid is in superposition
-                pass
+                # same as above, but now sid is in superposition
+                poss_states = ent_jid.return_possible_states_adv()
+                for sid in sup_sid: 
+                    for state in poss_states:
+                        cp = self.get_copy()
+                        cp_jids = cp.remove_from_rel_squares(jumped_id)
+                        cp_sids = cp.remove_from_rel_squares(sid)
+                        # Two scenario's
+                        # The source id is actually there
+                        if(str(sid) == str(move.source_id)):
+                            cp.classical_squares[str(sid)].chance = 100
+                            for id in state:
+                                if(id[1] == CheckersSquare.FULL):
+                                    cp.classical_squares[str(id[0])].chance = 100
+                                else:
+                                    cp.remove_piece(id[0])
+                            if(cp.classical_squares[str(jumped_id)].chance == 100): # if in this state the jumped is there, we need to remove it
+                                cp.remove_piece(jid)
+                                cp.classical_squares[str(move.target1_id)] = cp.classical_squares[str(move.source_id)]
+                                cp.classical_squares[str(move.target1_id)].id = move.target1_id
+                                cp.remove_piece(move.source_id)
+                                for i in cp_sids:
+                                    if(i == str(move.source_id)):
+                                        continue
+                                    cp.remove_piece(str(i))
+                        else: # sid != move.source id, therefore it cannot take the piece it is trying to take
+                            cp.classical_squares[str(sid)].chance = 100
+                            for s in cp_sids:
+                                if(s == str(sid)):
+                                    continue
+                                cp.remove_piece(str(s))
+                            for id in state:
+                                if(id[1] == CheckersSquare.FULL):
+                                    cp.classical_squares[str(id[0])].chance = 100
+                                else:
+                                    cp.remove_piece(id[0])
+                        cp.legal_moves = cp.calculate_possible_moves(self.player)
+                        cp.status = cp.result()
+                        states.append(cp)
             else: # sid is classical
-                pass
+                poss_states = ent_jid.return_possible_states_adv()
+                for state in poss_states:
+                    cp = self.get_copy()
+                    for id in state:
+                        if(id[1] == CheckersSquare.FULL):
+                            cp.classical_squares[str(id[0])].chance = 100
+                        else:
+                            cp.remove_piece(str(id[0]))
+                    if(cp.classical_squares[str(jumped_id)].chance == 100):
+                        cp.remove_piece(jumped_id)
+                        cp.classical_squares[str(move.target1_id)] = cp.classical_squares[str(move.source_id)]
+                        cp.classical_squares[str(move.target1_id)].id = move.target1_id
+                        cp.remove_piece(move.source_id)
+                    cp.remove_from_rel_squares(move.source_id)
+                    cp.remove_from_rel_squares(jumped_id) # should be redundant, since they are in the same list
+                    cp.legal_moves = cp.calculate_possible_moves(self.player)
+                    cp.status = cp.result()
+                    states.append(cp)
         return states
 
 
