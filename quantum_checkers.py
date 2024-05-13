@@ -953,7 +953,24 @@ class Checkers:
                         cp.status = cp.result()
                         states.append(cp)
             else: # jid is classical
-                pass
+                poss_states = ent_sid.return_possible_states_adv()
+                for state in poss_states:
+                    cp = self.get_copy()
+                    for id in state:
+                        if(id[1] == CheckersSquare.FULL):
+                            cp.classical_squares[str(id[0])].chance = 100
+                        else:
+                            cp.remove_piece(id[0])
+                    if(cp.classical_squares[str(sid)].chance == 100):
+                        cp.remove_piece(jumped_id)
+                        cp.classical_squares[str(move.target1_id)] = cp.classical_squares[str(move.source_id)]
+                        cp.classical_squares[str(move.target1_id)].id = move.target1_id
+                        cp.remove_piece(move.source_id)
+                    cp.remove_from_rel_squares(sid)
+                    cp.remove_from_rel_squares(jid) # should be redundant, since they are in the same list
+                    cp.legal_moves = cp.calculate_possible_moves(self.player)
+                    cp.status = cp.result()
+                    states.append(cp)
         else: # sid is not entangled, therefore jid must be
             if(len(sup_sid) > 1): # Sid is in superposition
                 pass
