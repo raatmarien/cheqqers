@@ -246,7 +246,7 @@ class Entangled():
 class Checkers:
     def __init__(self, run_on_hardware = False, num_vertical = 5, num_horizontal = 5, num_vertical_pieces = 1, rules = CheckersRules.QUANTUM_V3, SIMULATE_QUANTUM = False) -> None:
         self.rules = rules
-        self.SIMULATE_QUANTUM = False
+        self.SIMULATE_QUANTUM = True
         if(SIMULATE_QUANTUM.lower() == "true"):
             self.SIMULATE_QUANTUM = True
         self.player = CheckersPlayer.WHITE
@@ -687,6 +687,9 @@ class Checkers:
         self.player = CheckersPlayer.BLACK if self.player == CheckersPlayer.WHITE else CheckersPlayer.WHITE
         self.legal_moves = self.calculate_possible_moves(self.player)
         self.status = self.result()
+        print(self.related_squares)
+        for i in self.entangled_objects:
+            i.print_all()
         # DEBUG STUFF
         # print("########")
         # print("RELATED SQUARES")
@@ -1211,10 +1214,6 @@ class Checkers:
         It also measures the piece itself or the piece it is taking if it is relevant.
         Returns two booleans. First one is true if a piece has been taken. Second one is true if a move has failed
         """
-        print("start", end="")
-        print("^"*100)
-        print(self.get_sim_board()) 
-        move.print_move()
         # states, weights = self.return_all_possible_states(move)
         # for i in states:
         #     print(i.get_sim_board())
@@ -1278,14 +1277,10 @@ class Checkers:
                 self.superposition_pieces.add(original_piece)
                 return taken, False
                 # CheckersSplit(CheckersSquare.FULL, self.rules)(self.squares[str(move.source_id)], self.squares[str(move.target1_id)], self.squares[str(move.target2_id)])
-        print("^+"*100)
-        print(self.get_sim_board()) 
         self.classical_squares[str(move.target1_id)] = self.classical_squares[str(move.source_id)]
         self.classical_squares[str(move.target1_id)].id = move.target1_id
         # If we do a classical move on a piece in superposition, we need to append the new id to the correct list in related_squares
         for i in self.entangled_objects:
-            print("@@@@@@@@@@@@@@@@@@@@@")
-            move.print_move()
             i.update_entangled(str(move.source_id), [str(move.target1_id)])
         
         for i, squares in enumerate(self.related_squares):
@@ -1313,13 +1308,6 @@ class Checkers:
         # The piece moved so we need to cleanup the original id
         self.remove_id_from_rel_squares(move.source_id)
         self.remove_piece(move.source_id)
-
-        print("IS updated??")
-        for i in self.entangled_objects:
-            print(i.all_ids)
-        print(self.get_sim_board())
-        print(self.result())
-        print("@@@@@@@@@@@")
         if(not self.SIMULATE_QUANTUM):
             self.alternate_classic_move()
         return taken, False

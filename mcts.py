@@ -162,17 +162,17 @@ class Node():
     def expand(self):
         print("*"*100)
         print(self.game.get_sim_board())
+        print(self.game.related_squares)
         for i in self.game.entangled_objects:
             i.print_all()
         print("Expandable moves:")
-        
         for move in self.expandable_moves:
             move.print_move()
         action = random.choice(self.expandable_moves)
         print("Chosen move: ", end="")
         action.print_move()
         self.expandable_moves.remove(action)
-
+        self.backprop_print()
         # child_state = self.state.copy()
         # child_state = self.game.get_next_state(child_state, action, 1)
         # Change player (if not handled?)
@@ -263,7 +263,10 @@ class Node():
                 return 0
 
     def backprop_print(self):
+        print("BACKPROP")
         print(self.game.get_sim_board())
+        if(self.move != None):
+            self.move.print_move()
         print(self.game.related_squares)
         for i in self.game.entangled_objects:
             print(i.all_ids)

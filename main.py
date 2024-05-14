@@ -41,8 +41,8 @@ def main():
     args = parser.parse_args()
     p1 = random_bot()
     p2 = random_bot()
-    # p1 = human_player()
-    # p2 = human_player()
+    p1 = human_player()
+    p2 = human_player()
     if(args.num_columns % 2 == 1 and args.num_rows % 2 == 0):
         warning_len = len("# WARNING: If the number of columns is uneven and the number of rows is even the board is not symmetrical. #")
         print("#"*warning_len)
@@ -70,7 +70,7 @@ def main():
         print(f"Game {i+1}")
         start_t = time.time()
         checkers = Checkers(num_vertical=size, num_horizontal=size, num_vertical_pieces=args.num_vertical_pieces, SIMULATE_QUANTUM=args.sim_q, rules=rule)
-        game = GameInterface(checkers, white_player=p1, black_player=p2, GUI=args.GUI, white_mcts=False, black_mcts=True, print=False, attempt=i)
+        game = GameInterface(checkers, white_player=p1, black_player=p2, GUI=args.GUI, white_mcts=False, black_mcts=False, print=True, attempt=i)
         result, num_moves = (game.play())
         results.append(result)
         if(result == CheckersResult.WHITE_WINS):

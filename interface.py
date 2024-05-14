@@ -178,10 +178,10 @@ class GameInterface:
                 attempt_str = ""
                 attempt_str = self.game.get_sim_board()
                 if(self.print):
-                    # print("Simulated board")
-                    # self.print_board(True)
-                    print("Real board")
-                    self.print_board(False)
+                    print("Simulated board")
+                    self.print_board(True)
+                    # print("Real board")
+                    # self.print_board(False)
                     self.print_legal_moves(self.game.legal_moves)
                 counter += 1
                 # if(counter % 10 == 0):
