@@ -22,14 +22,26 @@ class MCTS():
         self.root = Node(self.game, self.args)
 
     def search(self):
-        # input("Press enter to start search")
         # Define root node
+        inp = False
         for srch in range(self.args['num_searches']):
+            # if(inp):
+                # input(f"###############Press enter to start search {i}")
             # print(f"Search {srch}")
             node = self.root
+            # print("ROOT NODE")
+            # print(node.game.get_sim_board())
+            # print("entagled objects: ", len(node.game.entangled_objects))
+            # for i in node.game.entangled_objects:
+            #     i.print_all()
             # print(f"Fully expandend: {node.is_fully_expanded()}")
             while node.is_fully_expanded():
                 node = node.select()
+            print("Selected NODE")
+            print(node.game.get_sim_board())
+            print("entagled objects: ", len(node.game.entangled_objects))
+            for i in node.game.entangled_objects:
+                i.print_all()
             result = node.game.status
 
             # If it is a leaf node
@@ -55,11 +67,24 @@ class MCTS():
                 value = 0
                 node.backpropogate(value)
             else: # game unfinished
+                print("Expanding")
                 nodes = node.expand() # Can add multiple nodes if quantum state is measured
+                print("After expanding NODE")
+                print(node.game.get_sim_board())
+                print(node.game.classical_squares.keys())
+                print("entagled objects: ", len(node.game.entangled_objects))
+                for i in node.game.entangled_objects:
+                    i.print_all()
                 for node in nodes:
                     value = 0
                     for i in range(self.args['num_simulations']):
                         value += node.simulate()
+                    print("After simulating NODE")
+                    print(node.game.get_sim_board())
+                    print(node.game.classical_squares.keys())
+                    print("entagled objects: ", len(node.game.entangled_objects))
+                    if(len(node.game.entangled_objects) > 0):
+                        inp = True
                     # backpropogation
                     node.backpropogate(value)
 
@@ -135,7 +160,17 @@ class Node():
         return child.weight * (q_value + self.args['C'] *(math.sqrt(math.log(self.visit_count) / child.visit_count)))
         
     def expand(self):
+        print("*"*100)
+        print(self.game.get_sim_board())
+        for i in self.game.entangled_objects:
+            i.print_all()
+        print("Expandable moves:")
+        
+        for move in self.expandable_moves:
+            move.print_move()
         action = random.choice(self.expandable_moves)
+        print("Chosen move: ", end="")
+        action.print_move()
         self.expandable_moves.remove(action)
 
         # child_state = self.state.copy()
@@ -146,6 +181,9 @@ class Node():
             try:
                 child_states, weights = self.game.return_all_possible_states(action)
             except Exception as error:
+                # print("%"*100)
+                # self.backprop_print()
+                # print("%"*100)
                 print("Error in expand")
                 print(traceback.format_exc())
                 print(self.game.get_sim_board())
@@ -162,10 +200,17 @@ class Node():
             child_states = [temp]
             weights = [1]
         to_backprop = []
+        print("Child states: ", child_states)
+        print(weights)
         for i, child_state in enumerate(child_states):
             # print(f"Length of legal moves new child: {len(child_state.legal_moves)}")
             # print(child_state.get_sim_board())
             child = Node(child_state, self.args, action, self, weights[i])
+            if(type(weights[i]) != int and type(weights[i]) != float):
+                print("Weight is not int or float")
+                print(weights[i])
+                print(type(weights[i]))
+                exit()
             self.children.append(child)
             to_backprop.append(child)
         return to_backprop
@@ -216,6 +261,14 @@ class Node():
                         return 1
             else: #draw
                 return 0
+
+    def backprop_print(self):
+        print(self.game.get_sim_board())
+        print(self.game.related_squares)
+        for i in self.game.entangled_objects:
+            print(i.all_ids)
+        if(self.parent != None):
+            self.parent.backprop_print()
 
     def backpropogate(self, value):
         self.value_sum += value
