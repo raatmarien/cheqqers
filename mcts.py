@@ -37,11 +37,6 @@ class MCTS():
             # print(f"Fully expandend: {node.is_fully_expanded()}")
             while node.is_fully_expanded():
                 node = node.select()
-            print("Selected NODE")
-            print(node.game.get_sim_board())
-            print("entagled objects: ", len(node.game.entangled_objects))
-            for i in node.game.entangled_objects:
-                i.print_all()
             result = node.game.status
 
             # If it is a leaf node
@@ -67,26 +62,13 @@ class MCTS():
                 value = 0
                 node.backpropogate(value)
             else: # game unfinished
-                print("Expanding")
                 nodes = node.expand() # Can add multiple nodes if quantum state is measured
-                print("After expanding NODE")
-                print(node.game.get_sim_board())
-                print(node.game.classical_squares.keys())
-                print("entagled objects: ", len(node.game.entangled_objects))
-                for i in node.game.entangled_objects:
-                    i.print_all()
                 for node in nodes:
                     value = 0
                     for i in range(self.args['num_simulations']):
                         value += node.simulate()
-                    print("After simulating NODE")
-                    print(node.game.get_sim_board())
-                    print(node.game.classical_squares.keys())
-                    print("entagled objects: ", len(node.game.entangled_objects))
-                    if(len(node.game.entangled_objects) > 0):
-                        inp = True
                     # backpropogation
-                    node.backpropogate(value)
+                    node.backpropogate(value) # To not inflate visit count if multiple children are added as once
 
         action_probs = np.zeros(len(self.root.children))
         for idx, child in enumerate(self.root.children):
@@ -160,31 +142,8 @@ class Node():
         return child.weight * (q_value + self.args['C'] *(math.sqrt(math.log(self.visit_count) / child.visit_count)))
         
     def expand(self):
-        print("*"*100)
-        print(self.game.get_sim_board())
-        print(self.game.related_squares)
-        for i in self.game.entangled_objects:
-            i.print_all()
-        print("Expandable moves:")
-        for move in self.expandable_moves:
-            move.print_move()
-        action = random.choice(self.expandable_moves)
-        print("Chosen move: ", end="")
-        action.print_move()
-        print(type(action.source_id))
-        tempp = False
-        if(action.source_id == 17 and action.target1_id == 11 and action.target2_id == None):
-            test = input("THIS IS THE EXPAND MOVE")
-            # test = 0
-            if(test == "1"):
-                print( "True")
-                tempp = True
+        action = random.choice(self.expandable_moves)   
         self.expandable_moves.remove(action)
-        # self.backprop_print()
-        # child_state = self.state.copy()
-        # child_state = self.game.get_next_state(child_state, action, 1)
-        # Change player (if not handled?)
-        # child_state = deepcopy(self.game)
         if(action.movetype == MoveType.TAKE):
             try:
                 child_states, weights = self.game.return_all_possible_states(action)
@@ -203,28 +162,11 @@ class Node():
             # print( "True")
         else:
             temp = self.game.get_copy()
-            if(tempp):
-                print("Before player move")
-                print(temp.get_sim_board())
-                print(temp.related_squares)
-                for i in temp.entangled_objects:
-                    i.print_all()
-                print("\n")
-            # temp = deepcopy(self.game)
             temp.player_move(action)
             child_states = [temp]
-            if(tempp):
-                print("after player move")
-                print(temp.get_sim_board())
-                print(temp.related_squares)
-                for i in temp.entangled_objects:
-                    i.print_all()
-                input('Press enter to continue')
             weights = [1]
         to_backprop = []
         for i, child_state in enumerate(child_states):
-            # print(f"Length of legal moves new child: {len(child_state.legal_moves)}")
-            # print(child_state.get_sim_board())
             child = Node(child_state, self.args, action, self, weights[i])
             if(type(weights[i]) != int and type(weights[i]) != float):
                 print("Weight is not int or float")
@@ -243,28 +185,14 @@ class Node():
         prev_board = sim_game.get_sim_board()
         while True:
             if(sim_game.status == CheckersResult.UNFINISHED):
-                # print(len(sim_game.legal_moves))
-                # if(len(sim_game.legal_moves) == 0):
-                #     print(prev_board)
-                #     print(sim_game.get_sim_board())
-                #     print(len(sim_game.calculate_possible_moves()))
                 try: 
                     move = random.choice(sim_game.legal_moves)
                     sim_game.player_move(move)
                 except Exception as error:
                     print("TEST")
                     print(traceback.format_exc())
-                    print(len(sim_game.legal_moves))
-                    if(len(sim_game.legal_moves) > 0):
-                        move.print_move()
-                    print(sim_game.status)
-                    leg2 = sim_game.calculate_possible_moves()
-                    print(len(leg2))
-                    if(len(leg2) > 0):
-                        leg2[0].print_move()
-                    # print(prev_board)
                     print(sim_game.get_sim_board())
-                   
+                    move.print_move()
                     print(sim_game.classical_squares.keys())
                     print(sim_game.status)
                     exit()

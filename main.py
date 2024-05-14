@@ -53,7 +53,7 @@ def main():
     # for rule in [CheckersRules.CLASSICAL, CheckersRules.QUANTUM_V1, CheckersRules.QUANTUM_V2]:
     #     for size in [10, 12, 14]:
     size = 5
-    rule = CheckersRules.QUANTUM_V1
+    rule = CheckersRules.QUANTUM_V2
     times = []
     results = []
     number_of_moves = []
@@ -62,7 +62,7 @@ def main():
     print(f"Size: {size}x{size}, Rule: {rule}")
     for i in range(100):
         sd = random.randint(0, 100000000000000000)
-        sd = 37016302642822923
+        # sd = 50355178492799047
         random.seed(sd)
         seed_str = f"Seed: {sd}\n"
         write_attempt(i, seed_str)
@@ -101,3 +101,5 @@ if __name__ == "__main__":
 
 # TODO:
 # RETURN ALL POSSIBLE STATES WERKT NIET
+# PROBLEM:
+# self.entangled squares is not cleaned up properly

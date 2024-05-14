@@ -8,6 +8,7 @@ from enums import (
 
 import traceback
 import itertools
+import time
 from typing import List, Dict
 from copy import deepcopy, copy
 from unitary.alpha import QuantumObject, QuantumWorld, quantum_if, Move, Split, Flip
@@ -107,8 +108,6 @@ class Entangled():
         self.unsuccessfully_takes = unsuccessfully_takes # # The piece that was (maybe) unsuccessfull in taking another piece
 
     def update_entangled(self, org_id: str, new_ids: list):
-        print("UPDATING ENTANGLEMENT WITH", self.all_ids)
-        print("org id, new ids", org_id, new_ids)
         if(org_id in self.all_ids):
             if(org_id in self.is_taken):
                 self.is_taken.remove(org_id)
@@ -122,8 +121,9 @@ class Entangled():
             elif(org_id in self.unsuccessfully_takes):
                 self.unsuccessfully_takes.remove(org_id)
                 self.unsuccessfully_takes += new_ids
-        self.all_ids.remove(org_id)
-        self.all_ids += new_ids
+            self.all_ids += new_ids
+            # self.all_ids.remove(org_id) # Deletion happens somewhere else
+        # self.all_ids += new_ids
 
     def measurement(self, id: str):
         """
@@ -177,7 +177,6 @@ class Entangled():
         Returns all possible states as a list of lists for all ids that are related to each other.
         Format is [[[id1, Checkersquare.EMPTY], [id2, Checkersquare.FULL], ...]], [[id1, Checkersquare.FULL], [id2, Checkersquare.EMPTY], ...]]
         """
-        print(classical_squares)
         all_states = []
         weights = []
         # Needs to be repeated for each possible state
@@ -237,6 +236,33 @@ class Entangled():
                 if i[0] == str(self.not_taken[idx]):
                     i[1] = CheckersSquare.FULL
         return state
+
+    def remove_id(self, id: str):
+        """
+        Removes id from all lists
+        """
+        all_ids = self.all_ids
+        if(id in self.is_taken):
+            self.is_taken.remove(id)
+        if(id in self.successfully_takes):
+            self.successfully_takes.remove(id)
+        if(id in self.not_taken):
+            self.not_taken.remove(id)
+        if(id in self.unsuccessfully_takes):
+            self.unsuccessfully_takes.remove(id)
+        if(id in self.all_ids):
+            self.all_ids.remove(id)
+            if(len(self.all_ids) <= 1):
+                print(self.all_ids)
+                print(10)
+                time.sleep(10)
+            return True, all_ids
+        return False, _
+    
+    def contains_id(self, str_id: str):
+        if(str_id in self.all_ids):
+            return True
+        return False
 
     def print_all(self):
         print(f"Related squares: {self.all_ids}")
@@ -310,9 +336,7 @@ class Checkers:
         return None
 
     def is_entangled(self, id: str):
-        print(id)
         for i in self.entangled_objects:
-            print(i.all_ids)
             if(id in i.all_ids):
                 return True
         return False
@@ -321,12 +345,15 @@ class Checkers:
         """
         Measures single square and returns CheckersSquare.EMPTY or CheckersSquare.FULL for ID
         """
+        # print("MEASURING BOARD")
+        # print(self.get_sim_board())
+        # print("ID: ", id)
         temp_uniq_rel_list = deepcopy(self.unique_related_squares)
         ids = self.remove_from_rel_squares(id)
         # ALl entangleds objects related to these ids also need to be removed
         to_be_removed = []
         for i in self.entangled_objects:
-            if(ids == i.all_ids):
+            if(i.contains_id(str(id))):
                 to_be_removed.append(i)
         # Check out all ids, for the one that remained, remove all others from classical squares
         if(not self.SIMULATE_QUANTUM):
@@ -647,12 +674,31 @@ class Checkers:
         for i in self.entangled_objects:
             ent_ids += i.all_ids
         for i in ent_ids:
-            if i not in self.related_squares:
-                print("ERROR")
-                print(i)
-                print(self.related_squares)
-                print(ent_ids)
+            exists = False
+            for j in self.related_squares:
+                if(i in j):
+                    exists = True
+                    break
+            if(not exists):     
+                print("ERROR: RELATED AND ENTANGLED DISCREPANCY")
+                print("Could not find: ", type(i), i)
+                print("In related squares: ", self.related_squares)
+                print("Entangled ids: ", ent_ids)
                 exit()
+
+    def verify_entangle_squares(self):
+        for count, i in enumerate(self.entangled_squares):
+            if(count == len(self.entangled_squares)-1):
+                break
+            temp = deepcopy(self.entangled_squares[count+1:])
+            for j in temp:
+                for k in i:
+                    if k in j:
+                        print("ERROR: ENTANGLED SQUARES DISCREPANCY")
+                        print("Found id in two entangled squares")
+                        print(self.entangled_squares)
+                        exit()
+            
 
     def verify_uniq_and_rel(self):
         for i in self.related_squares:
@@ -671,7 +717,11 @@ class Checkers:
 
     def player_move(self, move: Move_id, player: CheckersPlayer = None):
         # self.verify_uniq_and_rel() # used to find bug where related squares were not in unique related squares, which caused buggy behaviour
+        print(self.get_sim_board())
+        print(move.get_move())
+        print(self.entangled_squares)
         self.verify_rel_and_ent()
+        self.verify_entangle_squares()
         self.moves_since_take += 1
         prev_taken = False
         to_king = [] # list that holds moved pieces to check if they need to be kinged
@@ -887,8 +937,6 @@ class Checkers:
         return False, []
 
     def clean_ent_objects(self, ent_objs: list):
-        print("*"*500)
-        print("CLEANING ENTANGLED OBJECTS")
         tbr = [] # to be removed
         for obj in ent_objs:
             for self_obj in self.entangled_objects:
@@ -899,23 +947,15 @@ class Checkers:
         tbr = [] # to be removed
         for i in self.entangled_squares:
             for j in i:
-                print(j)
-                print(self.classical_squares.keys())
                 if(str(j) not in self.classical_squares.keys() or (self.classical_squares[str(j)] == 100 or self.classical_squares[str(j)] == 0)):
                     tbr.append(i)
         for i in tbr:
+            print("####")
+            print(self.entangled_squares)
+            print(i)
             self.entangled_squares.remove(i)
 
     def calc_ent_states(self, move: Move_id):
-        print("############# DEBUG ################")
-        print(self.get_sim_board())
-        print("MOVE:")
-        move.print_move()
-        print("ENT OBJS")
-        for i in self.entangled_objects:
-            print("&&&")
-            i.print_all()
-        print("&&&")
         _, jumped_id = self.is_adjacent(move.source_id, move.target1_id)
         jumped_id = str(jumped_id)
         # sid = move.source_id
@@ -929,11 +969,6 @@ class Checkers:
             if(self.is_entangled(jumped_id)): # jid is also entangled, either with the sid or different entanglement
                 if(ent_sid == self.get_id_entangled(str(jumped_id))): # Both are entangled with the same object
                     print("scenario 1")
-                    print("PRINTING ENTANGLED LOCATION")
-                    print(ent_sid)
-                    for i in self.entangled_objects:
-                        print(i)
-                    
                     poss_states, poss_weights = ent_sid.return_possible_states_adv(self.classical_squares)
                     for counter, state in enumerate(poss_states):
                         cp = self.get_copy()
@@ -944,7 +979,6 @@ class Checkers:
                                 cp.remove_piece(id[0])
                         cp.remove_from_rel_squares(move.source_id)
                         cp.remove_from_rel_squares(jumped_id) # should be redundant, since they are in the same list
-                        print("PRINTING ENTANGLED LOCATION")
                         cp.clean_ent_objects([ent_sid])
                         cp.legal_moves = cp.calculate_possible_moves(self.player)
                         cp.status = cp.result()
@@ -1139,11 +1173,11 @@ class Checkers:
             print(f"Jumped id is entangled: {self.is_entangled(str(jumped_id))}")
             # print(self.get_board())
             print(self.get_sim_board())
+            move.print_move()
             print("++++++++++")
             states, weights = self.calc_ent_states(move)
 
         elif(len(source_ids) > 1 or len(jumped_ids) > 1): # Only superposition, no entanglement
-            print("SUPERPOSITION")
             # Superposition
             # Find the related id's list the source and jumped id are in
             # Calculate all possible ids by first
@@ -1213,7 +1247,6 @@ class Checkers:
         #       We don't have to check jumped id, since the source id is not there
             return states, weights
         else: # Classical move
-            print("CLASSICAL MOVE")
             cp = self.get_copy()
             cp.player_move(move)
             states.append(cp)
@@ -1336,7 +1369,7 @@ class Checkers:
         self.classical_squares[str(move.target2_id)] = Piece(id=str(move.target2_id), color=original_piece.color, king=original_piece.king, superposition=True)
 
         for i in self.entangled_objects:
-            i.update_entangled(str(move.source_id), [str(move.target1_id)])
+            i.update_entangled(str(move.source_id), [str(move.target1_id), str(move.target2_id)])
 
         for i, squares in enumerate(self.unique_related_squares):
             if(str(move.source_id) in squares):
@@ -1431,6 +1464,27 @@ class Checkers:
                     self.unique_related_squares.pop(index)
                 return
 
+    def remove_id_from_entanglement(self, id):
+        """
+        Whenever an id is removed from related squares, it also needs to be removed from entanglement
+        """
+        removed = False
+        for i in self.entangled_objects:
+            removed, ids = i.remove_id(str(id))
+            if(removed): # if we have found the correct entangled object we can break
+                break
+        if(not removed):
+            return
+        tbr = []
+        for i in ids:
+            for j in self.entangled_squares:
+                if(str(i) in self.entangled_squares):
+                    tbr.append(j)
+        for i in tbr:
+            self.entangled_squares.remove(j)
+        return
+
+
     def remove_id_from_rel_squares(self, id):
         """
         Removes one specific id from a list of superpositions..
@@ -1449,6 +1503,7 @@ class Checkers:
                     self.q_rel_moves.pop(index)
                 # If we have removed something from related squares, we need to remove it from unique related squares
                 self.remove_id_from_unique_rel_squares(id)
+                self.remove_id_from_entanglement(id)
                 return
 
     def remove_from_rel_squares(self, id):
@@ -1473,6 +1528,16 @@ class Checkers:
                             to_be_removed.add(count2)
                 for i in to_be_removed:
                     self.unique_related_squares.remove(temp_uniq_rel_list[i])
+                # tbr = None # to be removed
+                # print(id)
+                # print(self.get_sim_board())
+                # for ent_obj in self.entangled_objects:
+                #     print(ent_obj.all_ids)
+                #     if(ent_obj.contains_id(str(id))):
+                #         tbr = ent_obj
+                #         break
+                # print(tbr)
+                # self.entangled_objects.remove(tbr)
                 return removed_rel_squares
         return []
     
