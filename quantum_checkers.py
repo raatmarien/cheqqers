@@ -122,6 +122,8 @@ class Entangled():
             elif(org_id in self.unsuccessfully_takes):
                 self.unsuccessfully_takes.remove(org_id)
                 self.unsuccessfully_takes += new_ids
+        self.all_ids.remove(org_id)
+        self.all_ids += new_ids
 
     def measurement(self, id: str):
         """
@@ -640,6 +642,18 @@ class Checkers:
         temp = self.recursive_cal_rel_state(related_objects, None, 0)
         print(temp)
 
+    def verify_rel_and_ent(self):
+        ent_ids = []
+        for i in self.entangled_objects:
+            ent_ids += i.all_ids
+        for i in ent_ids:
+            if i not in self.related_squares:
+                print("ERROR")
+                print(i)
+                print(self.related_squares)
+                print(ent_ids)
+                exit()
+
     def verify_uniq_and_rel(self):
         for i in self.related_squares:
             for id in i:
@@ -657,6 +671,7 @@ class Checkers:
 
     def player_move(self, move: Move_id, player: CheckersPlayer = None):
         # self.verify_uniq_and_rel() # used to find bug where related squares were not in unique related squares, which caused buggy behaviour
+        self.verify_rel_and_ent()
         self.moves_since_take += 1
         prev_taken = False
         to_king = [] # list that holds moved pieces to check if they need to be kinged
@@ -687,9 +702,6 @@ class Checkers:
         self.player = CheckersPlayer.BLACK if self.player == CheckersPlayer.WHITE else CheckersPlayer.WHITE
         self.legal_moves = self.calculate_possible_moves(self.player)
         self.status = self.result()
-        print(self.related_squares)
-        for i in self.entangled_objects:
-            i.print_all()
         # DEBUG STUFF
         # print("########")
         # print("RELATED SQUARES")
@@ -1272,7 +1284,7 @@ class Checkers:
                         rel_squares.append(str(move.target1_id))
                         self.q_rel_moves[i].append(move)
                         self.q_moves.append(move)
-                        entangled_obj = Entangled(rel_squares, [str(jumped_id)], rest, [str(move.target1_id)], [str(move.source_id)])
+                        entangled_obj = Entangled(deepcopy(rel_squares), [str(jumped_id)], rest, [str(move.target1_id)], [str(move.source_id)])
                         self.entangled_objects.append(entangled_obj)
                 self.superposition_pieces.add(original_piece)
                 return taken, False

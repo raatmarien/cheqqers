@@ -171,8 +171,16 @@ class Node():
         action = random.choice(self.expandable_moves)
         print("Chosen move: ", end="")
         action.print_move()
+        print(type(action.source_id))
+        tempp = False
+        if(action.source_id == 17 and action.target1_id == 11 and action.target2_id == None):
+            test = input("THIS IS THE EXPAND MOVE")
+            # test = 0
+            if(test == "1"):
+                print( "True")
+                tempp = True
         self.expandable_moves.remove(action)
-        self.backprop_print()
+        # self.backprop_print()
         # child_state = self.state.copy()
         # child_state = self.game.get_next_state(child_state, action, 1)
         # Change player (if not handled?)
@@ -195,13 +203,25 @@ class Node():
             # print( "True")
         else:
             temp = self.game.get_copy()
+            if(tempp):
+                print("Before player move")
+                print(temp.get_sim_board())
+                print(temp.related_squares)
+                for i in temp.entangled_objects:
+                    i.print_all()
+                print("\n")
             # temp = deepcopy(self.game)
             temp.player_move(action)
             child_states = [temp]
+            if(tempp):
+                print("after player move")
+                print(temp.get_sim_board())
+                print(temp.related_squares)
+                for i in temp.entangled_objects:
+                    i.print_all()
+                input('Press enter to continue')
             weights = [1]
         to_backprop = []
-        print("Child states: ", child_states)
-        print(weights)
         for i, child_state in enumerate(child_states):
             # print(f"Length of legal moves new child: {len(child_state.legal_moves)}")
             # print(child_state.get_sim_board())
