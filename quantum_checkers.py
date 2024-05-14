@@ -59,7 +59,7 @@ class Move_id:
         output += f"[{self.source_id}] to [{self.target1_id}]"
         if(self.target2_id != None):
             output += f" and [{self.target2_id}]"
-        output += f" = [{self.movetype}]"
+        # output += f" = [{self.movetype}]"
         print(output)
         return output
     
@@ -289,7 +289,7 @@ class Checkers:
         """
         Returns a simulated deepcopy of the current board
         """
-        return Sim_Checkers(run_on_hardware=False, player=deepcopy(self.player), num_vertical=self.num_vertical, num_horizontal=self.num_horizontal, num_vertical_pieces=self.num_vertical_pieces, classical_squares=deepcopy(self.classical_squares), related_squares=deepcopy(self.related_squares), q_rel_moves=deepcopy(self.q_rel_moves), q_moves=deepcopy(self.q_moves), superposition_pieces=deepcopy(self.superposition_pieces), status=deepcopy(self.status), moves_since_take=deepcopy(self.moves_since_take), king_squares=deepcopy(self.king_squares), legal_moves=self.calculate_possible_moves(), rules=self.rules, entangled_squares=self.entangled_squares, entangled_objects=self.entangled_objects, unique_related_squares=self.unique_related_squares)
+        return Sim_Checkers(run_on_hardware=False, player=deepcopy(self.player), num_vertical=self.num_vertical, num_horizontal=self.num_horizontal, num_vertical_pieces=self.num_vertical_pieces, classical_squares=deepcopy(self.classical_squares), related_squares=deepcopy(self.related_squares), q_rel_moves=deepcopy(self.q_rel_moves), q_moves=deepcopy(self.q_moves), superposition_pieces=deepcopy(self.superposition_pieces), status=deepcopy(self.status), moves_since_take=deepcopy(self.moves_since_take), king_squares=deepcopy(self.king_squares), legal_moves=self.calculate_possible_moves(), rules=self.rules, entangled_squares=deepcopy(self.entangled_squares), entangled_objects=deepcopy(self.entangled_objects), unique_related_squares=deepcopy(self.unique_related_squares))
 
     def write_to_log(self, string):
         self.log = open("./log.txt", "a")
