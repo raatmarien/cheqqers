@@ -198,7 +198,7 @@ class Entangled():
                         state.append([str(k), CheckersSquare.EMPTY])
                 all_states.append(state)
                 weights.append(classical_squares[str(i)].chance*classical_squares[str(j)].chance)
-        return all_states
+        return all_states, weights
         # state = []
         # for i in self.all_ids:
         #     state.append([str(i), CheckersSquare.EMPTY]) # Initalize all qubits to empty
@@ -1019,11 +1019,12 @@ class Checkers:
                 for sid in sup_sid:
                     sid_chance = self.classical_squares[str(sid)].chance 
                     for counter, state in enumerate(poss_states):
+                        print("STATE", state)
                         cp = self.get_copy()
                         cp_jids = cp.remove_from_rel_squares(jumped_id)
                         cp_sids = cp.remove_from_rel_squares(sid)
                         for id in state:
-                            print(id)
+                            print("ID:", id)
                             if(id[1] == CheckersSquare.FULL):
                                 cp.classical_squares[str(id[0])].chance = 100
                             else:
@@ -1058,6 +1059,7 @@ class Checkers:
                 for counter, state in enumerate(poss_states):
                     cp = self.get_copy()
                     for id in state:
+                        print("ID:", id)
                         if(id[1] == CheckersSquare.FULL):
                             cp.classical_squares[str(id[0])].chance = 100
                         else:
