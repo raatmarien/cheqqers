@@ -378,14 +378,9 @@ class Checkers:
                     self.classical_squares[str(classical_id)].chance = 100
                     for i in self.entangled_squares: 
                         if(str(classical_id) in i): # If the piece is in the entangled squares it has been jumped over and needs to be removed
-                            print(f"REMOVING {i}")
-                            print(self.entangled_squares)
-                            print(tbr)
                             self.remove_piece(str(classical_id), True)
                             self.entangled_squares.remove(i)
                             tbr.remove(i)
-                            print(self.entangled_squares)
-                            print(tbr)
                             continue
                     continue
                 self.remove_piece(str(classical_id))
@@ -1045,7 +1040,7 @@ class Checkers:
                                     cp.classical_squares[str(id[0])].chance = 100
                                 else:
                                     cp.remove_piece(id[0])
-                            if(cp.classical_squares[str(move.source_id)].chance == 100 and cp.classical_squares[str(jumped_id).chance == 100]): # If both ids are there it means the source id can take the jumped id and therefore we need to remove the jumped id and move the source id
+                            if(str(move.source_id) in cp.classical_squares.keys() and str(jumped_id) in cp.classical_squares.keys() and cp.classical_squares[str(move.source_id)].chance == 100 and cp.classical_squares[str(jumped_id)].chance == 100): # If both ids are there it means the source id can take the jumped id and therefore we need to remove the jumped id and move the source id
                                 cp.remove_piece(str(jumped_id))
 
                                 # Update source id
