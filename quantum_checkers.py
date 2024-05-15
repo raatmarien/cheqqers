@@ -200,7 +200,7 @@ class Entangled():
                     else:
                         state.append([str(k), CheckersSquare.EMPTY])
                 all_states.append(state)
-                weights.append(classical_squares[str(i)].chance/100*classical_squares[str(j)].chance/100)
+                weights.append(classical_squares[str(j)].chance/100)
         return all_states, weights
         # state = []
         # for i in self.all_ids:
@@ -1236,6 +1236,11 @@ class Checkers:
             # move.print_move()
             # self.print_current_state()
             states, weights = self.calc_ent_states(move)
+            if(sum(weights) != 1):
+                print("ERROR: weights do not sum to 1")
+                print(weights)
+                print(sum(weights))
+                exit()
             for i in weights:
                 if(i > 1):
                     print("error: weight too big")
