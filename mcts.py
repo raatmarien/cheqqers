@@ -62,8 +62,13 @@ class MCTS():
                 value = 0
                 node.backpropogate(value)
             else: # game unfinished
+                # print("expanding")
                 nodes = node.expand() # Can add multiple nodes if quantum state is measured
+                # print(f"len nodes: {len(nodes)}")
+                count = 0
                 for node in nodes:
+                    # print(f"simulating node: {count}")
+                    count += 1
                     value = 0
                     for i in range(self.args['num_simulations']):
                         value += node.simulate()
@@ -183,18 +188,34 @@ class Node():
         # sim_game.SIMULATE_QUANTUM = True
         rollout_player = sim_game.player
         prev_board = sim_game.get_sim_board()
+        ctr = 0
+        st = ""
         while True:
+            ctr += 1
             if(sim_game.status == CheckersResult.UNFINISHED):
-                try: 
+                try:
+                    
+                    
                     move = random.choice(sim_game.legal_moves)
+                    # print("SIMULATION", ctr)
+                    # 
+                    # sim_game.print_current_state()
+                    # move.print_move()
+                    st += str(ctr) + "\n"
+                    st += sim_game.get_current_state()
                     sim_game.player_move(move)
+                    
                 except Exception as error:
-                    print("TEST")
+                    print("Crashed in doing simulated move in iteration: ", ctr)
                     print(traceback.format_exc())
-                    print(sim_game.get_sim_board())
                     move.print_move()
-                    print(sim_game.classical_squares.keys())
-                    print(sim_game.status)
+                    print("original board")
+                    print(self.game.get_current_state())
+                    print("DATA DUMP &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+                    print(st)
+    
+                    print(self.parent.game.get_current_state())
+
                     exit()
             elif(sim_game.status == CheckersResult.BLACK_WINS or sim_game.status == CheckersResult.WHITE_WINS):
                 if(rollout_player == CheckersPlayer.BLACK): # because player just changed to other player. If black finished the last game by winning, the player changed to white just before the game finished

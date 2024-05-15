@@ -60,9 +60,10 @@ def main():
     # file.write("#"*100 + "\n")
     # file.write(f"Size: {size}x{size}, Rule: {rule}\n")
     print(f"Size: {size}x{size}, Rule: {rule}")
-    for i in range(100):
+    iterations = 100
+    for i in range(iterations):
         sd = random.randint(0, 100000000000000000)
-        sd = 9151511653984929
+        # sd = 71838066018812987
         random.seed(sd)
         seed_str = f"Seed: {sd}\n"
         write_attempt(i, seed_str)
@@ -81,7 +82,7 @@ def main():
             # exit()
         number_of_moves.append(num_moves)
         times.append(time.time()-start_t)
-        if((i+1)%100 == 0):
+        if((i+1)%int(iterations/10) == 0):
            print(f"Draw: {results.count(CheckersResult.DRAW)}, White wins: {results.count(CheckersResult.WHITE_WINS)}, Black wins: {results.count(CheckersResult.BLACK_WINS)}")
            print(f"Average number of moves: {sum(number_of_moves)/len(number_of_moves)}")
     print("#"*100)

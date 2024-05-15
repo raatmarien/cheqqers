@@ -160,8 +160,8 @@ class GameInterface:
                     if event.type == pygame.MOUSEBUTTONUP and ((self.game.player == CheckersPlayer.WHITE and isinstance(self.white_player, human_player)) or (self.game.player == CheckersPlayer.BLACK and isinstance(self.black_player, human_player))):
                         # Detect swipes for quantum moves
                         moved, _ = self.handle_click(down_pos, event.pos)
-                        if(moved):
-                            self.print_board()
+                        # if(moved):
+                        #     self.print_board()
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_c:
                             self.draw_chance = True if self.draw_chance == False else False
@@ -209,6 +209,10 @@ class GameInterface:
                 attempt_str += "Selected move: "
                 attempt_str += move.get_move()
                 attempt_str += '\n'
+                attempt_str += f"rel squares: {self.game.related_squares}\n"
+                attempt_str += f"entangled squares {self.game.entangled_squares}\n"
+                for i in self.game.entangled_objects:
+                    attempt_str += f"ent obj: {i.all_ids}"
                 self.write_attempt(attempt_str)
                 # states, weights = self.game.return_all_possible_states(move)
                 # for idx, state in enumerate(states):
