@@ -62,7 +62,7 @@ def main():
     print(f"Size: {size}x{size}, Rule: {rule}")
     for i in range(100):
         sd = random.randint(0, 100000000000000000)
-        # sd = 50355178492799047
+        sd = 9151511653984929
         random.seed(sd)
         seed_str = f"Seed: {sd}\n"
         write_attempt(i, seed_str)
