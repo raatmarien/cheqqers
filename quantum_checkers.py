@@ -357,19 +357,19 @@ class Checkers:
                 to_be_removed.append(i)
         # Check out all ids, for the one that remained, remove all others from classical squares
         if(not self.SIMULATE_QUANTUM):
+            tbr = []
             if(len(to_be_removed) > 0):
                 removed_ids = []
                 for i in to_be_removed: # also happens if simulated
                     removed_ids += (i.all_ids)
                     self.entangled_objects.remove(i)
-                tbr = [] 
                 for i in self.entangled_squares:
                     for j in i:
                         if(str(j) in removed_ids):
                             tbr.append(i)
                             break # the enitre list in entangled squares needs to be removed so we dont have to check more ids
-                for i in tbr:
-                    self.entangled_squares.remove(i)
+                # for i in tbr:
+                #     self.entangled_squares.remove(i)
             for classical_id in ids:
                 self.board.pop(objects=[self.squares[str(classical_id)]])
                 # original_peek = (self.board.peek(objects=[self.squares[str(id)]])) # peek returns double list of all object peeked. For one object that looks like [[<CheckersSquare.WHITE: 1>]]
@@ -378,11 +378,19 @@ class Checkers:
                     self.classical_squares[str(classical_id)].chance = 100
                     for i in self.entangled_squares: 
                         if(str(classical_id) in i): # If the piece is in the entangled squares it has been jumped over and needs to be removed
+                            print(f"REMOVING {i}")
+                            print(self.entangled_squares)
+                            print(tbr)
                             self.remove_piece(str(classical_id), True)
                             self.entangled_squares.remove(i)
+                            tbr.remove(i)
+                            print(self.entangled_squares)
+                            print(tbr)
                             continue
                     continue
                 self.remove_piece(str(classical_id))
+            for i in tbr:
+                self.entangled_squares.remove(i)
             return(self.board.peek(objects=[self.squares[str(id)]])[0][0]) # returns for original id
         else: # If we are only simulating
             if(len(ids) == 0): # If its is a classical piece
@@ -1006,6 +1014,12 @@ class Checkers:
                                 cp.classical_squares[str(id[0])].chance = 100
                             else:
                                 cp.remove_piece(id[0])
+                        # Now check if the source id can take the jumped id
+                        if(str(move.source_id) in cp.classical_squares.keys() and str(jumped_id) in cp.classical_squares.keys() and cp.classical_squares[str(move.source_id)].chance == 100 and cp.classical_squares[str(jumped_id)].chance == 100):
+                            # if both the source and jumped id are in the correct positions we need to remove the jumped id
+                            cp.remove_piece(jumped_id)
+
+
                         cp.remove_from_rel_squares(move.source_id)
                         cp.remove_from_rel_squares(jumped_id) # should be redundant, since they are in the same list
                         cp.clean_ent_objects([ent_sid])

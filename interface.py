@@ -180,8 +180,8 @@ class GameInterface:
                 if(self.print):
                     print("Simulated board")
                     self.print_board(True)
-                    # print("Real board")
-                    # self.print_board(False)
+                    print("Real board")
+                    self.print_board(False)
                     self.print_legal_moves(self.game.legal_moves)
                 counter += 1
                 # if(counter % 10 == 0):
@@ -209,10 +209,10 @@ class GameInterface:
                 attempt_str += "Selected move: "
                 attempt_str += move.get_move()
                 attempt_str += '\n'
-                attempt_str += f"rel squares: {self.game.related_squares}\n"
-                attempt_str += f"entangled squares {self.game.entangled_squares}\n"
-                for i in self.game.entangled_objects:
-                    attempt_str += f"ent obj: {i.all_ids}"
+                # attempt_str += f"rel squares: {self.game.related_squares}\n"
+                # attempt_str += f"entangled squares {self.game.entangled_squares}\n"
+                # for i in self.game.entangled_objects:
+                #     attempt_str += f"ent obj: {i.all_ids}"
                 self.write_attempt(attempt_str)
                 # states, weights = self.game.return_all_possible_states(move)
                 # for idx, state in enumerate(states):
