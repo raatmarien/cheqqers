@@ -63,7 +63,7 @@ def main():
     iterations = 100
     for i in range(iterations):
         sd = random.randint(0, 100000000000000000)
-        sd = 37101608801016169
+        sd = 70683092051622877
         random.seed(sd)
         seed_str = f"Seed: {sd}\n"
         write_attempt(i, seed_str)

@@ -189,6 +189,8 @@ class Entangled():
                     state.append([str(j), CheckersSquare.EMPTY])
             all_states.append(state)
             weights.append(classical_squares[str(i)].chance/100)
+        
+        unsuc_sum = sum([classical_squares[str(i)].chance/100 for i in self.unsuccessfully_takes])
         for i in self.unsuccessfully_takes:
             for j in self.not_taken:
                 state = []
@@ -200,7 +202,7 @@ class Entangled():
                     else:
                         state.append([str(k), CheckersSquare.EMPTY])
                 all_states.append(state)
-                weights.append(classical_squares[str(j)].chance/100)
+                weights.append((classical_squares[i].chance/100 * classical_squares[j].chance/100)/unsuc_sum)
         return all_states, weights
         # state = []
         # for i in self.all_ids:
@@ -1024,7 +1026,7 @@ class Checkers:
                         weights.append(poss_weights[counter])
                 else: # Both are entangled with different objects
                     # print("scenario 2")
-                    ent_jid = self.get_id_entangled(str(move.source_id))
+                    ent_jid = self.get_id_entangled(str(jumped_id))
                     poss_sid_states, poss_sid_weights = ent_sid.return_possible_states_adv(self.classical_squares)
                     poss_jid_states, poss_jid_weights = ent_jid.return_possible_states_adv(self.classical_squares)
                     for sid_counter, state_sid in enumerate(poss_sid_states): # For all possible sid states
@@ -1238,8 +1240,12 @@ class Checkers:
             states, weights = self.calc_ent_states(move)
             if(sum(weights) != 1):
                 print("ERROR: weights do not sum to 1")
-                print(weights)
-                print(sum(weights))
+                print(self.get_sim_board())
+                for i in self.entangled_objects:
+                    i.print_all()
+                print("weights: ", weights)
+                print("sum weights: ", sum(weights))
+                print("len states: ", len(states))
                 exit()
             for i in weights:
                 if(i > 1):
