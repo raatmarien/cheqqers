@@ -63,7 +63,7 @@ def main():
     iterations = 100
     for i in range(iterations):
         sd = random.randint(0, 100000000000000000)
-        sd = 70683092051622877
+        sd = 28865366231047279
         random.seed(sd)
         seed_str = f"Seed: {sd}\n"
         write_attempt(i, seed_str)
@@ -71,7 +71,7 @@ def main():
         print(f"Game {i+1}")
         start_t = time.time()
         checkers = Checkers(num_vertical=size, num_horizontal=size, num_vertical_pieces=args.num_vertical_pieces, SIMULATE_QUANTUM=args.sim_q, rules=rule)
-        game = GameInterface(checkers, white_player=p1, black_player=p2, GUI=args.GUI, white_mcts=False, black_mcts=True, print=False, attempt=i)
+        game = GameInterface(checkers, white_player=p1, black_player=p2, GUI=args.GUI, white_mcts=True, black_mcts=False, print=False, attempt=i)
         result, num_moves = (game.play())
         results.append(result)
         if(result == CheckersResult.WHITE_WINS):

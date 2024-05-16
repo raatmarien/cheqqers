@@ -38,20 +38,11 @@ class random_bot(bot):
             print(traceback.format_exc())
             print(possible_moves)
     
-class exp_min_max(bot):
-    def select_move(self, possible_moves):
-        pass
-
-class mcts_bot(bot):
-    def __init__(self, game) -> None:
-        args = {
-            'C': 1.41, # sqrt of 2
-            'num_searches': 100 #Budget per rollout
-        }
-        mcts = MCTS(game, args)
-        super().__init__()
-
-    def select_move(self, possible_moves):
-        pass
+# class heurisitc_bot():
+#     def select_move(self, game, possible_moves):
+#         for i in possible_moves:
+#             game.get_copy()
+#     def evaluate_board(self, game)
+           
     
             

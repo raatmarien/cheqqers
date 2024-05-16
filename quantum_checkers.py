@@ -723,6 +723,8 @@ class Checkers:
             for j in temp:
                 for k in i:
                     if k in j:
+                        print("Found id in two entangled squares")
+                        print(self.entangled_squares)
                         raise Exception("ENTANGLED SQUARES DISCREPANCY")
                         print("ERROR: ENTANGLED SQUARES DISCREPANCY")
                         print("Found id in two entangled squares")
@@ -749,11 +751,23 @@ class Checkers:
                     print(self.unique_related_squares)
                     exit()
 
+    def verify_odds(self):
+        for i in self.classical_squares.keys():
+            if self.classical_squares[i].chance != 100:
+                found = False
+                # Check if this id is somewhere in related squares
+                for sqrs in self.related_squares:
+                    if i in sqrs:
+                        found = True
+                if(not found):
+                    raise Exception(f"ERROR: ID NOT FOUND IN RELATED SQUARES. Chance is {self.classical_squares[i].chance} for id {i}")
+
 
     def player_move(self, move: Move_id, player: CheckersPlayer = None):
         self.verify_uniq_and_rel() # used to find bug where related squares were not in unique related squares, which caused buggy behaviour
         self.verify_rel_and_ent()
         self.verify_entangle_squares()
+        self.verify_odds()
         self.moves_since_take += 1
         prev_taken = False
         to_king = [] # list that holds moved pieces to check if they need to be kinged
@@ -1127,7 +1141,6 @@ class Checkers:
                     sid_chance = self.classical_squares[str(sid)].chance/100
                     for counter, state in enumerate(poss_states):
                         cp = self.get_copy()
-                        cp_sids = cp.remove_from_rel_squares(sid)
                         cp_jids = cp.remove_from_rel_squares(jumped_id)
                         for id in state:
                             if(id[1] == CheckersSquare.FULL):
@@ -1138,7 +1151,9 @@ class Checkers:
                             # Two scenario's
                             # The source id is actually there
                             # If the piece we are using to take is actually there, we are measuring
+                            cp_sids = cp.remove_from_rel_squares(sid)
                             if(str(sid) == str(move.source_id)):
+                                
                                 cp.classical_squares[str(sid)].chance = 100
                                 cp.remove_piece(str(jumped_id)) # WE HAVE TO REMOVE JUMPED ID
                                 cp.classical_squares[str(move.target1_id)] = cp.classical_squares[str(move.source_id)]
@@ -1148,12 +1163,12 @@ class Checkers:
                                     if(i == str(move.source_id)):
                                         continue
                                     cp.remove_piece(str(i))
-                        else: # sid != move.source id, therefore it cannot take the piece it is trying to take
-                            cp.classical_squares[str(sid)].chance = 100
-                            for s in cp_sids:
-                                if(s == str(sid)):
-                                    continue
-                                cp.remove_piece(str(s))
+                            else: # sid != source_id
+                                cp.classical_squares[str(sid)].chance = 100
+                                for s in cp_sids:
+                                    if(s == str(sid)):
+                                        continue
+                                    cp.remove_piece(str(s))
                         cp.clean_ent_objects([ent_jid])
                         cp.legal_moves = cp.calculate_possible_moves(self.player)
                         cp.status = cp.result()

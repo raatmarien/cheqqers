@@ -194,8 +194,6 @@ class Node():
             ctr += 1
             if(sim_game.status == CheckersResult.UNFINISHED):
                 try:
-                    
-                    
                     move = random.choice(sim_game.legal_moves)
                     # print("SIMULATION", ctr)
                     # 
@@ -203,6 +201,9 @@ class Node():
                     # move.print_move()
                     st += str(ctr) + "\n"
                     st += sim_game.get_current_state()
+
+                    st += move.get_move()
+                    st += '\n'
                     sim_game.player_move(move)
                     
                 except Exception as error:
