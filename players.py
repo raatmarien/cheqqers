@@ -30,7 +30,7 @@ class human_player(bot):
         return input(f'Select move: ')
 
 class random_bot(bot):
-    def select_move(self, possible_moves):
+    def select_move(self, game, possible_moves):
         try:
             if(len(possible_moves)-1 == 0):
                 return possible_moves[0]
@@ -40,24 +40,26 @@ class random_bot(bot):
             print(possible_moves)
     
 class heurisitc_bot():
-    def __init__(self, game, depth=2) -> None:
-        self.game = game
-        self.depth = depth
-        self.player = game.player
+    # def __init__(self, game, depth=2) -> None:
+    #     self.game = game
+    #     self.depth = depth
+    #     self.player = game.player
 
-    def select_move(self, game, parent_player: CheckersPlayer, curr_depth=0):
+    def select_move(self, game, parent_player: CheckersPlayer, curr_depth=0, max_depth=2):
         scores = []
-        possible_moves = self.game.legal_moves
-        if(curr_depth == self.depth): # if we reached the depth we want to go to, evaluate the board
+        possible_moves = game.legal_moves
+        if(curr_depth == max_depth): # if we reached the depth we want to go to, evaluate the board
             score =  self.evaluate_board(game)
             if(parent_player != game.player): # Invert the score if the player is not the same as the parent player
                 score = -score
             return score
+        if(len(possible_moves) == 0): # If there are no possible moves, return the score of the board
+            return self.evaluate_board(game)
         for i in possible_moves: # For all moves we can do from this position, do the move and recursively call this function
             cp = game.get_copy()
             player = cp.player
-            cp.move(i) # player probably changes here
-            scores.append(self.select_move(cp, player, curr_depth+1)) # is gonna return a score for this specific move
+            cp.player_move(i) # player probably changes here
+            scores.append(self.select_move(cp, player, curr_depth+1, max_depth)) # is gonna return a score for this specific move
         if(curr_depth == 0):
             return possible_moves[scores.index(max(scores))]
         return sum(scores)/len(scores) # Return average of scores
@@ -65,15 +67,18 @@ class heurisitc_bot():
     def evaluate_board(self, game):
         score = 0
         modifier = 1
-        if(self.player == CheckersPlayer.BLACK):
+        if(game.player == CheckersPlayer.BLACK):
             modifier = -1
-        for key, value in self.classical_squares.items():
+        for key, value in game.classical_squares.items():
+            points = value.chance
+            if(value.king):
+                points = points * 2
             if(value.color == CheckersPlayer.WHITE):
-                score += self.chance
+                score += points
             elif(value.color == CheckersPlayer.BLACK):
-                score -= self.chance
+                score -= value.chance
         score = score * modifier # Multiply by modifier to make sure the score is correct for the player
-        return score
+        return -score # Return negative score since this function is called from the parent.
         pass
            
     

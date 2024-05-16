@@ -189,13 +189,13 @@ class GameInterface:
                 # move = random.randint(1, len(legal_moves))
                 if(self.game.player == CheckersPlayer.WHITE):
                     if(not self.white_mcts):
-                        move = self.white_player.select_move(self.game.legal_moves)
+                        move = self.white_player.select_move(self.game, self.game.legal_moves)
                     else:
                         self.white_player = MCTS(self.game, self.args)
                         move = self.white_player.search()
                 else:
                     if(not self.black_mcts):
-                        move = self.black_player.select_move(self.game.legal_moves)
+                        move = self.black_player.select_move(self.game, self.game.legal_moves)
                     else:
                         self.black_player = MCTS(self.game, self.args)
                         move = self.black_player.search()
