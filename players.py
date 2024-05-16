@@ -11,7 +11,7 @@ class bot():
         pass
 
 class human_player(bot):
-    def select_move(self, possible_moves):
+    def select_move(self, game, possible_moves):
         selected = False
         while not selected:
             move = self.get_move()

@@ -963,7 +963,7 @@ class Checkers:
         For a specific ID, checks if it can take pieces. Used for checking if you can take another piece after taking a piece
         Returns true and the possible moves this piece can do if this piece can take a piece
         """
-        blind_moves = self.calculate_blind_moves(id, self.player)
+        blind_moves = self.calculate_blind_moves(id, self.player, self.classical_squares[str(id)].king)
         player_ids, opponent_ids = self.get_positions(self.player)
         
         # Concatenate all normal pieces and king pieces
