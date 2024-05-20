@@ -768,7 +768,6 @@ class Checkers:
         self.verify_rel_and_ent()
         self.verify_entangle_squares()
         self.verify_odds()
-        print(self.get_current_state())
         self.moves_since_take += 1
         prev_taken = False
         can_take = False
@@ -796,13 +795,10 @@ class Checkers:
         # If a move has been done we need to flip the player, IF they can not take another piece with the piece just used
         if(prev_taken and can_take): # If we took a piece and we can take another piece do not chance the player
             self.legal_moves = legal_moves
-            print(self.get_current_state())
             return
         self.player = CheckersPlayer.BLACK if self.player == CheckersPlayer.WHITE else CheckersPlayer.WHITE
         self.legal_moves = self.calculate_possible_moves(self.player)
         self.status = self.result()
-        print("AFTER MOVE")
-        print(self.get_current_state())
         # DEBUG STUFF
         # print("########")
         # print("RELATED SQUARES")
