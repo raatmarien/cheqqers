@@ -8,7 +8,8 @@ from time import sleep
 from enums import (
     CheckersResult,
     CheckersPlayer,
-    MoveType
+    MoveType,
+    CheckersRules
 )
 import os
 from pygame import gfxdraw
@@ -36,20 +37,7 @@ YELLOW = (230,225,7)
 L_RED = (221, 0, 0)
 RED = (180,2,1)
 BLUE = (0, 0, 255)
-# CROWN_IMG = pygame.image.load(os.path.join(os.path.dirname(__file__), "crown.png"))
-# CROWN_IMG = pygame.transform.smoothscale(CROWN_IMG, (int(SQUARE_W*0.65), int((CROWN_IMG.get_height()/(CROWN_IMG.get_width()/SQUARE_W))*0.65)))
-# RED_IMG = pygame.image.load(os.path.join(os.path.dirname(__file__), "images/Damsteen-rood.png"))
-# RED_IMG = pygame.transform.smoothscale(RED_IMG, (int(SQUARE_W), int((RED_IMG.get_height()/(RED_IMG.get_width()/SQUARE_W)))))
-# RED_SELECTED_IMG = pygame.image.load(os.path.join(os.path.dirname(__file__), "images/Damsteen-rood-geselecteerd.png"))
-# RED_SELECTED_IMG = pygame.transform.smoothscale(RED_SELECTED_IMG, (int(SQUARE_W), int((RED_SELECTED_IMG.get_height()/(RED_SELECTED_IMG.get_width()/SQUARE_W)))))
 
-# BLACK_IMG = pygame.image.load(os.path.join(os.path.dirname(__file__), "images/Damsteen-zwart.png"))
-# BLACK_IMG = pygame.transform.smoothscale(BLACK_IMG, (int(SQUARE_W), int((BLACK_IMG.get_height()/(BLACK_IMG.get_width()/SQUARE_W)))))
-# BLACK_SELECTED_IMG = pygame.image.load(os.path.join(os.path.dirname(__file__), "images/Damsteen-zwart-geselecteerd.png"))
-# BLACK_SELECTED_IMG = pygame.transform.smoothscale(BLACK_SELECTED_IMG, (int(SQUARE_W), int((BLACK_SELECTED_IMG.get_height()/(BLACK_SELECTED_IMG.get_width()/SQUARE_W)))))
-
-# BLUE_IMG = pygame.image.load(os.path.join(os.path.dirname(__file__), "images/Damsteen-geest.png"))
-# BLUE_IMG = pygame.transform.smoothscale(BLUE_IMG, (int(SQUARE_W), int((BLUE_IMG.get_height()/(BLUE_IMG.get_width()/SQUARE_W)))))
 
 class GameInterface:
     def __init__(self, game: Checkers, white_player, black_player, GUI = False, white_mcts = False, black_mcts = False, print = True, attempt=99999999) -> None:
@@ -71,9 +59,9 @@ class GameInterface:
         self.white_player = white_player
         self.print = print
         self.args = {
-            'C': 2, # 0.5 seems to work well
-            'num_searches': 250, # Budget per rollout
-            'num_simulations': 1, # Budget for simulations
+            'C': 1.4, # srqt 2
+            'num_searches': 200, # Budget per rollout
+            'num_simulations': 1, # Budget for extra simulations per node
             'attempt': self.attempt
         }
         self.black_player = black_player
@@ -89,9 +77,28 @@ class GameInterface:
         height = self.game.num_vertical*SQUARE_H
         self.screen = pygame.display.set_mode((width, height))
         pygame.display.set_caption("Quantum Checkers")
+        self.load_img()
         # Clock to control the frame rate
         clock = pygame.time.Clock()
 
+    def load_img(self):
+        CROWN_IMG = pygame.image.load(os.path.join(os.path.dirname(__file__), "crown.png"))
+        self.CROWN_IMG = pygame.transform.smoothscale(CROWN_IMG, (int(SQUARE_W*0.65), int((CROWN_IMG.get_height()/(CROWN_IMG.get_width()/SQUARE_W))*0.65)))
+        RED_IMG = pygame.image.load(os.path.join(os.path.dirname(__file__), "images/Damsteen-rood.png"))
+        self.RED_IMG = pygame.transform.smoothscale(RED_IMG, (int(SQUARE_W), int((RED_IMG.get_height()/(RED_IMG.get_width()/SQUARE_W)))))
+        RED_SELECTED_IMG = pygame.image.load(os.path.join(os.path.dirname(__file__), "images/Damsteen-rood-geselecteerd.png"))
+        self.RED_SELECTED_IMG = pygame.transform.smoothscale(RED_SELECTED_IMG, (int(SQUARE_W), int((RED_SELECTED_IMG.get_height()/(RED_SELECTED_IMG.get_width()/SQUARE_W)))))
+        self.RED_SELECTED_IMG = self.RED_IMG
+
+        BLACK_IMG = pygame.image.load(os.path.join(os.path.dirname(__file__), "images/Damsteen-zwart.png"))
+        self.BLACK_IMG = pygame.transform.smoothscale(BLACK_IMG, (int(SQUARE_W), int((BLACK_IMG.get_height()/(BLACK_IMG.get_width()/SQUARE_W)))))
+        BLACK_SELECTED_IMG = pygame.image.load(os.path.join(os.path.dirname(__file__), "images/Damsteen-zwart-geselecteerd.png"))
+        self.BLACK_SELECTED_IMG = pygame.transform.smoothscale(BLACK_SELECTED_IMG, (int(SQUARE_W), int((BLACK_SELECTED_IMG.get_height()/(BLACK_SELECTED_IMG.get_width()/SQUARE_W)))))
+        self.BLACK_SELECTED_IMG = self.BLACK_IMG
+
+        BLUE_IMG = pygame.image.load(os.path.join(os.path.dirname(__file__), "images/Damsteen-geest.png"))
+        self.BLUE_IMG = pygame.transform.smoothscale(BLUE_IMG, (int(SQUARE_W), int((BLUE_IMG.get_height()/(BLUE_IMG.get_width()/SQUARE_W)))))
+    
     def highlight_squares(self, moves_list: list):
         self.highlighted_squares = []
         self.move_locations.clear()
@@ -232,31 +239,31 @@ class GameInterface:
         if(color == RED):
             if(highlighted):
                 # highlight_color = YELLOW
-                c = RED_SELECTED_IMG.get_rect(center=(x+SQUARE_W//2, y+SQUARE_H//2)) # centers the image
-                self.screen.blit(RED_SELECTED_IMG, c)
+                c = self.RED_SELECTED_IMG.get_rect(center=(x+SQUARE_W//2, y+SQUARE_H//2)) # centers the image
+                self.screen.blit(self.RED_SELECTED_IMG, c)
             else:
                 # highlight_color = RED
-                c = RED_IMG.get_rect(center=(x+SQUARE_W//2, y+SQUARE_H//2)) # centers the image
-                self.screen.blit(RED_IMG, c)
+                c = self.RED_IMG.get_rect(center=(x+SQUARE_W//2, y+SQUARE_H//2)) # centers the image
+                self.screen.blit(self.RED_IMG, c)
             # gfxdraw.filled_circle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, highlight_color)
             # gfxdraw.filled_circle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius-int(radius*0.15), L_RED)
             # gfxdraw.aacircle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius-int(radius*0.15), L_RED)
             # gfxdraw.aacircle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, highlight_color)
         else:
             if(highlighted):
-                c = BLACK_SELECTED_IMG.get_rect(center=(x+SQUARE_W//2, y+SQUARE_H//2)) # centers the image
-                self.screen.blit(BLACK_SELECTED_IMG, c)
+                c = self.BLACK_SELECTED_IMG.get_rect(center=(x+SQUARE_W//2, y+SQUARE_H//2)) # centers the image
+                self.screen.blit(self.BLACK_SELECTED_IMG, c)
             else:
                 # highlight_color = RED
-                c = BLACK_IMG.get_rect(center=(x+SQUARE_W//2, y+SQUARE_H//2)) # centers the image
-                self.screen.blit(BLACK_IMG, c)
+                c = self.BLACK_IMG.get_rect(center=(x+SQUARE_W//2, y+SQUARE_H//2)) # centers the image
+                self.screen.blit(self.BLACK_IMG, c)
             # gfxdraw.filled_circle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, highlight_color)
             # gfxdraw.filled_circle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius-int(radius*0.15), GREY)
             # gfxdraw.aacircle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius-int(radius*0.15), GREY)
             # gfxdraw.aacircle(self.screen, x+SQUARE_W//2, y+SQUARE_H//2, radius, highlight_color)
         if(king):
-            c = CROWN_IMG.get_rect(center=(x+SQUARE_W//2, y+SQUARE_H//2)) # centers the image
-            self.screen.blit(CROWN_IMG, c)
+            c = self.CROWN_IMG.get_rect(center=(x+SQUARE_W//2, y+SQUARE_H//2)) # centers the image
+            self.screen.blit(self.CROWN_IMG, c)
         if(self.draw_chance):
             # pygame.font.init() # you have to call this at the start, 
                    # if you want to use this module.
@@ -346,7 +353,7 @@ class GameInterface:
         first_id = self.get_id_from_mouse_pos(mouse_x, mouse_y)
         mouse_x, mouse_y = second_pos[0], second_pos[1]
         second_id = self.get_id_from_mouse_pos(mouse_x, mouse_y)
-        if(first_id == second_id):
+        if(first_id == second_id or self.game.rules == CheckersRules.CLASSICAL):
             if(self.selected_id is not None and self.move_locations is not None and first_id in self.move_locations): # We want to move the piece to first id
                 # Find the correct move so the backend handels everything correctly.
                 temp_move = None

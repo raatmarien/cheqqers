@@ -147,7 +147,7 @@ class Node():
         return child.weight * (q_value + self.args['C'] *(math.sqrt(math.log(self.visit_count) / child.visit_count)))
         
     def expand(self):
-        action = random.choice(self.expandable_moves)   
+        action = random.choice(self.expandable_moves)
         self.expandable_moves.remove(action)
         if(action.movetype == MoveType.TAKE):
             try:

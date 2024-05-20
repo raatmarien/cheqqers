@@ -40,7 +40,7 @@ def main():
     parser.add_argument('--p2', help='Select agent for player 2 to use.', default=human_player())
     args = parser.parse_args()
     p1 = random_bot()
-    # p2 = random_bot()
+    p2 = random_bot()
     # p1 = heurisitc_bot()
     p2 = heurisitc_bot()
     p1 = human_player()
@@ -55,7 +55,7 @@ def main():
     # for rule in [CheckersRules.CLASSICAL, CheckersRules.QUANTUM_V1, CheckersRules.QUANTUM_V2]:
     #     for size in [10, 12, 14]:
     size = 5
-    rule = CheckersRules.CLASSICAL
+    rule = CheckersRules.QUANTUM_V1
     times = []
     results = []
     number_of_moves = []
@@ -65,7 +65,7 @@ def main():
     iterations = 100
     for i in range(iterations):
         sd = random.randint(0, 100000000000000000)
-        sd = 4271756581358815
+        # sd = 4271756581358815
         random.seed(sd)
         seed_str = f"Seed: {sd}\n"
         write_attempt(i, seed_str)
@@ -84,7 +84,7 @@ def main():
             # exit()
         number_of_moves.append(num_moves)
         times.append(time.time()-start_t)
-        if((i+1)%int(iterations/10) == 0):
+        if((i+1)%int(iterations/10) == 0 and i+1 != iterations):
            print(f"Draw: {results.count(CheckersResult.DRAW)}, White wins: {results.count(CheckersResult.WHITE_WINS)}, Black wins: {results.count(CheckersResult.BLACK_WINS)}")
            print(f"Average number of moves: {sum(number_of_moves)/len(number_of_moves)}")
     print("#"*100)
