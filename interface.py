@@ -60,7 +60,7 @@ class GameInterface:
         self.print = print
         self.args = {
             'C': 1.4, # srqt 2
-            'num_searches': 200, # Budget per rollout
+            'num_searches': 500, # Budget per rollout
             'num_simulations': 1, # Budget for extra simulations per node
             'attempt': self.attempt
         }
@@ -88,13 +88,13 @@ class GameInterface:
         self.RED_IMG = pygame.transform.smoothscale(RED_IMG, (int(SQUARE_W), int((RED_IMG.get_height()/(RED_IMG.get_width()/SQUARE_W)))))
         RED_SELECTED_IMG = pygame.image.load(os.path.join(os.path.dirname(__file__), "images/Damsteen-rood-geselecteerd.png"))
         self.RED_SELECTED_IMG = pygame.transform.smoothscale(RED_SELECTED_IMG, (int(SQUARE_W), int((RED_SELECTED_IMG.get_height()/(RED_SELECTED_IMG.get_width()/SQUARE_W)))))
-        self.RED_SELECTED_IMG = self.RED_IMG
+        # self.RED_SELECTED_IMG = self.RED_IMG
 
         BLACK_IMG = pygame.image.load(os.path.join(os.path.dirname(__file__), "images/Damsteen-zwart.png"))
         self.BLACK_IMG = pygame.transform.smoothscale(BLACK_IMG, (int(SQUARE_W), int((BLACK_IMG.get_height()/(BLACK_IMG.get_width()/SQUARE_W)))))
         BLACK_SELECTED_IMG = pygame.image.load(os.path.join(os.path.dirname(__file__), "images/Damsteen-zwart-geselecteerd.png"))
         self.BLACK_SELECTED_IMG = pygame.transform.smoothscale(BLACK_SELECTED_IMG, (int(SQUARE_W), int((BLACK_SELECTED_IMG.get_height()/(BLACK_SELECTED_IMG.get_width()/SQUARE_W)))))
-        self.BLACK_SELECTED_IMG = self.BLACK_IMG
+        # self.BLACK_SELECTED_IMG = self.BLACK_IMG
 
         BLUE_IMG = pygame.image.load(os.path.join(os.path.dirname(__file__), "images/Damsteen-geest.png"))
         self.BLUE_IMG = pygame.transform.smoothscale(BLUE_IMG, (int(SQUARE_W), int((BLUE_IMG.get_height()/(BLUE_IMG.get_width()/SQUARE_W)))))
@@ -142,6 +142,7 @@ class GameInterface:
         #     # legal_moves = self.get_legal_moves()
         #     self.game.player_move(self.game.legal_moves[i-1], self.game.player)
         #     self.print_board(False)
+        times = []
         while(self.game.status == CheckersResult.UNFINISHED and not self.quit):
             if(self.GUI):
                 if(self.game.player == CheckersPlayer.WHITE and not isinstance(self.white_player, human_player)):
@@ -198,14 +199,21 @@ class GameInterface:
                     if(not self.white_mcts):
                         move = self.white_player.select_move(self.game, self.game.legal_moves)
                     else:
+                        # Calculate time for function call
+                        start = time.time()
                         self.white_player = MCTS(self.game, self.args)
+                        end_time = time.time()-start
                         move = self.white_player.search()
+                        times.append(end_time)
                 else:
                     if(not self.black_mcts):
                         move = self.black_player.select_move(self.game, self.game.legal_moves)
                     else:
+                        start = time.time()
                         self.black_player = MCTS(self.game, self.args)
                         move = self.black_player.search()
+                        end_time = time.time()-start
+                        times.append(end_time)
                     # move.print_move()
                     # move = self.black_player.select_move(self.game.legal_moves)
                 moves.append(move)
@@ -220,7 +228,7 @@ class GameInterface:
                 # attempt_str += f"entangled squares {self.game.entangled_squares}\n"
                 # for i in self.game.entangled_objects:
                 #     attempt_str += f"ent obj: {i.all_ids}"
-                self.write_attempt(attempt_str)
+                # self.write_attempt(attempt_str)
                 # states, weights = self.game.return_all_possible_states(move)
                 # for idx, state in enumerate(states):
                 #     print(f"STATE: {state.get_sim_board()}, WEIGHT: {weights[idx]}")
@@ -232,8 +240,13 @@ class GameInterface:
         # self.print_board()
         if(self.print):
             print(f"Results: {self.game.status}")
-        self.write_attempt(f"Results: {self.game.status}")
-        return(self.game.status, counter)
+        # self.write_attempt(f"Results: {self.game.status}")
+        # file = open("./results.txt", "a")
+        # file.write(f"avg time for mcts move: {sum(times)/len(times)}\n")
+        avg_time = 0
+        if(len(times) > 0):
+            avg_time = sum(times)/len(times)
+        return(self.game.status, counter, avg_time)
 
     def draw_circle(self, id, color, x, y, radius, king = False, highlighted = False):
         if(color == RED):

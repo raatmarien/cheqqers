@@ -20,15 +20,15 @@ import numpy as np
 
 
 # WITHOUT DRAW
-size = ["5x5", "6x6", "7x7", "8x8", "10x10", "12x12", "14x14"]
-classic_moves= [14.446, 25.647, 34.162, 48.338, 104.48, 242.91, 333.04]
-superpos_moves = [18.22, 32.63, 54.2, 89.38, 238.53, 384.66, 977.69]
-entangle_moves = [21.79, 32.51, 51.88, 74.28, 170.17, 322.11, 610.4]
+size = ["5x5", "6x6", "7x7", "8x8"]
 
-classic_sec = [0,0,0,0, 0.28115068435668944, 0.742310152053833, 1.1754703831672668]
-superpos_sec = [0.12307815790176392, 0.26103954076766966, 0.5412048768997192, 1.0666403412818908, 4.7787405252456665, 12.199728529453278, 124.16093977212905]
-entangle_sec = [0.1587203025817871, 0.2678103756904602, 0.5275508308410645, 0.8896301293373108, 3.0269003748893737, 9.077003552913666, 62.786820361614225]
+classic_moves= [14.5, 27.62, 35.01, 61.92]
+superpos_moves = [18.93, 30.59, 51.68, 85.21]
+entangle_moves = [20.64, 37.68, 59.68, 86.17]
 
+classic_sec = [0.0314, 0.0712, 0.0908, 0.1921]
+superpos_sec = [0.1469, 0.2403, 0.5934, 1.2016]
+entangle_sec = [0.2211, 0.3667, 0.7127, 1.2654]
 # # plt.plot(size, classic_moves, superpos_moves, entangle_moves)
 # plt.plot(size, classic_moves, label="Classic")
 # plt.plot(size, superpos_moves, label="Superposition")
@@ -76,7 +76,7 @@ x = size
 # plotting figures by creating axes object
 # using subplots() function
 fig, ax = plt.subplots(figsize = (10, 5))
-plt.title('No draw')
+plt.title('Average time per game for different board sizes without draw')
 # ax2.set_yscale('log')
 ax.plot(x, classic_sec, color = 'yellow', label="Classic time")
 ax.plot(x, superpos_sec, color = 'blue', label="Superposition time")
@@ -84,11 +84,13 @@ ax.plot(x, entangle_sec, color = 'green', label="Entanglement time")
 ax.legend(loc="upper left")
 # giving labels to the axises
 ax.set_xlabel('Board size')
-ax.set_ylabel('Time (s)')
+ax.set_ylabel('Average time (s)')
 # defining display layout 
 plt.tight_layout()
 # show plot
-plt.show()
+# plt.show()
+plt.savefig('avgtimes.png')
+
 
 ############################################################
 # PLOT FOR MOVES
@@ -97,7 +99,7 @@ x = size
 # plotting figures by creating axes object
 # using subplots() function
 fig, ax = plt.subplots(figsize = (10, 5))
-plt.title('No draw')
+plt.title('Average number of moves per game for different board sizes without draw')
 # ax2.set_yscale('log')
 ax.plot(x, classic_moves, color = 'yellow', label="Classic time")
 ax.plot(x, superpos_moves, color = 'blue', label="Superposition time")
@@ -105,8 +107,9 @@ ax.plot(x, entangle_moves, color = 'green', label="Entanglement time")
 ax.legend(loc="upper left")
 # giving labels to the axises
 ax.set_xlabel('Board size')
-ax.set_ylabel('Number of moves')
+ax.set_ylabel('Average number of moves')
 # defining display layout 
 plt.tight_layout()
 # show plot
-plt.show()
+# plt.show()
+plt.savefig('avgmoves.png')

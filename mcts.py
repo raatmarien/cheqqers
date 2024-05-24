@@ -59,7 +59,7 @@ class MCTS():
                 # print(value)
                 node.backpropogate(value)
             elif(result == CheckersResult.DRAW):
-                value = 0
+                value = 0.1
                 node.backpropogate(value)
             else: # game unfinished
                 # print("expanding")
@@ -230,7 +230,7 @@ class Node():
                     else:
                         return 1
             else: #draw
-                return 0
+                return 0.1
 
     def backprop_print(self):
         print("BACKPROP")
