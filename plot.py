@@ -75,7 +75,8 @@ x = size
 # y-axis values
 # plotting figures by creating axes object
 # using subplots() function
-fig, ax = plt.subplots(figsize = (10, 5))
+# fig, ax = plt.subplots(figsize = (10, 5))
+fig, ax = plt.subplots()
 plt.title('Average time per game for different board sizes without draw')
 # ax2.set_yscale('log')
 ax.plot(x, classic_sec, color = 'yellow', label="Classic time")
@@ -98,7 +99,8 @@ x = size
 # y-axis values
 # plotting figures by creating axes object
 # using subplots() function
-fig, ax = plt.subplots(figsize = (10, 5))
+# fig, ax = plt.subplots(figsize = (10, 5))
+fig, ax = plt.subplots()
 plt.title('Average number of moves per game for different board sizes without draw')
 # ax2.set_yscale('log')
 ax.plot(x, classic_moves, color = 'yellow', label="Classic time")
