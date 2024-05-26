@@ -59,7 +59,7 @@ class MCTS():
                 # print(value)
                 node.backpropogate(value)
             elif(result == CheckersResult.DRAW):
-                value = 0.1
+                value = 0.5
                 node.backpropogate(value)
             else: # game unfinished
                 # print("expanding")
@@ -87,19 +87,19 @@ class MCTS():
         #     print(f"{action_probs[idx]:.2f}: ", end="")
         #     child.move.print_move()
 
-        str = "All moves: \n"
-        str += f"Own visits: {self.root.visit_count}\n"
-        for idx, child in enumerate(self.root.children):
-            str += f"{action_probs[idx]:.2f}: "
-            str += child.move.get_move()
-            str += "\n"
-            str += f"{child.visit_count} visits\n"
-            str += f"{child.value_sum} value\n"
-            str+= f"{child.weight} weight\n"
-            ucb = self.root.get_ucb(child)
-            str+= f"{ucb} ucb\n"
-        file_name = f"attempts/log_{self.args['attempt']}.txt"
-        write_to_file(file_name, str + "\n")
+        # str = "All moves: \n"
+        # str += f"Own visits: {self.root.visit_count}\n"
+        # for idx, child in enumerate(self.root.children):
+        #     str += f"{action_probs[idx]:.2f}: "
+        #     str += child.move.get_move()
+        #     str += "\n"
+        #     str += f"{child.visit_count} visits\n"
+        #     str += f"{child.value_sum} value\n"
+        #     str+= f"{child.weight} weight\n"
+        #     ucb = self.root.get_ucb(child)
+        #     str+= f"{ucb} ucb\n"
+        # file_name = f"attempts/log_{self.args['attempt']}.txt"
+        # write_to_file(file_name, str + "\n")
         return self.root.children[np.argmax(action_probs)].move
     
     # def new_root(self, move):
@@ -230,7 +230,7 @@ class Node():
                     else:
                         return 1
             else: #draw
-                return 0.1
+                return 0.5
 
     def backprop_print(self):
         print("BACKPROP")

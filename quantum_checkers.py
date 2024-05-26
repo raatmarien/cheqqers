@@ -1677,7 +1677,7 @@ class Checkers:
         """
         if(len(self.legal_moves) == 0):
             return CheckersResult.BLACK_WINS if self.player == CheckersPlayer.WHITE else CheckersResult.WHITE_WINS
-        if(self.moves_since_take >= 999999):
+        if(self.moves_since_take >= 40):
             return CheckersResult.DRAW
         return CheckersResult.UNFINISHED
 

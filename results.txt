@@ -1,84 +1,21 @@
 ----------------------------------------------------------------------------------------------------
 Rule: CheckersRules.CLASSICAL
 Board size: 5x5
-Average time: 0.03141315698623657, minimum time: 0.016034364700317383, max time: 0.062003135681152344
-Average number of moves: 14.5
-Average time for mcts move: 0.0
-Draw: 0, White wins: 48, Black wins: 52
+Average time: 3.9016623592376707, minimum time: 2.3689987659454346, max time: 12.598999977111816
+Average number of moves: 20.72
+Average time for mcts move: 0.3726271356353684
+Movetypes: {'CLASSIC': 425, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 93}
+Rating for white agent: [heuristic]: trueskill.Rating(mu=25.000, sigma=8.333)Rating for black agent: [low_mcts]: trueskill.Rating(mu=25.000, sigma=8.333)All ratings: Random agent: trueskill.Rating(mu=25.000, sigma=8.333), Heuristic agent: trueskill.Rating(mu=20.604, sigma=7.171), Low MCTS agent: trueskill.Rating(mu=29.396, sigma=7.171), High MCTS agent: trueskill.Rating(mu=25.000, sigma=8.333)
+Draw: 4, White wins: 0, Black wins: 46
 ----------------------------------------------------------------------------------------------------
 Rule: CheckersRules.CLASSICAL
-Board size: 6x6
-Average time: 0.07123106002807617, minimum time: 0.031983375549316406, max time: 0.1789720058441162
-Average number of moves: 27.62
-Average time for mcts move: 0.0
-Draw: 0, White wins: 44, Black wins: 56
-----------------------------------------------------------------------------------------------------
-Rule: CheckersRules.CLASSICAL
-Board size: 7x7
-Average time: 0.09083967447280884, minimum time: 0.03699898719787598, max time: 0.34599828720092773
-Average number of moves: 35.01
-Average time for mcts move: 0.0
-Draw: 0, White wins: 44, Black wins: 56
-----------------------------------------------------------------------------------------------------
-Rule: CheckersRules.CLASSICAL
-Board size: 8x8
-Average time: 0.1921199607849121, minimum time: 0.06999897956848145, max time: 0.6150007247924805
-Average number of moves: 61.92
-Average time for mcts move: 0.0
-Draw: 0, White wins: 53, Black wins: 47
-----------------------------------------------------------------------------------------------------
-Rule: CheckersRules.QUANTUM_V1
 Board size: 5x5
-Average time: 0.14688292503356934, minimum time: 0.01902031898498535, max time: 0.8480055332183838
-Average number of moves: 18.93
-Average time for mcts move: 0.0
-Draw: 0, White wins: 44, Black wins: 56
+Average time: 5.285809383392334, minimum time: 3.184999704360962, max time: 7.066956043243408
+Average number of moves: 37.52
+Average time for mcts move: 0.32764599927957505
+Movetypes: {'CLASSIC': 913, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 50}
+Rating for white agent: [low_mcts]: trueskill.Rating(mu=29.396, sigma=7.171)Rating for black agent: [heuristic]: trueskill.Rating(mu=20.604, sigma=7.171)All ratings: Random agent: trueskill.Rating(mu=25.000, sigma=8.333), Heuristic agent: trueskill.Rating(mu=18.770, sigma=6.523), Low MCTS agent: trueskill.Rating(mu=31.230, sigma=6.523), High MCTS agent: trueskill.Rating(mu=25.000, sigma=8.333)
+Draw: 39, White wins: 11, Black wins: 0
 ----------------------------------------------------------------------------------------------------
-Rule: CheckersRules.QUANTUM_V1
-Board size: 6x6
-Average time: 0.24030516147613526, minimum time: 0.03702187538146973, max time: 0.9049742221832275
-Average number of moves: 30.59
-Average time for mcts move: 0.0
-Draw: 0, White wins: 45, Black wins: 55
-----------------------------------------------------------------------------------------------------
-Rule: CheckersRules.QUANTUM_V1
-Board size: 7x7
-Average time: 0.5934106993675232, minimum time: 0.04995274543762207, max time: 2.2350082397460938
-Average number of moves: 51.68
-Average time for mcts move: 0.0
-Draw: 0, White wins: 54, Black wins: 46
-----------------------------------------------------------------------------------------------------
-Rule: CheckersRules.QUANTUM_V1
-Board size: 8x8
-Average time: 1.2015803575515747, minimum time: 0.16000056266784668, max time: 5.808018684387207
-Average number of moves: 85.21
-Average time for mcts move: 0.0
-Draw: 0, White wins: 56, Black wins: 44
-----------------------------------------------------------------------------------------------------
-Rule: CheckersRules.QUANTUM_V2
+Rule: CheckersRules.CLASSICAL
 Board size: 5x5
-Average time: 0.2211274743080139, minimum time: 0.011998653411865234, max time: 1.0250213146209717
-Average number of moves: 20.64
-Average time for mcts move: 0.0
-Draw: 0, White wins: 43, Black wins: 57
-----------------------------------------------------------------------------------------------------
-Rule: CheckersRules.QUANTUM_V2
-Board size: 6x6
-Average time: 0.3667119956016541, minimum time: 0.03999924659729004, max time: 1.3139657974243164
-Average number of moves: 37.68
-Average time for mcts move: 0.0
-Draw: 0, White wins: 43, Black wins: 57
-----------------------------------------------------------------------------------------------------
-Rule: CheckersRules.QUANTUM_V2
-Board size: 7x7
-Average time: 0.7127381491661072, minimum time: 0.038040876388549805, max time: 2.7632405757904053
-Average number of moves: 59.68
-Average time for mcts move: 0.0
-Draw: 0, White wins: 46, Black wins: 54
-----------------------------------------------------------------------------------------------------
-Rule: CheckersRules.QUANTUM_V2
-Board size: 8x8
-Average time: 1.265432870388031, minimum time: 0.1659529209136963, max time: 6.279045581817627
-Average number of moves: 86.17
-Average time for mcts move: 0.0
-Draw: 0, White wins: 53, Black wins: 47

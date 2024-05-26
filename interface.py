@@ -40,7 +40,7 @@ BLUE = (0, 0, 255)
 
 
 class GameInterface:
-    def __init__(self, game: Checkers, white_player, black_player, GUI = False, white_mcts = False, black_mcts = False, print = True, attempt=99999999) -> None:
+    def __init__(self, game: Checkers, white_player, black_player, args_1, args_2, GUI = False, white_mcts = False, black_mcts = False, print = True, attempt=99999999) -> None:
         self.game = game
         self.quit = False
         self.highlighted_squares = []
@@ -58,12 +58,8 @@ class GameInterface:
         self.draw_chance = False
         self.white_player = white_player
         self.print = print
-        self.args = {
-            'C': 1.4, # srqt 2
-            'num_searches': 500, # Budget per rollout
-            'num_simulations': 1, # Budget for extra simulations per node
-            'attempt': self.attempt
-        }
+        self.args1 = args_1
+        self.args2 = args_2
         self.black_player = black_player
         self.white_mcts = white_mcts
         self.black_mcts = black_mcts
@@ -137,6 +133,7 @@ class GameInterface:
     def play(self):
         counter = 0
         moves = []
+        mcts_moves = []
         prev_take = False # variable to check if a piece has been taken before
         # for i in [3, 2, 2, 1, 1, 2, 2, 1]:
         #     # legal_moves = self.get_legal_moves()
@@ -201,17 +198,19 @@ class GameInterface:
                     else:
                         # Calculate time for function call
                         start = time.time()
-                        self.white_player = MCTS(self.game, self.args)
-                        end_time = time.time()-start
+                        self.white_player = MCTS(self.game, self.args1)
                         move = self.white_player.search()
+                        end_time = time.time()-start
+                        mcts_moves.append(move)
                         times.append(end_time)
                 else:
                     if(not self.black_mcts):
                         move = self.black_player.select_move(self.game, self.game.legal_moves)
                     else:
                         start = time.time()
-                        self.black_player = MCTS(self.game, self.args)
+                        self.black_player = MCTS(self.game, self.args2)
                         move = self.black_player.search()
+                        mcts_moves.append(move)
                         end_time = time.time()-start
                         times.append(end_time)
                     # move.print_move()
@@ -224,20 +223,7 @@ class GameInterface:
                 attempt_str += "Selected move: "
                 attempt_str += move.get_move()
                 attempt_str += '\n'
-                # attempt_str += f"rel squares: {self.game.related_squares}\n"
-                # attempt_str += f"entangled squares {self.game.entangled_squares}\n"
-                # for i in self.game.entangled_objects:
-                #     attempt_str += f"ent obj: {i.all_ids}"
-                # self.write_attempt(attempt_str)
-                # states, weights = self.game.return_all_possible_states(move)
-                # for idx, state in enumerate(states):
-                #     print(f"STATE: {state.get_sim_board()}, WEIGHT: {weights[idx]}")
                 self.game.player_move(move, self.game.player)
-                # if(len(self.game.legal_moves) > 0):
-                #     prev_take = True
-                # self.write_to_log(move, counter, moves)
-                # time.sleep(1)
-        # self.print_board()
         if(self.print):
             print(f"Results: {self.game.status}")
         # self.write_attempt(f"Results: {self.game.status}")
@@ -246,7 +232,27 @@ class GameInterface:
         avg_time = 0
         if(len(times) > 0):
             avg_time = sum(times)/len(times)
-        return(self.game.status, counter, avg_time)
+        # For all moves in moves, count and return the movetypes
+        CLASSIC = 0
+        SPLIT = 0
+        ENTANGLE = 0
+        TAKE = 0
+        for move in mcts_moves:
+            if(move.movetype == MoveType.CLASSIC):
+                CLASSIC += 1
+            elif(move.movetype == MoveType.SPLIT):
+                SPLIT += 1
+            elif(move.movetype == MoveType.ENTANGLE):
+                ENTANGLE += 1
+            elif(move.movetype == MoveType.TAKE):
+                TAKE += 1
+        movetypes = {
+            "CLASSIC": CLASSIC,
+            "SPLIT": SPLIT,
+            "ENTANGLE": ENTANGLE,
+            "TAKE": TAKE
+        }
+        return(self.game.status, counter, avg_time, movetypes)
 
     def draw_circle(self, id, color, x, y, radius, king = False, highlighted = False):
         if(color == RED):
