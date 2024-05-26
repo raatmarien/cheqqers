@@ -116,13 +116,13 @@ def main():
             file.write(f"Rule: {rule}\n")
             file.write(f"Board size: {size}x{size}\n")
             print(f"Board size: {size}x{size}, Rule: {rule}")
-            print(f"{i} vs {j}")
             iterations = 15
             for k in range(iterations):
                 random.shuffle(agents)
                 matches = generate_matches(agents)
                 print(matches)
                 for i, j in matches:
+                    print(f"{i} vs {j}")
                     white_mcts = False
                     black_mcts = False
                     args1 = None
@@ -161,26 +161,14 @@ def main():
                     result, num_moves, avg_time, single_movetypes = (game.play())
                     results.append(result)
                     if(result == CheckersResult.WHITE_WINS):
-                        print(f"white [{i}] wins")
-                        print(f"current ratings: {ratings[i]} vs {ratings[j]}")
                         new_r1, new_r2 = env.rate_1vs1(ratings[i], ratings[j])
-                        print(f"new ratings: {new_r1} vs {new_r2}")
                     elif(result == CheckersResult.BLACK_WINS):
-                        print(f"black [{j}] wins")
-                        print(f"current ratings: {ratings[i]} vs {ratings[j]}")
                         new_r2, new_r1 = env.rate_1vs1(ratings[j], ratings[i])
-                        print(f"new ratings: {new_r1} vs {new_r2}")
                     else: # draw
-                        print("draw")
-                        print(f"current ratings: {ratings[i]} vs {ratings[j]}")
                         new_r1, new_r2 = env.rate_1vs1(ratings[i], ratings[j], drawn=True)
-                        print(f"new ratings: {new_r1} vs {new_r2}")
                     
                     ratings[i] = new_r1
                     ratings[j] = new_r2
-                    print(i, j, ratings)
-                    print(f"low {ratings['low_mcts']}")
-                    print(f"high {ratings['high_mcts']}")
                     # if(result == CheckersResult.WHITE_WINS):
                         # print(f"########################### White wins at {i}")
                         # exit()
