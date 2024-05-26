@@ -84,9 +84,9 @@ def main():
         print("# WARNING: If the number of columns is uneven and the number of rows is even the board is not symmetrical. #\n# To assure an equal number of pieces, set the number of vertical pieces to an even value.                 #")
         print("#"*warning_len)
         time.sleep(5)
-    file = open("./results.txt", "w")
+    file = open("./results2.txt", "w")
     file.close()
-    file = open("./results.txt", "a")
+    file = open("./results2.txt", "a")
     rules = [CheckersRules.CLASSICAL, CheckersRules.QUANTUM_V1, CheckersRules.QUANTUM_V2]
     sizes = [5]
     agents = ["random", "heuristic", "low_mcts", "high_mcts"]
@@ -112,8 +112,12 @@ def main():
                 black_mcts = False
                 args1 = None
                 args2 = None
-                p1 = agent_map[i]()
-                p2 = agent_map[j]()
+                p1 = None
+                p2 = None
+                if(i == "random" or i == "heuristic"):
+                    p1 = agent_map[i]()
+                if(j == "random" or j == "heuristic"):
+                    p2 = agent_map[j]()
                 if i == "low_mcts":
                     args1 = args_low
                     white_mcts = True
@@ -194,8 +198,8 @@ def main():
                 print(f"Average number of moves: {sum(number_of_moves)/len(number_of_moves)}")
                 print(f"Average time for mcts move: {sum(avg_mcts_time)/len(avg_mcts_time)}")
                 print(f"Movetypes: {movetypes}")
-                print(f"Rating for white agent: [{i}]: {new_r1}")
-                print(f"Rating for black agent: [{j}]: {new_r2}")
+                print(f"Rating for white agent: [{i}]: {ratings[i]}")
+                print(f"Rating for black agent: [{j}]: {ratings[j]}")
                 print(f"Random agent: {ratings['random']}")
                 print(f"Heuristic agent: {ratings['heuristic']}")
                 print(f"Low MCTS agent: {ratings['low_mcts']}")
@@ -207,24 +211,8 @@ def main():
                 file.write(f"Average number of moves: {sum(number_of_moves)/len(number_of_moves)}\n")
                 file.write(f"Average time for mcts move: {sum(avg_mcts_time)/len(avg_mcts_time)}\n")
                 file.write(f"Movetypes: {movetypes}\n")
-                if(i=="random"):
-                    result1 = random_rating
-                elif(i=="heuristic"):
-                    result1 = heuristic_rating
-                elif(i=="low_mcts"):
-                    result1 = mcts_low_rating
-                elif(i=="high_mcts"):
-                    result1 = mcts_high_rating
-                if(j=="random"):
-                    result2 = random_rating
-                elif(j=="heuristic"):
-                    result2 = heuristic_rating
-                elif(j=="low_mcts"):
-                    result2 = mcts_low_rating
-                elif(j=="high_mcts"):
-                    result2 = mcts_high_rating
-                file.write(f"Rating for white agent: [{i}]: {result1}\n")
-                file.write(f"Rating for black agent: [{j}]: {result2}\n")
+                file.write(f"Rating for white agent: [{i}]: {ratings[i]}\n")
+                file.write(f"Rating for black agent: [{j}]: {ratings[j]}\n")
                 file.write(f"Random agent: {ratings['random']}\n")
                 file.write(f"Heuristic agent: {ratings['heuristic']}\n")
                 file.write(f"Low MCTS agent: {ratings['low_mcts']}\n")
