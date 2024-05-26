@@ -39,7 +39,7 @@ class random_bot(bot):
             print(traceback.format_exc())
             print(possible_moves)
     
-class heurisitc_bot():
+class heuristic_bot():
     # def __init__(self, game, depth=2) -> None:
     #     self.game = game
     #     self.depth = depth

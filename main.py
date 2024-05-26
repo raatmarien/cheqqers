@@ -71,6 +71,13 @@ def main():
     # p2 = heurisitc_bot()
     # p1 = human_player()
     # p2 = human_player()
+    agent_map = {
+        'random': random_bot,
+        'heuristic': heuristic_bot,
+        'human': human_player,
+        'low_mcts': None,
+        'high_mcts': None
+    }
     if(args.num_columns % 2 == 1 and args.num_rows % 2 == 0):
         warning_len = len("# WARNING: If the number of columns is uneven and the number of rows is even the board is not symmetrical. #")
         print("#"*warning_len)
@@ -93,50 +100,36 @@ def main():
             matches = generate_matches(agents)
             print(matches)
             
-            random_rating = trueskill.Rating()
-            heuristic_rating = trueskill.Rating()
-            mcts_low_rating = trueskill.Rating()
-            mcts_high_rating = trueskill.Rating()
+            ratings = {
+                'random': trueskill.Rating(),
+                'heuristic': trueskill.Rating(),
+                'low_mcts': trueskill.Rating(),
+                'high_mcts': trueskill.Rating()
+            }
 
             for i, j in matches:
                 white_mcts = False
                 black_mcts = False
                 args1 = None
                 args2 = None
-                print(i, j)
-                if(i == "random"):
-                    p1 = random_bot()
-                    r1 = random_rating
-                elif(i == "heuristic"):
-                    p1 = heurisitc_bot()
-                    r1 = heuristic_rating
-                elif(i == "low_mcts"):
-                    p1 = None
+                p1 = agent_map[i]()
+                p2 = agent_map[j]()
+                if i == "low_mcts":
                     args1 = args_low
                     white_mcts = True
-                    r1 = mcts_low_rating
-                elif(i == "high_mcts"):
-                    p1 = None
+                elif i == "high_mcts":
                     args1 = args_high
                     white_mcts = True
-                    r1 = mcts_high_rating
+                r1 = ratings[i]
 
-                if(j == "random"):
-                    p2 = random_bot()
-                    r2 = random_rating
-                elif(j == "heuristic"):
-                    p2 = heurisitc_bot()
-                    r2 = heuristic_rating
-                elif(j == "low_mcts"):
-                    p2 = None
+                if j == "low_mcts":
                     args2 = args_low
                     black_mcts = True
-                    r2 = mcts_low_rating
-                elif(j == "high_mcts"):
-                    p2 = None
+                elif j == "high_mcts":
                     args2 = args_high
                     black_mcts = True
-                    r2 = mcts_high_rating               
+                r2 = ratings[j]
+
                 # size = 5
                 # rule = CheckersRules.CLASSICAL
                 times = []
@@ -153,7 +146,8 @@ def main():
                 file.write(f"Rule: {rule}\n")
                 file.write(f"Board size: {size}x{size}\n")
                 print(f"Board size: {size}x{size}, Rule: {rule}")
-                iterations = 50
+                print(f"{i} vs {j}")
+                iterations = 30
                 for k in range(iterations):
                     args_low['attempt'] = k
                     args_high['attempt'] = k
@@ -170,28 +164,14 @@ def main():
                     result, num_moves, avg_time, single_movetypes = (game.play())
                     results.append(result)
                     if(result == CheckersResult.WHITE_WINS):
-                        new_r1, new_r2 = trueskill.rate_1vs1(r1, r2)
+                        new_r1, new_r2 = env.rate_1vs1(r1, r2)
                     elif(result == CheckersResult.BLACK_WINS):
-                        new_r2, new_r1 = trueskill.rate_1vs1(r2, r1)
+                        new_r2, new_r1 = env.rate_1vs1(r2, r1)
                     else: # draw
-                        new_r1, new_r2 = trueskill.rate_1vs1(r1, r2, drawn=True)
+                        new_r1, new_r2 = env.rate_1vs1(r1, r2, drawn=True)
                     
-                    if(i == "random"):
-                        random_rating = new_r1
-                    elif(i == "heuristic"):
-                        heuristic_rating = new_r1
-                    elif(i == "low_mcts"):
-                        mcts_low_rating = new_r1
-                    elif(i == "high_mcts"):
-                        mcts_high_rating = new_r1
-                    if(j == "random"):
-                        random_rating = new_r2
-                    elif(j == "heuristic"):
-                        heuristic_rating = new_r2
-                    elif(j == "low_mcts"):
-                        mcts_low_rating = new_r2    
-                    elif(j == "high_mcts"):
-                        mcts_high_rating = new_r2
+                    ratings[i] = new_r1
+                    ratings[j] = new_r2
 
                     # if(result == CheckersResult.WHITE_WINS):
                         # print(f"########################### White wins at {i}")
@@ -209,21 +189,47 @@ def main():
                         print(f"Average number of moves: {sum(number_of_moves)/len(number_of_moves)}")
                         print(f"Average time for mcts move: {sum(avg_mcts_time)/len(avg_mcts_time)}")
                 print("#"*100)
+                print(f"{i} vs {j}")
                 print(f"Average time: {sum(times)/len(times)}, minimum time: {min(times)}, max time: {max(times)}")
                 print(f"Average number of moves: {sum(number_of_moves)/len(number_of_moves)}")
                 print(f"Average time for mcts move: {sum(avg_mcts_time)/len(avg_mcts_time)}")
                 print(f"Movetypes: {movetypes}")
-                print(f"Rating for white agent: [{i}]: {r1}")
-                print(f"Rating for black agent: [{j}]: {r2}")
-                print(f"All ratings: Random agent: {random_rating}, Heuristic agent: {heuristic_rating}, Low MCTS agent: {mcts_low_rating}, High MCTS agent: {mcts_high_rating}")
+                print(f"Rating for white agent: [{i}]: {new_r1}")
+                print(f"Rating for black agent: [{j}]: {new_r2}")
+                print(f"Random agent: {ratings['random']}")
+                print(f"Heuristic agent: {ratings['heuristic']}")
+                print(f"Low MCTS agent: {ratings['low_mcts']}")
+                print(f"High MCTS agent: {ratings['high_mcts']}")
+                # print(f"All ratings: Random agent: {random_rating}, Heuristic agent: {heuristic_rating}, Low MCTS agent: {mcts_low_rating}, High MCTS agent: {mcts_high_rating}")
                 print(f"Draw: {results.count(CheckersResult.DRAW)}, White wins: {results.count(CheckersResult.WHITE_WINS)}, Black wins: {results.count(CheckersResult.BLACK_WINS)}")
+                file.write(f"White agent: {i}, Black agent: {j}\n")
                 file.write(f"Average time: {sum(times)/len(times)}, minimum time: {min(times)}, max time: {max(times)}\n")
                 file.write(f"Average number of moves: {sum(number_of_moves)/len(number_of_moves)}\n")
                 file.write(f"Average time for mcts move: {sum(avg_mcts_time)/len(avg_mcts_time)}\n")
                 file.write(f"Movetypes: {movetypes}\n")
-                file.write(f"Rating for white agent: [{i}]: {r1}")
-                file.write(f"Rating for black agent: [{j}]: {r2}")
-                file.write(f"All ratings: Random agent: {random_rating}, Heuristic agent: {heuristic_rating}, Low MCTS agent: {mcts_low_rating}, High MCTS agent: {mcts_high_rating}\n")
+                if(i=="random"):
+                    result1 = random_rating
+                elif(i=="heuristic"):
+                    result1 = heuristic_rating
+                elif(i=="low_mcts"):
+                    result1 = mcts_low_rating
+                elif(i=="high_mcts"):
+                    result1 = mcts_high_rating
+                if(j=="random"):
+                    result2 = random_rating
+                elif(j=="heuristic"):
+                    result2 = heuristic_rating
+                elif(j=="low_mcts"):
+                    result2 = mcts_low_rating
+                elif(j=="high_mcts"):
+                    result2 = mcts_high_rating
+                file.write(f"Rating for white agent: [{i}]: {result1}\n")
+                file.write(f"Rating for black agent: [{j}]: {result2}\n")
+                file.write(f"Random agent: {ratings['random']}\n")
+                file.write(f"Heuristic agent: {ratings['heuristic']}\n")
+                file.write(f"Low MCTS agent: {ratings['low_mcts']}\n")
+                file.write(f"High MCTS agent: {ratings['high_mcts']}\n")
+                # file.write(f"All ratings: Random agent: {random_rating}, Heuristic agent: {heuristic_rating}, Low MCTS agent: {mcts_low_rating}, High MCTS agent: {mcts_high_rating}\n")
                 file.write(f"Draw: {results.count(CheckersResult.DRAW)}, White wins: {results.count(CheckersResult.WHITE_WINS)}, Black wins: {results.count(CheckersResult.BLACK_WINS)}\n")
     file.close()
 

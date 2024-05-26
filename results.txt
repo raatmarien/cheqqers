@@ -1,21 +1,269 @@
 ----------------------------------------------------------------------------------------------------
 Rule: CheckersRules.CLASSICAL
 Board size: 5x5
-Average time: 3.9016623592376707, minimum time: 2.3689987659454346, max time: 12.598999977111816
-Average number of moves: 20.72
-Average time for mcts move: 0.3726271356353684
-Movetypes: {'CLASSIC': 425, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 93}
-Rating for white agent: [heuristic]: trueskill.Rating(mu=25.000, sigma=8.333)Rating for black agent: [low_mcts]: trueskill.Rating(mu=25.000, sigma=8.333)All ratings: Random agent: trueskill.Rating(mu=25.000, sigma=8.333), Heuristic agent: trueskill.Rating(mu=20.604, sigma=7.171), Low MCTS agent: trueskill.Rating(mu=29.396, sigma=7.171), High MCTS agent: trueskill.Rating(mu=25.000, sigma=8.333)
-Draw: 4, White wins: 0, Black wins: 46
+Average time: 4.592369739214579, minimum time: 3.241999387741089, max time: 6.40398383140564
+Average number of moves: 31.4
+Average time for mcts move: 0.3601066010585729
+Movetypes: {'CLASSIC': 456, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 30}
+Rating for white agent: [low_mcts]: trueskill.Rating(mu=25.000, sigma=8.333)Rating for black agent: [heuristic]: trueskill.Rating(mu=25.000, sigma=8.333)All ratings: Random agent: trueskill.Rating(mu=25.000, sigma=8.333), Heuristic agent: trueskill.Rating(mu=20.604, sigma=7.171), Low MCTS agent: trueskill.Rating(mu=29.396, sigma=7.171), High MCTS agent: trueskill.Rating(mu=25.000, sigma=8.333)
+Draw: 18, White wins: 12, Black wins: 0
 ----------------------------------------------------------------------------------------------------
 Rule: CheckersRules.CLASSICAL
 Board size: 5x5
-Average time: 5.285809383392334, minimum time: 3.184999704360962, max time: 7.066956043243408
-Average number of moves: 37.52
-Average time for mcts move: 0.32764599927957505
-Movetypes: {'CLASSIC': 913, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 50}
-Rating for white agent: [low_mcts]: trueskill.Rating(mu=29.396, sigma=7.171)Rating for black agent: [heuristic]: trueskill.Rating(mu=20.604, sigma=7.171)All ratings: Random agent: trueskill.Rating(mu=25.000, sigma=8.333), Heuristic agent: trueskill.Rating(mu=18.770, sigma=6.523), Low MCTS agent: trueskill.Rating(mu=31.230, sigma=6.523), High MCTS agent: trueskill.Rating(mu=25.000, sigma=8.333)
-Draw: 39, White wins: 11, Black wins: 0
+Average time: 3.9328038374582928, minimum time: 2.380005359649658, max time: 13.348000049591064
+Average number of moves: 18.966666666666665
+Average time for mcts move: 0.400180758475942
+Movetypes: {'CLASSIC': 231, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 53}
+Rating for white agent: [heuristic]: trueskill.Rating(mu=20.604, sigma=7.171)Rating for black agent: [low_mcts]: trueskill.Rating(mu=29.396, sigma=7.171)All ratings: Random agent: trueskill.Rating(mu=25.000, sigma=8.333), Heuristic agent: trueskill.Rating(mu=18.770, sigma=6.523), Low MCTS agent: trueskill.Rating(mu=31.230, sigma=6.523), High MCTS agent: trueskill.Rating(mu=25.000, sigma=8.333)
+Draw: 3, White wins: 0, Black wins: 27
 ----------------------------------------------------------------------------------------------------
 Rule: CheckersRules.CLASSICAL
 Board size: 5x5
+Average time: 17.368635495503742, minimum time: 3.5749664306640625, max time: 33.66598582267761
+Average number of moves: 25.333333333333332
+Average time for mcts move: 0.6429113391226302
+Movetypes: {'CLASSIC': 703, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 57}
+Rating for white agent: [low_mcts]: trueskill.Rating(mu=31.230, sigma=6.523)Rating for black agent: [high_mcts]: trueskill.Rating(mu=25.000, sigma=8.333)All ratings: Random agent: trueskill.Rating(mu=25.000, sigma=8.333), Heuristic agent: trueskill.Rating(mu=18.770, sigma=6.523), Low MCTS agent: trueskill.Rating(mu=29.425, sigma=5.498), High MCTS agent: trueskill.Rating(mu=27.945, sigma=6.051)
+Draw: 11, White wins: 0, Black wins: 19
+----------------------------------------------------------------------------------------------------
+Rule: CheckersRules.CLASSICAL
+Board size: 5x5
+Average time: 28.182067012786867, minimum time: 15.145967960357666, max time: 61.90097141265869
+Average number of moves: 38.233333333333334
+Average time for mcts move: 0.7458580481325822
+Movetypes: {'CLASSIC': 1101, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 46}
+Rating for white agent: [high_mcts]: trueskill.Rating(mu=27.945, sigma=6.051)Rating for black agent: [low_mcts]: trueskill.Rating(mu=29.425, sigma=5.498)All ratings: Random agent: trueskill.Rating(mu=25.000, sigma=8.333), Heuristic agent: trueskill.Rating(mu=18.770, sigma=6.523), Low MCTS agent: trueskill.Rating(mu=28.985, sigma=4.610), High MCTS agent: trueskill.Rating(mu=28.478, sigma=4.842)
+Draw: 21, White wins: 0, Black wins: 9
+----------------------------------------------------------------------------------------------------
+Rule: CheckersRules.CLASSICAL
+Board size: 5x5
+Average time: 3.9761662006378176, minimum time: 1.1119654178619385, max time: 12.0169837474823
+Average number of moves: 17.2
+Average time for mcts move: 0.4158951002870752
+Movetypes: {'CLASSIC': 215, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 58}
+Rating for white agent: [low_mcts]: trueskill.Rating(mu=28.985, sigma=4.610)Rating for black agent: [random]: trueskill.Rating(mu=25.000, sigma=8.333)All ratings: Random agent: trueskill.Rating(mu=21.136, sigma=6.898), Heuristic agent: trueskill.Rating(mu=18.770, sigma=6.523), Low MCTS agent: trueskill.Rating(mu=30.168, sigma=4.383), High MCTS agent: trueskill.Rating(mu=28.478, sigma=4.842)
+Draw: 0, White wins: 29, Black wins: 1
+----------------------------------------------------------------------------------------------------
+Rule: CheckersRules.CLASSICAL
+Board size: 5x5
+Average time: 1.4140998125076294, minimum time: 0.7649779319763184, max time: 6.603989124298096
+Average number of moves: 8.666666666666666
+Average time for mcts move: 0.2996193603390739
+Movetypes: {'CLASSIC': 71, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 59}
+Rating for white agent: [random]: trueskill.Rating(mu=21.136, sigma=6.898)Rating for black agent: [low_mcts]: trueskill.Rating(mu=30.168, sigma=4.383)All ratings: Random agent: trueskill.Rating(mu=19.446, sigma=6.178), Heuristic agent: trueskill.Rating(mu=18.770, sigma=6.523), Low MCTS agent: trueskill.Rating(mu=30.850, sigma=4.205), High MCTS agent: trueskill.Rating(mu=28.478, sigma=4.842)
+Draw: 0, White wins: 0, Black wins: 30
+----------------------------------------------------------------------------------------------------
+Rule: CheckersRules.CLASSICAL
+Board size: 5x5
+Average time: 8.967999760309855, minimum time: 7.601978778839111, max time: 12.515047550201416
+Average number of moves: 15.6
+Average time for mcts move: 1.1436397855622424
+Movetypes: {'CLASSIC': 174, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 60}
+Rating for white agent: [heuristic]: trueskill.Rating(mu=18.770, sigma=6.523)Rating for black agent: [high_mcts]: trueskill.Rating(mu=28.478, sigma=4.842)All ratings: Random agent: trueskill.Rating(mu=19.446, sigma=6.178), Heuristic agent: trueskill.Rating(mu=17.376, sigma=5.944), Low MCTS agent: trueskill.Rating(mu=30.850, sigma=4.205), High MCTS agent: trueskill.Rating(mu=29.246, sigma=4.611)
+Draw: 0, White wins: 0, Black wins: 30
+----------------------------------------------------------------------------------------------------
+Rule: CheckersRules.CLASSICAL
+Board size: 5x5
+Average time: 14.094767117500306, minimum time: 10.348000764846802, max time: 16.36104106903076
+Average number of moves: 37.06666666666667
+Average time for mcts move: 0.910406574304553
+Movetypes: {'CLASSIC': 541, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 30}
+Rating for white agent: [high_mcts]: trueskill.Rating(mu=29.246, sigma=4.611)Rating for black agent: [heuristic]: trueskill.Rating(mu=17.376, sigma=5.944)All ratings: Random agent: trueskill.Rating(mu=19.446, sigma=6.178), Heuristic agent: trueskill.Rating(mu=16.523, sigma=5.563), Low MCTS agent: trueskill.Rating(mu=30.850, sigma=4.205), High MCTS agent: trueskill.Rating(mu=29.759, sigma=4.435)
+Draw: 23, White wins: 7, Black wins: 0
+----------------------------------------------------------------------------------------------------
+Rule: CheckersRules.CLASSICAL
+Board size: 5x5
+Average time: 0.06610072453816732, minimum time: 0.027996063232421875, max time: 0.1719958782196045
+Average number of moves: 25.033333333333335
+Average time for mcts move: 0.0
+Movetypes: {'CLASSIC': 0, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 0}
+Rating for white agent: [heuristic]: trueskill.Rating(mu=16.523, sigma=5.563)Rating for black agent: [random]: trueskill.Rating(mu=19.446, sigma=6.178)All ratings: Random agent: trueskill.Rating(mu=21.944, sigma=5.471), Heuristic agent: trueskill.Rating(mu=14.498, sigma=5.053), Low MCTS agent: trueskill.Rating(mu=30.850, sigma=4.205), High MCTS agent: trueskill.Rating(mu=29.759, sigma=4.435)
+Draw: 7, White wins: 20, Black wins: 3
+----------------------------------------------------------------------------------------------------
+Rule: CheckersRules.CLASSICAL
+Board size: 5x5
+Average time: 0.04730009237925212, minimum time: 0.023999691009521484, max time: 0.09199714660644531
+Average number of moves: 20.433333333333334
+Average time for mcts move: 0.0
+Movetypes: {'CLASSIC': 0, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 0}
+Rating for white agent: [random]: trueskill.Rating(mu=21.944, sigma=5.471)Rating for black agent: [heuristic]: trueskill.Rating(mu=14.498, sigma=5.053)All ratings: Random agent: trueskill.Rating(mu=17.481, sigma=4.706), Heuristic agent: trueskill.Rating(mu=18.305, sigma=4.458), Low MCTS agent: trueskill.Rating(mu=30.850, sigma=4.205), High MCTS agent: trueskill.Rating(mu=29.759, sigma=4.435)
+Draw: 7, White wins: 0, Black wins: 23
+----------------------------------------------------------------------------------------------------
+Rule: CheckersRules.CLASSICAL
+Board size: 5x5
+Average time: 12.756336871782938, minimum time: 3.6290018558502197, max time: 34.768975019454956
+Average number of moves: 16.4
+Average time for mcts move: 1.395479475828734
+Movetypes: {'CLASSIC': 205, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 55}
+Rating for white agent: [high_mcts]: trueskill.Rating(mu=29.759, sigma=4.435)Rating for black agent: [random]: trueskill.Rating(mu=17.481, sigma=4.706)All ratings: Random agent: trueskill.Rating(mu=17.014, sigma=4.514), Heuristic agent: trueskill.Rating(mu=18.305, sigma=4.458), Low MCTS agent: trueskill.Rating(mu=30.850, sigma=4.205), High MCTS agent: trueskill.Rating(mu=30.174, sigma=4.275)
+Draw: 0, White wins: 28, Black wins: 2
+----------------------------------------------------------------------------------------------------
+Rule: CheckersRules.CLASSICAL
+Board size: 5x5
+Average time: 5.329367884000143, minimum time: 1.8469998836517334, max time: 17.52299952507019
+Average number of moves: 10.333333333333334
+Average time for mcts move: 0.9657219562486365
+Movetypes: {'CLASSIC': 95, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 60}
+Rating for white agent: [random]: trueskill.Rating(mu=17.014, sigma=4.514)Rating for black agent: [high_mcts]: trueskill.Rating(mu=30.174, sigma=4.275)All ratings: Random agent: trueskill.Rating(mu=16.656, sigma=4.361), Heuristic agent: trueskill.Rating(mu=18.305, sigma=4.458), Low MCTS agent: trueskill.Rating(mu=30.850, sigma=4.205), High MCTS agent: trueskill.Rating(mu=30.495, sigma=4.146)
+Draw: 0, White wins: 0, Black wins: 30
+----------------------------------------------------------------------------------------------------
+Rule: CheckersRules.QUANTUM_V1
+Board size: 5x5
+Average time: 23.61723334789276, minimum time: 4.894998788833618, max time: 53.048022985458374
+Average number of moves: 16.6
+Average time for mcts move: 2.544675570986574
+Movetypes: {'CLASSIC': 141, 'SPLIT': 30, 'ENTANGLE': 0, 'TAKE': 76}
+Rating for white agent: [random]: trueskill.Rating(mu=25.000, sigma=8.333)Rating for black agent: [high_mcts]: trueskill.Rating(mu=25.000, sigma=8.333)All ratings: Random agent: trueskill.Rating(mu=20.604, sigma=7.171), Heuristic agent: trueskill.Rating(mu=25.000, sigma=8.333), Low MCTS agent: trueskill.Rating(mu=25.000, sigma=8.333), High MCTS agent: trueskill.Rating(mu=29.396, sigma=7.171)
+Draw: 0, White wins: 4, Black wins: 26
+----------------------------------------------------------------------------------------------------
+Rule: CheckersRules.QUANTUM_V1
+Board size: 5x5
+Average time: 37.45890557765961, minimum time: 9.402025699615479, max time: 88.6253092288971
+Average number of moves: 21.266666666666666
+Average time for mcts move: 3.4256226217424617
+Movetypes: {'CLASSIC': 156, 'SPLIT': 82, 'ENTANGLE': 0, 'TAKE': 92}
+Rating for white agent: [high_mcts]: trueskill.Rating(mu=29.396, sigma=7.171)Rating for black agent: [random]: trueskill.Rating(mu=20.604, sigma=7.171)All ratings: Random agent: trueskill.Rating(mu=26.643, sigma=6.040), Heuristic agent: trueskill.Rating(mu=25.000, sigma=8.333), Low MCTS agent: trueskill.Rating(mu=25.000, sigma=8.333), High MCTS agent: trueskill.Rating(mu=23.357, sigma=6.040)
+Draw: 4, White wins: 23, Black wins: 3
+----------------------------------------------------------------------------------------------------
+Rule: CheckersRules.QUANTUM_V1
+Board size: 5x5
+Average time: 0.17849919001261394, minimum time: 0.03806018829345703, max time: 0.5339727401733398
+Average number of moves: 18.9
+Average time for mcts move: 0.0
+Movetypes: {'CLASSIC': 0, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 0}
+Rating for white agent: [random]: trueskill.Rating(mu=26.643, sigma=6.040)Rating for black agent: [heuristic]: trueskill.Rating(mu=25.000, sigma=8.333)All ratings: Random agent: trueskill.Rating(mu=23.781, sigma=5.484), Heuristic agent: trueskill.Rating(mu=30.446, sigma=6.797), Low MCTS agent: trueskill.Rating(mu=25.000, sigma=8.333), High MCTS agent: trueskill.Rating(mu=23.357, sigma=6.040)
+Draw: 3, White wins: 4, Black wins: 23
+----------------------------------------------------------------------------------------------------
+Rule: CheckersRules.QUANTUM_V1
+Board size: 5x5
+Average time: 0.3317659060160319, minimum time: 0.046991825103759766, max time: 0.8899788856506348
+Average number of moves: 25.7
+Average time for mcts move: 0.0
+Movetypes: {'CLASSIC': 0, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 0}
+Rating for white agent: [heuristic]: trueskill.Rating(mu=30.446, sigma=6.797)Rating for black agent: [random]: trueskill.Rating(mu=23.781, sigma=5.484)All ratings: Random agent: trueskill.Rating(mu=22.418, sigma=5.102), Heuristic agent: trueskill.Rating(mu=32.541, sigma=6.054), Low MCTS agent: trueskill.Rating(mu=25.000, sigma=8.333), High MCTS agent: trueskill.Rating(mu=23.357, sigma=6.040)
+Draw: 5, White wins: 20, Black wins: 5
+----------------------------------------------------------------------------------------------------
+Rule: CheckersRules.QUANTUM_V1
+Board size: 5x5
+Average time: 8.517681352297465, minimum time: 1.8840372562408447, max time: 30.203028440475464
+Average number of moves: 17.566666666666666
+Average time for mcts move: 0.8705413231278624
+Movetypes: {'CLASSIC': 133, 'SPLIT': 42, 'ENTANGLE': 0, 'TAKE': 87}
+Rating for white agent: [random]: trueskill.Rating(mu=22.418, sigma=5.102)Rating for black agent: [low_mcts]: trueskill.Rating(mu=25.000, sigma=8.333)All ratings: Random agent: trueskill.Rating(mu=20.825, sigma=4.787), Heuristic agent: trueskill.Rating(mu=32.541, sigma=6.054), Low MCTS agent: trueskill.Rating(mu=29.249, sigma=6.872), High MCTS agent: trueskill.Rating(mu=23.357, sigma=6.040)
+Draw: 0, White wins: 3, Black wins: 27
+----------------------------------------------------------------------------------------------------
+Rule: CheckersRules.QUANTUM_V1
+Board size: 5x5
+Average time: 9.994674022992452, minimum time: 3.1419994831085205, max time: 31.625683546066284
+Average number of moves: 18.466666666666665
+Average time for mcts move: 0.9897757027848968
+Movetypes: {'CLASSIC': 146, 'SPLIT': 66, 'ENTANGLE': 0, 'TAKE': 77}
+Rating for white agent: [low_mcts]: trueskill.Rating(mu=29.249, sigma=6.872)Rating for black agent: [random]: trueskill.Rating(mu=20.825, sigma=4.787)All ratings: Random agent: trueskill.Rating(mu=19.954, sigma=4.550), Heuristic agent: trueskill.Rating(mu=32.541, sigma=6.054), Low MCTS agent: trueskill.Rating(mu=31.044, sigma=6.148), High MCTS agent: trueskill.Rating(mu=23.357, sigma=6.040)
+Draw: 0, White wins: 23, Black wins: 7
+----------------------------------------------------------------------------------------------------
+Rule: CheckersRules.QUANTUM_V1
+Board size: 5x5
+Average time: 36.00917863845825, minimum time: 10.141000747680664, max time: 103.82665014266968
+Average number of moves: 21.366666666666667
+Average time for mcts move: 3.095978615990249
+Movetypes: {'CLASSIC': 218, 'SPLIT': 70, 'ENTANGLE': 0, 'TAKE': 46}
+Rating for white agent: [high_mcts]: trueskill.Rating(mu=23.357, sigma=6.040)Rating for black agent: [heuristic]: trueskill.Rating(mu=32.541, sigma=6.054)All ratings: Random agent: trueskill.Rating(mu=19.954, sigma=4.550), Heuristic agent: trueskill.Rating(mu=33.819, sigma=5.600), Low MCTS agent: trueskill.Rating(mu=31.044, sigma=6.148), High MCTS agent: trueskill.Rating(mu=22.085, sigma=5.589)
+Draw: 6, White wins: 23, Black wins: 1
+----------------------------------------------------------------------------------------------------
+Rule: CheckersRules.QUANTUM_V1
+Board size: 5x5
+Average time: 48.95204009215037, minimum time: 6.515002012252808, max time: 106.2040467262268
+Average number of moves: 28.4
+Average time for mcts move: 3.26429741186073
+Movetypes: {'CLASSIC': 293, 'SPLIT': 78, 'ENTANGLE': 0, 'TAKE': 50}
+Rating for white agent: [heuristic]: trueskill.Rating(mu=33.819, sigma=5.600)Rating for black agent: [high_mcts]: trueskill.Rating(mu=22.085, sigma=5.589)All ratings: Random agent: trueskill.Rating(mu=19.954, sigma=4.550), Heuristic agent: trueskill.Rating(mu=30.045, sigma=4.613), Low MCTS agent: trueskill.Rating(mu=31.044, sigma=6.148), High MCTS agent: trueskill.Rating(mu=25.845, sigma=4.608)
+Draw: 10, White wins: 6, Black wins: 14
+----------------------------------------------------------------------------------------------------
+Rule: CheckersRules.QUANTUM_V1
+Board size: 5x5
+Average time: 61.92030758857727, minimum time: 12.369948625564575, max time: 157.81099939346313
+Average number of moves: 29.2
+Average time for mcts move: 2.163454723363662
+Movetypes: {'CLASSIC': 602, 'SPLIT': 162, 'ENTANGLE': 0, 'TAKE': 112}
+Rating for white agent: [high_mcts]: trueskill.Rating(mu=25.845, sigma=4.608)Rating for black agent: [low_mcts]: trueskill.Rating(mu=31.044, sigma=6.148)All ratings: Random agent: trueskill.Rating(mu=19.954, sigma=4.550), Heuristic agent: trueskill.Rating(mu=30.045, sigma=4.613), Low MCTS agent: trueskill.Rating(mu=26.261, sigma=5.137), High MCTS agent: trueskill.Rating(mu=28.532, sigma=4.200)
+Draw: 6, White wins: 14, Black wins: 10
+----------------------------------------------------------------------------------------------------
+Rule: CheckersRules.QUANTUM_V1
+Board size: 5x5
+Average time: 71.75636803309122, minimum time: 11.189000129699707, max time: 164.74602556228638
+Average number of moves: 32.63333333333333
+Average time for mcts move: 2.1991079601266565
+Movetypes: {'CLASSIC': 650, 'SPLIT': 200, 'ENTANGLE': 0, 'TAKE': 129}
+Rating for white agent: [low_mcts]: trueskill.Rating(mu=26.261, sigma=5.137)Rating for black agent: [high_mcts]: trueskill.Rating(mu=28.532, sigma=4.200)All ratings: Random agent: trueskill.Rating(mu=19.954, sigma=4.550), Heuristic agent: trueskill.Rating(mu=30.045, sigma=4.613), Low MCTS agent: trueskill.Rating(mu=29.312, sigma=4.491), High MCTS agent: trueskill.Rating(mu=26.493, sigma=3.855)
+Draw: 8, White wins: 14, Black wins: 8
+----------------------------------------------------------------------------------------------------
+Rule: CheckersRules.QUANTUM_V1
+Board size: 5x5
+Average time: 10.066809407869975, minimum time: 1.6610007286071777, max time: 29.12999725341797
+Average number of moves: 25.7
+Average time for mcts move: 0.7240732983975626
+Movetypes: {'CLASSIC': 270, 'SPLIT': 71, 'ENTANGLE': 0, 'TAKE': 41}
+Rating for white agent: [heuristic]: trueskill.Rating(mu=30.045, sigma=4.613)Rating for black agent: [low_mcts]: trueskill.Rating(mu=29.312, sigma=4.491)All ratings: Random agent: trueskill.Rating(mu=19.954, sigma=4.550), Heuristic agent: trueskill.Rating(mu=27.830, sigma=4.158), Low MCTS agent: trueskill.Rating(mu=31.411, sigma=4.072), High MCTS agent: trueskill.Rating(mu=26.493, sigma=3.855)
+Draw: 8, White wins: 6, Black wins: 16
+----------------------------------------------------------------------------------------------------
+Rule: CheckersRules.QUANTUM_V1
+Board size: 5x5
+Average time: 10.16416739622752, minimum time: 2.5950253009796143, max time: 27.489969491958618
+Average number of moves: 29.866666666666667
+Average time for mcts move: 0.6905959877005109
+Movetypes: {'CLASSIC': 332, 'SPLIT': 76, 'ENTANGLE': 0, 'TAKE': 54}
+Rating for white agent: [low_mcts]: trueskill.Rating(mu=31.411, sigma=4.072)Rating for black agent: [heuristic]: trueskill.Rating(mu=27.830, sigma=4.158)All ratings: Random agent: trueskill.Rating(mu=19.954, sigma=4.550), Heuristic agent: trueskill.Rating(mu=26.591, sigma=3.857), Low MCTS agent: trueskill.Rating(mu=32.599, sigma=3.790), High MCTS agent: trueskill.Rating(mu=26.493, sigma=3.855)
+Draw: 11, White wins: 19, Black wins: 0
+----------------------------------------------------------------------------------------------------
+Rule: CheckersRules.QUANTUM_V2
+Board size: 5x5
+Average time: 259.66593623956044, minimum time: 9.697997570037842, max time: 6181.062296628952
+Average number of moves: 37.93333333333333
+Average time for mcts move: 11.779235527478765
+Movetypes: {'CLASSIC': 331, 'SPLIT': 150, 'ENTANGLE': 1, 'TAKE': 82}
+Rating for white agent: [heuristic]: trueskill.Rating(mu=25.000, sigma=8.333)Rating for black agent: [high_mcts]: trueskill.Rating(mu=25.000, sigma=8.333)All ratings: Random agent: trueskill.Rating(mu=25.000, sigma=8.333), Heuristic agent: trueskill.Rating(mu=29.396, sigma=7.171), Low MCTS agent: trueskill.Rating(mu=25.000, sigma=8.333), High MCTS agent: trueskill.Rating(mu=20.604, sigma=7.171)
+Draw: 14, White wins: 7, Black wins: 9
+----------------------------------------------------------------------------------------------------
+Rule: CheckersRules.QUANTUM_V2
+Board size: 5x5
+Average time: 40.01440289020538, minimum time: 10.01300048828125, max time: 96.84400010108948
+Average number of moves: 22.966666666666665
+Average time for mcts move: 3.350803083222943
+Movetypes: {'CLASSIC': 196, 'SPLIT': 92, 'ENTANGLE': 3, 'TAKE': 63}
+Rating for white agent: [high_mcts]: trueskill.Rating(mu=20.604, sigma=7.171)Rating for black agent: [heuristic]: trueskill.Rating(mu=29.396, sigma=7.171)All ratings: Random agent: trueskill.Rating(mu=25.000, sigma=8.333), Heuristic agent: trueskill.Rating(mu=31.230, sigma=6.523), Low MCTS agent: trueskill.Rating(mu=25.000, sigma=8.333), High MCTS agent: trueskill.Rating(mu=18.770, sigma=6.523)
+Draw: 4, White wins: 17, Black wins: 9
+----------------------------------------------------------------------------------------------------
+Rule: CheckersRules.QUANTUM_V2
+Board size: 5x5
+Average time: 14.377822828292846, minimum time: 2.3949532508850098, max time: 24.15899658203125
+Average number of moves: 32.86666666666667
+Average time for mcts move: 0.8378126184400486
+Movetypes: {'CLASSIC': 286, 'SPLIT': 140, 'ENTANGLE': 2, 'TAKE': 62}
+Rating for white agent: [heuristic]: trueskill.Rating(mu=31.230, sigma=6.523)Rating for black agent: [low_mcts]: trueskill.Rating(mu=25.000, sigma=8.333)All ratings: Random agent: trueskill.Rating(mu=25.000, sigma=8.333), Heuristic agent: trueskill.Rating(mu=29.425, sigma=5.498), Low MCTS agent: trueskill.Rating(mu=27.945, sigma=6.051), High MCTS agent: trueskill.Rating(mu=18.770, sigma=6.523)
+Draw: 16, White wins: 4, Black wins: 10
+----------------------------------------------------------------------------------------------------
+Rule: CheckersRules.QUANTUM_V2
+Board size: 5x5
+Average time: 10.966637444496154, minimum time: 3.0330028533935547, max time: 27.745025634765625
+Average number of moves: 22.766666666666666
+Average time for mcts move: 0.9080821905235728
+Movetypes: {'CLASSIC': 199, 'SPLIT': 89, 'ENTANGLE': 6, 'TAKE': 59}
+Rating for white agent: [low_mcts]: trueskill.Rating(mu=27.945, sigma=6.051)Rating for black agent: [heuristic]: trueskill.Rating(mu=29.425, sigma=5.498)All ratings: Random agent: trueskill.Rating(mu=25.000, sigma=8.333), Heuristic agent: trueskill.Rating(mu=26.595, sigma=4.909), Low MCTS agent: trueskill.Rating(mu=31.373, sigma=5.256), High MCTS agent: trueskill.Rating(mu=18.770, sigma=6.523)
+Draw: 4, White wins: 21, Black wins: 5
+----------------------------------------------------------------------------------------------------
+Rule: CheckersRules.QUANTUM_V2
+Board size: 5x5
+Average time: 0.27170187632242837, minimum time: 0.03895378112792969, max time: 0.6349794864654541
+Average number of moves: 26.4
+Average time for mcts move: 0.0
+Movetypes: {'CLASSIC': 0, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 0}
+Rating for white agent: [heuristic]: trueskill.Rating(mu=26.595, sigma=4.909)Rating for black agent: [random]: trueskill.Rating(mu=25.000, sigma=8.333)All ratings: Random agent: trueskill.Rating(mu=20.398, sigma=6.793), Heuristic agent: trueskill.Rating(mu=28.193, sigma=4.615), Low MCTS agent: trueskill.Rating(mu=31.373, sigma=5.256), High MCTS agent: trueskill.Rating(mu=18.770, sigma=6.523)
+Draw: 5, White wins: 23, Black wins: 2
+----------------------------------------------------------------------------------------------------
+Rule: CheckersRules.QUANTUM_V2
+Board size: 5x5
+Average time: 0.18466897010803224, minimum time: 0.031000614166259766, max time: 0.45299720764160156
+Average number of moves: 21.033333333333335
+Average time for mcts move: 0.0
+Movetypes: {'CLASSIC': 0, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 0}
+Rating for white agent: [random]: trueskill.Rating(mu=20.398, sigma=6.793)Rating for black agent: [heuristic]: trueskill.Rating(mu=28.193, sigma=4.615)All ratings: Random agent: trueskill.Rating(mu=18.513, sigma=6.049), Heuristic agent: trueskill.Rating(mu=29.063, sigma=4.390), Low MCTS agent: trueskill.Rating(mu=31.373, sigma=5.256), High MCTS agent: trueskill.Rating(mu=18.770, sigma=6.523)
