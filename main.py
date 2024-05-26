@@ -90,69 +90,62 @@ def main():
     rules = [CheckersRules.CLASSICAL, CheckersRules.QUANTUM_V1, CheckersRules.QUANTUM_V2]
     sizes = [5]
     agents = ["random", "heuristic", "low_mcts", "high_mcts"]
+    # just mcts agents
+    # agents = ["low_mcts", "high_mcts"]
     for rule in rules:
-        for size in sizes:
-            args1 = None
-            args2 = None
-            # print(agents)
-            random.shuffle(agents)
-            # print(agents)
-            matches = generate_matches(agents)
-            print(matches)
-            
+        for size in sizes:  
             ratings = {
                 'random': trueskill.Rating(),
                 'heuristic': trueskill.Rating(),
                 'low_mcts': trueskill.Rating(),
                 'high_mcts': trueskill.Rating()
             }
+            # size = 5
+            # rule = CheckersRules.CLASSICAL
+            times = []
+            results = []
+            number_of_moves = []
+            avg_mcts_time = []
+            movetypes = {
+                "CLASSIC": 0,
+                "SPLIT": 0,
+                "ENTANGLE": 0,
+                "TAKE": 0
+            }
+            file.write("-"*100 + "\n")
+            file.write(f"Rule: {rule}\n")
+            file.write(f"Board size: {size}x{size}\n")
+            print(f"Board size: {size}x{size}, Rule: {rule}")
+            print(f"{i} vs {j}")
+            iterations = 15
+            for k in range(iterations):
+                random.shuffle(agents)
+                matches = generate_matches(agents)
+                print(matches)
+                for i, j in matches:
+                    white_mcts = False
+                    black_mcts = False
+                    args1 = None
+                    args2 = None
+                    p1 = None
+                    p2 = None
+                    if(i == "random" or i == "heuristic"):
+                        p1 = agent_map[i]()
+                    if(j == "random" or j == "heuristic"):
+                        p2 = agent_map[j]()
+                    if i == "low_mcts":
+                        args1 = args_low
+                        white_mcts = True
+                    elif i == "high_mcts":
+                        args1 = args_high
+                        white_mcts = True
 
-            for i, j in matches:
-                white_mcts = False
-                black_mcts = False
-                args1 = None
-                args2 = None
-                p1 = None
-                p2 = None
-                if(i == "random" or i == "heuristic"):
-                    p1 = agent_map[i]()
-                if(j == "random" or j == "heuristic"):
-                    p2 = agent_map[j]()
-                if i == "low_mcts":
-                    args1 = args_low
-                    white_mcts = True
-                elif i == "high_mcts":
-                    args1 = args_high
-                    white_mcts = True
-                r1 = ratings[i]
-
-                if j == "low_mcts":
-                    args2 = args_low
-                    black_mcts = True
-                elif j == "high_mcts":
-                    args2 = args_high
-                    black_mcts = True
-                r2 = ratings[j]
-
-                # size = 5
-                # rule = CheckersRules.CLASSICAL
-                times = []
-                results = []
-                number_of_moves = []
-                avg_mcts_time = []
-                movetypes = {
-                    "CLASSIC": 0,
-                    "SPLIT": 0,
-                    "ENTANGLE": 0,
-                    "TAKE": 0
-                }
-                file.write("-"*100 + "\n")
-                file.write(f"Rule: {rule}\n")
-                file.write(f"Board size: {size}x{size}\n")
-                print(f"Board size: {size}x{size}, Rule: {rule}")
-                print(f"{i} vs {j}")
-                iterations = 30
-                for k in range(iterations):
+                    if j == "low_mcts":
+                        args2 = args_low
+                        black_mcts = True
+                    elif j == "high_mcts":
+                        args2 = args_high
+                        black_mcts = True
                     args_low['attempt'] = k
                     args_high['attempt'] = k
                     sd = random.randint(0, 100000000000000000)
@@ -168,15 +161,26 @@ def main():
                     result, num_moves, avg_time, single_movetypes = (game.play())
                     results.append(result)
                     if(result == CheckersResult.WHITE_WINS):
-                        new_r1, new_r2 = env.rate_1vs1(r1, r2)
+                        print(f"white [{i}] wins")
+                        print(f"current ratings: {ratings[i]} vs {ratings[j]}")
+                        new_r1, new_r2 = env.rate_1vs1(ratings[i], ratings[j])
+                        print(f"new ratings: {new_r1} vs {new_r2}")
                     elif(result == CheckersResult.BLACK_WINS):
-                        new_r2, new_r1 = env.rate_1vs1(r2, r1)
+                        print(f"black [{j}] wins")
+                        print(f"current ratings: {ratings[i]} vs {ratings[j]}")
+                        new_r2, new_r1 = env.rate_1vs1(ratings[j], ratings[i])
+                        print(f"new ratings: {new_r1} vs {new_r2}")
                     else: # draw
-                        new_r1, new_r2 = env.rate_1vs1(r1, r2, drawn=True)
+                        print("draw")
+                        print(f"current ratings: {ratings[i]} vs {ratings[j]}")
+                        new_r1, new_r2 = env.rate_1vs1(ratings[i], ratings[j], drawn=True)
+                        print(f"new ratings: {new_r1} vs {new_r2}")
                     
                     ratings[i] = new_r1
                     ratings[j] = new_r2
-
+                    print(i, j, ratings)
+                    print(f"low {ratings['low_mcts']}")
+                    print(f"high {ratings['high_mcts']}")
                     # if(result == CheckersResult.WHITE_WINS):
                         # print(f"########################### White wins at {i}")
                         # exit()
