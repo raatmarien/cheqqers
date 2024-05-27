@@ -1,0 +1,1289 @@
+----------------------------------------------------------------------------------------------------
+Rule: CheckersRules.CLASSICAL
+Board size: 5x5
+----------------------------------------------------------------------------------------------------
+iteration: 0
+Movetypes: {'CLASSIC': 82, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 19}
+Random agent: trueskill.Rating(mu=14.749, sigma=4.808)
+Heuristic agent: trueskill.Rating(mu=22.458, sigma=4.120)
+Low MCTS agent: trueskill.Rating(mu=30.826, sigma=4.221)
+High MCTS agent: trueskill.Rating(mu=31.346, sigma=4.253)
+Draw: 1, White wins: 4, Black wins: 7
+iteration: 1
+Movetypes: {'CLASSIC': 256, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 35}
+Random agent: trueskill.Rating(mu=12.735, sigma=4.013)
+Heuristic agent: trueskill.Rating(mu=23.628, sigma=2.927)
+Low MCTS agent: trueskill.Rating(mu=31.722, sigma=2.884)
+High MCTS agent: trueskill.Rating(mu=30.616, sigma=2.775)
+Draw: 4, White wins: 8, Black wins: 12
+iteration: 2
+Movetypes: {'CLASSIC': 352, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 55}
+Random agent: trueskill.Rating(mu=12.040, sigma=3.672)
+Heuristic agent: trueskill.Rating(mu=25.366, sigma=2.311)
+Low MCTS agent: trueskill.Rating(mu=29.278, sigma=2.321)
+High MCTS agent: trueskill.Rating(mu=31.408, sigma=2.277)
+Draw: 6, White wins: 12, Black wins: 18
+iteration: 3
+Movetypes: {'CLASSIC': 448, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 74}
+Random agent: trueskill.Rating(mu=11.578, sigma=3.447)
+Heuristic agent: trueskill.Rating(mu=24.319, sigma=2.064)
+Low MCTS agent: trueskill.Rating(mu=29.135, sigma=2.052)
+High MCTS agent: trueskill.Rating(mu=32.857, sigma=2.040)
+Draw: 6, White wins: 18, Black wins: 24
+iteration: 4
+Movetypes: {'CLASSIC': 573, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 91}
+Random agent: trueskill.Rating(mu=11.225, sigma=3.276)
+Heuristic agent: trueskill.Rating(mu=24.970, sigma=1.811)
+Low MCTS agent: trueskill.Rating(mu=28.406, sigma=1.747)
+High MCTS agent: trueskill.Rating(mu=33.081, sigma=1.850)
+Draw: 9, White wins: 22, Black wins: 29
+iteration: 5
+Movetypes: {'CLASSIC': 701, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 108}
+Random agent: trueskill.Rating(mu=10.936, sigma=3.142)
+Heuristic agent: trueskill.Rating(mu=25.515, sigma=1.621)
+Low MCTS agent: trueskill.Rating(mu=28.495, sigma=1.573)
+High MCTS agent: trueskill.Rating(mu=32.441, sigma=1.660)
+Draw: 12, White wins: 25, Black wins: 35
+iteration: 6
+Movetypes: {'CLASSIC': 850, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 124}
+Random agent: trueskill.Rating(mu=13.731, sigma=2.716)
+Heuristic agent: trueskill.Rating(mu=24.726, sigma=1.475)
+Low MCTS agent: trueskill.Rating(mu=29.246, sigma=1.441)
+High MCTS agent: trueskill.Rating(mu=31.629, sigma=1.495)
+Draw: 16, White wins: 28, Black wins: 40
+iteration: 7
+Movetypes: {'CLASSIC': 947, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 144}
+Random agent: trueskill.Rating(mu=13.369, sigma=2.587)
+Heuristic agent: trueskill.Rating(mu=24.719, sigma=1.387)
+Low MCTS agent: trueskill.Rating(mu=29.316, sigma=1.349)
+High MCTS agent: trueskill.Rating(mu=31.664, sigma=1.421)
+Draw: 17, White wins: 32, Black wins: 47
+iteration: 8
+Movetypes: {'CLASSIC': 1054, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 162}
+Random agent: trueskill.Rating(mu=13.082, sigma=2.489)
+Heuristic agent: trueskill.Rating(mu=24.355, sigma=1.335)
+Low MCTS agent: trueskill.Rating(mu=29.500, sigma=1.284)
+High MCTS agent: trueskill.Rating(mu=31.941, sigma=1.351)
+Draw: 18, White wins: 37, Black wins: 53
+iteration: 9
+Movetypes: {'CLASSIC': 1234, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 178}
+Random agent: trueskill.Rating(mu=14.493, sigma=2.245)
+Heuristic agent: trueskill.Rating(mu=24.631, sigma=1.225)
+Low MCTS agent: trueskill.Rating(mu=29.028, sigma=1.203)
+High MCTS agent: trueskill.Rating(mu=31.704, sigma=1.274)
+Draw: 23, White wins: 40, Black wins: 57
+iteration: 10
+Movetypes: {'CLASSIC': 1325, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 197}
+Random agent: trueskill.Rating(mu=16.939, sigma=1.963)
+Heuristic agent: trueskill.Rating(mu=24.170, sigma=1.139)
+Low MCTS agent: trueskill.Rating(mu=29.123, sigma=1.152)
+High MCTS agent: trueskill.Rating(mu=31.353, sigma=1.216)
+Draw: 26, White wins: 42, Black wins: 64
+iteration: 11
+Movetypes: {'CLASSIC': 1413, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 216}
+Random agent: trueskill.Rating(mu=17.313, sigma=1.807)
+Heuristic agent: trueskill.Rating(mu=23.982, sigma=1.092)
+Low MCTS agent: trueskill.Rating(mu=29.155, sigma=1.109)
+High MCTS agent: trueskill.Rating(mu=31.386, sigma=1.182)
+Draw: 28, White wins: 45, Black wins: 71
+iteration: 12
+Movetypes: {'CLASSIC': 1511, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 233}
+Random agent: trueskill.Rating(mu=17.553, sigma=1.681)
+Heuristic agent: trueskill.Rating(mu=23.610, sigma=1.062)
+Low MCTS agent: trueskill.Rating(mu=29.288, sigma=1.078)
+High MCTS agent: trueskill.Rating(mu=31.574, sigma=1.147)
+Draw: 30, White wins: 50, Black wins: 76
+iteration: 13
+Movetypes: {'CLASSIC': 1619, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 251}
+Random agent: trueskill.Rating(mu=17.153, sigma=1.616)
+Heuristic agent: trueskill.Rating(mu=23.791, sigma=1.035)
+Low MCTS agent: trueskill.Rating(mu=29.400, sigma=1.052)
+High MCTS agent: trueskill.Rating(mu=31.421, sigma=1.105)
+Draw: 32, White wins: 55, Black wins: 81
+iteration: 14
+Movetypes: {'CLASSIC': 1762, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 269}
+Random agent: trueskill.Rating(mu=16.822, sigma=1.566)
+Heuristic agent: trueskill.Rating(mu=23.895, sigma=1.013)
+Low MCTS agent: trueskill.Rating(mu=29.579, sigma=1.019)
+High MCTS agent: trueskill.Rating(mu=31.252, sigma=1.078)
+Draw: 34, White wins: 59, Black wins: 87
+iteration: 15
+Movetypes: {'CLASSIC': 1874, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 286}
+Random agent: trueskill.Rating(mu=16.543, sigma=1.525)
+Heuristic agent: trueskill.Rating(mu=24.223, sigma=0.986)
+Low MCTS agent: trueskill.Rating(mu=29.445, sigma=0.993)
+High MCTS agent: trueskill.Rating(mu=31.168, sigma=1.046)
+Draw: 37, White wins: 62, Black wins: 93
+iteration: 16
+Movetypes: {'CLASSIC': 1981, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 303}
+Random agent: trueskill.Rating(mu=16.853, sigma=1.460)
+Heuristic agent: trueskill.Rating(mu=24.053, sigma=0.962)
+Low MCTS agent: trueskill.Rating(mu=29.326, sigma=0.971)
+High MCTS agent: trueskill.Rating(mu=31.345, sigma=1.028)
+Draw: 40, White wins: 66, Black wins: 98
+iteration: 17
+Movetypes: {'CLASSIC': 2127, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 320}
+Random agent: trueskill.Rating(mu=16.613, sigma=1.430)
+Heuristic agent: trueskill.Rating(mu=24.306, sigma=0.944)
+Low MCTS agent: trueskill.Rating(mu=29.309, sigma=0.945)
+High MCTS agent: trueskill.Rating(mu=31.189, sigma=1.010)
+Draw: 43, White wins: 70, Black wins: 103
+iteration: 18
+Movetypes: {'CLASSIC': 2243, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 337}
+Random agent: trueskill.Rating(mu=16.881, sigma=1.378)
+Heuristic agent: trueskill.Rating(mu=24.354, sigma=0.919)
+Low MCTS agent: trueskill.Rating(mu=29.213, sigma=0.928)
+High MCTS agent: trueskill.Rating(mu=31.108, sigma=0.987)
+Draw: 47, White wins: 73, Black wins: 108
+iteration: 19
+Movetypes: {'CLASSIC': 2380, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 354}
+Random agent: trueskill.Rating(mu=17.115, sigma=1.332)
+Heuristic agent: trueskill.Rating(mu=24.395, sigma=0.899)
+Low MCTS agent: trueskill.Rating(mu=29.132, sigma=0.914)
+High MCTS agent: trueskill.Rating(mu=31.035, sigma=0.968)
+Draw: 51, White wins: 76, Black wins: 113
+iteration: 20
+Movetypes: {'CLASSIC': 2493, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 371}
+Random agent: trueskill.Rating(mu=18.220, sigma=1.246)
+Heuristic agent: trueskill.Rating(mu=24.265, sigma=0.875)
+Low MCTS agent: trueskill.Rating(mu=28.896, sigma=0.896)
+High MCTS agent: trueskill.Rating(mu=30.864, sigma=0.953)
+Draw: 56, White wins: 77, Black wins: 119
+iteration: 21
+Movetypes: {'CLASSIC': 2612, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 388}
+Random agent: trueskill.Rating(mu=17.970, sigma=1.226)
+Heuristic agent: trueskill.Rating(mu=24.483, sigma=0.865)
+Low MCTS agent: trueskill.Rating(mu=28.835, sigma=0.886)
+High MCTS agent: trueskill.Rating(mu=30.821, sigma=0.937)
+Draw: 59, White wins: 80, Black wins: 125
+iteration: 22
+Movetypes: {'CLASSIC': 2723, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 405}
+Random agent: trueskill.Rating(mu=17.745, sigma=1.210)
+Heuristic agent: trueskill.Rating(mu=24.541, sigma=0.861)
+Low MCTS agent: trueskill.Rating(mu=28.935, sigma=0.881)
+High MCTS agent: trueskill.Rating(mu=30.775, sigma=0.923)
+Draw: 61, White wins: 84, Black wins: 131
+iteration: 23
+Movetypes: {'CLASSIC': 2881, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 421}
+Random agent: trueskill.Rating(mu=17.542, sigma=1.196)
+Heuristic agent: trueskill.Rating(mu=24.723, sigma=0.853)
+Low MCTS agent: trueskill.Rating(mu=29.003, sigma=0.869)
+High MCTS agent: trueskill.Rating(mu=30.609, sigma=0.907)
+Draw: 65, White wins: 87, Black wins: 136
+iteration: 24
+Movetypes: {'CLASSIC': 2981, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 440}
+Random agent: trueskill.Rating(mu=17.828, sigma=1.173)
+Heuristic agent: trueskill.Rating(mu=24.517, sigma=0.847)
+Low MCTS agent: trueskill.Rating(mu=29.183, sigma=0.869)
+High MCTS agent: trueskill.Rating(mu=30.482, sigma=0.899)
+Draw: 66, White wins: 90, Black wins: 144
+iteration: 25
+Movetypes: {'CLASSIC': 3066, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 456}
+Random agent: trueskill.Rating(mu=18.174, sigma=1.145)
+Heuristic agent: trueskill.Rating(mu=24.572, sigma=0.845)
+Low MCTS agent: trueskill.Rating(mu=29.044, sigma=0.862)
+High MCTS agent: trueskill.Rating(mu=30.372, sigma=0.892)
+Draw: 67, White wins: 93, Black wins: 152
+iteration: 26
+Movetypes: {'CLASSIC': 3193, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 474}
+Random agent: trueskill.Rating(mu=18.395, sigma=1.125)
+Heuristic agent: trueskill.Rating(mu=24.517, sigma=0.835)
+Low MCTS agent: trueskill.Rating(mu=28.976, sigma=0.856)
+High MCTS agent: trueskill.Rating(mu=30.376, sigma=0.883)
+Draw: 70, White wins: 95, Black wins: 159
+iteration: 27
+Movetypes: {'CLASSIC': 3290, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 493}
+Random agent: trueskill.Rating(mu=18.460, sigma=1.103)
+Heuristic agent: trueskill.Rating(mu=24.413, sigma=0.830)
+Low MCTS agent: trueskill.Rating(mu=29.151, sigma=0.857)
+High MCTS agent: trueskill.Rating(mu=30.267, sigma=0.877)
+Draw: 72, White wins: 99, Black wins: 165
+iteration: 28
+Movetypes: {'CLASSIC': 3431, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 511}
+Random agent: trueskill.Rating(mu=18.250, sigma=1.095)
+Heuristic agent: trueskill.Rating(mu=24.451, sigma=0.830)
+Low MCTS agent: trueskill.Rating(mu=29.070, sigma=0.850)
+High MCTS agent: trueskill.Rating(mu=30.444, sigma=0.876)
+Draw: 74, White wins: 103, Black wins: 171
+iteration: 29
+Movetypes: {'CLASSIC': 3540, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 527}
+Random agent: trueskill.Rating(mu=18.057, sigma=1.088)
+Heuristic agent: trueskill.Rating(mu=24.485, sigma=0.830)
+Low MCTS agent: trueskill.Rating(mu=29.000, sigma=0.845)
+High MCTS agent: trueskill.Rating(mu=30.607, sigma=0.874)
+Draw: 76, White wins: 107, Black wins: 177
+iteration: 30
+Movetypes: {'CLASSIC': 3635, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 545}
+Random agent: trueskill.Rating(mu=18.145, sigma=1.072)
+Heuristic agent: trueskill.Rating(mu=24.372, sigma=0.825)
+Low MCTS agent: trueskill.Rating(mu=28.966, sigma=0.848)
+High MCTS agent: trueskill.Rating(mu=30.710, sigma=0.871)
+Draw: 78, White wins: 112, Black wins: 182
+iteration: 31
+Movetypes: {'CLASSIC': 3738, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 565}
+Random agent: trueskill.Rating(mu=18.224, sigma=1.058)
+Heuristic agent: trueskill.Rating(mu=24.406, sigma=0.817)
+Low MCTS agent: trueskill.Rating(mu=29.002, sigma=0.846)
+High MCTS agent: trueskill.Rating(mu=30.583, sigma=0.868)
+Draw: 81, White wins: 115, Black wins: 188
+iteration: 32
+Movetypes: {'CLASSIC': 3812, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 584}
+Random agent: trueskill.Rating(mu=18.291, sigma=1.045)
+Heuristic agent: trueskill.Rating(mu=24.311, sigma=0.814)
+Low MCTS agent: trueskill.Rating(mu=29.166, sigma=0.848)
+High MCTS agent: trueskill.Rating(mu=30.472, sigma=0.864)
+Draw: 83, White wins: 119, Black wins: 194
+iteration: 33
+Movetypes: {'CLASSIC': 3930, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 602}
+Random agent: trueskill.Rating(mu=18.341, sigma=1.033)
+Heuristic agent: trueskill.Rating(mu=24.233, sigma=0.812)
+Low MCTS agent: trueskill.Rating(mu=29.433, sigma=0.847)
+High MCTS agent: trueskill.Rating(mu=30.253, sigma=0.858)
+Draw: 86, White wins: 122, Black wins: 200
+iteration: 34
+Movetypes: {'CLASSIC': 4041, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 618}
+Random agent: trueskill.Rating(mu=18.392, sigma=1.022)
+Heuristic agent: trueskill.Rating(mu=24.162, sigma=0.810)
+Low MCTS agent: trueskill.Rating(mu=29.471, sigma=0.846)
+High MCTS agent: trueskill.Rating(mu=30.262, sigma=0.853)
+Draw: 89, White wins: 126, Black wins: 205
+iteration: 35
+Movetypes: {'CLASSIC': 4165, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 635}
+Random agent: trueskill.Rating(mu=18.213, sigma=1.020)
+Heuristic agent: trueskill.Rating(mu=24.360, sigma=0.808)
+Low MCTS agent: trueskill.Rating(mu=29.363, sigma=0.842)
+High MCTS agent: trueskill.Rating(mu=30.276, sigma=0.849)
+Draw: 92, White wins: 129, Black wins: 211
+iteration: 36
+Movetypes: {'CLASSIC': 4295, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 652}
+Random agent: trueskill.Rating(mu=18.046, sigma=1.020)
+Heuristic agent: trueskill.Rating(mu=24.546, sigma=0.807)
+Low MCTS agent: trueskill.Rating(mu=29.268, sigma=0.838)
+High MCTS agent: trueskill.Rating(mu=30.284, sigma=0.845)
+Draw: 95, White wins: 132, Black wins: 217
+iteration: 37
+Movetypes: {'CLASSIC': 4395, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 671}
+Random agent: trueskill.Rating(mu=17.887, sigma=1.020)
+Heuristic agent: trueskill.Rating(mu=24.581, sigma=0.810)
+Low MCTS agent: trueskill.Rating(mu=29.413, sigma=0.842)
+High MCTS agent: trueskill.Rating(mu=30.207, sigma=0.845)
+Draw: 96, White wins: 136, Black wins: 224
+iteration: 38
+Movetypes: {'CLASSIC': 4474, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 689}
+Random agent: trueskill.Rating(mu=17.737, sigma=1.021)
+Heuristic agent: trueskill.Rating(mu=24.604, sigma=0.813)
+Low MCTS agent: trueskill.Rating(mu=29.412, sigma=0.840)
+High MCTS agent: trueskill.Rating(mu=30.287, sigma=0.849)
+Draw: 97, White wins: 140, Black wins: 231
+iteration: 39
+Movetypes: {'CLASSIC': 4597, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 707}
+Random agent: trueskill.Rating(mu=17.837, sigma=1.013)
+Heuristic agent: trueskill.Rating(mu=24.617, sigma=0.806)
+Low MCTS agent: trueskill.Rating(mu=29.310, sigma=0.837)
+High MCTS agent: trueskill.Rating(mu=30.307, sigma=0.845)
+Draw: 101, White wins: 143, Black wins: 236
+iteration: 40
+Movetypes: {'CLASSIC': 4705, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 727}
+Random agent: trueskill.Rating(mu=17.691, sigma=1.015)
+Heuristic agent: trueskill.Rating(mu=24.778, sigma=0.806)
+Low MCTS agent: trueskill.Rating(mu=29.309, sigma=0.836)
+High MCTS agent: trueskill.Rating(mu=30.232, sigma=0.844)
+Draw: 103, White wins: 146, Black wins: 243
+iteration: 41
+Movetypes: {'CLASSIC': 4828, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 745}
+Random agent: trueskill.Rating(mu=17.797, sigma=1.008)
+Heuristic agent: trueskill.Rating(mu=24.642, sigma=0.804)
+Low MCTS agent: trueskill.Rating(mu=29.555, sigma=0.837)
+High MCTS agent: trueskill.Rating(mu=30.058, sigma=0.840)
+Draw: 106, White wins: 150, Black wins: 248
+iteration: 42
+Movetypes: {'CLASSIC': 4992, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 762}
+Random agent: trueskill.Rating(mu=17.997, sigma=0.998)
+Heuristic agent: trueskill.Rating(mu=24.675, sigma=0.807)
+Low MCTS agent: trueskill.Rating(mu=29.784, sigma=0.839)
+High MCTS agent: trueskill.Rating(mu=29.659, sigma=0.830)
+Draw: 109, White wins: 153, Black wins: 254
+iteration: 43
+Movetypes: {'CLASSIC': 5101, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 781}
+Random agent: trueskill.Rating(mu=18.298, sigma=0.983)
+Heuristic agent: trueskill.Rating(mu=24.542, sigma=0.797)
+Low MCTS agent: trueskill.Rating(mu=29.749, sigma=0.838)
+High MCTS agent: trueskill.Rating(mu=29.625, sigma=0.831)
+Draw: 113, White wins: 155, Black wins: 260
+iteration: 44
+Movetypes: {'CLASSIC': 5206, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 797}
+Random agent: trueskill.Rating(mu=18.139, sigma=0.985)
+Heuristic agent: trueskill.Rating(mu=24.439, sigma=0.804)
+Low MCTS agent: trueskill.Rating(mu=29.959, sigma=0.839)
+High MCTS agent: trueskill.Rating(mu=29.641, sigma=0.832)
+Draw: 114, White wins: 160, Black wins: 266
+iteration: 45
+Movetypes: {'CLASSIC': 5345, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 811}
+Random agent: trueskill.Rating(mu=18.204, sigma=0.980)
+Heuristic agent: trueskill.Rating(mu=24.340, sigma=0.803)
+Low MCTS agent: trueskill.Rating(mu=29.901, sigma=0.833)
+High MCTS agent: trueskill.Rating(mu=29.759, sigma=0.831)
+Draw: 118, White wins: 164, Black wins: 270
+iteration: 46
+Movetypes: {'CLASSIC': 5485, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 827}
+Random agent: trueskill.Rating(mu=18.046, sigma=0.982)
+Heuristic agent: trueskill.Rating(mu=24.389, sigma=0.806)
+Low MCTS agent: trueskill.Rating(mu=29.997, sigma=0.832)
+High MCTS agent: trueskill.Rating(mu=29.724, sigma=0.826)
+Draw: 121, White wins: 168, Black wins: 275
+iteration: 47
+Movetypes: {'CLASSIC': 5573, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 847}
+Random agent: trueskill.Rating(mu=17.894, sigma=0.985)
+Heuristic agent: trueskill.Rating(mu=24.298, sigma=0.813)
+Low MCTS agent: trueskill.Rating(mu=30.087, sigma=0.837)
+High MCTS agent: trueskill.Rating(mu=29.837, sigma=0.831)
+Draw: 121, White wins: 173, Black wins: 282
+iteration: 48
+Movetypes: {'CLASSIC': 5667, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 864}
+Random agent: trueskill.Rating(mu=17.749, sigma=0.988)
+Heuristic agent: trueskill.Rating(mu=24.207, sigma=0.820)
+Low MCTS agent: trueskill.Rating(mu=30.077, sigma=0.840)
+High MCTS agent: trueskill.Rating(mu=30.046, sigma=0.833)
+Draw: 122, White wins: 178, Black wins: 288
+iteration: 49
+Movetypes: {'CLASSIC': 5773, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 881}
+Random agent: trueskill.Rating(mu=17.833, sigma=0.984)
+Heuristic agent: trueskill.Rating(mu=24.118, sigma=0.817)
+Low MCTS agent: trueskill.Rating(mu=29.912, sigma=0.836)
+High MCTS agent: trueskill.Rating(mu=30.243, sigma=0.835)
+Draw: 125, White wins: 181, Black wins: 294
+iteration: 50
+Movetypes: {'CLASSIC': 5858, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 900}
+Random agent: trueskill.Rating(mu=17.687, sigma=0.987)
+Heuristic agent: trueskill.Rating(mu=24.182, sigma=0.819)
+Low MCTS agent: trueskill.Rating(mu=30.019, sigma=0.841)
+High MCTS agent: trueskill.Rating(mu=30.174, sigma=0.835)
+Draw: 126, White wins: 185, Black wins: 301
+iteration: 51
+Movetypes: {'CLASSIC': 5936, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 919}
+Random agent: trueskill.Rating(mu=17.546, sigma=0.991)
+Heuristic agent: trueskill.Rating(mu=24.098, sigma=0.826)
+Low MCTS agent: trueskill.Rating(mu=30.118, sigma=0.845)
+High MCTS agent: trueskill.Rating(mu=30.265, sigma=0.840)
+Draw: 126, White wins: 190, Black wins: 308
+iteration: 52
+Movetypes: {'CLASSIC': 6042, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 938}
+Random agent: trueskill.Rating(mu=17.409, sigma=0.995)
+Heuristic agent: trueskill.Rating(mu=24.313, sigma=0.822)
+Low MCTS agent: trueskill.Rating(mu=30.059, sigma=0.844)
+High MCTS agent: trueskill.Rating(mu=30.197, sigma=0.840)
+Draw: 128, White wins: 193, Black wins: 315
+iteration: 53
+Movetypes: {'CLASSIC': 6204, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 954}
+Random agent: trueskill.Rating(mu=17.515, sigma=0.991)
+Heuristic agent: trueskill.Rating(mu=24.357, sigma=0.815)
+Low MCTS agent: trueskill.Rating(mu=30.002, sigma=0.838)
+High MCTS agent: trueskill.Rating(mu=30.133, sigma=0.834)
+Draw: 133, White wins: 196, Black wins: 319
+iteration: 54
+Movetypes: {'CLASSIC': 6311, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 972}
+Random agent: trueskill.Rating(mu=17.386, sigma=0.995)
+Heuristic agent: trueskill.Rating(mu=24.403, sigma=0.818)
+Low MCTS agent: trueskill.Rating(mu=29.852, sigma=0.835)
+High MCTS agent: trueskill.Rating(mu=30.323, sigma=0.837)
+Draw: 135, White wins: 201, Black wins: 324
+iteration: 55
+Movetypes: {'CLASSIC': 6405, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 989}
+Random agent: trueskill.Rating(mu=17.610, sigma=0.988)
+Heuristic agent: trueskill.Rating(mu=24.451, sigma=0.821)
+Low MCTS agent: trueskill.Rating(mu=29.570, sigma=0.828)
+High MCTS agent: trueskill.Rating(mu=30.401, sigma=0.842)
+Draw: 137, White wins: 204, Black wins: 331
+iteration: 56
+Movetypes: {'CLASSIC': 6521, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1006}
+Random agent: trueskill.Rating(mu=17.476, sigma=0.992)
+Heuristic agent: trueskill.Rating(mu=24.486, sigma=0.822)
+Low MCTS agent: trueskill.Rating(mu=29.462, sigma=0.826)
+High MCTS agent: trueskill.Rating(mu=30.573, sigma=0.844)
+Draw: 139, White wins: 208, Black wins: 337
+iteration: 57
+Movetypes: {'CLASSIC': 6618, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1025}
+Random agent: trueskill.Rating(mu=17.809, sigma=0.979)
+Heuristic agent: trueskill.Rating(mu=24.359, sigma=0.810)
+Low MCTS agent: trueskill.Rating(mu=29.449, sigma=0.827)
+High MCTS agent: trueskill.Rating(mu=30.480, sigma=0.844)
+Draw: 143, White wins: 210, Black wins: 343
+iteration: 58
+Movetypes: {'CLASSIC': 6737, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1042}
+Random agent: trueskill.Rating(mu=18.202, sigma=0.969)
+Heuristic agent: trueskill.Rating(mu=24.056, sigma=0.805)
+Low MCTS agent: trueskill.Rating(mu=29.494, sigma=0.829)
+High MCTS agent: trueskill.Rating(mu=30.468, sigma=0.841)
+Draw: 146, White wins: 213, Black wins: 349
+iteration: 59
+Movetypes: {'CLASSIC': 6845, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1060}
+Random agent: trueskill.Rating(mu=18.354, sigma=0.968)
+Heuristic agent: trueskill.Rating(mu=24.061, sigma=0.802)
+Low MCTS agent: trueskill.Rating(mu=29.479, sigma=0.829)
+High MCTS agent: trueskill.Rating(mu=30.362, sigma=0.841)
+Draw: 148, White wins: 216, Black wins: 356
+iteration: 60
+Movetypes: {'CLASSIC': 6924, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1078}
+Random agent: trueskill.Rating(mu=18.192, sigma=0.971)
+Heuristic agent: trueskill.Rating(mu=24.125, sigma=0.805)
+Low MCTS agent: trueskill.Rating(mu=29.461, sigma=0.829)
+High MCTS agent: trueskill.Rating(mu=30.433, sigma=0.845)
+Draw: 149, White wins: 221, Black wins: 362
+iteration: 61
+Movetypes: {'CLASSIC': 6989, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1096}
+Random agent: trueskill.Rating(mu=18.038, sigma=0.974)
+Heuristic agent: trueskill.Rating(mu=24.045, sigma=0.812)
+Low MCTS agent: trueskill.Rating(mu=29.598, sigma=0.833)
+High MCTS agent: trueskill.Rating(mu=30.496, sigma=0.849)
+Draw: 149, White wins: 226, Black wins: 369
+iteration: 62
+Movetypes: {'CLASSIC': 7118, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1111}
+Random agent: trueskill.Rating(mu=17.886, sigma=0.978)
+Heuristic agent: trueskill.Rating(mu=24.114, sigma=0.815)
+Low MCTS agent: trueskill.Rating(mu=29.586, sigma=0.828)
+High MCTS agent: trueskill.Rating(mu=30.548, sigma=0.848)
+Draw: 152, White wins: 230, Black wins: 374
+iteration: 63
+Movetypes: {'CLASSIC': 7235, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1129}
+Random agent: trueskill.Rating(mu=17.742, sigma=0.982)
+Heuristic agent: trueskill.Rating(mu=24.180, sigma=0.817)
+Low MCTS agent: trueskill.Rating(mu=29.817, sigma=0.831)
+High MCTS agent: trueskill.Rating(mu=30.340, sigma=0.844)
+Draw: 154, White wins: 234, Black wins: 380
+iteration: 64
+Movetypes: {'CLASSIC': 7300, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1148}
+Random agent: trueskill.Rating(mu=17.820, sigma=0.978)
+Heuristic agent: trueskill.Rating(mu=23.943, sigma=0.819)
+Low MCTS agent: trueskill.Rating(mu=29.930, sigma=0.836)
+High MCTS agent: trueskill.Rating(mu=30.416, sigma=0.848)
+Draw: 155, White wins: 239, Black wins: 386
+iteration: 65
+Movetypes: {'CLASSIC': 7422, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1165}
+Random agent: trueskill.Rating(mu=17.894, sigma=0.974)
+Heuristic agent: trueskill.Rating(mu=24.023, sigma=0.813)
+Low MCTS agent: trueskill.Rating(mu=29.785, sigma=0.834)
+High MCTS agent: trueskill.Rating(mu=30.424, sigma=0.845)
+Draw: 159, White wins: 242, Black wins: 391
+iteration: 66
+Movetypes: {'CLASSIC': 7513, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1185}
+Random agent: trueskill.Rating(mu=17.747, sigma=0.978)
+Heuristic agent: trueskill.Rating(mu=24.095, sigma=0.815)
+Low MCTS agent: trueskill.Rating(mu=29.744, sigma=0.834)
+High MCTS agent: trueskill.Rating(mu=30.498, sigma=0.850)
+Draw: 160, White wins: 246, Black wins: 398
+iteration: 67
+Movetypes: {'CLASSIC': 7589, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1204}
+Random agent: trueskill.Rating(mu=17.609, sigma=0.983)
+Heuristic agent: trueskill.Rating(mu=24.163, sigma=0.818)
+Low MCTS agent: trueskill.Rating(mu=29.861, sigma=0.839)
+High MCTS agent: trueskill.Rating(mu=30.405, sigma=0.848)
+Draw: 161, White wins: 250, Black wins: 405
+iteration: 68
+Movetypes: {'CLASSIC': 7722, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1222}
+Random agent: trueskill.Rating(mu=17.814, sigma=0.976)
+Heuristic agent: trueskill.Rating(mu=24.375, sigma=0.816)
+Low MCTS agent: trueskill.Rating(mu=29.577, sigma=0.832)
+High MCTS agent: trueskill.Rating(mu=30.319, sigma=0.848)
+Draw: 164, White wins: 252, Black wins: 412
+iteration: 69
+Movetypes: {'CLASSIC': 7839, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1239}
+Random agent: trueskill.Rating(mu=17.676, sigma=0.981)
+Heuristic agent: trueskill.Rating(mu=24.424, sigma=0.818)
+Low MCTS agent: trueskill.Rating(mu=29.602, sigma=0.833)
+High MCTS agent: trueskill.Rating(mu=30.343, sigma=0.844)
+Draw: 166, White wins: 256, Black wins: 418
+iteration: 70
+Movetypes: {'CLASSIC': 7958, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1259}
+Random agent: trueskill.Rating(mu=17.543, sigma=0.985)
+Heuristic agent: trueskill.Rating(mu=24.609, sigma=0.815)
+Low MCTS agent: trueskill.Rating(mu=29.580, sigma=0.833)
+High MCTS agent: trueskill.Rating(mu=30.267, sigma=0.843)
+Draw: 168, White wins: 259, Black wins: 425
+iteration: 71
+Movetypes: {'CLASSIC': 8052, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1279}
+Random agent: trueskill.Rating(mu=17.414, sigma=0.990)
+Heuristic agent: trueskill.Rating(mu=24.640, sigma=0.818)
+Low MCTS agent: trueskill.Rating(mu=29.706, sigma=0.838)
+High MCTS agent: trueskill.Rating(mu=30.199, sigma=0.843)
+Draw: 169, White wins: 263, Black wins: 432
+iteration: 72
+Movetypes: {'CLASSIC': 8182, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1295}
+Random agent: trueskill.Rating(mu=17.528, sigma=0.986)
+Heuristic agent: trueskill.Rating(mu=24.649, sigma=0.811)
+Low MCTS agent: trueskill.Rating(mu=29.585, sigma=0.834)
+High MCTS agent: trueskill.Rating(mu=30.229, sigma=0.839)
+Draw: 173, White wins: 266, Black wins: 437
+iteration: 73
+Movetypes: {'CLASSIC': 8300, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1313}
+Random agent: trueskill.Rating(mu=17.401, sigma=0.991)
+Heuristic agent: trueskill.Rating(mu=24.677, sigma=0.814)
+Low MCTS agent: trueskill.Rating(mu=29.674, sigma=0.832)
+High MCTS agent: trueskill.Rating(mu=30.200, sigma=0.841)
+Draw: 175, White wins: 270, Black wins: 443
+iteration: 74
+Movetypes: {'CLASSIC': 8429, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1331}
+Random agent: trueskill.Rating(mu=17.277, sigma=0.996)
+Heuristic agent: trueskill.Rating(mu=24.696, sigma=0.816)
+Low MCTS agent: trueskill.Rating(mu=29.757, sigma=0.829)
+High MCTS agent: trueskill.Rating(mu=30.184, sigma=0.842)
+Draw: 177, White wins: 274, Black wins: 449
+iteration: 75
+Movetypes: {'CLASSIC': 8542, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1349}
+Random agent: trueskill.Rating(mu=17.496, sigma=0.994)
+Heuristic agent: trueskill.Rating(mu=24.502, sigma=0.815)
+Low MCTS agent: trueskill.Rating(mu=29.772, sigma=0.831)
+High MCTS agent: trueskill.Rating(mu=30.216, sigma=0.839)
+Draw: 179, White wins: 277, Black wins: 456
+iteration: 76
+Movetypes: {'CLASSIC': 8633, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1368}
+Random agent: trueskill.Rating(mu=17.368, sigma=0.998)
+Heuristic agent: trueskill.Rating(mu=24.541, sigma=0.817)
+Low MCTS agent: trueskill.Rating(mu=29.883, sigma=0.836)
+High MCTS agent: trueskill.Rating(mu=30.154, sigma=0.839)
+Draw: 180, White wins: 281, Black wins: 463
+iteration: 77
+Movetypes: {'CLASSIC': 8817, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1383}
+Random agent: trueskill.Rating(mu=17.246, sigma=1.003)
+Heuristic agent: trueskill.Rating(mu=24.849, sigma=0.812)
+Low MCTS agent: trueskill.Rating(mu=29.708, sigma=0.826)
+High MCTS agent: trueskill.Rating(mu=30.088, sigma=0.833)
+Draw: 185, White wins: 284, Black wins: 467
+iteration: 78
+Movetypes: {'CLASSIC': 8977, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1399}
+Random agent: trueskill.Rating(mu=17.129, sigma=1.008)
+Heuristic agent: trueskill.Rating(mu=24.998, sigma=0.810)
+Low MCTS agent: trueskill.Rating(mu=29.589, sigma=0.824)
+High MCTS agent: trueskill.Rating(mu=30.131, sigma=0.832)
+Draw: 188, White wins: 287, Black wins: 473
+iteration: 79
+Movetypes: {'CLASSIC': 9062, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1418}
+Random agent: trueskill.Rating(mu=17.271, sigma=1.003)
+Heuristic agent: trueskill.Rating(mu=24.699, sigma=0.812)
+Low MCTS agent: trueskill.Rating(mu=29.524, sigma=0.829)
+High MCTS agent: trueskill.Rating(mu=30.418, sigma=0.838)
+Draw: 189, White wins: 292, Black wins: 479
+iteration: 80
+Movetypes: {'CLASSIC': 9139, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1437}
+Random agent: trueskill.Rating(mu=17.628, sigma=0.989)
+Heuristic agent: trueskill.Rating(mu=24.268, sigma=0.809)
+Low MCTS agent: trueskill.Rating(mu=29.661, sigma=0.834)
+High MCTS agent: trueskill.Rating(mu=30.487, sigma=0.843)
+Draw: 191, White wins: 296, Black wins: 485
+iteration: 81
+Movetypes: {'CLASSIC': 9258, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1455}
+Random agent: trueskill.Rating(mu=17.719, sigma=0.984)
+Heuristic agent: trueskill.Rating(mu=24.175, sigma=0.808)
+Low MCTS agent: trueskill.Rating(mu=29.691, sigma=0.837)
+High MCTS agent: trueskill.Rating(mu=30.493, sigma=0.840)
+Draw: 194, White wins: 299, Black wins: 491
+iteration: 82
+Movetypes: {'CLASSIC': 9371, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1471}
+Random agent: trueskill.Rating(mu=17.907, sigma=0.982)
+Heuristic agent: trueskill.Rating(mu=24.013, sigma=0.808)
+Low MCTS agent: trueskill.Rating(mu=29.571, sigma=0.834)
+High MCTS agent: trueskill.Rating(mu=30.652, sigma=0.843)
+Draw: 196, White wins: 302, Black wins: 498
+iteration: 83
+Movetypes: {'CLASSIC': 9510, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1486}
+Random agent: trueskill.Rating(mu=18.491, sigma=0.959)
+Heuristic agent: trueskill.Rating(mu=23.949, sigma=0.799)
+Low MCTS agent: trueskill.Rating(mu=29.233, sigma=0.825)
+High MCTS agent: trueskill.Rating(mu=30.638, sigma=0.840)
+Draw: 202, White wins: 303, Black wins: 503
+iteration: 84
+Movetypes: {'CLASSIC': 9619, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1503}
+Random agent: trueskill.Rating(mu=18.325, sigma=0.963)
+Heuristic agent: trueskill.Rating(mu=24.034, sigma=0.802)
+Low MCTS agent: trueskill.Rating(mu=29.284, sigma=0.827)
+High MCTS agent: trueskill.Rating(mu=30.618, sigma=0.838)
+Draw: 204, White wins: 307, Black wins: 509
+iteration: 85
+Movetypes: {'CLASSIC': 9757, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1519}
+Random agent: trueskill.Rating(mu=18.653, sigma=0.954)
+Heuristic agent: trueskill.Rating(mu=23.910, sigma=0.795)
+Low MCTS agent: trueskill.Rating(mu=29.387, sigma=0.824)
+High MCTS agent: trueskill.Rating(mu=30.397, sigma=0.835)
+Draw: 208, White wins: 310, Black wins: 514
+iteration: 86
+Movetypes: {'CLASSIC': 9922, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1533}
+Random agent: trueskill.Rating(mu=18.771, sigma=0.952)
+Heuristic agent: trueskill.Rating(mu=23.914, sigma=0.793)
+Low MCTS agent: trueskill.Rating(mu=29.253, sigma=0.816)
+High MCTS agent: trueskill.Rating(mu=30.442, sigma=0.835)
+Draw: 212, White wins: 313, Black wins: 519
+iteration: 87
+Movetypes: {'CLASSIC': 10001, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1551}
+Random agent: trueskill.Rating(mu=18.783, sigma=0.949)
+Heuristic agent: trueskill.Rating(mu=23.857, sigma=0.794)
+Low MCTS agent: trueskill.Rating(mu=29.254, sigma=0.817)
+High MCTS agent: trueskill.Rating(mu=30.494, sigma=0.840)
+Draw: 214, White wins: 317, Black wins: 525
+iteration: 88
+Movetypes: {'CLASSIC': 10110, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1568}
+Random agent: trueskill.Rating(mu=18.607, sigma=0.951)
+Heuristic agent: trueskill.Rating(mu=23.929, sigma=0.798)
+Low MCTS agent: trueskill.Rating(mu=29.165, sigma=0.815)
+High MCTS agent: trueskill.Rating(mu=30.644, sigma=0.842)
+Draw: 216, White wins: 321, Black wins: 531
+iteration: 89
+Movetypes: {'CLASSIC': 10266, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1585}
+Random agent: trueskill.Rating(mu=18.827, sigma=0.946)
+Heuristic agent: trueskill.Rating(mu=24.147, sigma=0.798)
+Low MCTS agent: trueskill.Rating(mu=29.088, sigma=0.814)
+High MCTS agent: trueskill.Rating(mu=30.315, sigma=0.834)
+Draw: 219, White wins: 323, Black wins: 538
+iteration: 90
+Movetypes: {'CLASSIC': 10402, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1603}
+Random agent: trueskill.Rating(mu=18.840, sigma=0.942)
+Heuristic agent: trueskill.Rating(mu=24.212, sigma=0.793)
+Low MCTS agent: trueskill.Rating(mu=29.205, sigma=0.812)
+High MCTS agent: trueskill.Rating(mu=30.111, sigma=0.831)
+Draw: 223, White wins: 326, Black wins: 543
+iteration: 91
+Movetypes: {'CLASSIC': 10552, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1621}
+Random agent: trueskill.Rating(mu=18.667, sigma=0.945)
+Heuristic agent: trueskill.Rating(mu=24.397, sigma=0.793)
+Low MCTS agent: trueskill.Rating(mu=29.117, sigma=0.812)
+High MCTS agent: trueskill.Rating(mu=30.134, sigma=0.828)
+Draw: 226, White wins: 329, Black wins: 549
+iteration: 92
+Movetypes: {'CLASSIC': 10666, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1638}
+Random agent: trueskill.Rating(mu=18.502, sigma=0.949)
+Heuristic agent: trueskill.Rating(mu=24.440, sigma=0.796)
+Low MCTS agent: trueskill.Rating(mu=29.173, sigma=0.815)
+High MCTS agent: trueskill.Rating(mu=30.156, sigma=0.826)
+Draw: 228, White wins: 333, Black wins: 555
+iteration: 93
+Movetypes: {'CLASSIC': 10803, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1653}
+Random agent: trueskill.Rating(mu=19.109, sigma=0.931)
+Heuristic agent: trueskill.Rating(mu=24.274, sigma=0.789)
+Low MCTS agent: trueskill.Rating(mu=29.093, sigma=0.814)
+High MCTS agent: trueskill.Rating(mu=29.956, sigma=0.818)
+Draw: 233, White wins: 334, Black wins: 561
+iteration: 94
+Movetypes: {'CLASSIC': 10941, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1669}
+Random agent: trueskill.Rating(mu=18.931, sigma=0.935)
+Heuristic agent: trueskill.Rating(mu=24.320, sigma=0.793)
+Low MCTS agent: trueskill.Rating(mu=29.112, sigma=0.810)
+High MCTS agent: trueskill.Rating(mu=30.024, sigma=0.819)
+Draw: 236, White wins: 338, Black wins: 566
+iteration: 95
+Movetypes: {'CLASSIC': 11058, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1688}
+Random agent: trueskill.Rating(mu=18.757, sigma=0.938)
+Heuristic agent: trueskill.Rating(mu=24.494, sigma=0.793)
+Low MCTS agent: trueskill.Rating(mu=29.121, sigma=0.811)
+High MCTS agent: trueskill.Rating(mu=29.961, sigma=0.820)
+Draw: 238, White wins: 341, Black wins: 573
+iteration: 96
+Movetypes: {'CLASSIC': 11150, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1707}
+Random agent: trueskill.Rating(mu=18.782, sigma=0.935)
+Heuristic agent: trueskill.Rating(mu=24.396, sigma=0.792)
+Low MCTS agent: trueskill.Rating(mu=29.260, sigma=0.816)
+High MCTS agent: trueskill.Rating(mu=29.906, sigma=0.821)
+Draw: 240, White wins: 344, Black wins: 580
+iteration: 97
+Movetypes: {'CLASSIC': 11286, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1725}
+Random agent: trueskill.Rating(mu=19.076, sigma=0.928)
+Heuristic agent: trueskill.Rating(mu=24.110, sigma=0.790)
+Low MCTS agent: trueskill.Rating(mu=29.160, sigma=0.815)
+High MCTS agent: trueskill.Rating(mu=30.089, sigma=0.824)
+Draw: 243, White wins: 347, Black wins: 586
+iteration: 98
+Movetypes: {'CLASSIC': 11424, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1743}
+Random agent: trueskill.Rating(mu=19.074, sigma=0.926)
+Heuristic agent: trueskill.Rating(mu=24.182, sigma=0.786)
+Low MCTS agent: trueskill.Rating(mu=29.260, sigma=0.813)
+High MCTS agent: trueskill.Rating(mu=29.909, sigma=0.822)
+Draw: 247, White wins: 349, Black wins: 592
+iteration: 99
+Movetypes: {'CLASSIC': 11502, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 1762}
+Random agent: trueskill.Rating(mu=18.898, sigma=0.930)
+Heuristic agent: trueskill.Rating(mu=24.240, sigma=0.790)
+Low MCTS agent: trueskill.Rating(mu=29.387, sigma=0.819)
+High MCTS agent: trueskill.Rating(mu=29.855, sigma=0.823)
+Draw: 248, White wins: 353, Black wins: 599
+----------------------------------------------------------------------------------------------------
+Rule: CheckersRules.QUANTUM_V1
+Board size: 5x5
+----------------------------------------------------------------------------------------------------
+iteration: 0
+Movetypes: {'CLASSIC': 50, 'SPLIT': 20, 'ENTANGLE': 0, 'TAKE': 25}
+Random agent: trueskill.Rating(mu=22.144, sigma=3.749)
+Heuristic agent: trueskill.Rating(mu=22.366, sigma=3.875)
+Low MCTS agent: trueskill.Rating(mu=24.308, sigma=4.103)
+High MCTS agent: trueskill.Rating(mu=32.633, sigma=4.622)
+Draw: 0, White wins: 5, Black wins: 7
+iteration: 1
+Movetypes: {'CLASSIC': 147, 'SPLIT': 66, 'ENTANGLE': 0, 'TAKE': 51}
+Random agent: trueskill.Rating(mu=24.032, sigma=2.509)
+Heuristic agent: trueskill.Rating(mu=24.920, sigma=2.453)
+Low MCTS agent: trueskill.Rating(mu=26.512, sigma=2.457)
+High MCTS agent: trueskill.Rating(mu=24.772, sigma=2.645)
+Draw: 3, White wins: 9, Black wins: 12
+iteration: 2
+Movetypes: {'CLASSIC': 204, 'SPLIT': 102, 'ENTANGLE': 0, 'TAKE': 76}
+Random agent: trueskill.Rating(mu=24.131, sigma=1.918)
+Heuristic agent: trueskill.Rating(mu=22.927, sigma=1.915)
+Low MCTS agent: trueskill.Rating(mu=27.703, sigma=2.014)
+High MCTS agent: trueskill.Rating(mu=24.963, sigma=2.075)
+Draw: 5, White wins: 14, Black wins: 17
+iteration: 3
+Movetypes: {'CLASSIC': 307, 'SPLIT': 133, 'ENTANGLE': 0, 'TAKE': 104}
+Random agent: trueskill.Rating(mu=23.408, sigma=1.633)
+Heuristic agent: trueskill.Rating(mu=24.102, sigma=1.594)
+Low MCTS agent: trueskill.Rating(mu=26.479, sigma=1.666)
+High MCTS agent: trueskill.Rating(mu=25.671, sigma=1.682)
+Draw: 9, White wins: 17, Black wins: 22
+iteration: 4
+Movetypes: {'CLASSIC': 454, 'SPLIT': 158, 'ENTANGLE': 0, 'TAKE': 129}
+Random agent: trueskill.Rating(mu=22.681, sigma=1.471)
+Heuristic agent: trueskill.Rating(mu=24.071, sigma=1.427)
+Low MCTS agent: trueskill.Rating(mu=26.967, sigma=1.482)
+High MCTS agent: trueskill.Rating(mu=26.035, sigma=1.460)
+Draw: 11, White wins: 21, Black wins: 28
+iteration: 5
+Movetypes: {'CLASSIC': 502, 'SPLIT': 176, 'ENTANGLE': 0, 'TAKE': 156}
+Random agent: trueskill.Rating(mu=21.614, sigma=1.368)
+Heuristic agent: trueskill.Rating(mu=23.775, sigma=1.322)
+Low MCTS agent: trueskill.Rating(mu=27.530, sigma=1.370)
+High MCTS agent: trueskill.Rating(mu=26.800, sigma=1.347)
+Draw: 11, White wins: 28, Black wins: 33
+iteration: 6
+Movetypes: {'CLASSIC': 651, 'SPLIT': 211, 'ENTANGLE': 0, 'TAKE': 186}
+Random agent: trueskill.Rating(mu=21.869, sigma=1.277)
+Heuristic agent: trueskill.Rating(mu=24.028, sigma=1.229)
+Low MCTS agent: trueskill.Rating(mu=27.418, sigma=1.259)
+High MCTS agent: trueskill.Rating(mu=26.409, sigma=1.231)
+Draw: 13, White wins: 35, Black wins: 36
+iteration: 7
+Movetypes: {'CLASSIC': 804, 'SPLIT': 249, 'ENTANGLE': 0, 'TAKE': 207}
+Random agent: trueskill.Rating(mu=22.892, sigma=1.191)
+Heuristic agent: trueskill.Rating(mu=23.711, sigma=1.134)
+Low MCTS agent: trueskill.Rating(mu=27.315, sigma=1.167)
+High MCTS agent: trueskill.Rating(mu=25.915, sigma=1.137)
+Draw: 17, White wins: 37, Black wins: 42
+iteration: 8
+Movetypes: {'CLASSIC': 892, 'SPLIT': 275, 'ENTANGLE': 0, 'TAKE': 235}
+Random agent: trueskill.Rating(mu=22.861, sigma=1.131)
+Heuristic agent: trueskill.Rating(mu=23.217, sigma=1.087)
+Low MCTS agent: trueskill.Rating(mu=27.649, sigma=1.118)
+High MCTS agent: trueskill.Rating(mu=26.101, sigma=1.084)
+Draw: 17, White wins: 42, Black wins: 49
+iteration: 9
+Movetypes: {'CLASSIC': 982, 'SPLIT': 312, 'ENTANGLE': 0, 'TAKE': 267}
+Random agent: trueskill.Rating(mu=22.138, sigma=1.088)
+Heuristic agent: trueskill.Rating(mu=23.145, sigma=1.051)
+Low MCTS agent: trueskill.Rating(mu=27.914, sigma=1.079)
+High MCTS agent: trueskill.Rating(mu=26.567, sigma=1.046)
+Draw: 17, White wins: 49, Black wins: 54
+iteration: 10
+Movetypes: {'CLASSIC': 1074, 'SPLIT': 350, 'ENTANGLE': 0, 'TAKE': 294}
+Random agent: trueskill.Rating(mu=22.089, sigma=1.044)
+Heuristic agent: trueskill.Rating(mu=23.236, sigma=1.011)
+Low MCTS agent: trueskill.Rating(mu=27.452, sigma=1.026)
+High MCTS agent: trueskill.Rating(mu=26.966, sigma=1.006)
+Draw: 20, White wins: 55, Black wins: 57
+iteration: 11
+Movetypes: {'CLASSIC': 1199, 'SPLIT': 378, 'ENTANGLE': 0, 'TAKE': 317}
+Random agent: trueskill.Rating(mu=21.877, sigma=1.013)
+Heuristic agent: trueskill.Rating(mu=23.455, sigma=0.983)
+Low MCTS agent: trueskill.Rating(mu=27.835, sigma=0.996)
+High MCTS agent: trueskill.Rating(mu=26.574, sigma=0.971)
+Draw: 21, White wins: 63, Black wins: 60
+iteration: 12
+Movetypes: {'CLASSIC': 1303, 'SPLIT': 403, 'ENTANGLE': 0, 'TAKE': 344}
+Random agent: trueskill.Rating(mu=21.569, sigma=0.988)
+Heuristic agent: trueskill.Rating(mu=23.632, sigma=0.950)
+Low MCTS agent: trueskill.Rating(mu=28.038, sigma=0.976)
+High MCTS agent: trueskill.Rating(mu=26.490, sigma=0.943)
+Draw: 23, White wins: 68, Black wins: 65
+iteration: 13
+Movetypes: {'CLASSIC': 1402, 'SPLIT': 435, 'ENTANGLE': 0, 'TAKE': 375}
+Random agent: trueskill.Rating(mu=21.303, sigma=0.966)
+Heuristic agent: trueskill.Rating(mu=23.684, sigma=0.919)
+Low MCTS agent: trueskill.Rating(mu=27.783, sigma=0.951)
+High MCTS agent: trueskill.Rating(mu=26.911, sigma=0.922)
+Draw: 26, White wins: 72, Black wins: 70
+iteration: 14
+Movetypes: {'CLASSIC': 1476, 'SPLIT': 460, 'ENTANGLE': 0, 'TAKE': 395}
+Random agent: trueskill.Rating(mu=21.654, sigma=0.939)
+Heuristic agent: trueskill.Rating(mu=23.957, sigma=0.892)
+Low MCTS agent: trueskill.Rating(mu=27.179, sigma=0.928)
+High MCTS agent: trueskill.Rating(mu=26.867, sigma=0.896)
+Draw: 29, White wins: 73, Black wins: 78
+iteration: 15
+Movetypes: {'CLASSIC': 1553, 'SPLIT': 486, 'ENTANGLE': 0, 'TAKE': 418}
+Random agent: trueskill.Rating(mu=21.509, sigma=0.927)
+Heuristic agent: trueskill.Rating(mu=23.748, sigma=0.877)
+Low MCTS agent: trueskill.Rating(mu=27.421, sigma=0.915)
+High MCTS agent: trueskill.Rating(mu=26.989, sigma=0.883)
+Draw: 30, White wins: 78, Black wins: 84
+iteration: 16
+Movetypes: {'CLASSIC': 1662, 'SPLIT': 514, 'ENTANGLE': 0, 'TAKE': 441}
+Random agent: trueskill.Rating(mu=21.644, sigma=0.912)
+Heuristic agent: trueskill.Rating(mu=23.790, sigma=0.862)
+Low MCTS agent: trueskill.Rating(mu=27.023, sigma=0.894)
+High MCTS agent: trueskill.Rating(mu=27.199, sigma=0.868)
+Draw: 32, White wins: 82, Black wins: 90
+iteration: 17
+Movetypes: {'CLASSIC': 1801, 'SPLIT': 540, 'ENTANGLE': 0, 'TAKE': 467}
+Random agent: trueskill.Rating(mu=21.271, sigma=0.905)
+Heuristic agent: trueskill.Rating(mu=23.947, sigma=0.849)
+Low MCTS agent: trueskill.Rating(mu=27.014, sigma=0.878)
+High MCTS agent: trueskill.Rating(mu=27.383, sigma=0.856)
+Draw: 35, White wins: 86, Black wins: 95
+iteration: 18
+Movetypes: {'CLASSIC': 1889, 'SPLIT': 569, 'ENTANGLE': 0, 'TAKE': 496}
+Random agent: trueskill.Rating(mu=21.191, sigma=0.896)
+Heuristic agent: trueskill.Rating(mu=24.167, sigma=0.840)
+Low MCTS agent: trueskill.Rating(mu=26.881, sigma=0.864)
+High MCTS agent: trueskill.Rating(mu=27.357, sigma=0.850)
+Draw: 36, White wins: 89, Black wins: 103
+iteration: 19
+Movetypes: {'CLASSIC': 1958, 'SPLIT': 595, 'ENTANGLE': 0, 'TAKE': 519}
+Random agent: trueskill.Rating(mu=20.863, sigma=0.892)
+Heuristic agent: trueskill.Rating(mu=24.027, sigma=0.838)
+Low MCTS agent: trueskill.Rating(mu=27.238, sigma=0.855)
+High MCTS agent: trueskill.Rating(mu=27.449, sigma=0.844)
+Draw: 37, White wins: 94, Black wins: 109
+iteration: 20
+Movetypes: {'CLASSIC': 1990, 'SPLIT': 611, 'ENTANGLE': 0, 'TAKE': 540}
+Random agent: trueskill.Rating(mu=21.331, sigma=0.873)
+Heuristic agent: trueskill.Rating(mu=23.672, sigma=0.829)
+Low MCTS agent: trueskill.Rating(mu=27.011, sigma=0.848)
+High MCTS agent: trueskill.Rating(mu=27.609, sigma=0.839)
+Draw: 39, White wins: 99, Black wins: 114
+iteration: 21
+Movetypes: {'CLASSIC': 2066, 'SPLIT': 639, 'ENTANGLE': 0, 'TAKE': 570}
+Random agent: trueskill.Rating(mu=21.012, sigma=0.871)
+Heuristic agent: trueskill.Rating(mu=23.898, sigma=0.823)
+Low MCTS agent: trueskill.Rating(mu=26.697, sigma=0.840)
+High MCTS agent: trueskill.Rating(mu=27.980, sigma=0.839)
+Draw: 40, White wins: 105, Black wins: 119
+iteration: 22
+Movetypes: {'CLASSIC': 2152, 'SPLIT': 676, 'ENTANGLE': 0, 'TAKE': 595}
+Random agent: trueskill.Rating(mu=21.219, sigma=0.862)
+Heuristic agent: trueskill.Rating(mu=23.902, sigma=0.820)
+Low MCTS agent: trueskill.Rating(mu=26.930, sigma=0.831)
+High MCTS agent: trueskill.Rating(mu=27.550, sigma=0.828)
+Draw: 42, White wins: 111, Black wins: 123
+iteration: 23
+Movetypes: {'CLASSIC': 2295, 'SPLIT': 708, 'ENTANGLE': 0, 'TAKE': 622}
+Random agent: trueskill.Rating(mu=21.325, sigma=0.853)
+Heuristic agent: trueskill.Rating(mu=24.099, sigma=0.815)
+Low MCTS agent: trueskill.Rating(mu=26.732, sigma=0.822)
+High MCTS agent: trueskill.Rating(mu=27.447, sigma=0.818)
+Draw: 45, White wins: 116, Black wins: 127
+iteration: 24
+Movetypes: {'CLASSIC': 2353, 'SPLIT': 728, 'ENTANGLE': 0, 'TAKE': 646}
+Random agent: trueskill.Rating(mu=21.021, sigma=0.853)
+Heuristic agent: trueskill.Rating(mu=23.974, sigma=0.815)
+Low MCTS agent: trueskill.Rating(mu=27.167, sigma=0.821)
+High MCTS agent: trueskill.Rating(mu=27.423, sigma=0.818)
+Draw: 45, White wins: 122, Black wins: 133
+iteration: 25
+Movetypes: {'CLASSIC': 2408, 'SPLIT': 740, 'ENTANGLE': 0, 'TAKE': 666}
+Random agent: trueskill.Rating(mu=21.203, sigma=0.847)
+Heuristic agent: trueskill.Rating(mu=24.049, sigma=0.814)
+Low MCTS agent: trueskill.Rating(mu=27.346, sigma=0.818)
+High MCTS agent: trueskill.Rating(mu=27.001, sigma=0.814)
+Draw: 45, White wins: 129, Black wins: 138
+iteration: 26
+Movetypes: {'CLASSIC': 2535, 'SPLIT': 778, 'ENTANGLE': 0, 'TAKE': 698}
+Random agent: trueskill.Rating(mu=21.353, sigma=0.843)
+Heuristic agent: trueskill.Rating(mu=23.857, sigma=0.810)
+Low MCTS agent: trueskill.Rating(mu=27.094, sigma=0.810)
+High MCTS agent: trueskill.Rating(mu=27.304, sigma=0.813)
+Draw: 47, White wins: 135, Black wins: 142
+iteration: 27
+Movetypes: {'CLASSIC': 2690, 'SPLIT': 809, 'ENTANGLE': 0, 'TAKE': 734}
+Random agent: trueskill.Rating(mu=21.208, sigma=0.839)
+Heuristic agent: trueskill.Rating(mu=24.071, sigma=0.806)
+Low MCTS agent: trueskill.Rating(mu=27.121, sigma=0.802)
+High MCTS agent: trueskill.Rating(mu=27.195, sigma=0.810)
+Draw: 50, White wins: 142, Black wins: 144
+iteration: 28
+Movetypes: {'CLASSIC': 2736, 'SPLIT': 822, 'ENTANGLE': 0, 'TAKE': 752}
+Random agent: trueskill.Rating(mu=21.349, sigma=0.836)
+Heuristic agent: trueskill.Rating(mu=24.157, sigma=0.803)
+Low MCTS agent: trueskill.Rating(mu=27.120, sigma=0.802)
+High MCTS agent: trueskill.Rating(mu=26.978, sigma=0.807)
+Draw: 50, White wins: 151, Black wins: 147
+iteration: 29
+Movetypes: {'CLASSIC': 2870, 'SPLIT': 852, 'ENTANGLE': 0, 'TAKE': 773}
+Random agent: trueskill.Rating(mu=21.486, sigma=0.831)
+Heuristic agent: trueskill.Rating(mu=24.150, sigma=0.801)
+Low MCTS agent: trueskill.Rating(mu=26.909, sigma=0.796)
+High MCTS agent: trueskill.Rating(mu=27.073, sigma=0.803)
+Draw: 52, White wins: 156, Black wins: 152
+iteration: 30
+Movetypes: {'CLASSIC': 2994, 'SPLIT': 885, 'ENTANGLE': 0, 'TAKE': 799}
+Random agent: trueskill.Rating(mu=21.407, sigma=0.830)
+Heuristic agent: trueskill.Rating(mu=24.324, sigma=0.798)
+Low MCTS agent: trueskill.Rating(mu=26.716, sigma=0.790)
+High MCTS agent: trueskill.Rating(mu=27.168, sigma=0.801)
+Draw: 54, White wins: 160, Black wins: 158
+iteration: 31
+Movetypes: {'CLASSIC': 3108, 'SPLIT': 908, 'ENTANGLE': 0, 'TAKE': 827}
+Random agent: trueskill.Rating(mu=21.106, sigma=0.833)
+Heuristic agent: trueskill.Rating(mu=24.383, sigma=0.799)
+Low MCTS agent: trueskill.Rating(mu=26.850, sigma=0.791)
+High MCTS agent: trueskill.Rating(mu=27.250, sigma=0.800)
+Draw: 55, White wins: 166, Black wins: 163
+iteration: 32
+Movetypes: {'CLASSIC': 3236, 'SPLIT': 938, 'ENTANGLE': 0, 'TAKE': 851}
+Random agent: trueskill.Rating(mu=20.949, sigma=0.832)
+Heuristic agent: trueskill.Rating(mu=24.442, sigma=0.793)
+Low MCTS agent: trueskill.Rating(mu=26.967, sigma=0.792)
+High MCTS agent: trueskill.Rating(mu=27.216, sigma=0.796)
+Draw: 58, White wins: 171, Black wins: 167
+iteration: 33
+Movetypes: {'CLASSIC': 3322, 'SPLIT': 968, 'ENTANGLE': 0, 'TAKE': 880}
+Random agent: trueskill.Rating(mu=20.808, sigma=0.832)
+Heuristic agent: trueskill.Rating(mu=24.370, sigma=0.792)
+Low MCTS agent: trueskill.Rating(mu=27.073, sigma=0.793)
+High MCTS agent: trueskill.Rating(mu=27.310, sigma=0.795)
+Draw: 60, White wins: 178, Black wins: 170
+iteration: 34
+Movetypes: {'CLASSIC': 3412, 'SPLIT': 984, 'ENTANGLE': 0, 'TAKE': 906}
+Random agent: trueskill.Rating(mu=20.907, sigma=0.828)
+Heuristic agent: trueskill.Rating(mu=24.306, sigma=0.790)
+Low MCTS agent: trueskill.Rating(mu=26.897, sigma=0.795)
+High MCTS agent: trueskill.Rating(mu=27.463, sigma=0.795)
+Draw: 61, White wins: 186, Black wins: 173
+iteration: 35
+Movetypes: {'CLASSIC': 3452, 'SPLIT': 1004, 'ENTANGLE': 0, 'TAKE': 928}
+Random agent: trueskill.Rating(mu=20.866, sigma=0.828)
+Heuristic agent: trueskill.Rating(mu=24.363, sigma=0.792)
+Low MCTS agent: trueskill.Rating(mu=26.924, sigma=0.798)
+High MCTS agent: trueskill.Rating(mu=27.415, sigma=0.794)
+Draw: 61, White wins: 194, Black wins: 177
+iteration: 36
+Movetypes: {'CLASSIC': 3550, 'SPLIT': 1029, 'ENTANGLE': 0, 'TAKE': 957}
+Random agent: trueskill.Rating(mu=20.830, sigma=0.829)
+Heuristic agent: trueskill.Rating(mu=24.412, sigma=0.794)
+Low MCTS agent: trueskill.Rating(mu=26.557, sigma=0.796)
+High MCTS agent: trueskill.Rating(mu=27.765, sigma=0.799)
+Draw: 61, White wins: 198, Black wins: 185
+iteration: 37
+Movetypes: {'CLASSIC': 3628, 'SPLIT': 1062, 'ENTANGLE': 0, 'TAKE': 988}
+Random agent: trueskill.Rating(mu=20.694, sigma=0.830)
+Heuristic agent: trueskill.Rating(mu=24.365, sigma=0.788)
+Low MCTS agent: trueskill.Rating(mu=26.404, sigma=0.794)
+High MCTS agent: trueskill.Rating(mu=28.096, sigma=0.803)
+Draw: 64, White wins: 202, Black wins: 190
+iteration: 38
+Movetypes: {'CLASSIC': 3748, 'SPLIT': 1094, 'ENTANGLE': 0, 'TAKE': 1012}
+Random agent: trueskill.Rating(mu=20.888, sigma=0.828)
+Heuristic agent: trueskill.Rating(mu=24.244, sigma=0.785)
+Low MCTS agent: trueskill.Rating(mu=26.555, sigma=0.788)
+High MCTS agent: trueskill.Rating(mu=27.887, sigma=0.800)
+Draw: 67, White wins: 206, Black wins: 195
+iteration: 39
+Movetypes: {'CLASSIC': 3828, 'SPLIT': 1111, 'ENTANGLE': 0, 'TAKE': 1036}
+Random agent: trueskill.Rating(mu=20.979, sigma=0.825)
+Heuristic agent: trueskill.Rating(mu=24.190, sigma=0.785)
+Low MCTS agent: trueskill.Rating(mu=26.523, sigma=0.788)
+High MCTS agent: trueskill.Rating(mu=27.891, sigma=0.798)
+Draw: 69, White wins: 210, Black wins: 201
+iteration: 40
+Movetypes: {'CLASSIC': 3907, 'SPLIT': 1142, 'ENTANGLE': 0, 'TAKE': 1062}
+Random agent: trueskill.Rating(mu=20.710, sigma=0.829)
+Heuristic agent: trueskill.Rating(mu=24.284, sigma=0.783)
+Low MCTS agent: trueskill.Rating(mu=26.834, sigma=0.788)
+High MCTS agent: trueskill.Rating(mu=27.723, sigma=0.798)
+Draw: 71, White wins: 214, Black wins: 207
+iteration: 41
+Movetypes: {'CLASSIC': 4006, 'SPLIT': 1174, 'ENTANGLE': 0, 'TAKE': 1087}
+Random agent: trueskill.Rating(mu=20.453, sigma=0.834)
+Heuristic agent: trueskill.Rating(mu=24.370, sigma=0.782)
+Low MCTS agent: trueskill.Rating(mu=27.036, sigma=0.786)
+High MCTS agent: trueskill.Rating(mu=27.664, sigma=0.796)
+Draw: 74, White wins: 218, Black wins: 212
+iteration: 42
+Movetypes: {'CLASSIC': 4066, 'SPLIT': 1197, 'ENTANGLE': 0, 'TAKE': 1109}
+Random agent: trueskill.Rating(mu=20.212, sigma=0.839)
+Heuristic agent: trueskill.Rating(mu=24.421, sigma=0.785)
+Low MCTS agent: trueskill.Rating(mu=27.144, sigma=0.787)
+High MCTS agent: trueskill.Rating(mu=27.719, sigma=0.798)
+Draw: 75, White wins: 224, Black wins: 217
+iteration: 43
+Movetypes: {'CLASSIC': 4132, 'SPLIT': 1219, 'ENTANGLE': 0, 'TAKE': 1134}
+Random agent: trueskill.Rating(mu=20.122, sigma=0.839)
+Heuristic agent: trueskill.Rating(mu=24.345, sigma=0.785)
+Low MCTS agent: trueskill.Rating(mu=27.063, sigma=0.788)
+High MCTS agent: trueskill.Rating(mu=27.961, sigma=0.800)
+Draw: 77, White wins: 230, Black wins: 221
+iteration: 44
+Movetypes: {'CLASSIC': 4204, 'SPLIT': 1235, 'ENTANGLE': 0, 'TAKE': 1157}
+Random agent: trueskill.Rating(mu=20.031, sigma=0.840)
+Heuristic agent: trueskill.Rating(mu=24.204, sigma=0.784)
+Low MCTS agent: trueskill.Rating(mu=27.153, sigma=0.790)
+High MCTS agent: trueskill.Rating(mu=28.098, sigma=0.804)
+Draw: 79, White wins: 234, Black wins: 227
+iteration: 45
+Movetypes: {'CLASSIC': 4306, 'SPLIT': 1263, 'ENTANGLE': 0, 'TAKE': 1187}
+Random agent: trueskill.Rating(mu=20.494, sigma=0.835)
+Heuristic agent: trueskill.Rating(mu=24.008, sigma=0.784)
+Low MCTS agent: trueskill.Rating(mu=26.856, sigma=0.788)
+High MCTS agent: trueskill.Rating(mu=28.187, sigma=0.805)
+Draw: 80, White wins: 239, Black wins: 233
+iteration: 46
+Movetypes: {'CLASSIC': 4339, 'SPLIT': 1278, 'ENTANGLE': 0, 'TAKE': 1206}
+Random agent: trueskill.Rating(mu=20.378, sigma=0.835)
+Heuristic agent: trueskill.Rating(mu=24.163, sigma=0.782)
+Low MCTS agent: trueskill.Rating(mu=26.883, sigma=0.791)
+High MCTS agent: trueskill.Rating(mu=28.103, sigma=0.806)
+Draw: 81, White wins: 245, Black wins: 238
+iteration: 47
+Movetypes: {'CLASSIC': 4397, 'SPLIT': 1299, 'ENTANGLE': 0, 'TAKE': 1230}
+Random agent: trueskill.Rating(mu=20.269, sigma=0.836)
+Heuristic agent: trueskill.Rating(mu=23.930, sigma=0.784)
+Low MCTS agent: trueskill.Rating(mu=27.101, sigma=0.795)
+High MCTS agent: trueskill.Rating(mu=28.224, sigma=0.810)
+Draw: 82, White wins: 251, Black wins: 243
+iteration: 48
+Movetypes: {'CLASSIC': 4550, 'SPLIT': 1322, 'ENTANGLE': 0, 'TAKE': 1259}
+Random agent: trueskill.Rating(mu=20.776, sigma=0.824)
+Heuristic agent: trueskill.Rating(mu=23.716, sigma=0.786)
+Low MCTS agent: trueskill.Rating(mu=26.970, sigma=0.786)
+High MCTS agent: trueskill.Rating(mu=28.108, sigma=0.805)
+Draw: 86, White wins: 256, Black wins: 246
+iteration: 49
+Movetypes: {'CLASSIC': 4653, 'SPLIT': 1347, 'ENTANGLE': 0, 'TAKE': 1290}
+Random agent: trueskill.Rating(mu=20.739, sigma=0.826)
+Heuristic agent: trueskill.Rating(mu=23.752, sigma=0.787)
+Low MCTS agent: trueskill.Rating(mu=26.967, sigma=0.788)
+High MCTS agent: trueskill.Rating(mu=28.110, sigma=0.805)
+Draw: 87, White wins: 262, Black wins: 251
+iteration: 50
+Movetypes: {'CLASSIC': 4793, 'SPLIT': 1379, 'ENTANGLE': 0, 'TAKE': 1318}
+Random agent: trueskill.Rating(mu=20.713, sigma=0.827)
+Heuristic agent: trueskill.Rating(mu=23.890, sigma=0.785)
+Low MCTS agent: trueskill.Rating(mu=26.772, sigma=0.784)
+High MCTS agent: trueskill.Rating(mu=28.195, sigma=0.803)
+Draw: 90, White wins: 265, Black wins: 257
+iteration: 51
+Movetypes: {'CLASSIC': 4910, 'SPLIT': 1413, 'ENTANGLE': 0, 'TAKE': 1344}
+Random agent: trueskill.Rating(mu=20.686, sigma=0.828)
+Heuristic agent: trueskill.Rating(mu=24.016, sigma=0.784)
+Low MCTS agent: trueskill.Rating(mu=26.710, sigma=0.786)
+High MCTS agent: trueskill.Rating(mu=28.152, sigma=0.800)
+Draw: 92, White wins: 268, Black wins: 264
+iteration: 52
+Movetypes: {'CLASSIC': 5013, 'SPLIT': 1447, 'ENTANGLE': 0, 'TAKE': 1365}
+Random agent: trueskill.Rating(mu=20.432, sigma=0.832)
+Heuristic agent: trueskill.Rating(mu=24.136, sigma=0.782)
+Low MCTS agent: trueskill.Rating(mu=26.644, sigma=0.787)
+High MCTS agent: trueskill.Rating(mu=28.331, sigma=0.802)
+Draw: 94, White wins: 274, Black wins: 268
+iteration: 53
+Movetypes: {'CLASSIC': 5157, 'SPLIT': 1483, 'ENTANGLE': 0, 'TAKE': 1395}
+Random agent: trueskill.Rating(mu=20.188, sigma=0.837)
+Heuristic agent: trueskill.Rating(mu=24.140, sigma=0.784)
+Low MCTS agent: trueskill.Rating(mu=26.892, sigma=0.787)
+High MCTS agent: trueskill.Rating(mu=28.293, sigma=0.798)
+Draw: 97, White wins: 279, Black wins: 272
+iteration: 54
+Movetypes: {'CLASSIC': 5275, 'SPLIT': 1511, 'ENTANGLE': 0, 'TAKE': 1417}
+Random agent: trueskill.Rating(mu=20.091, sigma=0.838)
+Heuristic agent: trueskill.Rating(mu=24.237, sigma=0.777)
+Low MCTS agent: trueskill.Rating(mu=26.708, sigma=0.786)
+High MCTS agent: trueskill.Rating(mu=28.468, sigma=0.800)
+Draw: 101, White wins: 284, Black wins: 275
+iteration: 55
+Movetypes: {'CLASSIC': 5377, 'SPLIT': 1530, 'ENTANGLE': 0, 'TAKE': 1443}
+Random agent: trueskill.Rating(mu=20.003, sigma=0.839)
+Heuristic agent: trueskill.Rating(mu=24.113, sigma=0.776)
+Low MCTS agent: trueskill.Rating(mu=26.857, sigma=0.788)
+High MCTS agent: trueskill.Rating(mu=28.527, sigma=0.799)
+Draw: 104, White wins: 288, Black wins: 280
+iteration: 56
+Movetypes: {'CLASSIC': 5466, 'SPLIT': 1560, 'ENTANGLE': 0, 'TAKE': 1470}
+Random agent: trueskill.Rating(mu=19.992, sigma=0.843)
+Heuristic agent: trueskill.Rating(mu=23.936, sigma=0.777)
+Low MCTS agent: trueskill.Rating(mu=27.076, sigma=0.793)
+High MCTS agent: trueskill.Rating(mu=28.500, sigma=0.801)
+Draw: 105, White wins: 293, Black wins: 286
+iteration: 57
+Movetypes: {'CLASSIC': 5551, 'SPLIT': 1588, 'ENTANGLE': 0, 'TAKE': 1497}
+Random agent: trueskill.Rating(mu=19.903, sigma=0.844)
+Heuristic agent: trueskill.Rating(mu=23.906, sigma=0.778)
+Low MCTS agent: trueskill.Rating(mu=27.199, sigma=0.795)
+High MCTS agent: trueskill.Rating(mu=28.485, sigma=0.802)
+Draw: 107, White wins: 299, Black wins: 290
+iteration: 58
+Movetypes: {'CLASSIC': 5605, 'SPLIT': 1606, 'ENTANGLE': 0, 'TAKE': 1519}
+Random agent: trueskill.Rating(mu=19.686, sigma=0.850)
+Heuristic agent: trueskill.Rating(mu=23.996, sigma=0.782)
+Low MCTS agent: trueskill.Rating(mu=27.202, sigma=0.800)
+High MCTS agent: trueskill.Rating(mu=28.582, sigma=0.805)
+Draw: 107, White wins: 306, Black wins: 295
+iteration: 59
+Movetypes: {'CLASSIC': 5696, 'SPLIT': 1630, 'ENTANGLE': 0, 'TAKE': 1546}
+Random agent: trueskill.Rating(mu=19.937, sigma=0.848)
+Heuristic agent: trueskill.Rating(mu=23.700, sigma=0.786)
+Low MCTS agent: trueskill.Rating(mu=27.205, sigma=0.795)
+High MCTS agent: trueskill.Rating(mu=28.664, sigma=0.806)
+Draw: 109, White wins: 309, Black wins: 302
+iteration: 60
+Movetypes: {'CLASSIC': 5787, 'SPLIT': 1650, 'ENTANGLE': 0, 'TAKE': 1573}
+Random agent: trueskill.Rating(mu=20.460, sigma=0.840)
+Heuristic agent: trueskill.Rating(mu=23.851, sigma=0.785)
+Low MCTS agent: trueskill.Rating(mu=27.051, sigma=0.789)
+High MCTS agent: trueskill.Rating(mu=28.191, sigma=0.802)
+Draw: 111, White wins: 312, Black wins: 309
+iteration: 61
+Movetypes: {'CLASSIC': 5915, 'SPLIT': 1667, 'ENTANGLE': 0, 'TAKE': 1591}
+Random agent: trueskill.Rating(mu=21.093, sigma=0.833)
+Heuristic agent: trueskill.Rating(mu=23.389, sigma=0.787)
+Low MCTS agent: trueskill.Rating(mu=27.068, sigma=0.786)
+High MCTS agent: trueskill.Rating(mu=28.073, sigma=0.798)
+Draw: 113, White wins: 315, Black wins: 316
+iteration: 62
+Movetypes: {'CLASSIC': 6026, 'SPLIT': 1703, 'ENTANGLE': 0, 'TAKE': 1613}
+Random agent: trueskill.Rating(mu=21.150, sigma=0.829)
+Heuristic agent: trueskill.Rating(mu=23.341, sigma=0.786)
+Low MCTS agent: trueskill.Rating(mu=26.865, sigma=0.782)
+High MCTS agent: trueskill.Rating(mu=28.282, sigma=0.800)
+Draw: 116, White wins: 318, Black wins: 322
+iteration: 63
+Movetypes: {'CLASSIC': 6112, 'SPLIT': 1730, 'ENTANGLE': 0, 'TAKE': 1632}
+Random agent: trueskill.Rating(mu=20.861, sigma=0.832)
+Heuristic agent: trueskill.Rating(mu=23.395, sigma=0.788)
+Low MCTS agent: trueskill.Rating(mu=26.956, sigma=0.784)
+High MCTS agent: trueskill.Rating(mu=28.399, sigma=0.805)
+Draw: 117, White wins: 325, Black wins: 326
+iteration: 64
+Movetypes: {'CLASSIC': 6196, 'SPLIT': 1765, 'ENTANGLE': 0, 'TAKE': 1657}
+Random agent: trueskill.Rating(mu=20.818, sigma=0.833)
+Heuristic agent: trueskill.Rating(mu=23.452, sigma=0.789)
+Low MCTS agent: trueskill.Rating(mu=26.886, sigma=0.784)
+High MCTS agent: trueskill.Rating(mu=28.452, sigma=0.803)
+Draw: 119, White wins: 332, Black wins: 329
+iteration: 65
+Movetypes: {'CLASSIC': 6300, 'SPLIT': 1804, 'ENTANGLE': 0, 'TAKE': 1684}
+Random agent: trueskill.Rating(mu=20.872, sigma=0.831)
+Heuristic agent: trueskill.Rating(mu=23.469, sigma=0.779)
+Low MCTS agent: trueskill.Rating(mu=26.982, sigma=0.785)
+High MCTS agent: trueskill.Rating(mu=28.283, sigma=0.800)
+Draw: 123, White wins: 337, Black wins: 332
+iteration: 66
+Movetypes: {'CLASSIC': 6374, 'SPLIT': 1826, 'ENTANGLE': 0, 'TAKE': 1710}
+Random agent: trueskill.Rating(mu=20.806, sigma=0.834)
+Heuristic agent: trueskill.Rating(mu=23.340, sigma=0.780)
+Low MCTS agent: trueskill.Rating(mu=27.363, sigma=0.789)
+High MCTS agent: trueskill.Rating(mu=28.087, sigma=0.800)
+Draw: 124, White wins: 344, Black wins: 336
+iteration: 67
+Movetypes: {'CLASSIC': 6442, 'SPLIT': 1852, 'ENTANGLE': 0, 'TAKE': 1737}
+Random agent: trueskill.Rating(mu=20.770, sigma=0.834)
+Heuristic agent: trueskill.Rating(mu=23.646, sigma=0.783)
+Low MCTS agent: trueskill.Rating(mu=26.781, sigma=0.788)
+High MCTS agent: trueskill.Rating(mu=28.401, sigma=0.805)
+Draw: 124, White wins: 351, Black wins: 341
+iteration: 68
+Movetypes: {'CLASSIC': 6563, 'SPLIT': 1883, 'ENTANGLE': 0, 'TAKE': 1767}
+Random agent: trueskill.Rating(mu=20.711, sigma=0.836)
+Heuristic agent: trueskill.Rating(mu=23.690, sigma=0.782)
+Low MCTS agent: trueskill.Rating(mu=26.734, sigma=0.789)
+High MCTS agent: trueskill.Rating(mu=28.459, sigma=0.803)
+Draw: 126, White wins: 354, Black wins: 348
+iteration: 69
+Movetypes: {'CLASSIC': 6720, 'SPLIT': 1906, 'ENTANGLE': 0, 'TAKE': 1790}
+Random agent: trueskill.Rating(mu=20.449, sigma=0.840)
+Heuristic agent: trueskill.Rating(mu=23.944, sigma=0.778)
+Low MCTS agent: trueskill.Rating(mu=26.830, sigma=0.784)
+High MCTS agent: trueskill.Rating(mu=28.330, sigma=0.802)
+Draw: 130, White wins: 357, Black wins: 353
+iteration: 70
+Movetypes: {'CLASSIC': 6832, 'SPLIT': 1931, 'ENTANGLE': 0, 'TAKE': 1810}
+Random agent: trueskill.Rating(mu=20.411, sigma=0.842)
+Heuristic agent: trueskill.Rating(mu=23.850, sigma=0.781)
+Low MCTS agent: trueskill.Rating(mu=26.875, sigma=0.783)
+High MCTS agent: trueskill.Rating(mu=28.417, sigma=0.801)
+Draw: 132, White wins: 362, Black wins: 358
+iteration: 71
+Movetypes: {'CLASSIC': 6926, 'SPLIT': 1956, 'ENTANGLE': 0, 'TAKE': 1834}
+Random agent: trueskill.Rating(mu=20.426, sigma=0.838)
+Heuristic agent: trueskill.Rating(mu=23.744, sigma=0.775)
+Low MCTS agent: trueskill.Rating(mu=26.875, sigma=0.782)
+High MCTS agent: trueskill.Rating(mu=28.519, sigma=0.806)
+Draw: 136, White wins: 365, Black wins: 363
+iteration: 72
+Movetypes: {'CLASSIC': 7001, 'SPLIT': 1987, 'ENTANGLE': 0, 'TAKE': 1863}
+Random agent: trueskill.Rating(mu=20.593, sigma=0.833)
+Heuristic agent: trueskill.Rating(mu=24.030, sigma=0.777)
+Low MCTS agent: trueskill.Rating(mu=26.911, sigma=0.785)
+High MCTS agent: trueskill.Rating(mu=28.023, sigma=0.799)
+Draw: 137, White wins: 374, Black wins: 365
+iteration: 73
+Movetypes: {'CLASSIC': 7192, 'SPLIT': 2025, 'ENTANGLE': 0, 'TAKE': 1889}
+Random agent: trueskill.Rating(mu=20.720, sigma=0.830)
+Heuristic agent: trueskill.Rating(mu=24.080, sigma=0.772)
+Low MCTS agent: trueskill.Rating(mu=27.015, sigma=0.782)
+High MCTS agent: trueskill.Rating(mu=27.748, sigma=0.787)
+Draw: 143, White wins: 378, Black wins: 367
+iteration: 74
+Movetypes: {'CLASSIC': 7327, 'SPLIT': 2061, 'ENTANGLE': 0, 'TAKE': 1916}
+Random agent: trueskill.Rating(mu=20.463, sigma=0.834)
+Heuristic agent: trueskill.Rating(mu=24.255, sigma=0.774)
+Low MCTS agent: trueskill.Rating(mu=27.193, sigma=0.782)
+High MCTS agent: trueskill.Rating(mu=27.615, sigma=0.788)
+Draw: 145, White wins: 382, Black wins: 373
+iteration: 75
+Movetypes: {'CLASSIC': 7415, 'SPLIT': 2103, 'ENTANGLE': 0, 'TAKE': 1939}
+Random agent: trueskill.Rating(mu=20.219, sigma=0.839)
+Heuristic agent: trueskill.Rating(mu=24.490, sigma=0.776)
+Low MCTS agent: trueskill.Rating(mu=27.014, sigma=0.786)
+High MCTS agent: trueskill.Rating(mu=27.772, sigma=0.792)
+Draw: 145, White wins: 388, Black wins: 379
+iteration: 76
+Movetypes: {'CLASSIC': 7493, 'SPLIT': 2138, 'ENTANGLE': 0, 'TAKE': 1965}
+Random agent: trueskill.Rating(mu=20.572, sigma=0.834)
+Heuristic agent: trueskill.Rating(mu=23.981, sigma=0.778)
+Low MCTS agent: trueskill.Rating(mu=27.071, sigma=0.786)
+High MCTS agent: trueskill.Rating(mu=27.925, sigma=0.796)
+Draw: 146, White wins: 392, Black wins: 386
+iteration: 77
+Movetypes: {'CLASSIC': 7595, 'SPLIT': 2175, 'ENTANGLE': 0, 'TAKE': 1988}
+Random agent: trueskill.Rating(mu=20.569, sigma=0.835)
+Heuristic agent: trueskill.Rating(mu=24.213, sigma=0.775)
+Low MCTS agent: trueskill.Rating(mu=26.974, sigma=0.788)
+High MCTS agent: trueskill.Rating(mu=27.784, sigma=0.791)
+Draw: 149, White wins: 397, Black wins: 390
+iteration: 78
+Movetypes: {'CLASSIC': 7689, 'SPLIT': 2202, 'ENTANGLE': 0, 'TAKE': 2014}
+Random agent: trueskill.Rating(mu=20.773, sigma=0.831)
+Heuristic agent: trueskill.Rating(mu=24.388, sigma=0.776)
+Low MCTS agent: trueskill.Rating(mu=26.775, sigma=0.782)
+High MCTS agent: trueskill.Rating(mu=27.624, sigma=0.790)
+Draw: 151, White wins: 400, Black wins: 397
+iteration: 79
+Movetypes: {'CLASSIC': 7801, 'SPLIT': 2238, 'ENTANGLE': 0, 'TAKE': 2043}
+Random agent: trueskill.Rating(mu=21.006, sigma=0.824)
+Heuristic agent: trueskill.Rating(mu=24.077, sigma=0.774)
+Low MCTS agent: trueskill.Rating(mu=26.910, sigma=0.785)
+High MCTS agent: trueskill.Rating(mu=27.598, sigma=0.785)
+Draw: 155, White wins: 404, Black wins: 401
+iteration: 80
+Movetypes: {'CLASSIC': 7899, 'SPLIT': 2270, 'ENTANGLE': 0, 'TAKE': 2063}
+Random agent: trueskill.Rating(mu=20.732, sigma=0.828)
+Heuristic agent: trueskill.Rating(mu=24.287, sigma=0.770)
+Low MCTS agent: trueskill.Rating(mu=26.729, sigma=0.783)
+High MCTS agent: trueskill.Rating(mu=27.811, sigma=0.787)
+Draw: 158, White wins: 409, Black wins: 405
+iteration: 81
+Movetypes: {'CLASSIC': 8033, 'SPLIT': 2310, 'ENTANGLE': 0, 'TAKE': 2088}
+Random agent: trueskill.Rating(mu=20.925, sigma=0.826)
+Heuristic agent: trueskill.Rating(mu=24.548, sigma=0.770)
+Low MCTS agent: trueskill.Rating(mu=26.264, sigma=0.778)
+High MCTS agent: trueskill.Rating(mu=27.836, sigma=0.789)
+Draw: 160, White wins: 414, Black wins: 410
+iteration: 82
+Movetypes: {'CLASSIC': 8140, 'SPLIT': 2350, 'ENTANGLE': 0, 'TAKE': 2119}
+Random agent: trueskill.Rating(mu=20.787, sigma=0.827)
+Heuristic agent: trueskill.Rating(mu=24.298, sigma=0.772)
+Low MCTS agent: trueskill.Rating(mu=26.430, sigma=0.780)
+High MCTS agent: trueskill.Rating(mu=28.055, sigma=0.792)
+Draw: 162, White wins: 419, Black wins: 415

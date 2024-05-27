@@ -87,7 +87,8 @@ def main():
     file = open("./results2.txt", "w")
     file.close()
     file = open("./results2.txt", "a")
-    rules = [CheckersRules.CLASSICAL, CheckersRules.QUANTUM_V1, CheckersRules.QUANTUM_V2]
+    # rules = [CheckersRules.CLASSICAL, CheckersRules.QUANTUM_V1, CheckersRules.QUANTUM_V2]
+    rules = [CheckersRules.QUANTUM_V2]
     sizes = [5]
     agents = ["random", "heuristic", "low_mcts", "high_mcts"]
     # just mcts agents
@@ -115,14 +116,22 @@ def main():
             file.write("-"*100 + "\n")
             file.write(f"Rule: {rule}\n")
             file.write(f"Board size: {size}x{size}\n")
+            file.write("-"*100 + "\n")
             print(f"Board size: {size}x{size}, Rule: {rule}")
-            iterations = 15
+            iterations = 25
+            stime = time.time()
             for k in range(iterations):
+                print(time.time() - stime)
+                stime = time.time()
+                if(k%10 == 0):
+                    print(f"Iteration: {k+1}")
+                sd = random.randint(0, 100000000000000000)
+                # sd = 4271756581358815
+                random.seed(sd)
                 random.shuffle(agents)
                 matches = generate_matches(agents)
                 print(matches)
                 for i, j in matches:
-                    print(f"{i} vs {j}")
                     white_mcts = False
                     black_mcts = False
                     args1 = None
@@ -148,13 +157,8 @@ def main():
                         black_mcts = True
                     args_low['attempt'] = k
                     args_high['attempt'] = k
-                    sd = random.randint(0, 100000000000000000)
-                    # sd = 4271756581358815
-                    random.seed(sd)
                     seed_str = f"Seed: {sd}\n"
                     # write_attempt(k, seed_str)
-                    if((k+1)%10 == 0):
-                        print(f"Game {k}")
                     start_t = time.time()
                     checkers = Checkers(num_vertical=size, num_horizontal=size, num_vertical_pieces=args.num_vertical_pieces, SIMULATE_QUANTUM=args.sim_q, rules=rule)
                     game = GameInterface(checkers, white_player=p1, black_player=p2, GUI=args.GUI, white_mcts=white_mcts, black_mcts=black_mcts, args_1=args1, args_2=args2, print=False, attempt=k)
@@ -169,42 +173,32 @@ def main():
                     
                     ratings[i] = new_r1
                     ratings[j] = new_r2
-                    # if(result == CheckersResult.WHITE_WINS):
-                        # print(f"########################### White wins at {i}")
-                        # exit()
-                    # elif(result == CheckersResult.DRAW):
-                        # print(f"########################### Draw at {i}")
-                        # exit()
                     number_of_moves.append(num_moves)
                     avg_mcts_time.append(avg_time)
                     times.append(time.time()-start_t)
                     for l in movetypes:
                         movetypes[l] += single_movetypes[l]
-                    if((k+1)%50 == 0 and k+1 != iterations):
-                        print(f"Draw: {results.count(CheckersResult.DRAW)}, White wins: {results.count(CheckersResult.WHITE_WINS)}, Black wins: {results.count(CheckersResult.BLACK_WINS)}")
-                        print(f"Average number of moves: {sum(number_of_moves)/len(number_of_moves)}")
-                        print(f"Average time for mcts move: {sum(avg_mcts_time)/len(avg_mcts_time)}")
+                    # if((k+1)%50 == 0 and k+1 != iterations):
+                    #     print(f"Draw: {results.count(CheckersResult.DRAW)}, White wins: {results.count(CheckersResult.WHITE_WINS)}, Black wins: {results.count(CheckersResult.BLACK_WINS)}")
+                    #     print(f"Average number of moves: {sum(number_of_moves)/len(number_of_moves)}")
+                    #     print(f"Average time for mcts move: {sum(avg_mcts_time)/len(avg_mcts_time)}")
                 print("#"*100)
-                print(f"{i} vs {j}")
-                print(f"Average time: {sum(times)/len(times)}, minimum time: {min(times)}, max time: {max(times)}")
-                print(f"Average number of moves: {sum(number_of_moves)/len(number_of_moves)}")
-                print(f"Average time for mcts move: {sum(avg_mcts_time)/len(avg_mcts_time)}")
-                print(f"Movetypes: {movetypes}")
-                print(f"Rating for white agent: [{i}]: {ratings[i]}")
-                print(f"Rating for black agent: [{j}]: {ratings[j]}")
+                # print(f"Average time: {sum(times)/len(times)}, minimum time: {min(times)}, max time: {max(times)}")
+                # print(f"Average number of moves: {sum(number_of_moves)/len(number_of_moves)}")
+                # print(f"Average time for mcts move: {sum(avg_mcts_time)/len(avg_mcts_time)}")
+                # print(f"Movetypes: {movetypes}")
                 print(f"Random agent: {ratings['random']}")
                 print(f"Heuristic agent: {ratings['heuristic']}")
                 print(f"Low MCTS agent: {ratings['low_mcts']}")
                 print(f"High MCTS agent: {ratings['high_mcts']}")
                 # print(f"All ratings: Random agent: {random_rating}, Heuristic agent: {heuristic_rating}, Low MCTS agent: {mcts_low_rating}, High MCTS agent: {mcts_high_rating}")
                 print(f"Draw: {results.count(CheckersResult.DRAW)}, White wins: {results.count(CheckersResult.WHITE_WINS)}, Black wins: {results.count(CheckersResult.BLACK_WINS)}")
-                file.write(f"White agent: {i}, Black agent: {j}\n")
-                file.write(f"Average time: {sum(times)/len(times)}, minimum time: {min(times)}, max time: {max(times)}\n")
-                file.write(f"Average number of moves: {sum(number_of_moves)/len(number_of_moves)}\n")
-                file.write(f"Average time for mcts move: {sum(avg_mcts_time)/len(avg_mcts_time)}\n")
+                file.write("iteration: " + str(k) + "\n")
+                # file.write(f"White agent: {i}, Black agent: {j}\n")
+                # file.write(f"Average time: {sum(times)/len(times)}, minimum time: {min(times)}, max time: {max(times)}\n")
+                # file.write(f"Average number of moves: {sum(number_of_moves)/len(number_of_moves)}\n")
+                # file.write(f"Average time for mcts move: {sum(avg_mcts_time)/len(avg_mcts_time)}\n")
                 file.write(f"Movetypes: {movetypes}\n")
-                file.write(f"Rating for white agent: [{i}]: {ratings[i]}\n")
-                file.write(f"Rating for black agent: [{j}]: {ratings[j]}\n")
                 file.write(f"Random agent: {ratings['random']}\n")
                 file.write(f"Heuristic agent: {ratings['heuristic']}\n")
                 file.write(f"Low MCTS agent: {ratings['low_mcts']}\n")
