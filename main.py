@@ -88,11 +88,11 @@ def main():
     file.close()
     file = open("./results2.txt", "a")
     # rules = [CheckersRules.CLASSICAL, CheckersRules.QUANTUM_V1, CheckersRules.QUANTUM_V2]
-    rules = [CheckersRules.QUANTUM_V2]
+    rules = [CheckersRules.QUANTUM_V1]
     sizes = [5]
-    agents = ["random", "heuristic", "low_mcts", "high_mcts"]
+    # agents = ["random", "heuristic", "low_mcts", "high_mcts"]
     # just mcts agents
-    # agents = ["low_mcts", "high_mcts"]
+    agents = ["low_mcts", "high_mcts"]
     for rule in rules:
         for size in sizes:  
             ratings = {
@@ -120,6 +120,12 @@ def main():
             print(f"Board size: {size}x{size}, Rule: {rule}")
             iterations = 25
             stime = time.time()
+            low_white_wins = 0
+            high_white_wins = 0
+            low_black_wins = 0
+            high_black_wins = 0
+            low_wins = 0
+            high_wins = 0
             for k in range(iterations):
                 print(time.time() - stime)
                 stime = time.time()
@@ -166,7 +172,19 @@ def main():
                     results.append(result)
                     if(result == CheckersResult.WHITE_WINS):
                         new_r1, new_r2 = env.rate_1vs1(ratings[i], ratings[j])
+                        if(i == "low_mcts"):
+                            low_wins += 1
+                            low_white_wins += 1
+                        else:
+                            high_white_wins += 1
+                            high_wins += 1
                     elif(result == CheckersResult.BLACK_WINS):
+                        if(j == "low_mcts"):
+                            low_wins += 1
+                            low_black_wins += 1
+                        else:
+                            high_wins += 1
+                            high_black_wins += 1
                         new_r2, new_r1 = env.rate_1vs1(ratings[j], ratings[i])
                     else: # draw
                         new_r1, new_r2 = env.rate_1vs1(ratings[i], ratings[j], drawn=True)
@@ -178,7 +196,17 @@ def main():
                     times.append(time.time()-start_t)
                     for l in movetypes:
                         movetypes[l] += single_movetypes[l]
-                    # if((k+1)%50 == 0 and k+1 != iterations):
+                    if((k+1)%10 == 0 and k+1 != iterations):
+                        print(f"Random agent: {ratings['random']}")
+                        print(f"Heuristic agent: {ratings['heuristic']}")
+                        print(f"Low MCTS agent: {ratings['low_mcts']}")
+                        print(f"High MCTS agent: {ratings['high_mcts']}")
+                        # print(f"All ratings: Random agent: {random_rating}, Heuristic agent: {heuristic_rating}, Low MCTS agent: {mcts_low_rating}, High MCTS agent: {mcts_high_rating}")
+                        print(f"Low wins: {low_wins}, High wins: {high_wins}")
+                        print(f"low_white_wins: {low_white_wins}, high_white_wins: {high_white_wins}")
+                        print(f"low_black_wins: {low_black_wins}, high_black_wins: {high_black_wins}")
+                        print(f"Draw: {results.count(CheckersResult.DRAW)}, White wins: {results.count(CheckersResult.WHITE_WINS)}, Black wins: {results.count(CheckersResult.BLACK_WINS)}")
+                
                     #     print(f"Draw: {results.count(CheckersResult.DRAW)}, White wins: {results.count(CheckersResult.WHITE_WINS)}, Black wins: {results.count(CheckersResult.BLACK_WINS)}")
                     #     print(f"Average number of moves: {sum(number_of_moves)/len(number_of_moves)}")
                     #     print(f"Average time for mcts move: {sum(avg_mcts_time)/len(avg_mcts_time)}")
@@ -192,6 +220,7 @@ def main():
                 print(f"Low MCTS agent: {ratings['low_mcts']}")
                 print(f"High MCTS agent: {ratings['high_mcts']}")
                 # print(f"All ratings: Random agent: {random_rating}, Heuristic agent: {heuristic_rating}, Low MCTS agent: {mcts_low_rating}, High MCTS agent: {mcts_high_rating}")
+                print(f"Low wins: {low_wins}, High wins: {high_wins}")
                 print(f"Draw: {results.count(CheckersResult.DRAW)}, White wins: {results.count(CheckersResult.WHITE_WINS)}, Black wins: {results.count(CheckersResult.BLACK_WINS)}")
                 file.write("iteration: " + str(k) + "\n")
                 # file.write(f"White agent: {i}, Black agent: {j}\n")
