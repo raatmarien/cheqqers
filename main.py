@@ -20,8 +20,8 @@ def generate_matches(agents):
     
     for i in range(num_agents):
         for j in range(i + 1, num_agents):
-            if(agents[i] == agents[j]):
-                continue
+            # if(agents[i] == agents[j]):
+            #     continue
             matches.append((agents[i], agents[j]))  # Agent i as player 1, Agent j as player 2
             matches.append((agents[j], agents[i]))  # Agent j as player 1, Agent i as player 2
     return matches
@@ -69,8 +69,8 @@ def main():
     # p2 = random_bot()
     # p1 = heurisitc_bot()
     # p2 = heurisitc_bot()
-    p1 = human_player()
-    p2 = human_player()
+    # p1 = human_player()
+    # p2 = human_player()
     agent_wincount = {
         'random': 0,
         'heuristic': 0,
@@ -94,11 +94,11 @@ def main():
     file.close()
     file = open("./results2.txt", "a")
     # rules = [CheckersRules.CLASSICAL, CheckersRules.QUANTUM_V1, CheckersRules.QUANTUM_V2]
-    rules = [CheckersRules.QUANTUM_V1]
+    rules = [CheckersRules.QUANTUM_V2]
     sizes = [5]
-    # agents = ["random", "heuristic", "low_mcts", "high_mcts"]
+    agents = ["random", "heuristic", "low_mcts", "high_mcts"]
     # just mcts agents
-    agents = ["human", "high_mcts"]
+    # agents = ["high_mcts", "high_mcts"]
     for rule in rules:
         for size in sizes:  
             ratings = {
@@ -142,7 +142,7 @@ def main():
                 random.seed(sd)
                 random.shuffle(agents)
                 matches = generate_matches(agents)
-                print(matches)
+                print("Matches:", matches)
                 for i, j in matches:
                     white_mcts = False
                     black_mcts = False
@@ -177,29 +177,29 @@ def main():
                     game = GameInterface(checkers, white_player=p1, black_player=p2, GUI=args.GUI, white_mcts=white_mcts, black_mcts=black_mcts, args_1=args1, args_2=args2, print=False, attempt=k)
                     result, num_moves, avg_time, single_movetypes = (game.play())
                     results.append(result)
-                    # if(result == CheckersResult.WHITE_WINS):
-                    #     new_r1, new_r2 = env.rate_1vs1(ratings[i], ratings[j])
-                    #     agent_wincount[i] += 1
-                    #     if(i == "low_mcts"):
-                    #         low_wins += 1
-                    #         low_white_wins += 1
-                    #     else:
-                    #         high_white_wins += 1
-                    #         high_wins += 1
-                    # elif(result == CheckersResult.BLACK_WINS):
-                    #     agent_wincount[j] += 1
-                    #     if(j == "low_mcts"):
-                    #         low_wins += 1
-                    #         low_black_wins += 1
-                    #     else:
-                    #         high_wins += 1
-                    #         high_black_wins += 1
-                    #     new_r2, new_r1 = env.rate_1vs1(ratings[j], ratings[i])
-                    # else: # draw
-                    #     new_r1, new_r2 = env.rate_1vs1(ratings[i], ratings[j], drawn=True)
+                    if(result == CheckersResult.WHITE_WINS):
+                        new_r1, new_r2 = env.rate_1vs1(ratings[i], ratings[j])
+                        agent_wincount[i] += 1
+                        if(i == "low_mcts"):
+                            low_wins += 1
+                            low_white_wins += 1
+                        else:
+                            high_white_wins += 1
+                            high_wins += 1
+                    elif(result == CheckersResult.BLACK_WINS):
+                        agent_wincount[j] += 1
+                        if(j == "low_mcts"):
+                            low_wins += 1
+                            low_black_wins += 1
+                        else:
+                            high_wins += 1
+                            high_black_wins += 1
+                        new_r2, new_r1 = env.rate_1vs1(ratings[j], ratings[i])
+                    else: # draw
+                        new_r1, new_r2 = env.rate_1vs1(ratings[i], ratings[j], drawn=True)
                     
-                    # ratings[i] = new_r1
-                    # ratings[j] = new_r2
+                    ratings[i] = new_r1
+                    ratings[j] = new_r2
                     number_of_moves.append(num_moves)
                     avg_mcts_time.append(avg_time)
                     times.append(time.time()-start_t)

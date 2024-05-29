@@ -1,14 +1,4 @@
 ----------------------------------------------------------------------------------------------------
-Rule: CheckersRules.QUANTUM_V1
+Rule: CheckersRules.QUANTUM_V2
 Board size: 5x5
 ----------------------------------------------------------------------------------------------------
-iteration: 0
-Movetypes: {'CLASSIC': 0, 'SPLIT': 0, 'ENTANGLE': 0, 'TAKE': 0}
-Random agent: trueskill.Rating(mu=25.000, sigma=8.333)
-Heuristic agent: trueskill.Rating(mu=25.000, sigma=8.333)
-Low MCTS agent: trueskill.Rating(mu=25.000, sigma=8.333)
-High MCTS agent: trueskill.Rating(mu=25.000, sigma=8.333)
-low_white_wins: 0, high_white_wins: 0
-low_black_wins: 0, high_black_wins: 0
-Agent wincount: {'random': 0, 'heuristic': 0, 'low_mcts': 0, 'high_mcts': 0}
-Draw: 0, White wins: 1, Black wins: 1
