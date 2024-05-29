@@ -130,6 +130,11 @@ class GameInterface:
         # self.log.write(self.game.get_board())
         self.log.close()
 
+    def redraw_board(self):
+        self.highlight_squares(self.game.legal_moves)
+        self.draw_board()
+        pygame.display.flip() # needs to be called outside draw function
+
     def play(self):
         counter = 0
         moves = []
@@ -142,15 +147,41 @@ class GameInterface:
         times = []
         while(self.game.status == CheckersResult.UNFINISHED and not self.quit):
             if(self.GUI):
-                if(self.game.player == CheckersPlayer.WHITE and not isinstance(self.white_player, human_player)):
-                    move = self.white_player.select_move(self.game.legal_moves)
-                    self.do_game_move(move)
-                    prev_take = False
-                elif(self.game.player == CheckersPlayer.BLACK and not isinstance(self.black_player, human_player)):
-                    self.black_player = MCTS(self.game, self.args)
-                    # move = self.black_player.search()
-                    move = self.white_player.select_move(self.game.legal_moves)
-                    self.do_game_move(move)
+                if(self.game.player == CheckersPlayer.WHITE): # white player
+                    if(self.white_mcts):
+                        self.white_player = MCTS(self.game, self.args1)
+                        stime = time.time()
+                        move = self.white_player.search()
+                        print("thinking time: ", time.time()-stime)
+                        self.do_game_move(move)
+                        self.redraw_board()
+                    elif(not isinstance(self.white_player, human_player)):
+                        move = self.white_player.select_move(self.game.legal_moves)
+                        self.do_game_move(move)
+                        self.redraw_board()
+                else: # black player
+                    if(self.black_mcts):
+                        self.black_player = MCTS(self.game, self.args2)
+                        stime = time.time()
+                        move = self.black_player.search()
+                        print("thinking time: ", time.time()-stime)
+                        self.do_game_move(move)
+                        self.redraw_board()
+                    elif(not isinstance(self.black_player, human_player)):
+                        move = self.black_player.select_move(self.game.legal_moves)
+                        self.do_game_move(move)
+                        self.redraw_board()
+
+
+                # if(self.game.player == CheckersPlayer.WHITE and not isinstance(self.white_player, human_player)):
+                #     move = self.white_player.select_move(self.game.legal_moves)
+                #     self.do_game_move(move)
+                #     prev_take = False
+                # elif(self.game.player == CheckersPlayer.BLACK and not isinstance(self.black_player, human_player)):
+                #     self.black_player = MCTS(self.game, self.args)
+                #     # move = self.black_player.search()
+                #     move = self.white_player.select_move(self.game.legal_moves)
+                #     self.do_game_move(move)
                 # for(i in self.game.related_squares):
                 #     if(id in i):
                 #     pass
