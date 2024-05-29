@@ -56,6 +56,7 @@ class GameInterface:
         else:
             self.GUI = False
         self.draw_chance = False
+        self.draw_numbers = False
         self.white_player = white_player
         self.print = print
         self.args1 = args_1
@@ -147,30 +148,6 @@ class GameInterface:
         times = []
         while(self.game.status == CheckersResult.UNFINISHED and not self.quit):
             if(self.GUI):
-                if(self.game.player == CheckersPlayer.WHITE): # white player
-                    if(self.white_mcts):
-                        self.white_player = MCTS(self.game, self.args1)
-                        stime = time.time()
-                        move = self.white_player.search()
-                        print("thinking time: ", time.time()-stime)
-                        self.do_game_move(move)
-                        self.redraw_board()
-                    elif(not isinstance(self.white_player, human_player)):
-                        move = self.white_player.select_move(self.game.legal_moves)
-                        self.do_game_move(move)
-                        self.redraw_board()
-                else: # black player
-                    if(self.black_mcts):
-                        self.black_player = MCTS(self.game, self.args2)
-                        stime = time.time()
-                        move = self.black_player.search()
-                        print("thinking time: ", time.time()-stime)
-                        self.do_game_move(move)
-                        self.redraw_board()
-                    elif(not isinstance(self.black_player, human_player)):
-                        move = self.black_player.select_move(self.game.legal_moves)
-                        self.do_game_move(move)
-                        self.redraw_board()
 
 
                 # if(self.game.player == CheckersPlayer.WHITE and not isinstance(self.white_player, human_player)):
@@ -185,7 +162,7 @@ class GameInterface:
                 # for(i in self.game.related_squares):
                 #     if(id in i):
                 #     pass
-
+                calc_next_move = False
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         pygame.quit()
@@ -201,13 +178,43 @@ class GameInterface:
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_c:
                             self.draw_chance = True if self.draw_chance == False else False
+                        if event.key == pygame.K_n:
+                            self.draw_numbers = True if self.draw_numbers == False else False
+                        # SPACEBAR
+                        if event.key == pygame.K_SPACE:
+                            calc_next_move = True
                     # self.game.player_move(legal_moves[random.randint(1, len(legal_moves))-1], self.game.player)
                     
                     # If it is the humans turn the click event will handle everything
                     # self.print_board()
-                    self.highlight_squares(self.game.legal_moves)
-                    self.draw_board()
-                    pygame.display.flip() # needs to be called outside draw function
+                if(calc_next_move):    
+                    if(self.game.player == CheckersPlayer.WHITE): # white player
+                        if(self.white_mcts):
+                            self.white_player = MCTS(self.game, self.args1)
+                            stime = time.time()
+                            move = self.white_player.search()
+                            print("thinking time: ", time.time()-stime)
+                            self.do_game_move(move)
+                            self.redraw_board()
+                        elif(not isinstance(self.white_player, human_player)):
+                            move = self.white_player.select_move(self.game.legal_moves)
+                            self.do_game_move(move)
+                            self.redraw_board()
+                    else: # black player
+                        if(self.black_mcts):
+                            self.black_player = MCTS(self.game, self.args2)
+                            stime = time.time()
+                            move = self.black_player.search()
+                            print("thinking time: ", time.time()-stime)
+                            self.do_game_move(move)
+                            self.redraw_board()
+                        elif(not isinstance(self.black_player, human_player)):
+                            move = self.black_player.select_move(self.game.legal_moves)
+                            self.do_game_move(move)
+                            self.redraw_board()
+                self.highlight_squares(self.game.legal_moves)
+                self.draw_board()
+                pygame.display.flip() # needs to be called outside draw function
                     # time.sleep(1)
             else: # ASCII BOARD
                 prev_take = False # Always reset
@@ -345,6 +352,12 @@ class GameInterface:
             else:
                 color = LIGHT_BROWN if (id) % 2 == 0 else DARK_BROWN
             pygame.draw.rect(self.screen, color, (screen_x, screen_y, SQUARE_W, SQUARE_H))
+            # Draw numbers on top of squares
+            if(self.draw_numbers):
+                my_font = pygame.font.SysFont('Comic Sans MS', 20)
+                text_surface = my_font.render(str(id), False, (0, 0, 0))
+                text_rect = text_surface.get_rect(center=(screen_x+SQUARE_W//2, screen_y+SQUARE_H//2)) # centers the image
+                self.screen.blit(text_surface, text_rect)
             highlight = True if (id in self.highlighted_squares) else False
             if(str(id) in black_pieces):
                 # pygame.draw.circle(self.screen, RED, (screen_x+SQUARE_W//2, screen_y+SQUARE_H//2), int(SQUARE_W-0.15*SQUARE_W)//2)

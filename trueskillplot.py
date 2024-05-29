@@ -30,6 +30,10 @@ for i, variant in enumerate(variants):
     stds = [rating[1] for rating in ratings[variant]]
     plt.errorbar(x, means, yerr=stds, fmt='o', capsize=5, label=variant, color=colors[i])
 
+     # Linear regression
+    poly = np.polyfit(x, means, 1)
+    plt.plot(x, np.polyval(poly, x), color=colors[i], linestyle='--')
+
 # Adding vertical lines between agents
 for i in range(len(agents) - 1):
     plt.axvline(x=i + 0.75, color='grey', linestyle='--', linewidth=0.5)
@@ -40,5 +44,5 @@ plt.ylabel('TrueSkill rating')
 plt.title('TrueSkill ratings for different agents in various checkers variants on a normal 8x8 checkerboard')
 plt.legend()
 plt.tight_layout()
-plt.savefig('trueskill_ratings.png')
-# plt.show()
+# plt.savefig('trueskill_ratings.png')
+plt.show()

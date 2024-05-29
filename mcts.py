@@ -24,6 +24,9 @@ class MCTS():
     def search(self):
         # Define root node
         inp = False
+        # If there is only 1 legal move, return that one
+        if(len(self.game.legal_moves) == 1):
+            return self.game.legal_moves[0]
         for srch in range(self.args['num_searches']):
             # if(inp):
                 # input(f"###############Press enter to start search {i}")

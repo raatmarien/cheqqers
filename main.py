@@ -59,7 +59,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--num_rows', help='The number of rows of the checkboard. INT', default=8)
     parser.add_argument('--num_columns', help='The number of columns of the checkboard. INT', default=8)
-    parser.add_argument('--num_vertical_pieces', help='The number of rows that are filled with checkerpieces. INT', default=1)
+    parser.add_argument('--num_vertical_pieces', help='The number of rows that are filled with checkerpieces. INT', default=3)
     parser.add_argument('--sim_q', help='Simulating quantum or actually use quantum mechanics. TRUE if you want to simulate quantum.', default="False")
     parser.add_argument('--GUI', help='If GUI is enabled. True or False', default="False")
     parser.add_argument('--p1', help='Select agent for player 1 to use.', default=human_player())
@@ -95,10 +95,10 @@ def main():
     file = open("./results2.txt", "a")
     # rules = [CheckersRules.CLASSICAL, CheckersRules.QUANTUM_V1, CheckersRules.QUANTUM_V2]
     rules = [CheckersRules.QUANTUM_V2]
-    sizes = [5]
-    agents = ["random", "heuristic", "low_mcts", "high_mcts"]
+    sizes = [8]
+    # agents = ["random", "heuristic", "low_mcts", "high_mcts"]
     # just mcts agents
-    # agents = ["high_mcts", "high_mcts"]
+    agents = ["low_mcts", "low_mcts"]
     for rule in rules:
         for size in sizes:  
             ratings = {
