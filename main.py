@@ -94,18 +94,18 @@ def main():
     file.close()
     file = open("./results2.txt", "a")
     # rules = [CheckersRules.CLASSICAL, CheckersRules.QUANTUM_V1, CheckersRules.QUANTUM_V2]
-    rules = [CheckersRules.QUANTUM_V2]
+    rules = [CheckersRules.QUANTUM_V1]
     sizes = [8]
-    # agents = ["random", "heuristic", "low_mcts", "high_mcts"]
+    agents = ["random", "heuristic", "low_mcts", "high_mcts"]
     # just mcts agents
-    agents = ["low_mcts", "low_mcts"]
+    # agents = ["low_mcts", "low_mcts"]
     for rule in rules:
         for size in sizes:  
             ratings = {
-                'random': trueskill.Rating(),
-                'heuristic': trueskill.Rating(),
-                'low_mcts': trueskill.Rating(),
-                'high_mcts': trueskill.Rating()
+                'random': trueskill.Rating(mu=12.638, sigma=2.593),
+                'heuristic': trueskill.Rating(mu=22.257, sigma=1.694),
+                'low_mcts': trueskill.Rating(mu=28.690, sigma=1.586),
+                'high_mcts': trueskill.Rating(mu=32.362, sigma=1.694)
             }
             # size = 5
             # rule = CheckersRules.CLASSICAL
@@ -135,8 +135,8 @@ def main():
             for k in range(iterations):
                 print(time.time() - stime)
                 stime = time.time()
-                if(k%10 == 0):
-                    print(f"Iteration: {k+1}")
+                # if(k%10 == 0):
+                print(f"Iteration: {k+1}")
                 sd = random.randint(0, 100000000000000000)
                 # sd = 4271756581358815
                 random.seed(sd)
