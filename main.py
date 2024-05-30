@@ -94,18 +94,25 @@ def main():
     file.close()
     file = open("./results2.txt", "a")
     # rules = [CheckersRules.CLASSICAL, CheckersRules.QUANTUM_V1, CheckersRules.QUANTUM_V2]
-    rules = [CheckersRules.QUANTUM_V2]
+    rules = [CheckersRules.CLASSICAL]
     sizes = [8]
-    agents = ["random", "heuristic", "low_mcts", "high_mcts"]
+    # agents = ["random", "heuristic", "low_mcts", "high_mcts"]
     # just mcts agents
-    # agents = ["low_mcts", "low_mcts"]
+    agents = ["heuristic", "high_mcts"]
     for rule in rules:
         for size in sizes:  
+            # ratings = {
+            #     'random': trueskill.Rating(mu=16.947, sigma=2.045),
+            #     'heuristic': trueskill.Rating(mu=22.949, sigma=1.638),
+            #     'low_mcts': trueskill.Rating(mu=29.595, sigma=1.681),
+            #     'high_mcts': trueskill.Rating(mu=30.348, sigma=1.654)
+            # }
+            # default ratings
             ratings = {
-                'random': trueskill.Rating(mu=16.947, sigma=2.045),
-                'heuristic': trueskill.Rating(mu=22.949, sigma=1.638),
-                'low_mcts': trueskill.Rating(mu=29.595, sigma=1.681),
-                'high_mcts': trueskill.Rating(mu=30.348, sigma=1.654)
+                'random': trueskill.Rating(),
+                'heuristic': trueskill.Rating(),
+                'low_mcts': trueskill.Rating(),
+                'high_mcts': trueskill.Rating()
             }
             # size = 5
             # rule = CheckersRules.CLASSICAL
@@ -136,7 +143,8 @@ def main():
                 print(time.time() - stime)
                 stime = time.time()
                 # if(k%10 == 0):
-                print(f"Iteration: {k+1}")
+                # print time at hour and minute
+                print(f"Iteration: {k+1} at {time.strftime('%H:%M', time.localtime())}")
                 sd = random.randint(0, 100000000000000000)
                 # sd = 4271756581358815
                 random.seed(sd)
