@@ -94,7 +94,7 @@ def main():
     file.close()
     file = open("./results2.txt", "a")
     # rules = [CheckersRules.CLASSICAL, CheckersRules.QUANTUM_V1, CheckersRules.QUANTUM_V2]
-    rules = [CheckersRules.QUANTUM_V1]
+    rules = [CheckersRules.QUANTUM_V2]
     sizes = [8]
     agents = ["random", "heuristic", "low_mcts", "high_mcts"]
     # just mcts agents
@@ -102,10 +102,10 @@ def main():
     for rule in rules:
         for size in sizes:  
             ratings = {
-                'random': trueskill.Rating(mu=12.638, sigma=2.593),
-                'heuristic': trueskill.Rating(mu=22.257, sigma=1.694),
-                'low_mcts': trueskill.Rating(mu=28.690, sigma=1.586),
-                'high_mcts': trueskill.Rating(mu=32.362, sigma=1.694)
+                'random': trueskill.Rating(mu=16.947, sigma=2.045),
+                'heuristic': trueskill.Rating(mu=22.949, sigma=1.638),
+                'low_mcts': trueskill.Rating(mu=29.595, sigma=1.681),
+                'high_mcts': trueskill.Rating(mu=30.348, sigma=1.654)
             }
             # size = 5
             # rule = CheckersRules.CLASSICAL
