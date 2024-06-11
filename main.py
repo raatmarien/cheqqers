@@ -59,7 +59,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--num_rows', help='The number of rows of the checkboard. INT', default=8)
     parser.add_argument('--num_columns', help='The number of columns of the checkboard. INT', default=8)
-    parser.add_argument('--num_vertical_pieces', help='The number of rows that are filled with checkerpieces. INT', default=3)
+    parser.add_argument('--num_vertical_pieces', help='The number of rows that are filled with checkerpieces. INT', default=1)
     parser.add_argument('--sim_q', help='Simulating quantum or actually use quantum mechanics. TRUE if you want to simulate quantum.', default="False")
     parser.add_argument('--GUI', help='If GUI is enabled. True or False', default="False")
     parser.add_argument('--p1', help='Select agent for player 1 to use.', default=human_player())
@@ -93,12 +93,12 @@ def main():
     file = open("./results2.txt", "w")
     file.close()
     file = open("./results2.txt", "a")
-    # rules = [CheckersRules.CLASSICAL, CheckersRules.QUANTUM_V1, CheckersRules.QUANTUM_V2]
-    rules = [CheckersRules.CLASSICAL]
-    sizes = [8]
+    rules = [CheckersRules.CLASSICAL, CheckersRules.QUANTUM_V1, CheckersRules.QUANTUM_V2]
+    # rules = [CheckersRules.QUANTUM_V2]
+    sizes = [5, 6, 7, 8, 10, 12, 14]
     # agents = ["random", "heuristic", "low_mcts", "high_mcts"]
     # just mcts agents
-    agents = ["heuristic", "high_mcts"]
+    agents = ["random", "random"]
     for rule in rules:
         for size in sizes:  
             # ratings = {
@@ -131,7 +131,7 @@ def main():
             file.write(f"Board size: {size}x{size}\n")
             file.write("-"*100 + "\n")
             print(f"Board size: {size}x{size}, Rule: {rule}")
-            iterations = 5
+            iterations = 500
             stime = time.time()
             low_white_wins = 0
             high_white_wins = 0
@@ -191,7 +191,7 @@ def main():
                         if(i == "low_mcts"):
                             low_wins += 1
                             low_white_wins += 1
-                        else:
+                        elif(i == "high_mcts"):
                             high_white_wins += 1
                             high_wins += 1
                     elif(result == CheckersResult.BLACK_WINS):
@@ -199,7 +199,7 @@ def main():
                         if(j == "low_mcts"):
                             low_wins += 1
                             low_black_wins += 1
-                        else:
+                        elif(j == "high_mcts"):
                             high_wins += 1
                             high_black_wins += 1
                         new_r2, new_r1 = env.rate_1vs1(ratings[j], ratings[i])
@@ -213,51 +213,51 @@ def main():
                     times.append(time.time()-start_t)
                     for l in movetypes:
                         movetypes[l] += single_movetypes[l]
-                    if((k+1)%10 == 0 and k+1 != iterations):
-                        print(f"Random agent: {ratings['random']}")
-                        print(f"Heuristic agent: {ratings['heuristic']}")
-                        print(f"Low MCTS agent: {ratings['low_mcts']}")
-                        print(f"High MCTS agent: {ratings['high_mcts']}")
-                        # print(f"All ratings: Random agent: {random_rating}, Heuristic agent: {heuristic_rating}, Low MCTS agent: {mcts_low_rating}, High MCTS agent: {mcts_high_rating}")
-                        print(f"Low wins: {low_wins}, High wins: {high_wins}")
-                        print(f"low_white_wins: {low_white_wins}, high_white_wins: {high_white_wins}")
-                        print(f"low_black_wins: {low_black_wins}, high_black_wins: {high_black_wins}")
-                        print(f"Agent wincount: {agent_wincount}")
-                        print(f"Draw: {results.count(CheckersResult.DRAW)}, White wins: {results.count(CheckersResult.WHITE_WINS)}, Black wins: {results.count(CheckersResult.BLACK_WINS)}")
+                    # if((k+1)%10 == 0 and k+1 != iterations):
+                    #     print(f"Random agent: {ratings['random']}")
+                    #     print(f"Heuristic agent: {ratings['heuristic']}")
+                    #     print(f"Low MCTS agent: {ratings['low_mcts']}")
+                    #     print(f"High MCTS agent: {ratings['high_mcts']}")
+                    #     # print(f"All ratings: Random agent: {random_rating}, Heuristic agent: {heuristic_rating}, Low MCTS agent: {mcts_low_rating}, High MCTS agent: {mcts_high_rating}")
+                    #     print(f"Low wins: {low_wins}, High wins: {high_wins}")
+                    #     print(f"low_white_wins: {low_white_wins}, high_white_wins: {high_white_wins}")
+                    #     print(f"low_black_wins: {low_black_wins}, high_black_wins: {high_black_wins}")
+                    #     print(f"Agent wincount: {agent_wincount}")
+                    #     print(f"Draw: {results.count(CheckersResult.DRAW)}, White wins: {results.count(CheckersResult.WHITE_WINS)}, Black wins: {results.count(CheckersResult.BLACK_WINS)}")
                 
                     #     print(f"Draw: {results.count(CheckersResult.DRAW)}, White wins: {results.count(CheckersResult.WHITE_WINS)}, Black wins: {results.count(CheckersResult.BLACK_WINS)}")
                     #     print(f"Average number of moves: {sum(number_of_moves)/len(number_of_moves)}")
                     #     print(f"Average time for mcts move: {sum(avg_mcts_time)/len(avg_mcts_time)}")
-                print("#"*100)
-                # print(f"Average time: {sum(times)/len(times)}, minimum time: {min(times)}, max time: {max(times)}")
-                # print(f"Average number of moves: {sum(number_of_moves)/len(number_of_moves)}")
-                # print(f"Average time for mcts move: {sum(avg_mcts_time)/len(avg_mcts_time)}")
-                # print(f"Movetypes: {movetypes}")
-                print(f"Random agent: {ratings['random']}")
-                print(f"Heuristic agent: {ratings['heuristic']}")
-                print(f"Low MCTS agent: {ratings['low_mcts']}")
-                print(f"High MCTS agent: {ratings['high_mcts']}")
-                # print(f"All ratings: Random agent: {random_rating}, Heuristic agent: {heuristic_rating}, Low MCTS agent: {mcts_low_rating}, High MCTS agent: {mcts_high_rating}")
-                print(f"Low wins: {low_wins}, High wins: {high_wins}")
-                print(f"low_white_wins: {low_white_wins}, high_white_wins: {high_white_wins}")
-                print(f"low_black_wins: {low_black_wins}, high_black_wins: {high_black_wins}")
-                print(f"Agent wincount: {agent_wincount}")
-                print(f"Draw: {results.count(CheckersResult.DRAW)}, White wins: {results.count(CheckersResult.WHITE_WINS)}, Black wins: {results.count(CheckersResult.BLACK_WINS)}")
-                file.write("iteration: " + str(k) + "\n")
+            print("#"*100)
+            print(f"Average time: {sum(times)/len(times)}, minimum time: {min(times)}, max time: {max(times)}")
+            print(f"Average number of moves: {sum(number_of_moves)/len(number_of_moves)}")
+            # print(f"Average time for mcts move: {sum(avg_mcts_time)/len(avg_mcts_time)}")
+            # print(f"Movetypes: {movetypes}")
+            # print(f"Random agent: {ratings['random']}")
+            # print(f"Heuristic agent: {ratings['heuristic']}")
+            # print(f"Low MCTS agent: {ratings['low_mcts']}")
+            # print(f"High MCTS agent: {ratings['high_mcts']}")
+            # # print(f"All ratings: Random agent: {random_rating}, Heuristic agent: {heuristic_rating}, Low MCTS agent: {mcts_low_rating}, High MCTS agent: {mcts_high_rating}")
+            # print(f"Low wins: {low_wins}, High wins: {high_wins}")
+            # print(f"low_white_wins: {low_white_wins}, high_white_wins: {high_white_wins}")
+            # print(f"low_black_wins: {low_black_wins}, high_black_wins: {high_black_wins}")
+            # print(f"Agent wincount: {agent_wincount}")
+            # print(f"Draw: {results.count(CheckersResult.DRAW)}, White wins: {results.count(CheckersResult.WHITE_WINS)}, Black wins: {results.count(CheckersResult.BLACK_WINS)}")
+            file.write("iteration: " + str(k) + "\n")
                 # file.write(f"White agent: {i}, Black agent: {j}\n")
-                # file.write(f"Average time: {sum(times)/len(times)}, minimum time: {min(times)}, max time: {max(times)}\n")
-                # file.write(f"Average number of moves: {sum(number_of_moves)/len(number_of_moves)}\n")
+            file.write(f"Average time: {sum(times)/len(times)}, minimum time: {min(times)}, max time: {max(times)}\n")
+            file.write(f"Average number of moves: {sum(number_of_moves)/len(number_of_moves)}\n")
                 # file.write(f"Average time for mcts move: {sum(avg_mcts_time)/len(avg_mcts_time)}\n")
-                file.write(f"Movetypes: {movetypes}\n")
-                file.write(f"Random agent: {ratings['random']}\n")
-                file.write(f"Heuristic agent: {ratings['heuristic']}\n")
-                file.write(f"Low MCTS agent: {ratings['low_mcts']}\n")
-                file.write(f"High MCTS agent: {ratings['high_mcts']}\n")
-                file.write(f"low_white_wins: {low_white_wins}, high_white_wins: {high_white_wins}\n")
-                file.write(f"low_black_wins: {low_black_wins}, high_black_wins: {high_black_wins}\n")
-                file.write(f"Agent wincount: {agent_wincount}\n")
-                # file.write(f"All ratings: Random agent: {random_rating}, Heuristic agent: {heuristic_rating}, Low MCTS agent: {mcts_low_rating}, High MCTS agent: {mcts_high_rating}\n")
-                file.write(f"Draw: {results.count(CheckersResult.DRAW)}, White wins: {results.count(CheckersResult.WHITE_WINS)}, Black wins: {results.count(CheckersResult.BLACK_WINS)}\n")
+                # file.write(f"Movetypes: {movetypes}\n")
+                # file.write(f"Random agent: {ratings['random']}\n")
+                # file.write(f"Heuristic agent: {ratings['heuristic']}\n")
+                # file.write(f"Low MCTS agent: {ratings['low_mcts']}\n")
+                # file.write(f"High MCTS agent: {ratings['high_mcts']}\n")
+                # file.write(f"low_white_wins: {low_white_wins}, high_white_wins: {high_white_wins}\n")
+                # file.write(f"low_black_wins: {low_black_wins}, high_black_wins: {high_black_wins}\n")
+                # file.write(f"Agent wincount: {agent_wincount}\n")
+                # # file.write(f"All ratings: Random agent: {random_rating}, Heuristic agent: {heuristic_rating}, Low MCTS agent: {mcts_low_rating}, High MCTS agent: {mcts_high_rating}\n")
+                # file.write(f"Draw: {results.count(CheckersResult.DRAW)}, White wins: {results.count(CheckersResult.WHITE_WINS)}, Black wins: {results.count(CheckersResult.BLACK_WINS)}\n")
     file.close()
 
 if __name__ == "__main__":
@@ -266,7 +266,9 @@ if __name__ == "__main__":
 # Generate prof:  python3 -m cProfile -o main.prof main.py
 # Visualise prof: snakeviz main.prof
 
-# TODO:
-# RETURN ALL POSSIBLE STATES WERKT NIET
-# PROBLEM:
-# self.entangled squares is not cleaned up properly
+# EXPERIMENT TO DO:
+# REDO experiments for average number of moves and time per game for different board sizes
+# Save all the data values for each game (e.g. time for one game and number of moves for one game)
+# Make a graph and for each board size:
+# calculate average number of moves/time
+# calculate standard deviation
