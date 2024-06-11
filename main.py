@@ -127,13 +127,12 @@ def main():
                 "ENTANGLE": 0,
                 "TAKE": 0
             }
-            file.write("-"*100 + "\n")
+            file.write("@"*200 + "\n")
             file.write(f"Rule: {rule}\n")
             file.write(f"Board size: {size}x{size}\n")
-            file.write("-"*100 + "\n")
+            file.write("@"*200 + "\n")
             print(f"Board size: {size}x{size}, Rule: {rule}")
             iterations = 500
-            stime = time.time()
             low_white_wins = 0
             high_white_wins = 0
             low_black_wins = 0
@@ -141,17 +140,14 @@ def main():
             low_wins = 0
             high_wins = 0
             for k in range(iterations):
-                print(time.time() - stime)
-                stime = time.time()
-                # if(k%10 == 0):
-                # print time at hour and minute
-                print(f"Iteration: {k+1} at {time.strftime('%H:%M', time.localtime())}")
+                if(k%50 == 0):
+                    print(f"Iteration: {k+1} at {time.strftime('%H:%M', time.localtime())}")
                 sd = random.randint(0, 100000000000000000)
                 # sd = 4271756581358815
                 random.seed(sd)
                 random.shuffle(agents)
                 matches = generate_matches(agents)
-                print("Matches:", matches)
+                # print("Matches:", matches)
                 for i, j in matches:
                     white_mcts = False
                     black_mcts = False
@@ -229,7 +225,7 @@ def main():
                     #     print(f"Average number of moves: {sum(number_of_moves)/len(number_of_moves)}")
                     #     print(f"Average time for mcts move: {sum(avg_mcts_time)/len(avg_mcts_time)}")
             print("#"*100)
-            print(f"All times: {times}")
+            # print(f"All times: {times}")
             print(f"Average time: {sum(times)/len(times)}, minimum time: {min(times)}, max time: {max(times)}")
             print(f"Standard deviation average times: {statistics.stdev(times)}")
             print(f"Average number of moves: {sum(number_of_moves)/len(number_of_moves)}")
@@ -249,7 +245,8 @@ def main():
             # print(f"Agent wincount: {agent_wincount}")
             # print(f"Draw: {results.count(CheckersResult.DRAW)}, White wins: {results.count(CheckersResult.WHITE_WINS)}, Black wins: {results.count(CheckersResult.BLACK_WINS)}")
             file.write("iteration: " + str(k) + "\n")
-            file.write(f"All times: {times}")
+            file.write(f"All times: {times}\n")
+            file.write(f"All moves: {number_of_moves}\n")
                 # file.write(f"White agent: {i}, Black agent: {j}\n")
             file.write(f"Average time: {sum(times)/len(times)}, minimum time: {min(times)}, max time: {max(times)}\n")
             file.write(f"Standard deviation average times: {statistics.stdev(times)}\n")
