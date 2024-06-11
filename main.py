@@ -13,6 +13,7 @@ import os
 import glob
 import random
 import trueskill
+import statistics
 
 def generate_matches(agents):
     matches = []
@@ -225,12 +226,16 @@ def main():
                     #     print(f"Agent wincount: {agent_wincount}")
                     #     print(f"Draw: {results.count(CheckersResult.DRAW)}, White wins: {results.count(CheckersResult.WHITE_WINS)}, Black wins: {results.count(CheckersResult.BLACK_WINS)}")
                 
-                    #     print(f"Draw: {results.count(CheckersResult.DRAW)}, White wins: {results.count(CheckersResult.WHITE_WINS)}, Black wins: {results.count(CheckersResult.BLACK_WINS)}")
                     #     print(f"Average number of moves: {sum(number_of_moves)/len(number_of_moves)}")
                     #     print(f"Average time for mcts move: {sum(avg_mcts_time)/len(avg_mcts_time)}")
             print("#"*100)
+            print(f"All times: {times}")
             print(f"Average time: {sum(times)/len(times)}, minimum time: {min(times)}, max time: {max(times)}")
+            print(f"Standard deviation average times: {statistics.stdev(times)}")
             print(f"Average number of moves: {sum(number_of_moves)/len(number_of_moves)}")
+            print(f"Standard deviation average number of moves: {statistics.stdev(number_of_moves)}")
+            print(f"Draw: {results.count(CheckersResult.DRAW)}, White wins: {results.count(CheckersResult.WHITE_WINS)}, Black wins: {results.count(CheckersResult.BLACK_WINS)}")
+
             # print(f"Average time for mcts move: {sum(avg_mcts_time)/len(avg_mcts_time)}")
             # print(f"Movetypes: {movetypes}")
             # print(f"Random agent: {ratings['random']}")
@@ -244,9 +249,13 @@ def main():
             # print(f"Agent wincount: {agent_wincount}")
             # print(f"Draw: {results.count(CheckersResult.DRAW)}, White wins: {results.count(CheckersResult.WHITE_WINS)}, Black wins: {results.count(CheckersResult.BLACK_WINS)}")
             file.write("iteration: " + str(k) + "\n")
+            file.write(f"All times: {times}")
                 # file.write(f"White agent: {i}, Black agent: {j}\n")
             file.write(f"Average time: {sum(times)/len(times)}, minimum time: {min(times)}, max time: {max(times)}\n")
+            file.write(f"Standard deviation average times: {statistics.stdev(times)}\n")
             file.write(f"Average number of moves: {sum(number_of_moves)/len(number_of_moves)}\n")
+            file.write(f"Standard deviation average number of moves: {statistics.stdev(number_of_moves)}\n")
+            file.write(f"Draw: {results.count(CheckersResult.DRAW)}, White wins: {results.count(CheckersResult.WHITE_WINS)}, Black wins: {results.count(CheckersResult.BLACK_WINS)}\n")
                 # file.write(f"Average time for mcts move: {sum(avg_mcts_time)/len(avg_mcts_time)}\n")
                 # file.write(f"Movetypes: {movetypes}\n")
                 # file.write(f"Random agent: {ratings['random']}\n")
