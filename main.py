@@ -94,9 +94,9 @@ def main():
     file = open("./results2.txt", "w")
     file.close()
     file = open("./results2.txt", "a")
-    rules = [CheckersRules.QUANTUM_V1]
+    rules = [CheckersRules.QUANTUM_V2]
     # rules = [CheckersRules.QUANTUM_V2]
-    sizes = [14]
+    sizes = [12, 14]
     # agents = ["random", "heuristic", "low_mcts", "high_mcts"]
     # just mcts agents
     agents = ["random", "random"]
@@ -140,7 +140,7 @@ def main():
             low_wins = 0
             high_wins = 0
             for k in range(iterations):
-                if(k%50 == 0):
+                if(k%250 == 0 and k != 0):
                     print(f"Iteration: {k+1} at {time.strftime('%H:%M', time.localtime())}")
                 sd = random.randint(0, 100000000000000000)
                 # sd = 4271756581358815
@@ -224,14 +224,14 @@ def main():
                 
                     #     print(f"Average number of moves: {sum(number_of_moves)/len(number_of_moves)}")
                     #     print(f"Average time for mcts move: {sum(avg_mcts_time)/len(avg_mcts_time)}")
-                if(k%50==0):
-                    print("#"*100)
-                    # print(f"All times: {times}")
-                    print(f"Average time: {sum(times)/len(times)}, minimum time: {min(times)}, max time: {max(times)}")
-                    print(f"Standard deviation average times: {statistics.stdev(times)}")
-                    print(f"Average number of moves: {sum(number_of_moves)/len(number_of_moves)}")
-                    print(f"Standard deviation average number of moves: {statistics.stdev(number_of_moves)}")
-                    print(f"Draw: {results.count(CheckersResult.DRAW)}, White wins: {results.count(CheckersResult.WHITE_WINS)}, Black wins: {results.count(CheckersResult.BLACK_WINS)}")
+                # if(k%250==0):
+                #     print("#"*100)
+                #     # print(f"All times: {times}")
+                #     print(f"Average time: {sum(times)/len(times)}, minimum time: {min(times)}, max time: {max(times)}")
+                #     print(f"Standard deviation average times: {statistics.stdev(times)}")
+                #     print(f"Average number of moves: {sum(number_of_moves)/len(number_of_moves)}")
+                #     print(f"Standard deviation average number of moves: {statistics.stdev(number_of_moves)}")
+                #     print(f"Draw: {results.count(CheckersResult.DRAW)}, White wins: {results.count(CheckersResult.WHITE_WINS)}, Black wins: {results.count(CheckersResult.BLACK_WINS)}")
 
                     # print(f"Average time for mcts move: {sum(avg_mcts_time)/len(avg_mcts_time)}")
                     # print(f"Movetypes: {movetypes}")
@@ -245,15 +245,15 @@ def main():
                     # print(f"low_black_wins: {low_black_wins}, high_black_wins: {high_black_wins}")
                     # print(f"Agent wincount: {agent_wincount}")
                     # print(f"Draw: {results.count(CheckersResult.DRAW)}, White wins: {results.count(CheckersResult.WHITE_WINS)}, Black wins: {results.count(CheckersResult.BLACK_WINS)}")
-                    file.write("iteration: " + str(k) + "\n")
-                    file.write(f"All times: {times}\n")
-                    file.write(f"All moves: {number_of_moves}\n")
-                        # file.write(f"White agent: {i}, Black agent: {j}\n")
-                    file.write(f"Average time: {sum(times)/len(times)}, minimum time: {min(times)}, max time: {max(times)}\n")
-                    file.write(f"Standard deviation average times: {statistics.stdev(times)}\n")
-                    file.write(f"Average number of moves: {sum(number_of_moves)/len(number_of_moves)}\n")
-                    file.write(f"Standard deviation average number of moves: {statistics.stdev(number_of_moves)}\n")
-                    file.write(f"Draw: {results.count(CheckersResult.DRAW)}, White wins: {results.count(CheckersResult.WHITE_WINS)}, Black wins: {results.count(CheckersResult.BLACK_WINS)}\n")
+                    # file.write("iteration: " + str(k) + "\n")
+                    # file.write(f"All times: {times}\n")
+                    # file.write(f"All moves: {number_of_moves}\n")
+                    #     # file.write(f"White agent: {i}, Black agent: {j}\n")
+                    # file.write(f"Average time: {sum(times)/len(times)}, minimum time: {min(times)}, max time: {max(times)}\n")
+                    # file.write(f"Standard deviation average times: {statistics.stdev(times)}\n")
+                    # file.write(f"Average number of moves: {sum(number_of_moves)/len(number_of_moves)}\n")
+                    # file.write(f"Standard deviation average number of moves: {statistics.stdev(number_of_moves)}\n")
+                    # file.write(f"Draw: {results.count(CheckersResult.DRAW)}, White wins: {results.count(CheckersResult.WHITE_WINS)}, Black wins: {results.count(CheckersResult.BLACK_WINS)}\n")
                 # file.write(f"Average time for mcts move: {sum(avg_mcts_time)/len(avg_mcts_time)}\n")
                 # file.write(f"Movetypes: {movetypes}\n")
                 # file.write(f"Random agent: {ratings['random']}\n")
