@@ -148,21 +148,8 @@ class GameInterface:
         times = []
         while(self.game.status == CheckersResult.UNFINISHED and not self.quit):
             if(self.GUI):
-
-
-                # if(self.game.player == CheckersPlayer.WHITE and not isinstance(self.white_player, human_player)):
-                #     move = self.white_player.select_move(self.game.legal_moves)
-                #     self.do_game_move(move)
-                #     prev_take = False
-                # elif(self.game.player == CheckersPlayer.BLACK and not isinstance(self.black_player, human_player)):
-                #     self.black_player = MCTS(self.game, self.args)
-                #     # move = self.black_player.search()
-                #     move = self.white_player.select_move(self.game.legal_moves)
-                #     self.do_game_move(move)
-                # for(i in self.game.related_squares):
-                #     if(id in i):
-                #     pass
-                calc_next_move = False
+                moved = False # init empty
+                calc_next_move = True
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         pygame.quit()
@@ -173,8 +160,7 @@ class GameInterface:
                     if event.type == pygame.MOUSEBUTTONUP and ((self.game.player == CheckersPlayer.WHITE and isinstance(self.white_player, human_player)) or (self.game.player == CheckersPlayer.BLACK and isinstance(self.black_player, human_player))):
                         # Detect swipes for quantum moves
                         moved, _ = self.handle_click(down_pos, event.pos)
-                        # if(moved):
-                        #     self.print_board()
+                        print(self.game.status)
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_c:
                             self.draw_chance = True if self.draw_chance == False else False
@@ -187,7 +173,7 @@ class GameInterface:
                     
                     # If it is the humans turn the click event will handle everything
                     # self.print_board()
-                if(calc_next_move):    
+                if(calc_next_move and not moved):    
                     if(self.game.player == CheckersPlayer.WHITE): # white player
                         if(self.white_mcts):
                             self.white_player = MCTS(self.game, self.args1)
@@ -197,7 +183,7 @@ class GameInterface:
                             self.do_game_move(move)
                             self.redraw_board()
                         elif(not isinstance(self.white_player, human_player)):
-                            move = self.white_player.select_move(self.game.legal_moves)
+                            move = self.white_player.select_move(self.game, self.game.legal_moves)
                             self.do_game_move(move)
                             self.redraw_board()
                     else: # black player
@@ -209,7 +195,7 @@ class GameInterface:
                             self.do_game_move(move)
                             self.redraw_board()
                         elif(not isinstance(self.black_player, human_player)):
-                            move = self.black_player.select_move(self.game.legal_moves)
+                            move = self.black_player.select_move(self.game, self.game.legal_moves)
                             self.do_game_move(move)
                             self.redraw_board()
                 self.highlight_squares(self.game.legal_moves)
@@ -221,8 +207,8 @@ class GameInterface:
                 attempt_str = ""
                 attempt_str = self.game.get_sim_board()
                 if(self.print):
-                    print("Simulated board")
-                    self.print_board(True)
+                    # print("Simulated board")
+                    # self.print_board(True)
                     print("Real board")
                     self.print_board(False)
                     self.print_legal_moves(self.game.legal_moves)
@@ -408,9 +394,8 @@ class GameInterface:
         """
         Handles clicking on the board. Returns true if a move was done
         """
-        print("ALL LEGAL MOVES")
-        for i in self.game.legal_moves:
-            i.print_move()
+
+        print(self.game.status)
         self.highlighted_squares = []
         mouse_x, mouse_y = first_pos[0], first_pos[1]
         first_id = self.get_id_from_mouse_pos(mouse_x, mouse_y)

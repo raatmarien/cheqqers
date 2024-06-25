@@ -42,7 +42,7 @@ def write_attempt(idx, attempt_str):
         temp.write(attempt_str)
         temp.close()
 
-def main():
+def run_experiments():
     args_low = {
         'C': 1.4, # srqt 2
         'num_searches': 200, # Budget per rollout
@@ -276,6 +276,76 @@ def main():
             file.write(f"Draw: {results.count(CheckersResult.DRAW)}, White wins: {results.count(CheckersResult.WHITE_WINS)}, Black wins: {results.count(CheckersResult.BLACK_WINS)}\n")
                 
     file.close()
+
+def play_normal_game():
+    args_low = {
+        'C': 1.4, # srqt 2
+        'num_searches': 200, # Budget per rollout
+        'num_simulations': 1, # Budget for extra simulations per node
+        'attempt': 0,
+    }
+    args_high = {
+        'C': 1.4, # srqt 2
+        'num_searches': 800, # Budget per rollout
+        'num_simulations': 1, # Budget for extra simulations per node
+        'attempt': 0,
+    }
+    env = trueskill.TrueSkill()
+    empty_attempts_folder()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--num_rows', help='The number of rows of the checkboard. INT', default=5)
+    parser.add_argument('--num_columns', help='The number of columns of the checkboard. INT', default=5)
+    parser.add_argument('--num_vertical_pieces', help='The number of rows that are filled with checkerpieces. INT', default=1)
+    parser.add_argument('--sim_q', help='Simulating quantum or actually use quantum mechanics. TRUE if you want to simulate quantum.', default="False")
+    parser.add_argument('--GUI', help='If GUI is enabled. True or False', default="False")
+    parser.add_argument('--p1', help='Select agent for player 1 to use.', default=human_player())
+    parser.add_argument('--p2', help='Select agent for player 2 to use.', default=human_player())
+    args = parser.parse_args()
+    p1 = random_bot()
+    # p2 = random_bot()
+    # p1 = heurisitc_bot()
+    # p2 = heurisitc_bot()
+    # p1 = human_player()
+    p2 = human_player()
+    white_mcts = False
+    black_mcts = False
+    rule = CheckersRules.CLASSICAL
+    args1 = args_low
+    args2 = args_low
+
+    agent_wincount = {
+        'random': 0,
+        'heuristic': 0,
+        'low_mcts': 0,
+        'high_mcts': 0
+    }
+    agent_map = {
+        'random': random_bot,
+        'heuristic': heuristic_bot,
+        'human': human_player,
+        'low_mcts': None,
+        'high_mcts': None
+    }
+    if(args.num_columns % 2 == 1 and args.num_rows % 2 == 0):
+        warning_len = len("# WARNING: If the number of columns is uneven and the number of rows is even the board is not symmetrical. #")
+        print("#"*warning_len)
+        print("# WARNING: If the number of columns is uneven and the number of rows is even the board is not symmetrical. #\n# To assure an equal number of pieces, set the number of vertical pieces to an even value.                 #")
+        print("#"*warning_len)
+        time.sleep(5)
+
+    checkers = Checkers(num_vertical=args.num_rows, num_horizontal=args.num_columns, num_vertical_pieces=args.num_vertical_pieces, SIMULATE_QUANTUM=args.sim_q, rules=rule)
+    game = GameInterface(checkers, white_player=p1, black_player=p2, GUI=args.GUI, white_mcts=white_mcts, black_mcts=black_mcts, args_1=args1, args_2=args2, print=True, attempt=99999999)
+    result, num_moves, avg_time, single_movetypes = (game.play())
+    if(result == CheckersResult.WHITE_WINS):
+        print("White wins!")
+    elif(result == CheckersResult.BLACK_WINS):
+        print("Black wins!")
+    else:
+        print("Draw!")
+
+def main():
+    # run_experiments()
+    play_normal_game()
 
 if __name__ == "__main__":
     main()
