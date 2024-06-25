@@ -160,7 +160,6 @@ class GameInterface:
                     if event.type == pygame.MOUSEBUTTONUP and ((self.game.player == CheckersPlayer.WHITE and isinstance(self.white_player, human_player)) or (self.game.player == CheckersPlayer.BLACK and isinstance(self.black_player, human_player))):
                         # Detect swipes for quantum moves
                         moved, _ = self.handle_click(down_pos, event.pos)
-                        print(self.game.status)
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_c:
                             self.draw_chance = True if self.draw_chance == False else False
@@ -394,8 +393,6 @@ class GameInterface:
         """
         Handles clicking on the board. Returns true if a move was done
         """
-
-        print(self.game.status)
         self.highlighted_squares = []
         mouse_x, mouse_y = first_pos[0], first_pos[1]
         first_id = self.get_id_from_mouse_pos(mouse_x, mouse_y)
