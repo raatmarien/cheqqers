@@ -42,6 +42,7 @@ BLUE = (0, 0, 255)
 class GameInterface:
     def __init__(self, game: Checkers, white_player, black_player, args_1, args_2, GUI = False, white_mcts = False, black_mcts = False, print = True, attempt=99999999) -> None:
         self.game = game
+        self.scrshot_counter = 0
         self.quit = False
         self.highlighted_squares = []
         self.selected_id = None # Square select by player, used for highlighting and moving pieces
@@ -55,7 +56,7 @@ class GameInterface:
             self.init_gui()
         else:
             self.GUI = False
-        self.draw_chance = False
+        self.draw_chance = True
         self.draw_numbers = False
         self.white_player = white_player
         self.print = print
@@ -141,6 +142,9 @@ class GameInterface:
         moves = []
         mcts_moves = []
         prev_take = False # variable to check if a piece has been taken before
+        self.draw_board()
+        pygame.image.save(self.screen, f"screenshots/screenshot{self.scrshot_counter}.jpeg")
+        self.scrshot_counter += 1
         # for i in [3, 2, 2, 1, 1, 2, 2, 1]:
         #     # legal_moves = self.get_legal_moves()
         #     self.game.player_move(self.game.legal_moves[i-1], self.game.player)
@@ -172,6 +176,10 @@ class GameInterface:
                     
                     # If it is the humans turn the click event will handle everything
                     # self.print_board()
+                if(moved):
+                    pygame.image.save(self.screen, f"screenshots/screenshot{self.scrshot_counter}.jpeg")
+                    self.scrshot_counter += 1
+
                 if(calc_next_move and not moved):    
                     if(self.game.player == CheckersPlayer.WHITE): # white player
                         if(self.white_mcts):
@@ -197,6 +205,9 @@ class GameInterface:
                             move = self.black_player.select_move(self.game, self.game.legal_moves)
                             self.do_game_move(move)
                             self.redraw_board()
+                    pygame.image.save(self.screen, f"screenshots/screenshot{self.scrshot_counter}.jpeg")
+                    self.scrshot_counter += 1
+
                 self.highlight_squares(self.game.legal_moves)
                 self.draw_board()
                 pygame.display.flip() # needs to be called outside draw function

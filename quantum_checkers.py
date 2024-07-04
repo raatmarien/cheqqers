@@ -214,6 +214,7 @@ class Entangled():
         Returns one possible state as a list of lists for all ids that are related to each other.
         Format is [[id1, Checkersquare.FULL], [id2, Checkersquare.EMPTY], ...]
         """
+        is_taken = False
         chance = random.randint(1, 2)
         # 1 is the piece is being taken
         # 2 is the the piece is not taken
@@ -221,6 +222,7 @@ class Entangled():
         for i in self.all_ids:
             state.append([str(i), CheckersSquare.EMPTY]) # Initalize all qubits to empty
         if(chance == 1):
+            is_taken = True
             # Select random ID from successfully_takes that is true.
             idx = random.randint(0, len(self.successfully_takes)-1)
             for i in state:
@@ -237,7 +239,7 @@ class Entangled():
             for i in state:
                 if i[0] == str(self.not_taken[idx]):
                     i[1] = CheckersSquare.FULL
-        return state
+        return state, is_taken
 
     def remove_id(self, id: str):
         """
@@ -347,6 +349,7 @@ class Checkers:
         """
         Measures single square and returns CheckersSquare.EMPTY or CheckersSquare.FULL for ID
         """
+        taken = False # keeps track if an entangled piece has been taken
         # print("MEASURING BOARD")
         # print(self.get_sim_board())
         # print("ID: ", id)
@@ -383,19 +386,20 @@ class Checkers:
                             self.remove_piece(str(classical_id), True)
                             self.entangled_squares.remove(i)
                             tbr.remove(i)
+                            taken = True
                             continue
                     continue
                 self.remove_piece(str(classical_id))
             for i in tbr:
                 self.entangled_squares.remove(i)
-            return(self.board.peek(objects=[self.squares[str(id)]])[0][0]) # returns for original id
+            return(self.board.peek(objects=[self.squares[str(id)]])[0][0], taken) # returns for original id
         else: # If we are only simulating
             if(len(ids) == 0): # If its is a classical piece
-                return CheckersSquare.FULL
+                return CheckersSquare.FULL, taken
             # There can only be one entangled object
             if(len(to_be_removed) == 1): # Entanglement
                 idx = -1
-                random_state = to_be_removed[0].return_random_state()
+                random_state, taken = to_be_removed[0].return_random_state()
                 all_ids = to_be_removed[0].all_ids
                 self.entangled_objects.remove(to_be_removed[0])
                 # Also need to update self.entangled squares
@@ -413,7 +417,7 @@ class Checkers:
                         idx = i[0]
                     else:
                         self.remove_piece(i[0])
-                return CheckersSquare.FULL if str(idx) == str(id) else CheckersSquare.EMPTY
+                return (CheckersSquare.FULL if str(idx) == str(id) else CheckersSquare.EMPTY), taken
             elif(len(to_be_removed) > 1):  
                 print("ERROR: More than one entangled object")
                 exit()
@@ -435,7 +439,7 @@ class Checkers:
                 if(i == idx):
                     continue
                 self.remove_piece(str(classical_id))
-            return CheckersSquare.FULL if str(ids[idx]) == str(id) else CheckersSquare.EMPTY
+            return (CheckersSquare.FULL if str(ids[idx]) == str(id) else CheckersSquare.EMPTY), taken
 
     def on_board(self, x, y):
         """
@@ -1366,12 +1370,14 @@ class Checkers:
             if(move.movetype == MoveType.TAKE): # If a the source piece is in superposition
                 # First check if the piece we are using is actually there
                 entangled_objects = []
-                if(self.measure_square(move.source_id) == CheckersSquare.EMPTY): # If the piece is not there, turn is wasted
+                result, taken = self.measure_square(move.source_id)
+                if(result == CheckersSquare.EMPTY): # If the piece is not there, turn is wasted
                     self.remove_piece(move.source_id)
                     return taken, True
 
                 # Next check if the piece we are taking is actually there
-                if(self.measure_square(jumped_id) == CheckersSquare.EMPTY): # if it empty our turn is wasted
+                result, taken = self.measure_square(jumped_id)
+                if(result == CheckersSquare.EMPTY): # if it empty our turn is wasted
                     # CHECK IF PIECE WAS ENTANGLED
                     # for count, i in enumerate(self.entangled_squares): # If we have jumped over a piece and it is entangled, we need to remove the piece it is entangled with
                     #     print(i)
@@ -1677,7 +1683,7 @@ class Checkers:
         """
         if(len(self.legal_moves) == 0):
             return CheckersResult.BLACK_WINS if self.player == CheckersPlayer.WHITE else CheckersResult.WHITE_WINS
-        if(self.moves_since_take >= 9999999999999999999999):
+        if(self.moves_since_take >= 40):
             return CheckersResult.DRAW
         return CheckersResult.UNFINISHED
 

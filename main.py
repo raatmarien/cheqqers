@@ -31,6 +31,10 @@ def empty_attempts_folder():
     files = glob.glob('./attempts/*')
     for f in files:
         os.remove(f)
+    
+    files = glob.glob('./screenshots/*')
+    for f in files:
+        os.remove(f)
 
 def empty_attempts():
     files = glob.glob('./attempts/*')
@@ -68,8 +72,8 @@ def run_experiments():
     args = parser.parse_args()
     # p1 = random_bot()
     # p2 = random_bot()
-    # p1 = heurisitc_bot()
-    # p2 = heurisitc_bot()
+    # p1 = heuristic_bot()
+    # p2 = heuristic_bot()
     # p1 = human_player()
     # p2 = human_player()
     agent_wincount = {
@@ -293,25 +297,25 @@ def play_normal_game():
     env = trueskill.TrueSkill()
     empty_attempts_folder()
     parser = argparse.ArgumentParser()
-    parser.add_argument('--num_rows', help='The number of rows of the checkboard. INT', default=5)
-    parser.add_argument('--num_columns', help='The number of columns of the checkboard. INT', default=5)
-    parser.add_argument('--num_vertical_pieces', help='The number of rows that are filled with checkerpieces. INT', default=1)
+    parser.add_argument('--num_rows', help='The number of rows of the checkboard. INT', default=8)
+    parser.add_argument('--num_columns', help='The number of columns of the checkboard. INT', default=8)
+    parser.add_argument('--num_vertical_pieces', help='The number of rows that are filled with checkerpieces. INT', default=3)
     parser.add_argument('--sim_q', help='Simulating quantum or actually use quantum mechanics. TRUE if you want to simulate quantum.', default="False")
     parser.add_argument('--GUI', help='If GUI is enabled. True or False', default="False")
     parser.add_argument('--p1', help='Select agent for player 1 to use.', default=human_player())
     parser.add_argument('--p2', help='Select agent for player 2 to use.', default=human_player())
     args = parser.parse_args()
-    p1 = random_bot()
-    # p2 = random_bot()
-    # p1 = heurisitc_bot()
-    # p2 = heurisitc_bot()
+    # p1 = random_bot()
+    p2 = random_bot()
+    p1 = heuristic_bot()
+    # p2 = heuristic_bot()
     # p1 = human_player()
-    p2 = human_player()
+    # p2 = human_player()
     white_mcts = False
-    black_mcts = False
-    rule = CheckersRules.CLASSICAL
-    args1 = args_low
-    args2 = args_low
+    black_mcts = True
+    rule = CheckersRules.QUANTUM_V2
+    args1 = args_high
+    args2 = args_high
 
     agent_wincount = {
         'random': 0,
