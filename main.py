@@ -309,10 +309,10 @@ def play_normal_game():
     p2 = random_bot()
     p1 = heuristic_bot()
     # p2 = heuristic_bot()
-    # p1 = human_player()
-    # p2 = human_player()
+    p1 = human_player()
+    p2 = human_player()
     white_mcts = False
-    black_mcts = True
+    black_mcts = False
     rule = CheckersRules.QUANTUM_V2
     args1 = args_high
     args2 = args_high
