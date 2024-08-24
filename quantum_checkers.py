@@ -100,11 +100,7 @@ class Piece():
         self.chance = chance
 
 class Entangled():
-<<<<<<< HEAD
-    def __init__(self, related_squares: list, is_taken: str, not_taken: str, successfully_takes: str, unsuccessfully_takes: str) -> None:
-=======
     def __init__(self, related_squares: list, is_taken: list, not_taken: list, successfully_takes: list, unsuccessfully_takes: list) -> None:
->>>>>>> origin/monte-carlo-entanglement
         self.all_ids = related_squares # All ids
         self.is_taken = is_taken # The piece that is being taken by another piece which causes entanglement
         self.not_taken = not_taken # The pieces that are related to the piece that is taken
@@ -113,11 +109,6 @@ class Entangled():
 
     def update_entangled(self, org_id: str, new_ids: list):
         if(org_id in self.all_ids):
-<<<<<<< HEAD
-            self.all_ids.remove(org_id)
-            self.all_ids += new_ids
-    
-=======
             if(org_id in self.is_taken):
                 self.is_taken.remove(org_id)
                 self.is_taken += new_ids
@@ -134,16 +125,11 @@ class Entangled():
             # self.all_ids.remove(org_id) # Deletion happens somewhere else
         # self.all_ids += new_ids
 
->>>>>>> origin/monte-carlo-entanglement
     def measurement(self, id: str):
         """
         This function is called when a measurement is taking place. It returns all ids that are related to the id that is measured.
         """
         if(id in self.all_ids):
-<<<<<<< HEAD
-            return self.all_ids
-        return []
-=======
             return True
         return False
     
@@ -288,7 +274,6 @@ class Entangled():
         print(f"Not taken: {self.not_taken}")
         print(f"Successfully takes: {self.successfully_takes}")
         print(f"Unsuccessfully takes: {self.unsuccessfully_takes}")
->>>>>>> origin/monte-carlo-entanglement
 
 class Checkers:
     def __init__(self, run_on_hardware = False, num_vertical = 5, num_horizontal = 5, num_vertical_pieces = 1, rules = CheckersRules.QUANTUM_V3, SIMULATE_QUANTUM = False) -> None:
@@ -306,12 +291,7 @@ class Checkers:
         self.unique_related_squares = [] # Contains information about 1 piece and its related squares. 
         self.q_rel_moves = [] # parallel to related squares, but keeps track of quantum moves
         self.q_moves = [] # Just a list of al quantum moves so we can do them again when doing a new move
-<<<<<<< HEAD
-        self.entangled_squares = [] # list of squares that have been jumped over causing entanglement
-        self.related_entangled_squares = [] # Total list of squares that are related to the entangled square
-=======
         self.entangled_squares = [] # list of entangled squares
->>>>>>> origin/monte-carlo-entanglement
         self.entangled_objects = [] # list of entangled objects
         self.white_squares = {}
         self.black_squares = {}
@@ -369,44 +349,6 @@ class Checkers:
         """
         Measures single square and returns CheckersSquare.EMPTY or CheckersSquare.FULL for ID
         """
-<<<<<<< HEAD
-        all_ids = self.remove_from_rel_entangled_squares(id)
-        for ids in all_ids:
-            # Check out all ids, for the one that remained, remove all others from classical squares
-            if(not self.SIMULATE_QUANTUM):
-                for classical_id in ids:
-                    self.board.pop(objects=[self.squares[str(classical_id)]])
-                    # original_peek = (self.board.peek(objects=[self.squares[str(id)]])) # peek returns double list of all object peeked. For one object that looks like [[<CheckersSquare.WHITE: 1>]]
-                    peek = (self.board.peek(objects=[self.squares[str(classical_id)]]))
-                    if(peek[0][0] == CheckersSquare.FULL):
-                        self.classical_squares[str(classical_id)].chance = 100
-                        for i in self.entangled_squares: 
-                            if(str(classical_id) in i): # If the piece is in the entangled squares it has been jumped over and needs to be removed
-                                self.remove_piece(str(classical_id), True)
-                                self.entangled_squares.remove(i)
-                                continue
-                        continue
-                    self.remove_piece(str(classical_id))
-                return(self.board.peek(objects=[self.squares[str(id)]])[0][0]) # returns for original id
-            else: # If we are only simulating
-                # First select the id that remains
-                if(len(ids) == 0): # If its is a classical piece
-                    return CheckersSquare.FULL
-                idx = random.randint(0, len(ids)-1)
-                # try:
-                self.classical_squares[str(ids[idx])].chance = 100
-                # except Exception as error:
-                #     print("ERROR")
-                #     print(traceback.format_exc())
-                #     print(ids)
-                #     print(self.classical_squares.keys())
-                #     exit()
-                for i, classical_id in enumerate(ids):
-                    if(i == idx):
-                        continue
-                    self.remove_piece(str(classical_id))                
-                return CheckersSquare.FULL if str(ids[idx]) == str(id) else CheckersSquare.EMPTY
-=======
         taken = False # keeps track if an entangled piece has been taken
         # print("MEASURING BOARD")
         # print(self.get_sim_board())
@@ -498,7 +440,6 @@ class Checkers:
                     continue
                 self.remove_piece(str(classical_id))
             return (CheckersSquare.FULL if str(ids[idx]) == str(id) else CheckersSquare.EMPTY), taken
->>>>>>> origin/monte-carlo-entanglement
 
     def on_board(self, x, y):
         """
@@ -1470,23 +1411,11 @@ class Checkers:
                 self.entangled_squares.append([str(jumped_id)])
                 for i, rel_squares in enumerate(self.related_squares):
                     if(str(jumped_id) in rel_squares):
-<<<<<<< HEAD
-                        related_entangled_squares = deepcopy(rel_squares)
-                        related_entangled_squares.append(str(move.target1_id))
-                        related_entangled_squares.append(str(move.source_id))
-                        # rel_squares.append(str(move.source_id))
-                        # rel_squares.append(str(move.target1_id))
-                        self.related_entangled_squares.append(related_entangled_squares)
-                        temp_list = deepcopy(rel_squares)
-                        temp_list.remove(str(jumped_id))
-                        self.entangled_objects.append(Entangled(related_entangled_squares, str(jumped_id), temp_list, str(move.target1_id), str(move.source_id)))
-=======
                         self.unique_related_squares.append([str(move.source_id), str(move.target1_id)])
                         rest = deepcopy(rel_squares) # All related id's that are not being jumped over
                         rest.remove(str(jumped_id)) 
                         rel_squares.append(str(move.source_id))
                         rel_squares.append(str(move.target1_id))
->>>>>>> origin/monte-carlo-entanglement
                         self.q_rel_moves[i].append(move)
                         self.q_moves.append(move)
                         entangled_obj = Entangled(deepcopy(rel_squares), [str(jumped_id)], rest, [str(move.target1_id)], [str(move.source_id)])
@@ -1507,11 +1436,7 @@ class Checkers:
                 self.q_moves.append(move)
                 break
         
-<<<<<<< HEAD
-        for i, squares in enumerate(self.related_entangled_squares):
-=======
         for i, squares in enumerate(self.unique_related_squares):
->>>>>>> origin/monte-carlo-entanglement
             if(str(move.source_id) in squares):
                 squares.append(str(move.target1_id))
                 squares.remove(str(move.source_id))
