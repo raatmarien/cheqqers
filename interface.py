@@ -143,7 +143,7 @@ class GameInterface:
         mcts_moves = []
         prev_take = False # variable to check if a piece has been taken before
         self.draw_board()
-        pygame.image.save(self.screen, f"screenshots/screenshot{self.scrshot_counter}.jpeg")
+        # pygame.image.save(self.screen, f"screenshots/screenshot{self.scrshot_counter}.jpeg")
         self.scrshot_counter += 1
         # for i in [3, 2, 2, 1, 1, 2, 2, 1]:
         #     # legal_moves = self.get_legal_moves()
@@ -176,9 +176,9 @@ class GameInterface:
                     
                     # If it is the humans turn the click event will handle everything
                     # self.print_board()
-                if(moved):
-                    pygame.image.save(self.screen, f"screenshots/screenshot{self.scrshot_counter}.jpeg")
-                    self.scrshot_counter += 1
+                # if(moved):
+                #     pygame.image.save(self.screen, f"screenshots/screenshot{self.scrshot_counter}.jpeg")
+                #     self.scrshot_counter += 1
 
                 if(calc_next_move and not moved):    
                     if(self.game.player == CheckersPlayer.WHITE): # white player
@@ -205,8 +205,8 @@ class GameInterface:
                             move = self.black_player.select_move(self.game, self.game.legal_moves)
                             self.do_game_move(move)
                             self.redraw_board()
-                    pygame.image.save(self.screen, f"screenshots/screenshot{self.scrshot_counter}.jpeg")
-                    self.scrshot_counter += 1
+                    # pygame.image.save(self.screen, f"screenshots/screenshot{self.scrshot_counter}.jpeg")
+                    # self.scrshot_counter += 1
 
                 self.highlight_squares(self.game.legal_moves)
                 self.draw_board()
