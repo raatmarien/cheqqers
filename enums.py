@@ -36,8 +36,8 @@ class CheckersRules(Enum):
 
     CLASSICAL = 0
     QUANTUM_V1 = 1 # Superpositions
-    QUANTUM_V2 = 2 # Entanglement
-    QUANTUM_V3 = 3
+    QUANTUM_V2 = 2 # Entanglement without being able to entangle with entangled squares
+    QUANTUM_V3 = 3 # Entanglement with no limitations
 
 class Colors(Enum):
     """
