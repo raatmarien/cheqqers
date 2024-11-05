@@ -83,10 +83,14 @@ def get_argument_parser_args():
         default=False,
     )
     parser.add_argument(
-        "--p1", help="Select agent for player 1 to use.", default=players.human_player()
+        "--p1", help="Select agent for player 1 to use.",
+        default="human",
+        choices=["human", "heuristic", "random"]
     )
     parser.add_argument(
-        "--p2", help="Select agent for player 2 to use.", default=players.human_player()
+        "--p2", help="Select agent for player 2 to use.",
+        default="human",
+        choices=["human", "heuristic", "random"]
     )
     return parser.parse_args()
 
@@ -306,12 +310,6 @@ def play_normal_game():
 
     env = trueskill.TrueSkill()
     empty_attempts_folder()
-    # p1 = players.random_bot()
-    p2 = players.random_bot()
-    p1 = players.heuristic_bot()
-    # p2 = players.heuristic_bot()
-    p1 = players.human_player()
-    p2 = players.human_player()
     white_mcts = False
     black_mcts = False
     rule = CheckersRules.QUANTUM_V2
@@ -326,6 +324,8 @@ def play_normal_game():
         "low_mcts": None,
         "high_mcts": None,
     }
+    p1 = agent_map[args.p1]()
+    p2 = agent_map[args.p2]()
     if args.num_columns % 2 == 1 and args.num_rows % 2 == 0:
         warning_len = len(
             "# WARNING: If the number of columns is uneven and the number of rows is even the board is not symmetrical. #"
