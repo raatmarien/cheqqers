@@ -9,12 +9,14 @@ from quantum_checkers import Sim_Checkers, Checkers
 import traceback
 from time import sleep
 
+
 def write_to_file(file_name, text):
     temp = open(file_name, "a")
     temp.write(text)
     temp.close()
 
-class MCTS():
+
+class MCTS:
     def __init__(self, game, args):
         # self.game = deepcopy(game)
         self.game = game.get_copy()
@@ -25,11 +27,11 @@ class MCTS():
         # Define root node
         inp = False
         # If there is only 1 legal move, return that one
-        if(len(self.game.legal_moves) == 1):
+        if len(self.game.legal_moves) == 1:
             return self.game.legal_moves[0]
-        for srch in range(self.args['num_searches']):
+        for srch in range(self.args["num_searches"]):
             # if(inp):
-                # input(f"###############Press enter to start search {i}")
+            # input(f"###############Press enter to start search {i}")
             # print(f"Search {srch}")
             node = self.root
             # print("ROOT NODE")
@@ -43,15 +45,15 @@ class MCTS():
             result = node.game.status
 
             # If it is a leaf node
-            if(result != CheckersResult.DRAW and result != CheckersResult.UNFINISHED):
+            if result != CheckersResult.DRAW and result != CheckersResult.UNFINISHED:
                 # print(node.game.status)
-                if(node.game.player == CheckersPlayer.BLACK):
-                    if(result == CheckersResult.BLACK_WINS):
+                if node.game.player == CheckersPlayer.BLACK:
+                    if result == CheckersResult.BLACK_WINS:
                         value = 0
                     else:
                         value = 1
                 else:
-                    if(result == CheckersResult.WHITE_WINS):
+                    if result == CheckersResult.WHITE_WINS:
                         value = 0
                     else:
                         value = 1
@@ -61,22 +63,26 @@ class MCTS():
                 #     value = 1
                 # print(value)
                 node.backpropogate(value)
-            elif(result == CheckersResult.DRAW):
+            elif result == CheckersResult.DRAW:
                 value = 0.5
                 node.backpropogate(value)
-            else: # game unfinished
+            else:  # game unfinished
                 # print("expanding")
-                nodes = node.expand() # Can add multiple nodes if quantum state is measured
+                nodes = (
+                    node.expand()
+                )  # Can add multiple nodes if quantum state is measured
                 # print(f"len nodes: {len(nodes)}")
                 count = 0
                 for node in nodes:
                     # print(f"simulating node: {count}")
                     count += 1
                     value = 0
-                    for i in range(self.args['num_simulations']):
+                    for i in range(self.args["num_simulations"]):
                         value += node.simulate()
                     # backpropogation
-                    node.backpropogate(value) # To not inflate visit count if multiple children are added as once
+                    node.backpropogate(
+                        value
+                    )  # To not inflate visit count if multiple children are added as once
 
         action_probs = np.zeros(len(self.root.children))
         for idx, child in enumerate(self.root.children):
@@ -104,16 +110,16 @@ class MCTS():
         # file_name = f"attempts/log_{self.args['attempt']}.txt"
         # write_to_file(file_name, str + "\n")
         return self.root.children[np.argmax(action_probs)].move
-    
+
     # def new_root(self, move):
     #     self.root = node
 
 
-class Node():
-    def __init__(self, game, args, move=None, parent=None, weight = 1) -> None:
+class Node:
+    def __init__(self, game, args, move=None, parent=None, weight=1) -> None:
         self.game = game
         self.args = args
-        self.move = move # the move done to get to this state
+        self.move = move  # the move done to get to this state
         self.parent = parent
         self.weight = weight
 
@@ -126,7 +132,7 @@ class Node():
 
     def is_fully_expanded(self):
         return len(self.expandable_moves) == 0 and len(self.children) > 0
-    
+
     def select(self):
         best_children = []
         best_ucb = -np.inf
@@ -138,21 +144,25 @@ class Node():
             elif ucb == best_ucb:
                 best_children.append(child)  # Add to the list if it's tied
         return random.choice(best_children)
-    
+
     def get_ucb(self, child):
         # q_value is what child think of itself so we reverse it
         # TODO: fix with checkers being able to move twice in a row
         # q_value = (((child.value_sum / child.visit_count) + 1) / 2)
-        q_value = (child.value_sum / child.visit_count)
-        if(child.game.player == self.game.player):
+        q_value = child.value_sum / child.visit_count
+        if child.game.player == self.game.player:
             q_value = 1 - q_value
         # return (child.value_sum / child.visit_count) + self.args['C'] * (math.sqrt(math.log(self.visit_count) / child.visit_count))
-        return child.weight * (q_value + self.args['C'] *(math.sqrt(math.log(self.visit_count) / child.visit_count)))
-        
+        return child.weight * (
+            q_value
+            + self.args["C"]
+            * (math.sqrt(math.log(self.visit_count) / child.visit_count))
+        )
+
     def expand(self):
         action = random.choice(self.expandable_moves)
         self.expandable_moves.remove(action)
-        if(action.movetype == MoveType.TAKE):
+        if action.movetype == MoveType.TAKE:
             try:
                 child_states, weights = self.game.return_all_possible_states(action)
             except Exception as error:
@@ -176,7 +186,7 @@ class Node():
         to_backprop = []
         for i, child_state in enumerate(child_states):
             child = Node(child_state, self.args, action, self, weights[i])
-            if(type(weights[i]) != int and type(weights[i]) != float):
+            if type(weights[i]) != int and type(weights[i]) != float:
                 print("Weight is not int or float")
                 print(weights[i])
                 print(type(weights[i]))
@@ -195,20 +205,20 @@ class Node():
         st = ""
         while True:
             ctr += 1
-            if(sim_game.status == CheckersResult.UNFINISHED):
+            if sim_game.status == CheckersResult.UNFINISHED:
                 try:
                     move = random.choice(sim_game.legal_moves)
                     # print("SIMULATION", ctr)
-                    # 
+                    #
                     # sim_game.print_current_state()
                     # move.print_move()
                     st += str(ctr) + "\n"
                     st += sim_game.get_current_state()
 
                     st += move.get_move()
-                    st += '\n'
+                    st += "\n"
                     sim_game.player_move(move)
-                    
+
                 except Exception as error:
                     print("Crashed in doing simulated move in iteration: ", ctr)
                     print(traceback.format_exc())
@@ -217,42 +227,46 @@ class Node():
                     print(self.game.get_current_state())
                     print("DATA DUMP &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
                     print(st)
-    
+
                     print(self.parent.game.get_current_state())
 
                     exit()
-            elif(sim_game.status == CheckersResult.BLACK_WINS or sim_game.status == CheckersResult.WHITE_WINS):
-                if(rollout_player == CheckersPlayer.BLACK): # because player just changed to other player. If black finished the last game by winning, the player changed to white just before the game finished
-                    if(sim_game.status == CheckersResult.BLACK_WINS):
+            elif (
+                sim_game.status == CheckersResult.BLACK_WINS
+                or sim_game.status == CheckersResult.WHITE_WINS
+            ):
+                if (
+                    rollout_player == CheckersPlayer.BLACK
+                ):  # because player just changed to other player. If black finished the last game by winning, the player changed to white just before the game finished
+                    if sim_game.status == CheckersResult.BLACK_WINS:
                         return 0
                     else:
                         return 1
                 else:
-                    if(sim_game.status == CheckersResult.WHITE_WINS):
+                    if sim_game.status == CheckersResult.WHITE_WINS:
                         return 0
                     else:
                         return 1
-            else: #draw
+            else:  # draw
                 return 0.5
 
     def backprop_print(self):
         print("BACKPROP")
         print(self.game.get_sim_board())
-        if(self.move != None):
+        if self.move != None:
             self.move.print_move()
         print(self.game.related_squares)
         for i in self.game.entangled_objects:
             print(i.all_ids)
-        if(self.parent != None):
+        if self.parent != None:
             self.parent.backprop_print()
 
     def backpropogate(self, value):
         self.value_sum += value
         self.visit_count += 1
         # if(self.parent != None and self.game.player != self.parent.game.player):
-        if(self.parent != None and self.parent.game.player != self.game.player):
+        if self.parent != None and self.parent.game.player != self.game.player:
             value = 1 - value
         # value = value * -1
-        if(self.parent != None):
+        if self.parent != None:
             self.parent.backpropogate(value)
-
