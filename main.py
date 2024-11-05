@@ -92,6 +92,13 @@ def get_argument_parser_args():
         default="human",
         choices=["human", "heuristic", "random"]
     )
+    parser.add_argument(
+        "--rule-set", help="What rule set to use. With 'superposition', no "
+        "entanglement is possible. With 'entanglement', both superposition "
+        "and entanglement are possible",
+        default="entanglement",
+        choices=["classical", "superposition", "entanglement"]
+    )
     return parser.parse_args()
 
 
@@ -312,7 +319,6 @@ def play_normal_game():
     empty_attempts_folder()
     white_mcts = False
     black_mcts = False
-    rule = CheckersRules.QUANTUM_V2
     args1 = args_high
     args2 = args_high
 
@@ -326,6 +332,14 @@ def play_normal_game():
     }
     p1 = agent_map[args.p1]()
     p2 = agent_map[args.p2]()
+
+    quantum_rule_map = {
+        "classical": CheckersRules.CLASSICAL,
+        "superposition": CheckersRules.QUANTUM_V1,
+        "entanglement": CheckersRules.QUANTUM_V2
+    }
+    rule = quantum_rule_map[args.rule_set]
+    
     if args.num_columns % 2 == 1 and args.num_rows % 2 == 0:
         warning_len = len(
             "# WARNING: If the number of columns is uneven and the number of rows is even the board is not symmetrical. #"
