@@ -51,11 +51,9 @@ class GameInterface:
         self.attempt = attempt
         self.file_name = f"./attempts/log_{attempt}.txt"
         # open(self.file_name, 'w').close()
-        if(GUI.lower() == "true"):
-            self.GUI = True
+        self.GUI = GUI
+        if self.GUI:
             self.init_gui()
-        else:
-            self.GUI = False
         self.draw_chance = True
         self.draw_numbers = False
         self.white_player = white_player
