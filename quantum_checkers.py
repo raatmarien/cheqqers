@@ -1878,13 +1878,6 @@ class Checkers:
             self.q_moves.append(move)
             self.superposition_pieces.add(original_piece)
 
-        for i, squares in enumerate(self.related_entangled_squares):
-            if str(move.source_id) in squares:
-                squares.append(str(move.target1_id))
-                squares.append(str(move.target2_id))
-                squares.remove(str(move.source_id))
-                break
-
         # if the piece was entangled, we need to append it to the correct list
         for i, squares in enumerate(self.entangled_squares):
             if str(move.source_id) in squares:
@@ -2014,21 +2007,6 @@ class Checkers:
                 self.remove_id_from_unique_rel_squares(id)
                 self.remove_id_from_entanglement(id)
                 return
-
-    def remove_from_rel_entangled_squares(self, id: str):
-        """
-        If an ID is measured, the ID itself and all related squares need to be removed
-        """
-        temp_list = deepcopy(self.related_entangled_squares)
-        all_related_entangled_squares = []
-        for index, squares in enumerate(temp_list):
-            if str(id) in squares:
-                # If it is entangled we also need to remove from the related squares list
-                self.remove_from_rel_squares(id)
-                all_related_entangled_squares.append(
-                    self.related_entangled_squares.pop(index)
-                )
-        return all_related_entangled_squares
 
     def remove_from_rel_squares(self, id):
         """
