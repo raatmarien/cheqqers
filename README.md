@@ -1,4 +1,5 @@
-# quantum_checkers
+# Quantum checkers
+
 This repository is created for the master thesis by Luuk van den Nouweland, university of Leiden. This is the final version of the code. My thesis can be found in Master_Thesis.pdf.
 
 There are three versions of Quantumness that can be ussed:
@@ -10,3 +11,34 @@ In the main file most parameters can be changed.
 If you set white_mcts or black_mcts to true respectively the white or black player uses MCTS to decide its moves. args1 and args2 are respectively related to white or black. These can be set to args_high or args_low. The difference is that args_low builds smaller trees in MCTS and is therefore faster.
 
 For more information, see Master_Thesis.pdf
+
+## Installing
+
+You'll need Python 3. Check that you have at least version 3.12 with
+
+```
+python --version
+```
+
+Then create a virtual environment for the dependencies.
+
+```
+python -m venv ./qcheckersenv
+```
+
+Activate it now (and everytime you want to do something with this project in the shell).
+
+```
+source qcheckersenv/bin/activate
+```
+
+You will need to install the [unitary library](https://github.com/quantumlib/unitary/) from source.
+
+```
+git clone https://github.com/quantumlib/unitary.git
+cd unitary/
+pip install .
+cd ..
+```
+
+Now you are ready to run Quantum Checkers. Run it with `python main.py` or see all options with `python main.py --help`.
