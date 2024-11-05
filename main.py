@@ -46,6 +46,17 @@ def write_attempt(idx, attempt_str):
         temp.write(attempt_str)
         temp.close()
 
+def get_argument_parser_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--num_rows', help='The number of rows of the checkboard. INT', default=8, type=int)
+    parser.add_argument('--num_columns', help='The number of columns of the checkboard. INT', default=8, type=int)
+    parser.add_argument('--num_vertical_pieces', help='The number of rows that are filled with checkerpieces. INT', default=3, type=int)
+    parser.add_argument('--sim_q', help='Simulating quantum or actually use quantum mechanics. TRUE if you want to simulate quantum.', action="store_true", default=False)
+    parser.add_argument('--disable-GUI', help='If GUI is enabled. True or False', action="store_true", default=False)
+    parser.add_argument('--p1', help='Select agent for player 1 to use.', default=human_player())
+    parser.add_argument('--p2', help='Select agent for player 2 to use.', default=human_player())
+    return parser.parse_args()
+
 def run_experiments():
     args_low = {
         'C': 1.4, # srqt 2
@@ -61,15 +72,7 @@ def run_experiments():
     }
     env = trueskill.TrueSkill()
     empty_attempts_folder()
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--num_rows', help='The number of rows of the checkboard. INT', default=8, type=int)
-    parser.add_argument('--num_columns', help='The number of columns of the checkboard. INT', default=8, type=int)
-    parser.add_argument('--num_vertical_pieces', help='The number of rows that are filled with checkerpieces. INT', default=1, type=int)
-    parser.add_argument('--sim_q', help='Simulating quantum or actually use quantum mechanics. TRUE if you want to simulate quantum.', default="False", type=bool)
-    parser.add_argument('--GUI', help='If GUI is enabled. True or False', default="False", type=bool)
-    parser.add_argument('--p1', help='Select agent for player 1 to use.', default=human_player())
-    parser.add_argument('--p2', help='Select agent for player 2 to use.', default=human_player())
-    args = parser.parse_args()
+    args = get_argument_parser_args()
 
     # p1 = random_bot()
     # p2 = random_bot()
@@ -295,17 +298,12 @@ def play_normal_game():
         'num_simulations': 1, # Budget for extra simulations per node
         'attempt': 0,
     }
+
+    args = get_argument_parser_args()
+
+
     env = trueskill.TrueSkill()
     empty_attempts_folder()
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--num_rows', help='The number of rows of the checkboard. INT', default=8, type=int)
-    parser.add_argument('--num_columns', help='The number of columns of the checkboard. INT', default=8, type=int)
-    parser.add_argument('--num_vertical_pieces', help='The number of rows that are filled with checkerpieces. INT', default=3, type=int)
-    parser.add_argument('--sim_q', help='Simulating quantum or actually use quantum mechanics. TRUE if you want to simulate quantum.', default="False", type=bool)
-    parser.add_argument('--GUI', help='If GUI is enabled. True or False', default="False", type=bool)
-    parser.add_argument('--p1', help='Select agent for player 1 to use.', default=human_player())
-    parser.add_argument('--p2', help='Select agent for player 2 to use.', default=human_player())
-    args = parser.parse_args()
     # p1 = random_bot()
     p2 = random_bot()
     p1 = heuristic_bot()
@@ -339,7 +337,7 @@ def play_normal_game():
         time.sleep(5)
 
     checkers = Checkers(num_vertical=args.num_rows, num_horizontal=args.num_columns, num_vertical_pieces=args.num_vertical_pieces, SIMULATE_QUANTUM=args.sim_q, rules=rule)
-    game = GameInterface(checkers, white_player=p1, black_player=p2, GUI=args.GUI, white_mcts=white_mcts, black_mcts=black_mcts, args_1=args1, args_2=args2, print=True, attempt=99999999)
+    game = GameInterface(checkers, white_player=p1, black_player=p2, GUI=not args.disable_GUI, white_mcts=white_mcts, black_mcts=black_mcts, args_1=args1, args_2=args2, print=True, attempt=99999999)
     result, num_moves, avg_time, single_movetypes = (game.play())
     if(result == CheckersResult.WHITE_WINS):
         print("White wins!")
