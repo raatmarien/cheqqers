@@ -41,4 +41,10 @@ pip install .
 cd ..
 ```
 
+And install the other requirements:
+
+```
+pip install -r requirements.txt
+```
+
 Now you are ready to run Quantum Checkers. Run it with `python main.py` or see all options with `python main.py --help`.
