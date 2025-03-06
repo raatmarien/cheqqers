@@ -6,40 +6,53 @@ def splitSerToArr(ser):
     return [ser.index, ser.values]
 
 
+def add_nans(arr):
+    return arr[:4] + [np.nan, arr[4], np.nan, arr[5], np.nan, arr[6]]
+
+
 # Data
 sizes = ['5x5', '6x6', '7x7', '8x8', '9x9', '10x10', '11x11', '12x12', '13x13', '14x14']
 # fake = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-fake = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+fake = [0.0]*10
 
-# draw average moves
-# classic_checkers = [14.446, 25.647, 34.162, 48.338, np.nan, 75.331, np.nan, 88.895, np.nan, 54.488]
-# superpositions = [18.229, 29.979, 41.514, 57.387, np.nan, 85.256, np.nan, 64.086, np.nan, 42.869]
-# entanglement = [19.961, 30.339, 41.216, 56.415, np.nan, 75.591, np.nan, 58.445, np.nan, 42.49]
+plot_type = 'no-draw-moves'
 
-# draw average time v1
-# classic_checkers = [0.085, 0.143, 0.203, 0.315, np.nan, 0.252, np.nan, 0.304, np.nan, 0.141]
-# superpositions = [0.196, 0.342, 0.263, 0.304, np.nan, 0.755, np.nan, 0.821, np.nan, 0.375]
-# entanglement = [0.083, 0.146, 0.472, 0.772, np.nan, 0.923, np.nan, 0.710, np.nan, 0.356]
+if plot_type == 'draw-moves':
+    classic_checkers = add_nans([14.357, 25.092, 33.92, 49.154, 75.075, 89.171, 54.653])
+    classic_checkers_sd = add_nans([7.3241514316809555, 12.95412464604789, 17.427429968739375, 22.65222742706349, 25.183597610122916, 32.85506375300791, 33.78227098394708])
 
-# draw average time v2
-# classic_checkers = [0.03317761182785034, 0.07399027585983277, 0.09972482442855835, 0.13175885438919066, np.nan, 0.2760949230194092, np.nan, 0.4483185696601868, np.nan, 0.3535179734230042]
-# superpositions = [0.13645691633224488, 0.2448665714263916, 0.3935587453842163, 0.565906114578247, np.nan, 1.0073673033714294, np.nan, 0.7707014632225037, np.nan, 0.43078853845596315]
-# entanglement = [0.14664857864379882, 0.24127572059631347, 0.4191624689102173, 0.6339619660377502, np.nan, 0.9631063532829285, np.nan, 0.6422774720191956, np.nan, 0.3980593204498291]
+    superpositions = add_nans([17.95, 29.654, 40.077, 55.413, 84.641, 72.984, 45.425])
+    superpositions_sd = add_nans([10.168918669500062, 16.43929848060843, 20.65496789391595, 25.623055476893693, 28.49733701975006, 42.65422754109054, 23.892618781377486])
 
-# draw average time v3
-# classic_checkers = [0.03286042761802673, 0.05982771277427673, 0.09083635711669921, 0.135130069732666, np.nan, 0.26139082956314086, np.nan, 0.4310459086894989, np.nan, 0.33128737354278565]
-# superpositions = [0.11905886316299438, 0.22072631311416627, 0.35732102489471435, 0.5875248553752899, np.nan, 0.9878685400485993, np.nan, 0.8283736248016358, np.nan, 0.39050336098670957]
-# entanglement = [0.14853967022895814, 0.27124722957611086, 0.4050951590538025, 0.6036663694381714, np.nan, 0.9906493396759033, np.nan, 0.7642709438800812, np.nan, 0.3750457744598389]
+    entanglement = add_nans([19.28, 30.457, 42.274, 57.669, 84.599, 71.64, 46.975])
+    entanglement_sd = add_nans([10.860918909537975, 16.61566222668333, 20.978346336520783, 25.216409464995333, 29.349064151460887, 41.76856489051321, 26.789663324891954])
+elif plot_type == 'draw-times':
+    classic_checkers = add_nans([0.0006178343296051026, 0.0013408238887786866, 0.0022601535320281984, 0.004056111335754394, 0.009039983749389649, 0.014247995138168336, 0.011765658855438232])
+    classic_checkers_sd = add_nans([0.00029111881628889145, 0.000636946538448609, 0.001101727599906939, 0.00180132057043077, 0.002942844183420461, 0.005121331765066966, 0.006989170263047937])
 
-# draw average moves v2
-classic_checkers = [14.483, 26.001, 34.833, 48.556, np.nan, 74.842, np.nan, 90.465, np.nan, 54.32]
-superpositions = [18.434, 28.849, 40.493, 58.852, np.nan, 84.139, np.nan, 65.302, np.nan, 43.616]
-entanglement = [20.487, 32.52, 42.365, 58.233, np.nan, 79.833, np.nan, 58.598, np.nan, 42.781]
+    superpositions = add_nans([0.0009600751399993897, 0.0019862160682678222, 0.003289463520050049, 0.00538588809967041, 0.011859311819076538, 0.014266619205474854, 0.011591273069381713])
+    superpositions_sd = add_nans([0.0005649835531086878, 0.0011059827914970638, 0.0017253411631075121, 0.0025667910343942515, 0.004146225748706533, 0.008214098272835126, 0.007274499026706325])
 
-# Recalculate these maybe?
-classic_checkers_sd = [7.240581607994072, 13.099021313035541, 17.35601193103272, 22.18770592680312, np.nan, 25.54221957819995, np.nan, 31.75351641637198, np.nan, 33.95545735348125]
-superpositions_sd = [10.753990855460094, 16.98159387485552, 21.464711361530902, 25.035765707574527, np.nan, 28.032306544596185, np.nan, 38.61147329317893, np.nan, 15.271652411162565]
-entanglement_sd = [12.293523934606005, 16.499360590638048, 20.376388202922424, 23.79151418357283, np.nan, 28.37073876052257, np.nan, 35.131676286204716, np.nan, 13.210562363425637]
+    entanglement = add_nans([0.0009567785263061523, 0.0019979445934295652, 0.0033137247562408448, 0.005471489191055298, 0.011595349788665771, 0.013175289392471314, 0.011174434661865235])
+    entanglement_sd = add_nans([0.0005297331865478094, 0.001100147020915267, 0.0016867171018092905, 0.002472735628507048, 0.004158409903529284, 0.007580366139194792, 0.0062358512781999515])
+elif plot_type == 'no-draw-moves':
+    classic_checkers = add_nans([14.423, 25.068, 36.537, 56.984, 115.598, 194.34, 329.024])
+    classic_checkers_sd = add_nans([6.977876594047917, 14.116112802065611, 22.72049409347983, 34.300470350510736, 69.46279202188374, 114.32823511865013, 191.96429280914123])
+
+    superpositions = add_nans([18.048, 31.275, 47.995, 73.767, 172.333, 334.856, 601.97])
+    superpositions_sd = add_nans([11.085512373570497, 19.845987963269508, 33.57371247224783, 49.70403607557642, 118.42090872233088, 212.52734679832884, 357.605983086328])
+
+    entanglement = add_nans([19.785, 31.864, 47.627, 76.38, 164.482, 300.817, 499.214])
+    entanglement_sd = add_nans([11.012177034675888, 18.962201060770056, 30.08526207288203, 51.797186685654545, 105.11665513698192, 190.7897750123136, 289.2269981527666])
+elif plot_type == 'no-draw-times':
+    classic_checkers = add_nans([0.0006304497718811035, 0.0013582642078399658, 0.002378401517868042, 0.004628655910491944, 0.013882984399795533, 0.031196022510528564, 0.06740591192245483])
+    classic_checkers_sd = add_nans([0.0002800181338188237, 0.0007007513075656215, 0.0013859946979418115, 0.0026643327230273985, 0.008057236984303452, 0.01799731976029842, 0.03893700718036809])
+
+    superpositions = add_nans([0.0008720424175262451, 0.0019171054363250732, 0.0037376513481140136, 0.007106372833251953, 0.025520331859588623, 0.07806557345390319, 0.18942372846603395])
+    superpositions_sd = add_nans([0.0005318801826450361, 0.0012336652989708942, 0.0026607269430416313, 0.0049939599695415, 0.01848044377748349, 0.05349518575006284, 0.12168185490347344])
+
+    entanglement = add_nans([0.0010290758609771728, 0.0022201855182647705, 0.004288601398468018, 0.009248939990997315, 0.029344993352890016, 0.07005107235908509, 0.15228004097938538])
+    entanglement_sd = add_nans([0.0005840097299704804, 0.0013444734237917668, 0.002826938203292016, 0.0069120073223498165, 0.02048914858227869, 0.05049416942553472, 0.0927268619486995])
 
 #no draw average moves
 # classic_checkers = [14.56, 27.18, 36.0, 57.47, np.nan, 104.48, np.nan, 242.91, np.nan, 333.04]
@@ -87,25 +100,47 @@ for data in [classic_data, superpositions_data, entanglement_data]:
     series = data['series'].dropna()
     x = series.index
     y = series.values
-    del data['series']
-    plt.errorbar(x=x,
-                 y=y,
-                 **data,
-                 linestyle='--',
-                 marker='o',
-                 capsize=3)
+    d = data.copy()
+    del d['series']
+    plt.errorbar(x=x, y=y,
+                 fmt='none',
+                 yerr=d['yerr'],
+                 alpha=.5,
+                 capsize=3,
+                 color=d['color'])
     data_2 = {
         'x': x,
-        'y1': [y - e for y, e in zip(y, data['yerr'])],
-        'y2': [y + e for y, e in zip(y, data['yerr'])]}
-    plt.fill_between(**data_2, alpha=.15, color=data['color'])
+        'y1': [y - e for y, e in zip(y, d['yerr'])],
+        'y2': [y + e for y, e in zip(y, d['yerr'])]}
+    plt.fill_between(**data_2, alpha=.2, color=d['color'])
+
+for data in [classic_data, superpositions_data, entanglement_data]:
+    series = data['series'].dropna()
+    x = series.index
+    y = series.values
+    del data['series']
+    plt.plot(series,
+             color=data['color'],
+             label=data['label'],
+             linestyle='-',
+             marker='o')
 
 
 plt.xlabel('Board Size')
 # plt.ylabel('Average time (s)')
 # plt.title('Average time per game different board sizes')
-plt.ylabel('Average number of moves')
-plt.title('Average number of moves for different board sizes')
+if plot_type == 'draw-moves':
+    plt.ylabel('Average number of moves')
+    plt.title('Average number of moves for different board sizes')
+elif plot_type == 'draw-times':
+    plt.ylabel('Average time (s)')
+    plt.title('Average time per game for different board sizes')
+elif plot_type == 'no-draw-moves':
+    plt.ylabel('Average number of moves')
+    plt.title('Average number of moves for different board sizes')
+elif plot_type == 'no-draw-times':
+    plt.ylabel('Average time (s)')
+    plt.title('Average time per game for different board sizes')
 plt.legend(loc='upper left')
 plt.grid(True)
 # plt.xticks(sizes)  # Set xticks to display all sizes
@@ -113,10 +148,20 @@ frame1 = plt.gca()
 count = 0
 for xlabel_i in frame1.axes.get_xticklabels():
     # set visible for 9x9, 11x11, 13x13 to false
-    if(sizes[count] == '9x9' or sizes[count] == '11x11' or sizes[count] == '13x13'):
+    if sizes[count] == '9x9' or\
+       sizes[count] == '11x11' or\
+       sizes[count] == '13x13':
         xlabel_i.set_visible(False)
         xlabel_i.set_fontsize(0.0)
     count += 1
 plt.tight_layout()
-plt.savefig('draw_average_moves.png')
+if plot_type == 'draw-moves':
+    plt.savefig('draw_average_moves.pdf')
+elif plot_type == 'draw-times':
+    plt.savefig('draw_average_times.pdf')
+elif plot_type == 'no-draw-moves':
+    plt.savefig('no_draw_average_moves.pdf')
+elif plot_type == 'no-draw-times':
+    plt.savefig('no_draw_average_times.pdf')
+
 plt.show()
