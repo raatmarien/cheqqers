@@ -48,3 +48,15 @@ pip install -r requirements.txt
 ```
 
 Now you are ready to run Quantum Checkers. Run it with `python main.py` or see all options with `python main.py --help`.
+
+
+## Experiments
+
+For our paper, we have run a number of experiments. To run many random
+vs random games and report the average moves and times per rule set
+and game type, use the following command. You can change the amount of
+iterations, the file name and many other options.
+
+```
+python main.py --do-average-moves-and-time-experiment --iterations 500 --results-file average_moves_and_times_with_draw_experiment_result.txt
+```

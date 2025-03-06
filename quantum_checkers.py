@@ -341,9 +341,11 @@ class Checkers:
         num_vertical_pieces=1,
         rules=CheckersRules.QUANTUM_V3,
         SIMULATE_QUANTUM=False,
+        draw_after_40_rule_enabled=False,
     ) -> None:
         self.rules = rules
         self.SIMULATE_QUANTUM = SIMULATE_QUANTUM
+        self.draw_after_40_rule_enabled = draw_after_40_rule_enabled
         self.player = CheckersPlayer.WHITE
         self.num_vertical = num_vertical
         self.run_on_hardware = run_on_hardware
@@ -2087,7 +2089,7 @@ class Checkers:
                 if self.player == CheckersPlayer.WHITE
                 else CheckersResult.WHITE_WINS
             )
-        if self.moves_since_take >= 40:
+        if self.moves_since_take >= 40 and self.draw_after_40_rule_enabled:
             return CheckersResult.DRAW
         return CheckersResult.UNFINISHED
 

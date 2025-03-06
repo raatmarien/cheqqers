@@ -122,77 +122,83 @@ def run_average_moves_and_times_experiment(args):
     # rules = [CheckersRules.QUANTUM_V2]
     sizes = [5, 6, 7, 8, 10, 12, 14]
     args.num_vertical_pieces = 1
-    args.sim_q = True
+    args.sim_q = False
     args.disable_GUI = True
     # just mcts agents
     agents = ["random", "random"]
 
-    for rule in rules:
-        moves_list = []
-        moves_sd_list = []
-        times_list = []
-        times_sd_list = []
-        for size in sizes:
-            print(f'Rule {rule} on size {size}')
-            times = []
-            results = []
-            number_of_moves = []
-            avg_mcts_time = []
-            iterations = args.iterations
-            for k in range(iterations):
-                if k % 250 == 0 and k != 0:
-                    print(
-                        f"Iteration: {k+1} at {time.strftime('%H:%M', time.localtime())}"
-                    )
-                sd = random.randint(0, 100000000000000000)
-                # sd = 4271756581358815
-                random.seed(sd)
-                random.shuffle(agents)
-                matches = generate_matches(agents)
-                # print("Matches:", matches)
-                for i, j in matches:
-                    white_mcts = False
-                    black_mcts = False
-                    args1 = None
-                    args2 = None
-                    p1 = players.random_bot()
-                    p2 = players.random_bot()
+    for draw_rule_enabled in [True, False]:
+        if draw_rule_enabled:
+            file.write('\n\nDraw rule enabled\n\n')
+        else:
+            file.write('\n\nNo draw rule\n\n')
+        for rule in rules:
+            moves_list = []
+            moves_sd_list = []
+            times_list = []
+            times_sd_list = []
+            for size in sizes:
+                print(f'Rule {rule} on size {size}')
+                times = []
+                results = []
+                number_of_moves = []
+                avg_mcts_time = []
+                iterations = args.iterations
+                for k in range(iterations):
+                    if k % 250 == 0 and k != 0:
+                        print(
+                            f"Iteration: {k+1} at {time.strftime('%H:%M', time.localtime())}"
+                        )
+                    sd = random.randint(0, 100000000000000000)
+                    # sd = 4271756581358815
+                    random.seed(sd)
+                    random.shuffle(agents)
+                    matches = generate_matches(agents)
+                    # print("Matches:", matches)
+                    for i, j in matches:
+                        white_mcts = False
+                        black_mcts = False
+                        args1 = None
+                        args2 = None
+                        p1 = players.random_bot()
+                        p2 = players.random_bot()
 
-                    start_t = time.time()
-                    checkers = Checkers(
-                        num_vertical=size,
-                        num_horizontal=size,
-                        num_vertical_pieces=args.num_vertical_pieces,
-                        SIMULATE_QUANTUM=args.sim_q,
-                        rules=rule,
-                    )
-                    game = GameInterface(
-                        checkers,
-                        white_player=p1,
-                        black_player=p2,
-                        GUI=(not args.disable_GUI),
-                        white_mcts=white_mcts,
-                        black_mcts=black_mcts,
-                        args_1=args1,
-                        args_2=args2,
-                        print=False,
-                        attempt=k,
-                    )
-                    result, num_moves, avg_time, single_movetypes = game.play()
-                    results.append(result)
-                    number_of_moves.append(num_moves)
-                    avg_mcts_time.append(avg_time)
-                    times.append(time.time() - start_t)
+                        start_t = time.time()
+                        checkers = Checkers(
+                            num_vertical=size,
+                            num_horizontal=size,
+                            num_vertical_pieces=args.num_vertical_pieces,
+                            SIMULATE_QUANTUM=args.sim_q,
+                            rules=rule,
+                            draw_after_40_rule_enabled=draw_rule_enabled
+                        )
+                        game = GameInterface(
+                            checkers,
+                            white_player=p1,
+                            black_player=p2,
+                            GUI=(not args.disable_GUI),
+                            white_mcts=white_mcts,
+                            black_mcts=black_mcts,
+                            args_1=args1,
+                            args_2=args2,
+                            print=False,
+                            attempt=k,
+                        )
+                        result, num_moves, avg_time, single_movetypes = game.play()
+                        results.append(result)
+                        number_of_moves.append(num_moves)
+                        avg_mcts_time.append(avg_time)
+                        times.append(time.time() - start_t)
 
-            times_list.append(sum(times)/len(times))
-            times_sd_list.append(statistics.stdev(times))
-            moves_list.append(sum(number_of_moves)/len(number_of_moves))
-            moves_sd_list.append(statistics.stdev(number_of_moves))
-        file.write("@"*10 + f"{rule}" + "@"*10 + "\n")
-        file.write(f"moves: {moves_list}\n")
-        file.write(f"moves_sd: {moves_sd_list}\n")
-        file.write(f"times: {times_list}\n")
-        file.write(f"times_sd: {times_sd_list}\n")
+                times_list.append(sum(times)/len(times))
+                times_sd_list.append(statistics.stdev(times))
+                moves_list.append(sum(number_of_moves)/len(number_of_moves))
+                moves_sd_list.append(statistics.stdev(number_of_moves))
+            file.write("@"*10 + f"{rule}" + "@"*10 + "\n")
+            file.write(f"moves: {moves_list}\n")
+            file.write(f"moves_sd: {moves_sd_list}\n")
+            file.write(f"times: {times_list}\n")
+            file.write(f"times_sd: {times_sd_list}\n")
 
     file.close()
 
