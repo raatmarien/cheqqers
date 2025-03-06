@@ -57,26 +57,49 @@ entanglement_series = pd.Series(entanglement, index=sizes)
 fake_series = pd.Series(fake, index=sizes)
 
 classic_sd_series = pd.Series(classic_checkers_sd, index=sizes)
-superposition_sd_series = pd.Series(superpositions_sd, index=sizes)
+superpositions_sd_series = pd.Series(superpositions_sd, index=sizes)
 entanglement_sd_series = pd.Series(entanglement_sd, index=sizes)
 
-
-# Plot
-# plt.figure(figsize=(10, 6))
+# To make sure all the points, even those without data, are given
 plt.plot(*splitSerToArr(fake_series.dropna()), linestyle='-',
          marker='o', alpha=0)
-plt.errorbar(*splitSerToArr(classic_series.dropna()), linestyle='-',
-             marker='o', label='Classic checkers', color='blue',
-             yerr=classic_sd_series.dropna().values, capsize=3)
-plt.errorbar(*splitSerToArr(superpositions_series.dropna()),
-             linestyle='-', marker='o', label='Checkers with superpositions',
-             color='green',
-             yerr=superposition_sd_series.dropna().values,
-             capsize=3)
-plt.errorbar(*splitSerToArr(entanglement_series.dropna()), linestyle='-',
-             marker='o', label='Checkers with entanglement', color='orange',
-             yerr=entanglement_sd_series.dropna().values,
-             capsize=3)
+
+classic_data = {
+    'color': 'blue',
+    'label': 'Classic checkers',
+    'series': classic_series,
+    'yerr': classic_sd_series.dropna().values,
+}
+superpositions_data = {
+    'color': 'green',
+    'label': 'Checkers with superpositions',
+    'series': superpositions_series,
+    'yerr': superpositions_sd_series.dropna().values,
+}
+entanglement_data = {
+    'color': 'orange',
+    'label': 'Checkers with entanglement',
+    'series': entanglement_series,
+    'yerr': entanglement_sd_series.dropna().values,
+}
+
+for data in [classic_data, superpositions_data, entanglement_data]:
+    series = data['series'].dropna()
+    x = series.index
+    y = series.values
+    del data['series']
+    plt.errorbar(x=x,
+                 y=y,
+                 **data,
+                 linestyle='--',
+                 marker='o',
+                 capsize=3)
+    data_2 = {
+        'x': x,
+        'y1': [y - e for y, e in zip(y, data['yerr'])],
+        'y2': [y + e for y, e in zip(y, data['yerr'])]}
+    plt.fill_between(**data_2, alpha=.15, color=data['color'])
+
 
 plt.xlabel('Board Size')
 # plt.ylabel('Average time (s)')
