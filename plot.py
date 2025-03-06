@@ -36,6 +36,11 @@ classic_checkers = [14.483, 26.001, 34.833, 48.556, np.nan, 74.842, np.nan, 90.4
 superpositions = [18.434, 28.849, 40.493, 58.852, np.nan, 84.139, np.nan, 65.302, np.nan, 43.616]
 entanglement = [20.487, 32.52, 42.365, 58.233, np.nan, 79.833, np.nan, 58.598, np.nan, 42.781]
 
+# Recalculate these maybe?
+classic_checkers_sd = [7.240581607994072, 13.099021313035541, 17.35601193103272, 22.18770592680312, np.nan, 25.54221957819995, np.nan, 31.75351641637198, np.nan, 33.95545735348125]
+superpositions_sd = [10.753990855460094, 16.98159387485552, 21.464711361530902, 25.035765707574527, np.nan, 28.032306544596185, np.nan, 38.61147329317893, np.nan, 15.271652411162565]
+entanglement_sd = [12.293523934606005, 16.499360590638048, 20.376388202922424, 23.79151418357283, np.nan, 28.37073876052257, np.nan, 35.131676286204716, np.nan, 13.210562363425637]
+
 #no draw average moves
 # classic_checkers = [14.56, 27.18, 36.0, 57.47, np.nan, 104.48, np.nan, 242.91, np.nan, 333.04]
 # superpositions = [18.22, 32.63, 54.2, 89.38, np.nan, 238.53, np.nan, 384.66, np.nan, 977.69]
@@ -51,12 +56,27 @@ superpositions_series = pd.Series(superpositions, index=sizes)
 entanglement_series = pd.Series(entanglement, index=sizes)
 fake_series = pd.Series(fake, index=sizes)
 
+classic_sd_series = pd.Series(classic_checkers_sd, index=sizes)
+superposition_sd_series = pd.Series(superpositions_sd, index=sizes)
+entanglement_sd_series = pd.Series(entanglement_sd, index=sizes)
+
+
 # Plot
 # plt.figure(figsize=(10, 6))
-plt.plot( *splitSerToArr(fake_series.dropna()), linestyle='-', marker='o', alpha=0)
-plt.plot( *splitSerToArr(classic_series.dropna()), linestyle='-', marker='o', label='Classic checkers', color='blue')
-plt.plot( *splitSerToArr(superpositions_series.dropna()), linestyle='-', marker='o', label='Checkers with superpositions', color='green')
-plt.plot( *splitSerToArr(entanglement_series.dropna()), linestyle='-', marker='o', label='Checkers with entanglement', color='orange')
+plt.plot(*splitSerToArr(fake_series.dropna()), linestyle='-',
+         marker='o', alpha=0)
+plt.errorbar(*splitSerToArr(classic_series.dropna()), linestyle='-',
+             marker='o', label='Classic checkers', color='blue',
+             yerr=classic_sd_series.dropna().values, capsize=3)
+plt.errorbar(*splitSerToArr(superpositions_series.dropna()),
+             linestyle='-', marker='o', label='Checkers with superpositions',
+             color='green',
+             yerr=superposition_sd_series.dropna().values,
+             capsize=3)
+plt.errorbar(*splitSerToArr(entanglement_series.dropna()), linestyle='-',
+             marker='o', label='Checkers with entanglement', color='orange',
+             yerr=entanglement_sd_series.dropna().values,
+             capsize=3)
 
 plt.xlabel('Board Size')
 # plt.ylabel('Average time (s)')
@@ -70,7 +90,7 @@ frame1 = plt.gca()
 count = 0
 for xlabel_i in frame1.axes.get_xticklabels():
     # set visible for 9x9, 11x11, 13x13 to false
-    if(sizes[count] == '9x9' or sizes[count] == '11x11' or sizes[count] == '13x13'):    
+    if(sizes[count] == '9x9' or sizes[count] == '11x11' or sizes[count] == '13x13'):
         xlabel_i.set_visible(False)
         xlabel_i.set_fontsize(0.0)
     count += 1
