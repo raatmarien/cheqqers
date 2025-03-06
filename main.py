@@ -99,7 +99,102 @@ def get_argument_parser_args():
         default="entanglement",
         choices=["classical", "superposition", "entanglement"]
     )
+    parser.add_argument(
+        "--results-file", help="The filename to save the results in",
+        default="results.txt")
+    parser.add_argument(
+        "--iterations", help="The amount of iterations for the experiment",
+        default=500,
+        type=int)
+    parser.add_argument(
+        "--do-average-moves-and-time-experiment",
+        help="Run experiments to determine the average moves and times in "
+        "different versions on different board sizes", action="store_true",
+        default=False)
     return parser.parse_args()
+
+
+def run_average_moves_and_times_experiment(args):
+    file = open(args.results_file, "w")
+    file.close()
+    file = open(args.results_file, "a")
+    rules = [CheckersRules.CLASSICAL, CheckersRules.QUANTUM_V1, CheckersRules.QUANTUM_V2]
+    # rules = [CheckersRules.QUANTUM_V2]
+    sizes = [5, 6, 7, 8, 10, 12, 14]
+    args.num_vertical_pieces = 1
+    args.sim_q = True
+    args.disable_GUI = True
+    # just mcts agents
+    agents = ["random", "random"]
+
+    for rule in rules:
+        moves_list = []
+        moves_sd_list = []
+        times_list = []
+        times_sd_list = []
+        for size in sizes:
+            print(f'Rule {rule} on size {size}')
+            times = []
+            results = []
+            number_of_moves = []
+            avg_mcts_time = []
+            iterations = args.iterations
+            for k in range(iterations):
+                if k % 250 == 0 and k != 0:
+                    print(
+                        f"Iteration: {k+1} at {time.strftime('%H:%M', time.localtime())}"
+                    )
+                sd = random.randint(0, 100000000000000000)
+                # sd = 4271756581358815
+                random.seed(sd)
+                random.shuffle(agents)
+                matches = generate_matches(agents)
+                # print("Matches:", matches)
+                for i, j in matches:
+                    white_mcts = False
+                    black_mcts = False
+                    args1 = None
+                    args2 = None
+                    p1 = players.random_bot()
+                    p2 = players.random_bot()
+
+                    start_t = time.time()
+                    checkers = Checkers(
+                        num_vertical=size,
+                        num_horizontal=size,
+                        num_vertical_pieces=args.num_vertical_pieces,
+                        SIMULATE_QUANTUM=args.sim_q,
+                        rules=rule,
+                    )
+                    game = GameInterface(
+                        checkers,
+                        white_player=p1,
+                        black_player=p2,
+                        GUI=(not args.disable_GUI),
+                        white_mcts=white_mcts,
+                        black_mcts=black_mcts,
+                        args_1=args1,
+                        args_2=args2,
+                        print=False,
+                        attempt=k,
+                    )
+                    result, num_moves, avg_time, single_movetypes = game.play()
+                    results.append(result)
+                    number_of_moves.append(num_moves)
+                    avg_mcts_time.append(avg_time)
+                    times.append(time.time() - start_t)
+
+            times_list.append(sum(times)/len(times))
+            times_sd_list.append(statistics.stdev(times))
+            moves_list.append(sum(number_of_moves)/len(number_of_moves))
+            moves_sd_list.append(statistics.stdev(number_of_moves))
+        file.write("@"*10 + f"{rule}" + "@"*10 + "\n")
+        file.write(f"moves: {moves_list}\n")
+        file.write(f"moves_sd: {moves_sd_list}\n")
+        file.write(f"times: {times_list}\n")
+        file.write(f"times_sd: {times_sd_list}\n")
+
+    file.close()
 
 
 def run_experiments():
@@ -179,7 +274,7 @@ def run_experiments():
             file.write(f"Board size: {size}x{size}\n")
             file.write("@" * 200 + "\n")
             print(f"Board size: {size}x{size}, Rule: {rule}")
-            iterations = 500
+            iterations = args.iterations
             low_white_wins = 0
             high_white_wins = 0
             low_black_wins = 0
@@ -238,7 +333,7 @@ def run_experiments():
                         checkers,
                         white_player=p1,
                         black_player=p2,
-                        GUI=args.GUI,
+                        GUI=(not args.disable_GUI),
                         white_mcts=white_mcts,
                         black_mcts=black_mcts,
                         args_1=args1,
@@ -299,7 +394,7 @@ def run_experiments():
     file.close()
 
 
-def play_normal_game():
+def play_normal_game(args):
     args_low = {
         "C": 1.4,  # srqt 2
         "num_searches": 200,  # Budget per rollout
@@ -312,8 +407,6 @@ def play_normal_game():
         "num_simulations": 1,  # Budget for extra simulations per node
         "attempt": 0,
     }
-
-    args = get_argument_parser_args()
 
     env = trueskill.TrueSkill()
     empty_attempts_folder()
@@ -380,8 +473,14 @@ def play_normal_game():
 
 
 def main():
+    args = get_argument_parser_args()
+
+    if args.do_average_moves_and_time_experiment:
+        run_average_moves_and_times_experiment(args)
+        exit()
+
     # run_experiments()
-    play_normal_game()
+    play_normal_game(args)
 
 
 if __name__ == "__main__":

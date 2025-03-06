@@ -35,7 +35,7 @@ class human_player(bot):
 
 
 class random_bot(bot):
-    def select_move(self, game, possible_movesg):
+    def select_move(self, game, possible_moves):
         try:
             if len(possible_moves) - 1 == 0:
                 return possible_moves[0]
