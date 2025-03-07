@@ -32,11 +32,12 @@ Activate it now (and everytime you want to do something with this project in the
 source qcheckersenv/bin/activate
 ```
 
-You will need to install the [unitary library](https://github.com/quantumlib/unitary/) from source.
+You will need to install the [unitary library](https://github.com/quantumlib/unitary/) from source. It is important to use v0.1, later version may not be compatible.
 
 ```
 git clone https://github.com/quantumlib/unitary.git
 cd unitary/
+git checkout v0.1
 pip install .
 cd ..
 ```
