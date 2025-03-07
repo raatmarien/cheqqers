@@ -118,7 +118,8 @@ def run_average_moves_and_times_experiment(args):
     file = open(args.results_file, "w")
     file.close()
     file = open(args.results_file, "a")
-    rules = [CheckersRules.CLASSICAL, CheckersRules.QUANTUM_V1, CheckersRules.QUANTUM_V2]
+    rules = [CheckersRules.CLASSICAL, CheckersRules.QUANTUM_V1,
+             CheckersRules.QUANTUM_V2]
     # rules = [CheckersRules.QUANTUM_V2]
     sizes = [5, 6, 7, 8, 10, 12, 14]
     args.num_vertical_pieces = 1
@@ -147,7 +148,8 @@ def run_average_moves_and_times_experiment(args):
                 for k in range(iterations):
                     if k % 250 == 0 and k != 0:
                         print(
-                            f"Iteration: {k+1} at {time.strftime('%H:%M', time.localtime())}"
+                            f"Iteration: {k+1} at "
+                            f"{time.strftime('%H:%M', time.localtime())}"
                         )
                     sd = random.randint(0, 100000000000000000)
                     # sd = 4271756581358815
@@ -199,6 +201,7 @@ def run_average_moves_and_times_experiment(args):
             file.write(f"moves_sd: {moves_sd_list}\n")
             file.write(f"times: {times_list}\n")
             file.write(f"times_sd: {times_sd_list}\n")
+            file.flush()
 
     file.close()
 
