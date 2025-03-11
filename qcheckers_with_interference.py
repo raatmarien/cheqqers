@@ -324,8 +324,9 @@ class Game:
 
     def apply_move(self, move: Move):
         self.moves_since_take += 1
+        canceled = False
         if isinstance(move, ClassicalMove):
-            self._apply_classical_move(move)
+            canceled = self._apply_classical_move(move)
         elif isinstance(move, SplitMove):
             self._apply_split_move(move)
         elif isinstance(move, MergeMove):
@@ -334,7 +335,9 @@ class Game:
         # Add the move to the history
         self.moves.append(move)
 
-        if move.is_take_move:
+        # If the take move didn't go through because the measurement went off
+        # then we don't reset the takes.
+        if move.is_take_move and not canceled:
             self.moves_since_take = 0
 
         if not move.is_take_move or\
@@ -428,29 +431,29 @@ class Game:
             else:
                 is_there = self.measure(taken_index)
                 if not is_there:
-                    return
+                    return True
         elif (from_occupancy == ClassicalSquareState.OCCUPIED and
               taken_occupancy == ClassicalSquareState.QUANTUM and
               self._is_entangled(taken_index)):
             # Now we need to measure the taken piece
             is_there = self.measure(taken_index)
             if not is_there:
-                return
+                return True
         elif (from_occupancy == ClassicalSquareState.QUANTUM and
               taken_occupancy == ClassicalSquareState.OCCUPIED):
             # Now we first need to measure the from piece
             is_there = self.measure(move.from_index)
             if not is_there:
-                return
+                return True
         elif (from_occupancy == ClassicalSquareState.QUANTUM and
               taken_occupancy == ClassicalSquareState.QUANTUM):
             # First measure the from piece
             from_is_there = self.measure(move.from_index)
             if not from_is_there:
-                return
+                return True
             taken_is_there = self.measure(taken_index)
             if not taken_is_there:
-                return
+                return True
 
         # Remove the taken piece
         self.board.piece_map[taken_index] = None
@@ -463,6 +466,8 @@ class Game:
         # Clear the original position
         self.board.piece_map[move.from_index] = None
         self.board.classic_occupancy[move.from_index] = ClassicalSquareState.EMPTY
+
+        return False
 
     def _apply_split_move(self, move: SplitMove):
         # Implement split move logic here
@@ -568,18 +573,24 @@ class Game:
         # Extract which qubit was measured as |1⟩ (occupied)
         measurement = result.measurements["result"][0]
         collapsed_square = None
+
         for square, qubit in qubit_by_current_square.items():
             if measurement[list(qubit_by_current_square.values()).index(qubit)] == 1:
                 collapsed_square = square
                 break
 
+        piece = self.board.piece_map[collapsed_square]
+
         # Update the board occupancy
         for square in superposition.occupied_squares:
             self.board.classic_occupancy[square] = ClassicalSquareState.EMPTY
-        
+            self.board.piece_map[square] = None
+
         self.board.classic_occupancy[collapsed_square] = ClassicalSquareState.OCCUPIED
-        
+        self.board.piece_map[collapsed_square] = piece
+
         # Remove the superposition
         self.superpositions.remove(superposition)
 
         return collapsed_square == square_index
+
