@@ -1,5 +1,8 @@
 from enum import Enum
 import copy
+import cirq
+import random
+import numpy as np
 
 
 class ClassicalSquareState(Enum):
@@ -214,7 +217,7 @@ class Board:
     def from_same_piece(self, index1, index2):
         if index1 == index2:
             return True
-        return True  # TODO actually check
+        return True  # TODO actually check. Probably need some info on the superpositions.
 
     def display(self):
         """Display the current board state"""
@@ -225,7 +228,7 @@ class Board:
                 if (x, y) not in self.xy_index_map:
                     row += "□ "  # White square
                     continue
-                
+
                 i = self.xy_index_map[(x, y)]
                 if self.classic_occupancy[i] == ClassicalSquareState.EMPTY:
                     row += "· "  # Empty black square
@@ -258,13 +261,13 @@ class PieceSuperposition():
 
     def _apply_classical_move(self, move: ClassicalMove):
         if move.is_take_move:
-            return self._apply_classical_take_move(move)
+            raise 'Error: take moves should always result in measurement'
 
         self.occupied_squares.remove(move.from_index)
         self.occupied_squares.append(move.to_index)
 
-    def _apply_classical_take_move(self, move: ClassicalMove):
-        raise 'TODO: implement'
+    def insert_entanglement_placeholder(self):
+        self.moves.append(None)
 
     def _apply_split_move(self, move: SplitMove):
         self.occupied_squares.remove(move.from_index)
@@ -294,12 +297,14 @@ class Game:
     board: Board
     moves: list[Move]
     turn: PieceColor
+    allow_entanglement: bool
     moves_since_take: int
     superpositions: list[PieceSuperposition]
     entanglements: list[PieceEntanglement]
 
-    def __init__(self, size, start_rows):
+    def __init__(self, size, start_rows, allow_entanglement: bool = True):
         self.board = Board(size, start_rows)
+        self.allow_entanglement = allow_entanglement
         self.moves = []
         self.turn = PieceColor.WHITE
         self.moves_since_take = 0
@@ -404,18 +409,24 @@ class Game:
                 from_occupancy == ClassicalSquareState.OCCUPIED and
                 taken_occupancy == ClassicalSquareState.QUANTUM and
                 not self._is_entangled(taken_index)):
-            # This is the only condition in which we entangle
-            self.board.classic_occupancy[move.from_index] = ClassicalSquareState.QUANTUM
-            self.board.classic_occupancy[move.to_index] = ClassicalSquareState.QUANTUM
-            self.board.piece_map[move.to_index] = piece
+            if self.allow_entanglement:
+                # This is the only condition in which we entangle
+                self.board.classic_occupancy[move.from_index] = ClassicalSquareState.QUANTUM
+                self.board.classic_occupancy[move.to_index] = ClassicalSquareState.QUANTUM
+                self.board.piece_map[move.to_index] = piece
 
-            superposition_taken = self._find_superposition_on_square(taken_index)
-            superposition_from = PieceSuperposition(move)#TODO: Later interpret this correctly
-            self.superpositions.append(superposition_from)
-            self.entanglements.append(
-                PieceEntanglement(superposition_taken, superposition_from))
+                superposition_taken = self._find_superposition_on_square(taken_index)
+                self.superposition_taken.insert_entanglement_placeholder()
+                superposition_from = PieceSuperposition(move)#TODO: Later interpret this correctly
+                self.superpositions.append(superposition_from)
+                self.entanglements.append(
+                    PieceEntanglement(superposition_taken, superposition_from))
 
-            return
+                return
+            else:
+                is_there = self.measure(taken_index)
+                if not is_there:
+                    return
         elif (from_occupancy == ClassicalSquareState.OCCUPIED and
               taken_occupancy == ClassicalSquareState.QUANTUM and
               self._is_entangled(taken_index)):
@@ -480,3 +491,93 @@ class Game:
         # Implement merge move logic here
         pass
 
+    def measure(self, square_index: int) -> bool:
+        """
+        Measure whether a piece exists at a specific square.
+
+        Args:
+            square_index: The index of the square to measure
+
+        Returns:
+            bool: True if a piece is found at the square, False otherwise
+        """
+        #TODO: Deal with entanglements
+
+        # Find the superposition that contains this square
+        superposition = self._find_superposition_on_square(square_index)
+        if superposition is None:
+            # If the square is not part of any superposition, check the classical state
+            return self.board.classic_occupancy[square_index] == ClassicalSquareState.OCCUPIED
+
+        qubit_name_counter = 0
+        qubit_by_current_square = {
+            superposition.moves[0].from_index: cirq.NamedQubit(f"{qubit_name_counter}")
+        }
+        qubit_name_counter += 1
+
+        # Create a quantum circuit
+        circuit = cirq.Circuit()
+
+        # Set up the initial state - we know the initial square was occupied
+        # Initialize the first qubit to |1⟩ (occupied)
+        circuit.append(cirq.X(qubit_by_current_square.values()[0]))
+
+        # Apply the gates corresponding to each move in the superposition's history
+        for move in superposition.moves:
+            if move is None:  # Skip entanglement placeholders
+                continue
+
+            if isinstance(move, ClassicalMove) and not move.is_take_move:
+                # Simply change the mapping of the qubit and then add a S gate for the phase.
+                qubit = qubit_by_current_square[move.from_index]
+                qubit_by_current_square[move.to_index] = qubit
+                del qubit_by_current_square[move.from_index]
+
+                circuit.append(cirq.S(qubit_by_current_square[move.to_index]))
+            elif isinstance(move, SplitMove):
+                # Here we create a new qubit for the superposition
+                # And we change the square of the original qubit
+                # Then we apply a sqrt-i-swap between them to make up the difference.
+                qubit = qubit_by_current_square[move.from_index]
+                qubit_by_current_square[move.to_index1] = qubit
+                del qubit_by_current_square[move.from_index]
+
+                qubit_by_current_square[move.to_index2] = cirq.NamedQubit(f"{qubit_name_counter}")
+                qubit_name_counter += 1
+
+                in_qubit_sqrt_iswap = np.array([
+                    [1, 0, 0, 0],
+                    [0, 1j/np.sqrt(2), 1j/np.sqrt(2), 0],
+                    [0, 1j/np.sqrt(2), -1j/np.sqrt(2), 0],
+                    [0, 0, 0, 1]
+                ])
+
+                circuit.append(cirq.MatrixGate(in_qubit_sqrt_iswap).on(
+                    qubit_by_current_square[move.to_index1],
+                    qubit_by_current_square[move.to_index2]))
+
+        # Measure all qubits
+        circuit.append(cirq.measure(*qubit_by_current_square.values(), key="result"))
+
+        # Simulate the measurement
+        simulator = cirq.Simulator()
+        result = simulator.run(circuit)
+
+        # Extract which qubit was measured as |1⟩ (occupied)
+        measurement = result.measurements["result"][0]
+        collapsed_square = None
+        for square, qubit in qubit_by_current_square.items():
+            if measurement[list(qubit_by_current_square.values()).index(qubit)] == 1:
+                collapsed_square = square
+                break
+
+        # Update the board occupancy
+        for square in superposition.occupied_squares:
+            self.board.classic_occupancy[square] = ClassicalSquareState.EMPTY
+        
+        self.board.classic_occupancy[collapsed_square] = ClassicalSquareState.OCCUPIED
+        
+        # Remove the superposition
+        self.superpositions.remove(superposition)
+
+        return collapsed_square == square_index
