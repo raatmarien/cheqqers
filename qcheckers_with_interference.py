@@ -117,9 +117,10 @@ class Board:
                    self.piece_map[i].color != color:
                     continue
 
-                possible_squares = [(x - 1, y + 1), (x + 1, y + 1)]
+                standard_dir = 1 if color == PieceColor.WHITE else -1
+                possible_squares = [(x - 1, y + standard_dir), (x + 1, y + standard_dir)]
                 if self.piece_map[i].crowned:
-                    possible_squares += [(x - 1, y - 1), (x + 1, y - 1)]
+                    possible_squares += [(x - 1, y - standard_dir), (x + 1, y - standard_dir)]
 
                 for (x_, y_) in possible_squares:
                     if (x_, y_) not in self.xy_index_map:
@@ -130,7 +131,7 @@ class Board:
                            self.piece_map[i_].color == color:
                             continue
                         x_to = x_ + (x_ - x)
-                        y_to = y + (y_ - y)
+                        y_to = y_ + (y_ - y)
                         if (x_to, y_to) not in self.xy_index_map:
                             continue
                         i_to = self.xy_index_map[(x_to, y_to)]
