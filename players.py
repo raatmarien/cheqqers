@@ -8,7 +8,7 @@ class bot:
     def __init__(self) -> None:
         pass
 
-    def select_move(self, possible_moves):
+    def select_move(self, game, possible_moves):
         pass
 
 
@@ -35,7 +35,7 @@ class human_player(bot):
 
 
 class random_bot(bot):
-    def select_move(self, game, possible_movesg):
+    def select_move(self, game, possible_moves):
         try:
             if len(possible_moves) - 1 == 0:
                 return possible_moves[0]
@@ -56,24 +56,15 @@ class heuristic_bot(bot):
     ):
         scores = []
         possible_moves = game.legal_moves
-        if (
-            curr_depth == max_depth
-        ):  # if we reached the depth we want to go to, evaluate the board
+        if curr_depth == max_depth:  # if we reached the depth we want to go to, evaluate the board
             score = self.evaluate_board(game)
-            if (
-                parent_player != game.player
-            ):  # Invert the score if the player is not the same as the parent player
+            if parent_player != game.player:  # Invert the score if the player is not the same as the parent player
                 score = -score
             return score
-        if (
-            len(possible_moves) == 0
-        ):  # If there are no possible moves, return the score of the board
+        if len(possible_moves) == 0:  # If there are no possible moves, return the score of the board
             return self.evaluate_board(game)
-        for (
-            i
-        ) in (
-            possible_moves
-        ):  # For all moves we can do from this position, do the move and recursively call this function
+        
+        for i in possible_moves: # For all moves we can do from this position, do the move and recursively call this function
             cp = game.get_copy()
             player = cp.player
             cp.player_move(i)  # player probably changes here

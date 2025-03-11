@@ -217,7 +217,7 @@ class GameInterface:
         moves = []
         mcts_moves = []
         prev_take = False  # variable to check if a piece has been taken before
-        self.draw_board()
+        #self.draw_board()
         # pygame.image.save(self.screen, f"screenshots/screenshot{self.scrshot_counter}.jpeg")
         self.scrshot_counter += 1
         # for i in [3, 2, 2, 1, 1, 2, 2, 1]:
@@ -226,143 +226,52 @@ class GameInterface:
         #     self.print_board(False)
         times = []
         while self.game.status == CheckersResult.UNFINISHED and not self.quit:
-            if self.GUI:
-                moved = False  # init empty
-                calc_next_move = True
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        pygame.quit()
-                        sys.exit(0)
-                    if event.type == pygame.MOUSEBUTTONDOWN and (
-                        (
-                            self.game.player == CheckersPlayer.WHITE
-                            and isinstance(self.white_player, human_player)
-                        )
-                        or (
-                            self.game.player == CheckersPlayer.BLACK
-                            and isinstance(self.black_player, human_player)
-                        )
-                    ):
-                        down_pos = event.pos
-                        # self.handle_click(event.pos)
-                    if event.type == pygame.MOUSEBUTTONUP and (
-                        (
-                            self.game.player == CheckersPlayer.WHITE
-                            and isinstance(self.white_player, human_player)
-                        )
-                        or (
-                            self.game.player == CheckersPlayer.BLACK
-                            and isinstance(self.black_player, human_player)
-                        )
-                    ):
-                        # Detect swipes for quantum moves
-                        moved, _ = self.handle_click(down_pos, event.pos)
-                    if event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_c:
-                            self.draw_chance = (
-                                True if self.draw_chance == False else False
-                            )
-                        if event.key == pygame.K_n:
-                            self.draw_numbers = (
-                                True if self.draw_numbers == False else False
-                            )
-                        # SPACEBAR
-                        if event.key == pygame.K_SPACE:
-                            calc_next_move = True
-                    # self.game.player_move(legal_moves[random.randint(1, len(legal_moves))-1], self.game.player)
-
-                    # If it is the humans turn the click event will handle everything
-                    # self.print_board()
-                # if(moved):
-                #     pygame.image.save(self.screen, f"screenshots/screenshot{self.scrshot_counter}.jpeg")
-                #     self.scrshot_counter += 1
-
-                if calc_next_move and not moved:
-                    if self.game.player == CheckersPlayer.WHITE:  # white player
-                        if self.white_mcts:
-                            self.white_player = MCTS(self.game, self.args1)
-                            stime = time.time()
-                            move = self.white_player.search()
-                            print("thinking time: ", time.time() - stime)
-                            self.do_game_move(move)
-                            self.redraw_board()
-                        elif not isinstance(self.white_player, human_player):
-                            move = self.white_player.select_move(
-                                self.game, self.game.legal_moves
-                            )
-                            self.do_game_move(move)
-                            self.redraw_board()
-                    else:  # black player
-                        if self.black_mcts:
-                            self.black_player = MCTS(self.game, self.args2)
-                            stime = time.time()
-                            move = self.black_player.search()
-                            print("thinking time: ", time.time() - stime)
-                            self.do_game_move(move)
-                            self.redraw_board()
-                        elif not isinstance(self.black_player, human_player):
-                            move = self.black_player.select_move(
-                                self.game, self.game.legal_moves
-                            )
-                            self.do_game_move(move)
-                            self.redraw_board()
-                    # pygame.image.save(self.screen, f"screenshots/screenshot{self.scrshot_counter}.jpeg")
-                    # self.scrshot_counter += 1
-
-                self.highlight_squares(self.game.legal_moves)
-                self.draw_board()
-                pygame.display.flip()  # needs to be called outside draw function
-                # time.sleep(1)
-            else:  # ASCII BOARD
-                prev_take = False  # Always reset
-                attempt_str = ""
-                attempt_str = self.game.get_sim_board()
-                if self.print:
-                    # print("Simulated board")
-                    # self.print_board(True)
-                    print("Real board")
-                    self.print_board(False)
-                    self.print_legal_moves(self.game.legal_moves)
-                counter += 1
-                # if(counter % 10 == 0):
-                #     print(f"Move number {counter}")
-                # move = random.randint(1, len(legal_moves))
-                if self.game.player == CheckersPlayer.WHITE:
-                    if not self.white_mcts:
-                        move = self.white_player.select_move(
-                            self.game, self.game.legal_moves
-                        )
-                    else:
-                        # Calculate time for function call
-                        start = time.time()
-                        self.white_player = MCTS(self.game, self.args1)
-                        move = self.white_player.search()
-                        end_time = time.time() - start
-                        mcts_moves.append(move)
-                        times.append(end_time)
+            prev_take = False  # Always reset
+            attempt_str = ""
+            attempt_str = self.game.get_sim_board()
+            if self.print:
+                # print("Simulated board")
+                # self.print_board(True)
+                print("Real board")
+                self.print_board(False)
+                self.print_legal_moves(self.game.legal_moves)
+            counter += 1
+            # if(counter % 10 == 0):
+            #     print(f"Move number {counter}")
+            # move = random.randint(1, len(legal_moves))
+            print(self.game.legal_moves)
+            if self.game.player == CheckersPlayer.WHITE:
+                if not self.white_mcts:
+                    move = self.white_player.select_move(
+                        self.game, self.game.legal_moves
+                    )
                 else:
-                    if not self.black_mcts:
-                        move = self.black_player.select_move(
-                            self.game, self.game.legal_moves
-                        )
-                    else:
-                        start = time.time()
-                        self.black_player = MCTS(self.game, self.args2)
-                        move = self.black_player.search()
-                        mcts_moves.append(move)
-                        end_time = time.time() - start
-                        times.append(end_time)
-                    # move.print_move()
-                    # move = self.black_player.select_move(self.game.legal_moves)
-                moves.append(move)
-                if self.print:
-                    print("Selected move: ", end="")
-                    move.print_move()
-                attempt_str += "\n"
-                attempt_str += "Selected move: "
-                attempt_str += move.get_move()
-                attempt_str += "\n"
-                self.game.player_move(move, self.game.player)
+                    # Calculate time for function call
+                    start = time.time()
+                    self.white_player = MCTS(self.game, self.args1)
+                    move = self.white_player.search()
+                    end_time = time.time() - start
+                    mcts_moves.append(move)
+                    times.append(end_time)
+            else:
+                if not self.black_mcts:
+                    move = self.black_player.select_move(
+                        self.game, self.game.legal_moves
+                    )
+                else:
+                    start = time.time()
+                    self.black_player = MCTS(self.game, self.args2)
+                    move = self.black_player.search()
+                    mcts_moves.append(move)
+                    end_time = time.time() - start
+                    times.append(end_time)
+                # move.print_move()
+                # move = self.black_player.select_move(self.game.legal_moves)
+
+            moves.append(move)
+            print("Move: ", move)
+            self.game.player_move(move, self.game.player)
+
         if self.print:
             print(f"Results: {self.game.status}")
         # self.write_attempt(f"Results: {self.game.status}")

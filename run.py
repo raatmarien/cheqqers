@@ -86,8 +86,8 @@ def run_experiment(rules : CheckersRules, board_size : int, agent1 : str, agent2
 
     results = []
 
-    p1 = agent_map[agent1]
-    p2 = agent_map[agent2]
+    p1 = agent_map[agent1]()
+    p2 = agent_map[agent2]()
 
     wins = [0,0,0]
     for k in range(num_games):
@@ -101,6 +101,8 @@ def run_experiment(rules : CheckersRules, board_size : int, agent1 : str, agent2
             SIMULATE_QUANTUM=True,
             rules=rules,
         )
+
+        print(agent1)
 
         game = GameInterface(
             checkers,
@@ -130,7 +132,7 @@ def run_experiment(rules : CheckersRules, board_size : int, agent1 : str, agent2
 
 def main():
     # # agents = ["random", "heuristic", "low_mcts", "high_mcts"]
-    results, wins = run_experiment(CheckersRules.ENTANGLEMENT, 5, "heuristic", "low_mcts", 5)
+    results, wins = run_experiment(CheckersRules.QUANTUM_V2, 5, "random", "random", 5)
 
     print(results, wins)
 
