@@ -296,6 +296,7 @@ class Game:
     turn: PieceColor
     moves_since_take: int
     superpositions: list[PieceSuperposition]
+    entanglements: list[PieceEntanglement]
 
     def __init__(self, size, start_rows):
         self.board = Board(size, start_rows)
@@ -337,6 +338,18 @@ class Game:
         for superposition in self.superpositions:
             if square_id in superposition.occupied_squares:
                 return superposition
+
+    def _is_entangled(self, square_id):
+        superposition = self._find_superposition_on_square(square_id)
+        if superposition is None:
+            return False
+
+        for entanglement in self.entanglements:
+            if entanglement.superposition_from == superposition or\
+               entanglement.superposition_taken == superposition:
+                return True
+
+        return False
 
     def _apply_classical_move(self, move: ClassicalMove):
         if move.is_take_move:
@@ -387,8 +400,10 @@ class Game:
                 piece = piece.copy()
                 piece.crowned = True
 
-        if from_occupancy == ClassicalSquareState.OCCUPIED and\
-           taken_occupancy == ClassicalSquareState.QUANTUM:
+        if (
+                from_occupancy == ClassicalSquareState.OCCUPIED and
+                taken_occupancy == ClassicalSquareState.QUANTUM and
+                not self._is_entangled(taken_index)):
             # This is the only condition in which we entangle
             self.board.classic_occupancy[move.from_index] = ClassicalSquareState.QUANTUM
             self.board.classic_occupancy[move.to_index] = ClassicalSquareState.QUANTUM
@@ -401,6 +416,28 @@ class Game:
                 PieceEntanglement(superposition_taken, superposition_from))
 
             return
+        elif (from_occupancy == ClassicalSquareState.OCCUPIED and
+              taken_occupancy == ClassicalSquareState.QUANTUM and
+              self._is_entangled(taken_index)):
+            # Now we need to measure the taken piece
+            is_there = self.measure(taken_index)
+            if not is_there:
+                return
+        elif (from_occupancy == ClassicalSquareState.QUANTUM and
+              taken_occupancy == ClassicalSquareState.OCCUPIED):
+            # Now we first need to measure the from piece
+            is_there = self.measure(move.from_index)
+            if not is_there:
+                return
+        elif (from_occupancy == ClassicalSquareState.QUANTUM and
+              taken_occupancy == ClassicalSquareState.QUANTUM):
+            # First measure the from piece
+            from_is_there = self.measure(move.from_index)
+            if not from_is_there:
+                return
+            taken_is_there = self.measure(taken_index)
+            if not taken_is_there:
+                return
 
         # Remove the taken piece
         self.board.piece_map[taken_index] = None
