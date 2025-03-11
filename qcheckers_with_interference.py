@@ -1,6 +1,5 @@
 from enum import Enum
-import random
-import statistics
+import copy
 
 
 class ClassicalSquareState(Enum):
@@ -27,6 +26,9 @@ class Piece:
     def __init__(self, color, crowned):
         self.color = color
         self.crowned = crowned
+
+    def copy(self):
+        return copy.deepcopy(self)
 
 
 class Move:
@@ -272,6 +274,15 @@ class PieceSuperposition():
         raise 'TODO: implement'
 
 
+class PieceEntanglement:
+    superposition_taken: PieceSuperposition
+    superposition_from: PieceSuperposition
+
+    def __init__(self, superposition_taken, superposition_from):
+        self.superposition_taken = superposition_taken
+        self.superposition_from = superposition_from
+
+
 class GameState(Enum):
     IN_PROGRESS = 0
     WHITE_WON = 1
@@ -343,6 +354,7 @@ class Game:
             to_x, to_y = self.board.index_xy_map[move.to_index]
             if (piece.color == PieceColor.WHITE and to_y == self.board.size - 1) or \
                (piece.color == PieceColor.BLACK and to_y == 0):
+                piece = piece.copy()
                 piece.crowned = True
 
         # Move the piece to the new position
@@ -355,6 +367,7 @@ class Game:
 
     def _apply_classical_take_move(self, move: ClassicalMove):
         piece = self.board.piece_map[move.from_index]
+        from_occupancy = self.board.classic_occupancy[move.from_index]
 
         # Calculate the position of the taken piece
         from_x, from_y = self.board.index_xy_map[move.from_index]
@@ -364,6 +377,30 @@ class Game:
         taken_x = (from_x + to_x) // 2
         taken_y = (from_y + to_y) // 2
         taken_index = self.board.xy_index_map[(taken_x, taken_y)]
+        taken_occupancy = self.board.classic_occupancy[taken_index]
+
+        # Check if the piece should be crowned (reached the opposite edge)
+        if not piece.crowned:
+            to_x, to_y = self.board.index_xy_map[move.to_index]
+            if (piece.color == PieceColor.WHITE and to_y == self.board.size - 1) or \
+               (piece.color == PieceColor.BLACK and to_y == 0):
+                piece = piece.copy()
+                piece.crowned = True
+
+        if from_occupancy == ClassicalSquareState.OCCUPIED and\
+           taken_occupancy == ClassicalSquareState.QUANTUM:
+            # This is the only condition in which we entangle
+            self.board.classic_occupancy[move.from_index] = ClassicalSquareState.QUANTUM
+            self.board.classic_occupancy[move.to_index] = ClassicalSquareState.QUANTUM
+            self.board.piece_map[move.to_index] = piece
+
+            superposition_taken = self._find_superposition_on_square(taken_index)
+            superposition_from = PieceSuperposition(move)#TODO: Later interpret this correctly
+            self.superpositions.append(superposition_from)
+            self.entanglements.append(
+                PieceEntanglement(superposition_taken, superposition_from))
+
+            return
 
         # Remove the taken piece
         self.board.piece_map[taken_index] = None
@@ -395,6 +432,7 @@ class Game:
             to_x, to_y = self.board.index_xy_map[move.to_index]
             if (piece.color == PieceColor.WHITE and to_y == self.board.size - 1) or \
                (piece.color == PieceColor.BLACK and to_y == 0):
+                piece = piece.copy()
                 piece.crowned = True
 
         for i in [move.to_index1, move.to_index2]:
