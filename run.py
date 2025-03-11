@@ -1,5 +1,5 @@
 import argparse
-from enums import CheckersResult, CheckersRules
+from enums import CheckersResult, CheckersRules, MoveType
 from interface import GameInterface
 from quantum_checkers import Checkers
 import players
@@ -85,6 +85,7 @@ def run_experiment(rules : CheckersRules, board_size : int, agent1 : str, agent2
     }
 
     results = []
+    moves = []
 
     p1 = agent_map[agent1]()
     p2 = agent_map[agent2]()
@@ -102,8 +103,6 @@ def run_experiment(rules : CheckersRules, board_size : int, agent1 : str, agent2
             rules=rules,
         )
 
-        print(agent1)
-
         game = GameInterface(
             checkers,
             white_player=p1,
@@ -117,8 +116,9 @@ def run_experiment(rules : CheckersRules, board_size : int, agent1 : str, agent2
             attempt=k,
         )
 
-        result, num_moves, avg_time, single_movetypes = game.play()
-        results.append([result, num_moves])
+        result, move_history = game.play()
+        results.append(result)
+        moves.append(move_history)
         
         if result == CheckersResult.WHITE_WINS:
             wins[0] += 1
@@ -127,14 +127,23 @@ def run_experiment(rules : CheckersRules, board_size : int, agent1 : str, agent2
         else:
             wins[2] += 1
 
-    return results, wins
+    return results, moves, wins
     
 
 def main():
     # # agents = ["random", "heuristic", "low_mcts", "high_mcts"]
-    results, wins = run_experiment(CheckersRules.QUANTUM_V2, 5, "random", "random", 5)
+    results, moves, wins = run_experiment(CheckersRules.QUANTUM_V2, 5, "random", "random", 50)
 
-    print(results, wins)
+    take_after_collapse = 0
+    takes = 0
+    for move_history in moves:
+        for move in range(len(move_history)-1):
+            if move_history[move+1].movetype == MoveType.TAKE:
+                takes += 1
+                if move_history[move].movetype == MoveType.SPLIT or move_history[move].movetype == MoveType.ENTANGLE:
+                    take_after_collapse += 1
+
+    print(takes, take_after_collapse)
 
 if __name__ == "__main__":
     main()
