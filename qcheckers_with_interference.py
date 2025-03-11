@@ -235,6 +235,36 @@ class Board:
         return board_display
 
 
+class PieceSuperposition():
+    """Keeps track of the quantum state of one piece over the board
+    """
+    occupied_squares: list[int]
+    moves: list[Move]
+
+    def __init__(self, move: SplitMove):
+        self.occupied_squares = [move.to_index1, move.to_index1]
+        self.moves = [move]
+
+    def apply_move(self, move: Move):
+        self.moves.append(move)
+        if isinstance(ClassicalMove, move):
+            self._apply_classical_move(move)
+        elif isinstance(SplitMove, move):
+            self._apply_split_move(move)
+        elif isinstance(MergeMove, move):
+            self._apply_merge_move(move)
+
+    def _apply_classical_move(self, move: ClassicalMove):
+        raise 'TODO: implement'
+
+    def _apply_split_move(self, move: SplitMove):
+        self.occupied_squares.remove(move.from_index)
+        self.occupied_squares += [move.to_index1, move.to_index2]
+
+    def _apply_merge_move(self, move: MergeMove):
+        raise 'TODO: implement'
+
+
 class GameState(Enum):
     IN_PROGRESS = 0
     WHITE_WON = 1
@@ -247,6 +277,7 @@ class Game:
     moves: list[Move]
     turn: PieceColor
     moves_since_take: int
+    superpositions: list[PieceSuperposition]
 
     def __init__(self, size, start_rows):
         self.board = Board(size, start_rows)
@@ -282,6 +313,7 @@ class Game:
             self.turn = self.turn.other()
 
     def _apply_classical_move(self, move: ClassicalMove):
+        #TODO: Deal with quantumness
         piece = self.board.piece_map[move.from_index]
 
         if move.is_take_move:
@@ -298,6 +330,13 @@ class Game:
             self.board.piece_map[taken_index] = None
             self.board.classic_occupancy[taken_index] = ClassicalSquareState.EMPTY
 
+        # Check if the piece should be crowned (reached the opposite edge)
+        if not piece.crowned:
+            to_x, to_y = self.board.index_xy_map[move.to_index]
+            if (piece.color == PieceColor.WHITE and to_y == self.board.size - 1) or \
+               (piece.color == PieceColor.BLACK and to_y == 0):
+                piece.crowned = True
+
         # Move the piece to the new position
         self.board.piece_map[move.to_index] = piece
         self.board.classic_occupancy[move.to_index] = ClassicalSquareState.OCCUPIED
@@ -306,6 +345,22 @@ class Game:
         self.board.piece_map[move.from_index] = None
         self.board.classic_occupancy[move.from_index] = ClassicalSquareState.EMPTY
 
+        # Add the move to the history
+        self.moves.append(move)
+
+    def _apply_split_move(self, move: SplitMove):
+        # Implement split move logic here
+        piece = self.board.piece_map[move.from_index]
+
+        if self.board.classic_occupancy[move.from_index] == ClassicalSquareState.QUANTUM:
+            superposition = self._find_superposition_on_square(move.from_index)
+            superposition.apply_move(move)
+        else:
+            self.superpositions.append(PieceSuperposition(move))
+
+        self.board.classic_occupancy[move.from_index] = ClassicalSquareState.EMPTY
+        self.board.piece_map[move.from_index] = None
+
         # Check if the piece should be crowned (reached the opposite edge)
         if not piece.crowned:
             to_x, to_y = self.board.index_xy_map[move.to_index]
@@ -313,12 +368,11 @@ class Game:
                (piece.color == PieceColor.BLACK and to_y == 0):
                 piece.crowned = True
 
-        # Add the move to the history
-        self.moves.append(move)
+        for i in [move.to_index1, move.to_index2]:
+            self.board.classic_occupancy[i] = ClassicalSquareState.QUANTUM
+            self.board.piece_map[i] = piece
 
-    def _apply_split_move(self, move: SplitMove):
-        # Implement split move logic here
-        pass
+        self.moves.append(move)
 
     def _apply_merge_move(self, move: MergeMove):
         # Implement merge move logic here
