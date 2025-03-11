@@ -956,9 +956,11 @@ class Checkers:
         self.verify_rel_and_ent()
         self.verify_entangle_squares()
         self.verify_odds()
+
         self.moves_since_take += 1
         prev_taken = False
         can_take = False
+        
         to_king = []  # list that holds moved pieces to check if they need to be kinged
         if player == None:
             player = self.player
@@ -995,15 +997,6 @@ class Checkers:
         )
         self.legal_moves = self.calculate_possible_moves(self.player)
         self.status = self.result()
-        # DEBUG STUFF
-        # print("########")
-        # print("RELATED SQUARES")
-        # print(self.related_squares)
-        # print(self.unique_related_squares)
-        # print(self.entangled_squares)
-        # for i in self.classical_squares.keys():
-        #     print(i, self.is_entangled(i))
-        # print("&&&&&&&&&&&&&&&&")
 
     def get_board(self) -> str:
         """Returns the Checkers board in ASCII form. Also returns dictionary with id as key.

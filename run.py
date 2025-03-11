@@ -4,6 +4,7 @@ from interface import GameInterface
 from quantum_checkers import Checkers
 import players
 import random
+import numpy as np
 
 def write_attempt(idx, attempt_str):
     temp = open(f"./attempts/log_{idx}.txt", "a")
@@ -86,11 +87,11 @@ def run_experiment(rules : CheckersRules, board_size : int, agent1 : str, agent2
 
     results = []
     moves = []
+    legal_moves = []
 
     p1 = agent_map[agent1]()
     p2 = agent_map[agent2]()
 
-    wins = [0,0,0]
     for k in range(num_games):
         sd = random.randint(0, 100000000000000000)
         random.seed(sd)
@@ -116,23 +117,24 @@ def run_experiment(rules : CheckersRules, board_size : int, agent1 : str, agent2
             attempt=k,
         )
 
-        result, move_history = game.play()
+        result, move_history, num_legal_moves_by_turn = game.play()
         results.append(result)
         moves.append(move_history)
-        
-        if result == CheckersResult.WHITE_WINS:
-            wins[0] += 1
-        elif result == CheckersResult.BLACK_WINS:
-            wins[1] += 1
-        else:
-            wins[2] += 1
+        padded_legal_moves = np.pad(np.array(num_legal_moves_by_turn), (0, 100 - len(num_legal_moves_by_turn)), 'constant')
+        legal_moves.append(padded_legal_moves)
 
-    return results, moves, wins
+    return results, moves, np.array(legal_moves)
     
 
 def main():
     # # agents = ["random", "heuristic", "low_mcts", "high_mcts"]
-    results, moves, wins = run_experiment(CheckersRules.QUANTUM_V2, 5, "random", "random", 50)
+    results, moves, num_legal_moves = run_experiment(CheckersRules.QUANTUM_V2, 5, "random", "random", 500)
+
+    # Get average number of legal moves per turn
+    num_legal_moves = np.ma.masked_array(num_legal_moves, mask=(num_legal_moves == 0))
+    avg_legal_moves = np.ma.mean(num_legal_moves, axis=0)
+    print(avg_legal_moves)
+    print("Average branching factor over all plies: ", np.mean(avg_legal_moves))
 
     take_after_collapse = 0
     takes = 0

@@ -78,18 +78,6 @@ class GameInterface:
         self.black_mcts = black_mcts
         # self.black_player = MCTS(self.game, self.args)
 
-    def init_gui(self):
-        pygame.init()
-        # Initialize the screen
-        infoObject = pygame.display.Info()
-        width = self.game.num_horizontal * SQUARE_W
-        height = self.game.num_vertical * SQUARE_H
-        self.screen = pygame.display.set_mode((width, height))
-        pygame.display.set_caption("Quantum Checkers")
-        self.load_img()
-        # Clock to control the frame rate
-        clock = pygame.time.Clock()
-
     def load_img(self):
         CROWN_IMG = pygame.image.load(
             os.path.join(os.path.dirname(__file__), "crown.png")
@@ -225,8 +213,11 @@ class GameInterface:
         #     self.game.player_move(self.game.legal_moves[i-1], self.game.player)
         #     self.print_board(False)
         times = []
+
+        num_legal_moves_by_turn = []
         while self.game.status == CheckersResult.UNFINISHED and not self.quit:
-            prev_take = False  # Always reset
+
+            num_legal_moves_by_turn.append(len(self.game.legal_moves))
 
             counter += 1
             if self.game.player == CheckersPlayer.WHITE:
@@ -252,7 +243,7 @@ class GameInterface:
             moves.append(move)
             self.game.player_move(move, self.game.player)
 
-        return (self.game.status, moves)
+        return (self.game.status, moves, num_legal_moves_by_turn)
 
     def get_positions(self, player) -> [[list, list], [list, list]]:
         """
