@@ -247,16 +247,16 @@ class PieceSuperposition():
     moves: list[Move]
 
     def __init__(self, move: SplitMove):
-        self.occupied_squares = [move.to_index1, move.to_index1]
+        self.occupied_squares = [move.to_index1, move.to_index2]
         self.moves = [move]
 
     def apply_move(self, move: Move):
         self.moves.append(move)
-        if isinstance(ClassicalMove, move):
+        if isinstance(move, ClassicalMove):
             self._apply_classical_move(move)
-        elif isinstance(SplitMove, move):
+        elif isinstance(move, SplitMove):
             self._apply_split_move(move)
-        elif isinstance(MergeMove, move):
+        elif isinstance(move, MergeMove):
             self._apply_merge_move(move)
 
     def _apply_classical_move(self, move: ClassicalMove):
@@ -308,6 +308,8 @@ class Game:
         self.moves = []
         self.turn = PieceColor.WHITE
         self.moves_since_take = 0
+        self.superpositions = []
+        self.entanglements = []
 
     def get_game_state(self) -> GameState:
         if self.moves_since_take >= 40:
@@ -477,7 +479,7 @@ class Game:
 
         # Check if the piece should be crowned (reached the opposite edge)
         if not piece.crowned:
-            to_x, to_y = self.board.index_xy_map[move.to_index]
+            to_x, to_y = self.board.index_xy_map[move.to_index1]
             if (piece.color == PieceColor.WHITE and to_y == self.board.size - 1) or \
                (piece.color == PieceColor.BLACK and to_y == 0):
                 piece = piece.copy()
@@ -520,7 +522,7 @@ class Game:
 
         # Set up the initial state - we know the initial square was occupied
         # Initialize the first qubit to |1⟩ (occupied)
-        circuit.append(cirq.X(qubit_by_current_square.values()[0]))
+        circuit.append(cirq.X(qubit_by_current_square[superposition.moves[0].from_index]))
 
         # Apply the gates corresponding to each move in the superposition's history
         for move in superposition.moves:
