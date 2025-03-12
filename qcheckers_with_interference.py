@@ -321,7 +321,6 @@ class GameState(Enum):
     BLACK_WON = 2
     DRAW = 3
 
-
 class Game:
     board: Board
     moves: list[Move]
