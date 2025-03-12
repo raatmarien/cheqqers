@@ -327,13 +327,16 @@ class Game:
     moves: list[Move]
     turn: PieceColor
     allow_entanglement: bool
+    allow_draws: bool
     moves_since_take: int
     superpositions: list[PieceSuperposition]
     entanglements: list[PieceEntanglement]
 
-    def __init__(self, size, start_rows, allow_entanglement: bool = True):
+    def __init__(self, size, start_rows, allow_entanglement: bool = True,
+                 allow_draws: bool = True):
         self.board = Board(size, start_rows)
         self.allow_entanglement = allow_entanglement
+        self.allow_draws = allow_draws
         self.moves = []
         self.turn = PieceColor.WHITE
         self.moves_since_take = 0
@@ -341,7 +344,7 @@ class Game:
         self.entanglements = []
 
     def get_game_state(self) -> GameState:
-        if self.moves_since_take >= 40:
+        if self.allow_draws and self.moves_since_take >= 40:
             return GameState.DRAW
 
         moves = self.board.get_possible_moves(self.turn, self.superpositions)
