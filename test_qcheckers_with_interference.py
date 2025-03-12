@@ -1,6 +1,6 @@
 import unittest
 from enum import Enum
-from qcheckers_with_interference import Board, Piece, PieceColor, ClassicalSquareState, Game, GameState, Move, SplitMove, MergeMove, ClassicalMove, PieceSuperposition
+from qcheckers_with_interference import Board, Piece, PieceColor, ClassicalSquareState, Game, GameState, Move, SplitMove, MergeMove, ClassicalMove, PieceSuperposition, GameType
 import statistics
 import cirq
 import random
@@ -388,7 +388,7 @@ class TestSuperpositionGame(unittest.TestCase):
         white_won = 0
         black_won = 0
         for _ in range(amount):
-            game = Game(board_size, start_rows, False)
+            game = Game(board_size, start_rows, GameType.SUPERPOSITION)
             move_count = 0
 
             while game.get_game_state() == GameState.IN_PROGRESS:
@@ -434,7 +434,7 @@ class TestEntanglementGame(unittest.TestCase):
         white_won = 0
         black_won = 0
         for _ in range(amount):
-            game = Game(board_size, start_rows, True)
+            game = Game(board_size, start_rows, GameType.ENTANGLEMENT)
             move_count = 0
 
             while game.get_game_state() == GameState.IN_PROGRESS:
@@ -480,7 +480,7 @@ class TestInterferenceGame(unittest.TestCase):
         white_won = 0
         black_won = 0
         for _ in range(amount):
-            game = Game(board_size, start_rows, True)
+            game = Game(board_size, start_rows, GameType.INTERFERENCE)
             move_count = 0
 
             while game.get_game_state() == GameState.IN_PROGRESS:

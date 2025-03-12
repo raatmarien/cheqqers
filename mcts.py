@@ -20,8 +20,11 @@ class RandomBot:
             return None  # Safe fallback
 
 class MCTS:
-    def __init__(self, args):
+    goal_state: GameState
+
+    def __init__(self, args, goal_state):
         self.args = args
+        self.goal_state = goal_state
 
     def search(self, game):
         self.game = deepcopy(game)
@@ -45,12 +48,12 @@ class MCTS:
 
             # If the game has ended
             if result != GameState.IN_PROGRESS.value:
-                value = 0.5 if result == GameState.DRAW else (0 if result == GameState.BLACK_WON else 1)
+                value = 0.5 if result == GameState.DRAW else (0 if result == self.goal_state else 1)
                 node.backpropagate(value)
             else:
                 # Expand all children
                 for child in node.expand():
-                    value = sum( child.simulate() for _ in range(self.args["num_simulations"]) )
+                    value = sum(child.simulate() for _ in range(self.args["num_simulations"]) )
                     child.backpropagate(value)
 
         action_probs = np.array([child.visit_count for child in self.root.children])

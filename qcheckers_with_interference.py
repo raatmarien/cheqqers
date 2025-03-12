@@ -5,6 +5,13 @@ import random
 import numpy as np
 
 
+class GameType(Enum):
+    CLASSIC = 0
+    SUPERPOSITION = 1
+    ENTANGLEMENT = 2
+    INTERFERENCE = 3
+
+
 class ClassicalSquareState(Enum):
     EMPTY = 0
     OCCUPIED = 1
@@ -87,13 +94,15 @@ class MergeMove(Move):
 
 class Board:
     size: int
+    game_type: GameType
     piece_map: list[Piece]
     classic_occupancy: list[ClassicalSquareState]
     xy_index_map: dict
     index_xy_map: dict
 
-    def __init__(self, size, start_rows):
+    def __init__(self, size, start_rows, game_type: GameType = GameType.INTERFERENCE):
         self.size = size
+        self.game_type = game_type
         self.piece_map = []
         self.classic_occupancy = []
         self.xy_index_map = {}
@@ -128,7 +137,13 @@ class Board:
         if len(take_moves) > 0:
             return take_moves
         else:
-            return self._get_possible_moves(color, False, superpositions)
+            possible_moves = self._get_possible_moves(color, False, superpositions)
+            if self.game_type == GameType.INTERFERENCE:
+                return possible_moves
+            elif self.game_type == GameType.SUPERPOSITION or self.game_type == GameType.ENTANGLEMENT:
+                return [m for m in possible_moves if isinstance(m, ClassicalMove) or isinstance(m, SplitMove)]
+            elif self.game_type == GameType.CLASSIC:
+                return [m for m in possible_moves if isinstance(m, ClassicalMove)]
 
     def get_take_moves(self, color: PieceColor, superpositions):
         return self._get_possible_moves(color, True, superpositions)
@@ -325,17 +340,18 @@ class Game:
     board: Board
     moves: list[Move]
     turn: PieceColor
-    allow_entanglement: bool
+    game_type: GameType
     allow_draws: bool
     moves_since_take: int
     superpositions: list[PieceSuperposition]
     entanglements: list[PieceEntanglement]
 
-    def __init__(self, size, start_rows, allow_entanglement: bool = True,
+    def __init__(self, size, start_rows,
+                 game_type: GameType = GameType.INTERFERENCE,
                  allow_draws: bool = True):
-        self.board = Board(size, start_rows)
-        self.allow_entanglement = allow_entanglement
+        self.board = Board(size, start_rows, game_type)
         self.allow_draws = allow_draws
+        self.game_type = game_type
         self.moves = []
         self.turn = PieceColor.WHITE
         self.moves_since_take = 0
@@ -452,7 +468,7 @@ class Game:
                 from_occupancy == ClassicalSquareState.OCCUPIED and
                 taken_occupancy == ClassicalSquareState.QUANTUM and
                 not self._is_entangled(taken_index)):
-            if self.allow_entanglement:
+            if self.game_type == GameType.ENTANGLEMENT or self.game_type == GameType.INTERFERENCE:
                 # This is the only condition in which we entangle
                 self.board.classic_occupancy[move.from_index] = ClassicalSquareState.QUANTUM
                 self.board.classic_occupancy[move.to_index] = ClassicalSquareState.QUANTUM

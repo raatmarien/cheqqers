@@ -2,6 +2,7 @@ from random import randint
 import traceback
 from mcts import MCTS
 from enums import CheckersPlayer
+from qcheckers_with_interference import GameState
 
 
 class bot:
@@ -49,8 +50,8 @@ class random_bot(bot):
             print(possible_moves)
 
 class mcts_bot(bot):
-    def __init__(self, args):
-        self.mcts = MCTS(args)
+    def __init__(self, args, goal_state = GameState.WHITE_WON):
+        self.mcts = MCTS(args, goal_state)
 
     def select_move(self, game):
         try:
