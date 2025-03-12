@@ -609,11 +609,18 @@ class Game:
 
                 # Now we need to apply the gate on these three qubits
                 # This is simply a CCNOT (we only take if both are there)
+                # Followed by two CNOTs to remove the taken piece
                 # Followed by an S gate for the phase change on the moving piece
                 circuit.append(cirq.CCX(
                     qubit_by_current_square[f"{taker_prefix}-{take_move.from_index}"],
                     qubit_by_current_square[f"{prefix}-{taken_index}"],
                     qubit_by_current_square[f"{taker_prefix}-{take_move.to_index}"])) 
+                circuit.append(cirq.CX(
+                    qubit_by_current_square[f"{taker_prefix}-{take_move.to_index}"],
+                    qubit_by_current_square[f"{prefix}-{taken_index}"]))
+                circuit.append(cirq.CX(
+                    qubit_by_current_square[f"{taker_prefix}-{take_move.to_index}"],
+                    qubit_by_current_square[f"{taker_prefix}-{take_move.from_index}"]))
                 circuit.append(cirq.S(
                     qubit_by_current_square[f"{taker_prefix}-{take_move.to_index}"]))
 

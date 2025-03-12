@@ -383,7 +383,7 @@ class TestClassicalGame(unittest.TestCase):
 
 class TestSuperpositionGame(unittest.TestCase):
     def test_random_superposition_game(self, board_size=8, start_rows=1):
-        """Run a random game of quantum checkers with only classical moves"""
+        """Run a random game of quantum checkers with superposition"""
         amount = 100
         moves = []
         white_won = 0
@@ -424,14 +424,14 @@ class TestSuperpositionGame(unittest.TestCase):
         self.assertGreater(statistics.mean(moves), 45)
         self.assertLess(statistics.mean(moves), 65)
         self.assertGreater(white_won, 20)
-        self.assertLess(white_won, 40)
+        self.assertLess(white_won, 45)
         self.assertGreater(black_won, 20)
-        self.assertLess(black_won, 40)
+        self.assertLess(black_won, 45)
 
 
 class TestEntanglementGame(unittest.TestCase):
     def test_random_entanglement_game(self, board_size=8, start_rows=1):
-        """Run a random game of quantum checkers with only classical moves"""
+        """Run a random game of quantum checkers with superposition + entanglement"""
         amount = 1000
         moves = []
         white_won = 0
@@ -478,7 +478,6 @@ class TestEntanglementGame(unittest.TestCase):
 
 
 class TestQuantumMeasurement(unittest.TestCase):
-
     def setUp(self):
         """Set up a simple 4x4 board to avoid complexity."""
         self.board_size = 4
