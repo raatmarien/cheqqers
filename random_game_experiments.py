@@ -89,7 +89,7 @@ if __name__ == "__main__":
     for draw in [True, False]:
         for game_type in [GameType.CLASSIC, GameType.SUPERPOSITION,
                           GameType.ENTANGLEMENT, GameType.INTERFERENCE]:
-            for size in [5, 6, 7, 8, 10, 12, 14]:
+            for size in [5, 6, 7, 8, 9, 10, 11, 12, 13, 14]:
                 results[f"{draw}-{game_type}-{size}"]\
                     = run_one_experiment(game_type, size, amount, draw)
     f.write(str(results) + '\n')
