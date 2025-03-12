@@ -370,8 +370,10 @@ class Game:
         if taken or (not canceled and move.is_take_move):
             self.moves_since_take = 0
 
+        last_row = 0 if self.turn == PieceColor.BLACK else self.board.size - 1
         if not move.is_take_move or\
-           len(self.board.get_take_moves(self.turn, None)) == 0:
+           len(self.board.get_take_moves(self.turn, None)) == 0 or\
+           self.board.index_xy_map[move.to_index][1] == last_row: # Also reset if piece is kinged
             self.turn = self.turn.other()
 
     def _find_superposition_on_square(self, square_id):
