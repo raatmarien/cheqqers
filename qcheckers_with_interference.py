@@ -135,11 +135,6 @@ class Board:
 
                 i = self.xy_index_map[(x, y)]
 
-                if self.classic_occupancy[i] != ClassicalSquareState.EMPTY and\
-                   self.piece_map[i] is None:
-                    __import__("pdb").set_trace()
-                    pass
-
                 if self.classic_occupancy[i] == ClassicalSquareState.EMPTY or\
                    self.piece_map[i].color != color:
                     continue
@@ -296,8 +291,6 @@ class PieceSuperposition():
         self.occupied_squares += [move.to_index1, move.to_index2]
 
     def _apply_merge_move(self, move: MergeMove):
-        self.occupied_squares.remove(move.from_index1)
-        self.occupied_squares.remove(move.from_index2)
         self.occupied_squares.append(move.to_index)
 
 
@@ -528,10 +521,6 @@ class Game:
         superposition = self._find_superposition_on_square(move.from_index1)
         superposition.apply_move(move)
 
-        for index in [move.from_index1, move.from_index2]:
-            self.board.classic_occupancy[index] = ClassicalSquareState.EMPTY
-            self.board.piece_map[index] = None
-
         # Check if the piece should be crowned (reached the opposite edge)
         if not piece.crowned:
             to_x, to_y = self.board.index_xy_map[move.to_index]
@@ -575,6 +564,7 @@ class Game:
                 qubit_by_current_square[add_prefix(move.to_index2)] = cirq.NamedQubit(f"{qubit_name_counter}")
                 qubit_name_counter += 1
 
+                # We can use the small one here, because everything leaves the square
                 in_qubit_sqrt_iswap = np.array([
                     [1, 0, 0, 0],
                     [0, 1j/np.sqrt(2), 1j/np.sqrt(2), 0],
@@ -586,22 +576,25 @@ class Game:
                     qubit_by_current_square[add_prefix(move.to_index1)],
                     qubit_by_current_square[add_prefix(move.to_index2)]))
             elif isinstance(move, MergeMove):
-                # We simply use the inverse of the split move
-                hermitian_conjugate = np.array([
-                    [1, 0, 0, 0],
-                    [0, -1j/np.sqrt(2), -1j/np.sqrt(2), 0],
-                    [0, -1j/np.sqrt(2), 1j/np.sqrt(2), 0],
-                    [0, 0, 0, 1]
+                # We simply use the inverse of the split move, but the 3 point matrix
+                merge_jump = np.array([
+                    [1, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, -1j/np.sqrt(2), 0, -1j/np.sqrt(2), 0, 0, 0],
+                    [0, 0, 1/np.sqrt(2), 0, -1/np.sqrt(2), 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, -1j, 0],
+                    [0, -1j, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, -1/np.sqrt(2), 0, -1j/np.sqrt(2), 0, 0],
+                    [0, 0, 0, -1j/np.sqrt(2), 0, -1/np.sqrt(2), 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 1],
                 ])
 
-                # Rename the first from to the target
-                qubit = qubit_by_current_square[add_prefix(move.from_index1)]
-                qubit_by_current_square[add_prefix(move.to_index)] = qubit
-                del qubit_by_current_square[add_prefix(move.from_index1)]
+                # Add a qubit for the target
+                qubit_by_current_square[add_prefix(move.to_index)] = cirq.NamedQubit(f"{qubit_name_counter}")
+                qubit_name_counter += 1
 
-                # Now apply the matrix, we need to invert the basis as per
-                # the quantum chess merge jump unitary
-                circuit.append(cirq.MatrixGate(hermitian_conjugate).on(
+                # Now apply the matrix
+                circuit.append(cirq.MatrixGate(merge_jump).on(
+                    qubit_by_current_square[add_prefix(move.from_index1)],
                     qubit_by_current_square[add_prefix(move.from_index2)],
                     qubit_by_current_square[add_prefix(move.to_index)]))
 

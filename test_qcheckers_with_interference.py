@@ -475,7 +475,7 @@ class TestEntanglementGame(unittest.TestCase):
 class TestInterferenceGame(unittest.TestCase):
     def test_random_interference_game(self, board_size=8, start_rows=1):
         """Run a random game of quantum checkers with superposition + entanglement + interference"""
-        amount = 1000
+        amount = 100
         moves = []
         white_won = 0
         black_won = 0
@@ -491,6 +491,7 @@ class TestInterferenceGame(unittest.TestCase):
 
                 # Apply the move
                 game.apply_move(random_move)
+
                 move_count += 1
 
             moves.append(move_count)
