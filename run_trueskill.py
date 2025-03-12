@@ -5,7 +5,7 @@ import random
 import numpy as np
 from players import *
 import trueskill
-from qcheckers_with_interference import Game, GameState, PieceColor
+from qcheckers_with_interference import Game, GameState, PieceColor, GameType
 
 def generate_matches(agents):
     matches = []
@@ -36,7 +36,7 @@ args_high = {
     "attempt": 0,
 }
 
-def run_tournament(size, start_rows, num_iterations, ruleset):
+def run_tournament(size, start_rows, num_iterations, game_type):
     env = trueskill.TrueSkill()
 
     ratings = {
@@ -50,24 +50,27 @@ def run_tournament(size, start_rows, num_iterations, ruleset):
         sd = random.randint(0, 100000000000000000)
         random.seed(sd)
 
-        print("Running iteration", k)
+        # print("Running iteration", k)
 
         
         agent_names = ['random', 'low_mcts', 'medium_mcts', 'high_mcts']
         matches = generate_matches(range(4))
-        print("Matches:", matches)
+        # print("Matches:", matches)
 
         # For each match
         for i, j in matches:
 
-            print("\t Match:", agent_names[i], "vs", agent_names[j])
+            # print("\t Match:", agent_names[i], "vs", agent_names[j])
             # Translate ruleset to right Game
-            game = Game(size=size, start_rows=start_rows)
+            game = Game(size=size, start_rows=start_rows, game_type=game_type)
             # Generate new agents
-            agents = [random_bot(), mcts_bot(args_low), mcts_bot(args_medium), mcts_bot(args_high)]
+            white = GameState.WHITE_WON
+            black = GameState.BLACK_WON
+            agents_white = [random_bot(), mcts_bot(args_low, white), mcts_bot(args_medium, white), mcts_bot(args_high, white)]
+            agents_black = [random_bot(), mcts_bot(args_low, black), mcts_bot(args_medium, black), mcts_bot(args_high, black)]
 
-            p1 = agents[i]
-            p2 = agents[j]
+            p1 = agents_white[i]
+            p2 = agents_black[j]
 
             while game.get_game_state() == GameState.IN_PROGRESS:
                 selected_move = p1.select_move(game) if game.turn == PieceColor.WHITE else p2.select_move(game)
@@ -86,5 +89,10 @@ def run_tournament(size, start_rows, num_iterations, ruleset):
 
     return ratings
 
+
 if __name__ == '__main__':
-    run_tournament(5, 1, 10, None)
+    print("Experiment 5x5 with 150 games per agent")
+    for game_type in [GameType.CLASSIC, GameType.SUPERPOSITION, GameType.ENTANGLEMENT, GameType.INTERFERENCE]:
+        print(f"Playing tournament for 5x5 in mode {game_type}")
+        ratings = run_tournament(5, 1, 25, game_type)
+        print(ratings)
