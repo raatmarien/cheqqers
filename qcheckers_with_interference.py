@@ -433,7 +433,7 @@ class Game:
                 self.entanglements.append(
                     PieceEntanglement(superposition_taken, superposition_from))
 
-                return True
+                return True  # This does not count as a take
             else:
                 is_there = self.measure(taken_index)
                 if not is_there:

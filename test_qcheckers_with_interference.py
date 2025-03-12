@@ -359,8 +359,7 @@ class TestClassicalGame(unittest.TestCase):
                 # Apply the move
                 prev_turn = game.turn
                 game.apply_move(random_move)
-                if game.turn != prev_turn:
-                    move_count += 1
+                move_count += 1
 
             moves.append(move_count)
             result = game.get_game_state()
@@ -406,10 +405,8 @@ class TestSuperpositionGame(unittest.TestCase):
                 random_move = random.choice(classical_or_split_moves)
 
                 # Apply the move
-                prev_turn = game.turn
                 game.apply_move(random_move)
-                if game.turn != prev_turn:
-                    move_count += 1
+                move_count += 1
 
             moves.append(move_count)
             result = game.get_game_state()
@@ -454,10 +451,8 @@ class TestEntanglementGame(unittest.TestCase):
                 random_move = random.choice(classical_or_split_moves)
 
                 # Apply the move
-                prev_turn = game.turn
                 game.apply_move(random_move)
-                if game.turn != prev_turn:
-                    move_count += 1
+                move_count += 1
 
             moves.append(move_count)
             result = game.get_game_state()
