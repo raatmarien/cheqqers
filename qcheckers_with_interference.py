@@ -576,28 +576,32 @@ class Game:
                 circuit.append(cirq.S(qubit_by_current_square[add_prefix(move.to_index)]))
             elif isinstance(move, SplitMove):
                 # Here we create a new qubit for the superposition
-                # And we change the square of the original qubit
-                # Then we apply a sqrt-i-swap between them to make up the difference.
-                qubit = qubit_by_current_square[add_prefix(move.from_index)]
-                qubit_by_current_square[add_prefix(move.to_index1)] = qubit
+                qubit_from = qubit_by_current_square[add_prefix(move.from_index)]
+                qubit_by_current_square[add_prefix(move.to_index1)] = cirq.NamedQubit(f"{qubit_name_counter}")
+                qubit_name_counter += 1
                 del qubit_by_current_square[add_prefix(move.from_index)]
 
                 qubit_by_current_square[add_prefix(move.to_index2)] = cirq.NamedQubit(f"{qubit_name_counter}")
                 qubit_name_counter += 1
 
-                # We can use the small one here, because everything leaves the square
-                in_qubit_sqrt_iswap = np.array([
-                    [1, 0, 0, 0],
-                    [0, 1j/np.sqrt(2), 1j/np.sqrt(2), 0],
-                    [0, 1j/np.sqrt(2), -1j/np.sqrt(2), 0],
-                    [0, 0, 0, 1]
+                # From quantum chess split
+                split_jump = np.array([
+                    [1, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 1j, 0, 0, 0],
+                    [0, 1j/np.sqrt(2), 1/np.sqrt(2), 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, -1/np.sqrt(2), 1j/np.sqrt(2), 0],
+                    [0, 1j/np.sqrt(2), -1/np.sqrt(2), 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 1j/np.sqrt(2), -1/np.sqrt(2), 0],
+                    [0, 0, 0, 1j, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 1],
                 ])
 
-                circuit.append(cirq.MatrixGate(in_qubit_sqrt_iswap).on(
+                circuit.append(cirq.MatrixGate(split_jump).on(
                     qubit_by_current_square[add_prefix(move.to_index1)],
-                    qubit_by_current_square[add_prefix(move.to_index2)]))
+                    qubit_by_current_square[add_prefix(move.to_index2)],
+                    qubit_from))
             elif isinstance(move, MergeMove):
-                # We simply use the inverse of the split move, but the 3 point matrix
+                # From quantum chess merge jum
                 merge_jump = np.array([
                     [1, 0, 0, 0, 0, 0, 0, 0],
                     [0, 0, -1j/np.sqrt(2), 0, -1j/np.sqrt(2), 0, 0, 0],
