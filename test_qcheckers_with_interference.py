@@ -523,7 +523,7 @@ class TestQuantumMeasurement(unittest.TestCase):
         """Test that a piece in superposition between two squares collapses to one."""
         # Manually create a split move
         move = SplitMove(False, 1, 2, 3)
-        self.game.superpositions.append(PieceSuperposition(move))
+        self.game.superpositions.append(PieceSuperposition(move, 0))
         self.game.board.classic_occupancy[2] = ClassicalSquareState.QUANTUM
         self.game.board.classic_occupancy[3] = ClassicalSquareState.QUANTUM
 
@@ -546,7 +546,7 @@ class TestQuantumMeasurement(unittest.TestCase):
         move1 = SplitMove(False, 1, 2, 3)
         move2 = SplitMove(False, 2, 4, 5)
 
-        superposition = PieceSuperposition(move1)
+        superposition = PieceSuperposition(move1, 0)
         superposition.apply_move(move2)
         self.game.superpositions.append(superposition)
 
@@ -571,7 +571,7 @@ class TestQuantumMeasurement(unittest.TestCase):
         move1 = SplitMove(False, 1, 2, 3)
         move2 = ClassicalMove(False, 3, 4)
 
-        superposition = PieceSuperposition(move1)
+        superposition = PieceSuperposition(move1, 0)
         superposition.apply_move(move2)
         self.game.superpositions.append(superposition)
 

@@ -25,13 +25,20 @@ class PieceColor(Enum):
 class Piece:
     color: PieceColor
     crowned: bool
+    moves_since_measure: int
 
     def __init__(self, color, crowned):
         self.color = color
         self.crowned = crowned
+        self.moves_since_measure = 0
 
     def copy(self):
         return copy.deepcopy(self)
+
+    def apply_phase(self):
+        n = self.copy()
+        n.moves_since_measure += 1
+        return n
 
 
 class Move:
@@ -252,13 +259,15 @@ class Board:
         return board_display
 
 
-class PieceSuperposition():
+class PieceSuperposition:
     """Keeps track of the quantum state of one piece over the board
     """
     occupied_squares: list[int]
     moves: list[Move]
+    moves_since_measure: int
 
-    def __init__(self, move: Move):
+    def __init__(self, move: Move, moves_since_measure):
+        self.moves_since_measure = moves_since_measure
         if isinstance(move, ClassicalMove):
             self.occupied_squares = [move.from_index, move.to_index]
         elif isinstance(move, SplitMove):
@@ -389,6 +398,8 @@ class Game:
         if occupancy_state == ClassicalSquareState.QUANTUM:
             superposition = self._find_superposition_on_square(move.from_index)
             superposition.apply_move(move)
+        else:
+            piece = piece.apply_phase()
 
         # Check if the piece should be crowned (reached the opposite edge)
         if not piece.crowned:
@@ -442,7 +453,7 @@ class Game:
 
                 superposition_taken = self._find_superposition_on_square(taken_index)
                 superposition_taken.insert_entanglement_placeholder()
-                superposition_from = PieceSuperposition(move)
+                superposition_from = PieceSuperposition(move, piece.moves_since_measure)
 
                 self.superpositions.append(superposition_from)
                 self.entanglements.append(
@@ -476,6 +487,8 @@ class Game:
             if not taken_is_there:
                 return True, taken1 or taken2
 
+        piece = piece.apply_phase()
+
         # Remove the taken piece
         self.board.piece_map[taken_index] = None
         self.board.classic_occupancy[taken_index] = ClassicalSquareState.EMPTY
@@ -498,7 +511,7 @@ class Game:
             superposition = self._find_superposition_on_square(move.from_index)
             superposition.apply_move(move)
         else:
-            self.superpositions.append(PieceSuperposition(move))
+            self.superpositions.append(PieceSuperposition(move, piece.moves_since_measure))
 
         self.board.classic_occupancy[move.from_index] = ClassicalSquareState.EMPTY
         self.board.piece_map[move.from_index] = None
@@ -628,6 +641,11 @@ class Game:
         circuit.append(cirq.X(qubit_by_current_square[
             f"{prefix}-{superposition.moves[0].from_index}"]))
 
+        # Now apply the phase
+        for i in range(superposition.moves_since_measure % 4):
+            circuit.append(cirq.S(qubit_by_current_square[
+                f"{prefix}-{superposition.moves[0].from_index}"]))
+
         taker_prefix = "taker"
         # Apply the gates corresponding to each move in the superposition's history
         for move in superposition.moves:
@@ -646,6 +664,11 @@ class Game:
                 # It should be initialized to 1
                 circuit.append(cirq.X(
                     qubit_by_current_square[f"{taker_prefix}-{take_move.from_index}"]))
+
+                # Now apply the phase
+                for i in range(superposition_from.moves_since_measure % 4):
+                    circuit.append(cirq.S(qubit_by_current_square[
+                        f"{taker_prefix}-{take_move.from_index}"]))
 
                 # We also need a new qubit for where the piece is taking to
                 qubit_by_current_square[f"{taker_prefix}-{take_move.to_index}"]\
