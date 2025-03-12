@@ -554,7 +554,12 @@ class Game:
 
         Returns:
             bool: True if a piece is found at the square, False otherwise
+            bool: Whether anything was found to be taken during measurement
         """
+        if self.board.classic_occupancy[square_index] != ClassicalSquareState.QUANTUM:
+            return (self.board.classic_occupancy[square_index] == ClassicalSquareState.OCCUPIED,
+                    False)
+
         def handle_move(qubit_by_current_square, circuit, qubit_name_counter, prefix):
             def add_prefix(index):
                 return f"{prefix}-{index}"
@@ -614,6 +619,7 @@ class Game:
             return qubit_name_counter
 
         superposition = self._find_superposition_on_square(square_index)
+
         superposition_from = None
         entanglement = None
         if self._is_entangled(square_index):
@@ -724,7 +730,6 @@ class Game:
 
         # Extract which qubit was measured as |1⟩ (occupied)
         measurement = result.measurements["result"][0]
-        collapsed_square = None
 
         s = 0
         square_found = {}
@@ -755,5 +760,48 @@ class Game:
             self.entanglements.remove(entanglement)
             self.superpositions.remove(superposition_from)
 
-        return collapsed_square == square_index, taken
+        return square_found[square_index], taken
 
+
+def run_game():
+    game = Game(size=8, start_rows=3)
+    
+    while game.get_game_state() == GameState.IN_PROGRESS:
+        print(f"Turn: {game.turn.name}")
+        print("Board:")
+        print(game.board.display())
+        
+        moves = game.board.get_possible_moves(game.turn, game.superpositions)
+        
+        print("Possible moves:")
+        for idx, move in enumerate(moves):
+            if isinstance(move, ClassicalMove):
+                from_x, from_y = game.board.index_xy_map[move.from_index]
+                to_x, to_y = game.board.index_xy_map[move.to_index]
+                print(f"{idx}: Move from ({from_x}, {from_y}) to ({to_x}, {to_y})")
+            elif isinstance(move, SplitMove):
+                from_x, from_y = game.board.index_xy_map[move.from_index]
+                to_x1, to_y1 = game.board.index_xy_map[move.to_index1]
+                to_x2, to_y2 = game.board.index_xy_map[move.to_index2]
+                print(f"{idx}: Split move from ({from_x}, {from_y}) to ({to_x1}, {to_y1}) and ({to_x2}, {to_y2})")
+            elif isinstance(move, MergeMove):
+                from_x1, from_y1 = game.board.index_xy_map[move.from_index1]
+                from_x2, from_y2 = game.board.index_xy_map[move.from_index2]
+                to_x, to_y = game.board.index_xy_map[move.to_index]
+                print(f"{idx}: Merge move from ({from_x1}, {from_y1}) and ({from_x2}, {from_y2}) to ({to_x}, {to_y})")
+        
+        move_idx = int(input("Enter the move index: ").strip())
+        selected_move = moves[move_idx]
+        
+        game.apply_move(selected_move)
+    
+    if game.get_game_state() == GameState.WHITE_WON:
+        print("White won the game!")
+    elif game.get_game_state() == GameState.BLACK_WON:
+        print("Black won the game!")
+    else:
+        print("The game is a draw!")    
+
+
+if __name__ == '__main__':
+    run_game()
