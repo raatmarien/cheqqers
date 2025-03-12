@@ -44,6 +44,14 @@ class random_bot(bot):
             print(traceback.format_exc())
             print(possible_moves)
 
+class mcts_bot(bot):
+    def __init__(self, args):
+        self.args = args
+        
+    def select_move(self, game, possible_moves):
+        mcts = MCTS(game, 1.4, 200, 1, 0)
+        move = mcts.search()
+        return move
 
 class heuristic_bot(bot):
     # def __init__(self, game, depth=2) -> None:

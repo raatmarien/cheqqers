@@ -128,12 +128,19 @@ def run_experiment(rules : CheckersRules, board_size : int, agent1 : str, agent2
 
 def main():
     # # agents = ["random", "heuristic", "low_mcts", "high_mcts"]
-    results, moves, num_legal_moves = run_experiment(CheckersRules.QUANTUM_V2, 5, "random", "random", 500)
+    results, moves, num_legal_moves = run_experiment(CheckersRules.QUANTUM_V2, 5, "random", "random", 10000)
+
+    # # Get win rate
+    results = np.array(results)
+    win_rate_white = np.sum(results == CheckersResult.WHITE_WINS) / len(results)
+    win_rate_black = np.sum(results == CheckersResult.BLACK_WINS) / len(results)
+    print("Win rate for white: ", win_rate_white)
+    print("Win rate for black: ", win_rate_black)
+    print("Draw rate: ", 1 - win_rate_white - win_rate_black)
 
     # Get average number of legal moves per turn
     num_legal_moves = np.ma.masked_array(num_legal_moves, mask=(num_legal_moves == 0))
     avg_legal_moves = np.ma.mean(num_legal_moves, axis=0)
-    print(avg_legal_moves)
     print("Average branching factor over all plies: ", np.mean(avg_legal_moves))
 
     take_after_collapse = 0
@@ -146,6 +153,8 @@ def main():
                     take_after_collapse += 1
 
     print(takes, take_after_collapse)
+
+    print(avg_legal_moves)
 
 if __name__ == "__main__":
     main()
