@@ -241,21 +241,24 @@ class Board:
     def display(self):
         """Display the current board state"""
         board_display = ""
-        for y in range(self.size):
-            row = ""
+        for y in range(self.size-1, -1, -1):
+            row = f"{y} "
             for x in range(self.size):
                 if (x, y) not in self.xy_index_map:
-                    row += "□ "  # White square
+                    row += "  "  # White square
                     continue
 
                 i = self.xy_index_map[(x, y)]
                 if self.classic_occupancy[i] == ClassicalSquareState.EMPTY:
-                    row += "· "  # Empty black square
+                    row += "- "  # Empty black square
                 elif self.piece_map[i].color == PieceColor.WHITE:
-                    row += "○ " if not self.piece_map[i].crowned else "♔ "  # White piece
+                    row += "● " if not self.piece_map[i].crowned else "♚ "  # White piece
                 else:
-                    row += "● " if not self.piece_map[i].crowned else "♚ "  # Black piece
+                    row += "○ " if not self.piece_map[i].crowned else "♔ "  # Black piece
             board_display += row + "\n"
+        board_display += "  "
+        for x in range(self.size):
+            board_display += f"{x} "
         return board_display
 
 
