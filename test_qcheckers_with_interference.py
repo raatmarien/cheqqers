@@ -415,9 +415,9 @@ class TestSuperpositionGame(unittest.TestCase):
             elif result == GameState.BLACK_WON:
                 black_won += 1
 
-        # print(statistics.mean(moves))
-        # print(white_won)
-        # print(black_won)
+        print(statistics.mean(moves))
+        print(white_won)
+        print(black_won)
         self.assertGreater(statistics.mean(moves), 45)
         self.assertLess(statistics.mean(moves), 65)
         self.assertGreater(white_won, 20)
@@ -429,7 +429,7 @@ class TestSuperpositionGame(unittest.TestCase):
 class TestEntanglementGame(unittest.TestCase):
     def test_random_entanglement_game(self, board_size=8, start_rows=1):
         """Run a random game of quantum checkers with superposition + entanglement"""
-        amount = 1000
+        amount = 100
         moves = []
         white_won = 0
         black_won = 0
@@ -464,12 +464,12 @@ class TestEntanglementGame(unittest.TestCase):
         print(statistics.mean(moves))
         print(white_won)
         print(black_won)
-        # self.assertGreater(statistics.mean(moves), 45)
-        # self.assertLess(statistics.mean(moves), 65)
-        # self.assertGreater(white_won, 20)
-        # self.assertLess(white_won, 40)
-        # self.assertGreater(black_won, 20)
-        # self.assertLess(black_won, 40)
+        self.assertGreater(statistics.mean(moves), 45)
+        self.assertLess(statistics.mean(moves), 65)
+        self.assertGreater(white_won, 20)
+        self.assertLess(white_won, 45)
+        self.assertGreater(black_won, 20)
+        self.assertLess(black_won, 45)
 
 
 class TestQuantumMeasurement(unittest.TestCase):

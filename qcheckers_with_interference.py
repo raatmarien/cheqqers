@@ -171,7 +171,6 @@ class Board:
         return moves
 
     def _find_split_and_merge_moves(self, moves: list[Move]):
-
         # Split moves
         split_moves = []
         for move in moves:
@@ -191,7 +190,7 @@ class Board:
                                   related_moves[i].to_index,
                                   related_moves[j].to_index))
 
-        # Merge mvoes
+        # Merge moves
         merge_moves = []
         for move in moves:
             if len([mv for mv in merge_moves
@@ -330,8 +329,9 @@ class Game:
     def apply_move(self, move: Move):
         self.moves_since_take += 1
         canceled = False
+        taken = False
         if isinstance(move, ClassicalMove):
-            canceled = self._apply_classical_move(move)
+            canceled, taken = self._apply_classical_move(move)
         elif isinstance(move, SplitMove):
             self._apply_split_move(move)
         elif isinstance(move, MergeMove):
@@ -342,7 +342,7 @@ class Game:
 
         # If the take move didn't go through because the measurement went off
         # then we don't reset the takes.
-        if move.is_take_move and not canceled:
+        if taken or (not canceled and move.is_take_move):
             self.moves_since_take = 0
 
         if not move.is_take_move or\
@@ -393,6 +393,8 @@ class Game:
         self.board.piece_map[move.from_index] = None
         self.board.classic_occupancy[move.from_index] = ClassicalSquareState.EMPTY
 
+        return False, False
+
     def _apply_classical_take_move(self, move: ClassicalMove):
         piece = self.board.piece_map[move.from_index]
         from_occupancy = self.board.classic_occupancy[move.from_index]
@@ -433,33 +435,33 @@ class Game:
                 self.entanglements.append(
                     PieceEntanglement(superposition_taken, superposition_from))
 
-                return True  # This does not count as a take
+                return True, False  # This does not count as a take
             else:
-                is_there = self.measure(taken_index)
+                is_there, taken = self.measure(taken_index)
                 if not is_there:
-                    return True
+                    return True, taken
         elif (from_occupancy == ClassicalSquareState.OCCUPIED and
               taken_occupancy == ClassicalSquareState.QUANTUM and
               self._is_entangled(taken_index)):
             # Now we need to measure the taken piece
-            is_there = self.measure(taken_index)
+            is_there, taken = self.measure(taken_index)
             if not is_there:
-                return True
+                return True, taken 
         elif (from_occupancy == ClassicalSquareState.QUANTUM and
               taken_occupancy == ClassicalSquareState.OCCUPIED):
             # Now we first need to measure the from piece
-            is_there = self.measure(move.from_index)
+            is_there, taken = self.measure(move.from_index)
             if not is_there:
-                return True
+                return True, taken
         elif (from_occupancy == ClassicalSquareState.QUANTUM and
               taken_occupancy == ClassicalSquareState.QUANTUM):
             # First measure the from piece
-            from_is_there = self.measure(move.from_index)
+            from_is_there, taken1 = self.measure(move.from_index)
             if not from_is_there:
-                return True
-            taken_is_there = self.measure(taken_index)
+                return True, taken1
+            taken_is_there, taken2 = self.measure(taken_index)
             if not taken_is_there:
-                return True
+                return True, taken1 or taken2
 
         # Remove the taken piece
         self.board.piece_map[taken_index] = None
@@ -473,7 +475,7 @@ class Game:
         self.board.piece_map[move.from_index] = None
         self.board.classic_occupancy[move.from_index] = ClassicalSquareState.EMPTY
 
-        return False
+        return False, True
 
     def _apply_split_move(self, move: SplitMove):
         # Implement split move logic here
@@ -651,14 +653,18 @@ class Game:
         measurement = result.measurements["result"][0]
         collapsed_square = None
 
+        s = 0
         for square, qubit in qubit_by_current_square.items():
             square = int(square.split('-')[1])
 
             if measurement[list(qubit_by_current_square.values()).index(qubit)] == 1:
+                s += 1
                 self.board.classic_occupancy[square] = ClassicalSquareState.OCCUPIED
             else:
                 self.board.classic_occupancy[square] = ClassicalSquareState.EMPTY
                 self.board.piece_map[square] = None
+
+        taken = s == 1 and entanglement is not None
 
         # Remove the superposition
         self.superpositions.remove(superposition)
@@ -668,5 +674,5 @@ class Game:
             self.entanglements.remove(entanglement)
             self.superpositions.remove(superposition_from)
 
-        return collapsed_square == square_index
+        return collapsed_square == square_index, taken
 
