@@ -10,7 +10,8 @@ def splitSerToArr(ser):
 import matplotlib as mpl
 fig_size_dim    = 5
 golden_ratio    = (1+np.sqrt(5))/2
-fig_size        = (fig_size_dim, fig_size_dim/golden_ratio * 1.5)
+# Increase height for three subplots
+fig_size        = (fig_size_dim, fig_size_dim/golden_ratio * 2)
 
 def plot_style():
     font_size       = 12
@@ -45,20 +46,21 @@ def list_item(key, dicts):
 # Data
 sizes = ['5x5', '6x6', '7x7', '8x8', '9x9', '10x10', '11x11', '12x12', '13x13', '14x14']
 size_nums = range(5, 15)
-# fake = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 fake = [0.0]*10
 
 fake_series = pd.Series(fake, index=sizes)
 
 plot_type = 'draw-moves'
 
-# Create figure with subplots: top for average moves, bottom for draw percentage
-fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(fig_size_dim, (fig_size_dim/golden_ratio)*1.5), 
-                               sharex=True, gridspec_kw={'height_ratios': [2, 1]})
+# Create figure with three subplots: 
+# 1. top for average moves with draws
+# 2. middle for draw percentage
+# 3. bottom for average moves without draws
+fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=fig_size, 
+                               sharex=True, gridspec_kw={'height_ratios': [2, 1, 2]})
 
 # Set the current axis to the top subplot for the average moves plot
 plt.sca(ax1)
-
 
 data_plot_1 = []
 lines = []
@@ -67,7 +69,7 @@ game_types = [
     ('SUPERPOSITION', 'green', 'Level 1'),
     ('ENTANGLEMENT', 'orange', 'Level 2'),
     ('INTERFERENCE', 'purple', 'Level 3')]
-for game_type, color, label in  game_types:
+for game_type, color, label in game_types:
     draw_moves = list_item('average_moves', [results.get(f'True-GameType.{game_type}-{s}') for s in size_nums])
     draw_moves_std = list_item('stdev_moves', [results.get(f'True-GameType.{game_type}-{s}') for s in size_nums])
     draw_series = pd.Series(draw_moves, index=sizes)
@@ -113,13 +115,11 @@ for data in data_plot_1:
                       marker='o')
     lines.append(line1)
 
-
-ax1.set_ylabel('Average number of moves')
-ax1.set_title('Average game length')
+ax1.set_ylabel('Average moves')
+ax1.set_title('Average game length (with draws)')
 ax1.grid(True)
 
-
-# Switch to bottom subplot for draw percentage
+# Switch to middle subplot for draw percentage
 plt.sca(ax2)
 
 # Generate data for draw percentage subplot
@@ -144,36 +144,84 @@ for data in data_plot_2:
              linestyle='-',
              marker='o')
 
-# Settings for bottom subplot
-ax2.set_xlabel('Board Size')
+# Settings for middle subplot
 ax2.set_ylabel('Draws (\%)')
 ax2.set_title('Draw rate')
 ax2.grid(True)
 
-# Handle x-tick labels for both subplots
-# count = 0
-# for i, size in enumerate(sizes):
-#     if size == '9x9' or size == '11x11' or size == '13x13':
-#         ax2.get_xticklabels()[i].set_visible(False)
-#         ax2.get_xticklabels()[i].set_fontsize(0.0)
+# Now setup the third subplot for average moves without draws
+plt.sca(ax3)
 
-# Create a legend outside both subplots
+# Generate data for the third subplot
+data_plot_3 = []
+for game_type, color, label in game_types:
+    no_draw_moves = list_item('average_moves', [results.get(f'False-GameType.{game_type}-{s}') for s in size_nums])
+    no_draw_moves_std = list_item('stdev_moves', [results.get(f'False-GameType.{game_type}-{s}') for s in size_nums])
+    if game_type == 'SUPERPOSITION':
+        no_draw_moves = no_draw_moves[:6] + [np.nan, 334.856, np.nan, 601.97]
+        no_draw_moves_std = no_draw_moves_std[:6] + [np.nan, 212.52734679832884, np.nan, 357.605983086328]
+    if game_type == 'ENTANGLEMENT':
+        no_draw_moves = no_draw_moves[:4] + [np.nan, 164.482, np.nan, 300.817, np.nan, 499.214]
+        no_draw_moves_std = no_draw_moves_std[:4] + [np.nan, 105.11665513698192, np.nan, 190.7897750123136, np.nan, 289.2269981527666]
+    no_draw_series = pd.Series(no_draw_moves, index=sizes)
+    no_draw_sd_series = pd.Series(no_draw_moves_std, index=sizes)
+    data_plot_3.append({
+        'color': color,
+        'label': label,
+        'series': no_draw_series,
+        'yerr': no_draw_sd_series.dropna().values
+    })
+
+# To make sure all the points, even those without data, are given
+ax3.plot(*splitSerToArr(fake_series.dropna()), linestyle='-',
+         marker='o', alpha=0)
+
+for data in data_plot_3:
+    series = data['series'].dropna()
+    x = series.index
+    y = series.values
+    d = data.copy()
+    del d['series']
+    ax3.errorbar(x=x, y=y,
+                 fmt='none',
+                 yerr=d['yerr'],
+                 alpha=.5,
+                 capsize=3,
+                 color=d['color'])
+    data_2 = {
+        'x': x,
+        'y1': [y - e for y, e in zip(y, d['yerr'])],
+        'y2': [y + e for y, e in zip(y, d['yerr'])]}
+    ax3.fill_between(**data_2, alpha=.2, color=d['color'])
+
+for data in data_plot_3:
+    series = data['series'].dropna()
+    x = series.index
+    y = series.values
+    del data['series']
+    ax3.plot(series,
+            color=data['color'],
+            linestyle='-',
+            marker='o')
+
+# Settings for bottom subplot
+ax3.set_xlabel('Board size')
+ax3.set_ylabel('Average moves')
+ax3.set_title('Average game length (without draws)')
+ax3.grid(True)
+
+# Create a legend outside all subplots - placed to the left for better space utilization
 leg = fig.legend(lines, [d['label'] for d in data_plot_1], 
-                 loc='upper left', 
-                 bbox_to_anchor=(0.15, 0.43, 0.1, 0.5),
+                 loc='lower left', 
+                 bbox_to_anchor=(0.17, 0.18, 0.1, 0.5),
                  ncol=1,
-                 fontsize='small',
+                 fontsize='medium',
                  frameon=True,
                  fancybox=True,
                  shadow=True)
 
-plt.tight_layout()
-# Adjust layout to make room for the legend at bottom
-plt.subplots_adjust(bottom=0.15)
-
-
-# plt.xticks(sizes)  # Set xticks to display all sizes
-frame1 = plt.gca()
+# Handle x-tick labels 
+frame1 = ax3
 count = 0
 for xlabel_i in frame1.axes.get_xticklabels():
     # set visible for 9x9, 11x11, 13x13 to false
@@ -183,14 +231,13 @@ for xlabel_i in frame1.axes.get_xticklabels():
         xlabel_i.set_visible(False)
         xlabel_i.set_fontsize(0.0)
     count += 1
-plt.tight_layout()
-if plot_type == 'draw-moves':
-    plt.savefig('draw_average_moves.pdf')
-elif plot_type == 'draw-times':
-    plt.savefig('draw_average_times.pdf')
-elif plot_type == 'no-draw-moves':
-    plt.savefig('no_draw_average_moves.pdf')
-elif plot_type == 'no-draw-times':
-    plt.savefig('no_draw_average_times.pdf')
 
+# Apply tight layout and save
+plt.tight_layout()
+fig.tight_layout()
+
+# Update filename to reflect three subplots
+filename = 'game_analysis_three_plots.pdf'
+
+plt.savefig(filename)
 plt.show()
