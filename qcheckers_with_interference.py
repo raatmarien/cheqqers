@@ -466,6 +466,11 @@ class Game:
                 self.entanglements.append(
                     PieceEntanglement(superposition_taken, superposition_from))
 
+                # But the taken piece is definitely not there anymore
+                self.board.classic_occupancy[taken_index] = ClassicalSquareState.EMPTY
+                self.board.piece_map[taken_index] = None
+                superposition_taken.occupied_squares.remove(taken_index)
+
                 return True, False  # This does not count as a take
             else:
                 is_there, taken = self.measure(taken_index)
@@ -716,9 +721,7 @@ class Game:
                 circuit.append(cirq.S(
                     qubit_by_current_square[f"{taker_prefix}-{take_move.to_index}"]))
 
-                # TODO: Actually we know that the taken_index is always empty,
-                # but with our implementation we now follow the original version
-                # and treat it like this is not the case.
+                del qubit_by_current_square[f"{prefix}-{taken_index}"]
             else:
                 qubit_name_counter\
                     = handle_move(qubit_by_current_square,
