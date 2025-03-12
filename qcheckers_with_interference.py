@@ -246,8 +246,13 @@ class PieceSuperposition():
     occupied_squares: list[int]
     moves: list[Move]
 
-    def __init__(self, move: SplitMove):
-        self.occupied_squares = [move.to_index1, move.to_index2]
+    def __init__(self, move: Move):
+        if isinstance(move, ClassicalMove):
+            self.occupied_squares = [move.from_index, move.to_index]
+        elif isinstance(move, SplitMove):
+            self.occupied_squares = [move.to_index1, move.to_index2]
+        else:
+            raise 'Superposition can only be start with split or classic take'
         self.moves = [move]
 
     def apply_move(self, move: Move):
@@ -421,8 +426,9 @@ class Game:
                 self.board.piece_map[move.to_index] = piece
 
                 superposition_taken = self._find_superposition_on_square(taken_index)
-                self.superposition_taken.insert_entanglement_placeholder()
-                superposition_from = PieceSuperposition(move)#TODO: Later interpret this correctly
+                superposition_taken.insert_entanglement_placeholder()
+                superposition_from = PieceSuperposition(move)
+
                 self.superpositions.append(superposition_from)
                 self.entanglements.append(
                     PieceEntanglement(superposition_taken, superposition_from))
@@ -508,48 +514,26 @@ class Game:
         Returns:
             bool: True if a piece is found at the square, False otherwise
         """
-        #TODO: Deal with entanglements
-
-        # Find the superposition that contains this square
-        superposition = self._find_superposition_on_square(square_index)
-        if superposition is None:
-            # If the square is not part of any superposition, check the classical state
-            return self.board.classic_occupancy[square_index] == ClassicalSquareState.OCCUPIED
-
-        qubit_name_counter = 0
-        qubit_by_current_square = {
-            superposition.moves[0].from_index: cirq.NamedQubit(f"{qubit_name_counter}")
-        }
-        qubit_name_counter += 1
-
-        # Create a quantum circuit
-        circuit = cirq.Circuit()
-
-        # Set up the initial state - we know the initial square was occupied
-        # Initialize the first qubit to |1⟩ (occupied)
-        circuit.append(cirq.X(qubit_by_current_square[superposition.moves[0].from_index]))
-
-        # Apply the gates corresponding to each move in the superposition's history
-        for move in superposition.moves:
-            if move is None:  # Skip entanglement placeholders
-                continue
+        def handle_move(qubit_by_current_square, circuit, qubit_name_counter, prefix):
+            def add_prefix(index):
+                return f"{prefix}-{index}"
 
             if isinstance(move, ClassicalMove) and not move.is_take_move:
                 # Simply change the mapping of the qubit and then add a S gate for the phase.
-                qubit = qubit_by_current_square[move.from_index]
-                qubit_by_current_square[move.to_index] = qubit
-                del qubit_by_current_square[move.from_index]
+                qubit = qubit_by_current_square[add_prefix(move.from_index)]
+                qubit_by_current_square[add_prefix(move.to_index)] = qubit
+                del qubit_by_current_square[add_prefix(move.from_index)]
 
-                circuit.append(cirq.S(qubit_by_current_square[move.to_index]))
+                circuit.append(cirq.S(qubit_by_current_square[add_prefix(move.to_index)]))
             elif isinstance(move, SplitMove):
                 # Here we create a new qubit for the superposition
                 # And we change the square of the original qubit
                 # Then we apply a sqrt-i-swap between them to make up the difference.
-                qubit = qubit_by_current_square[move.from_index]
-                qubit_by_current_square[move.to_index1] = qubit
-                del qubit_by_current_square[move.from_index]
+                qubit = qubit_by_current_square[add_prefix(move.from_index)]
+                qubit_by_current_square[add_prefix(move.to_index1)] = qubit
+                del qubit_by_current_square[add_prefix(move.from_index)]
 
-                qubit_by_current_square[move.to_index2] = cirq.NamedQubit(f"{qubit_name_counter}")
+                qubit_by_current_square[add_prefix(move.to_index2)] = cirq.NamedQubit(f"{qubit_name_counter}")
                 qubit_name_counter += 1
 
                 in_qubit_sqrt_iswap = np.array([
@@ -560,8 +544,94 @@ class Game:
                 ])
 
                 circuit.append(cirq.MatrixGate(in_qubit_sqrt_iswap).on(
-                    qubit_by_current_square[move.to_index1],
-                    qubit_by_current_square[move.to_index2]))
+                    qubit_by_current_square[add_prefix(move.to_index1)],
+                    qubit_by_current_square[add_prefix(move.to_index2)]))
+            return qubit_name_counter
+
+        superposition = self._find_superposition_on_square(square_index)
+        superposition_from = None
+        entanglement = None
+        if self._is_entangled(square_index):
+            for e in self.entanglements:
+                if e.superposition_from == superposition or\
+                   e.superposition_taken == superposition:
+                    entanglement = e
+                    superposition = e.superposition_taken
+                    superposition_from = e.superposition_from
+                    break
+
+        prefix = "to_be_captured"
+        qubit_name_counter = 0
+        qubit_by_current_square = {
+            f"{prefix}-{superposition.moves[0].from_index}":
+            cirq.NamedQubit(f"{qubit_name_counter}")
+        }
+        qubit_name_counter += 1
+
+        # Create a quantum circuit
+        circuit = cirq.Circuit()
+
+        # Set up the initial state - we know the initial square was occupied
+        # Initialize the first qubit to |1⟩ (occupied)
+        circuit.append(cirq.X(qubit_by_current_square[
+            f"{prefix}-{superposition.moves[0].from_index}"]))
+
+        taker_prefix = "taker"
+        # Apply the gates corresponding to each move in the superposition's history
+        for move in superposition.moves:
+            if move is None:
+                # This is where the entanglement magic should happen
+                # We set up the circuit for the taken part so far, and
+                # now we need to entangle it with the part that is
+                # taking it. This part doesn't start in superposition!
+                # We apply the first move of the superposition_from on both together.
+                take_move = superposition_from.moves[0]
+
+                # We need a new qubit for the piece that is taking
+                qubit_by_current_square[f"{taker_prefix}-{take_move.from_index}"]\
+                    = cirq.NamedQubit(f"{qubit_name_counter}")
+                qubit_name_counter += 1
+                # It should be initialized to 1
+                circuit.append(cirq.X(
+                    qubit_by_current_square[f"{taker_prefix}-{take_move.from_index}"]))
+
+                # We also need a new qubit for where the piece is taking to
+                qubit_by_current_square[f"{taker_prefix}-{take_move.to_index}"]\
+                    = cirq.NamedQubit(f"{qubit_name_counter}")
+                qubit_name_counter += 1
+
+                # We need to find the square that is taken
+                from_x, from_y = self.board.index_xy_map[take_move.from_index]
+                to_x, to_y = self.board.index_xy_map[take_move.to_index]
+                taken_x = (from_x + to_x) // 2
+                taken_y = (from_y + to_y) // 2
+                taken_index = self.board.xy_index_map[(taken_x, taken_y)]
+
+                # Now we need to apply the gate on these three qubits
+                # This is simply a CCNOT (we only take if both are there)
+                # Followed by an S gate for the phase change on the moving piece
+                circuit.append(cirq.CCX(
+                    qubit_by_current_square[f"{taker_prefix}-{take_move.from_index}"],
+                    qubit_by_current_square[f"{prefix}-{taken_index}"],
+                    qubit_by_current_square[f"{taker_prefix}-{take_move.to_index}"])) 
+                circuit.append(cirq.S(
+                    qubit_by_current_square[f"{taker_prefix}-{take_move.to_index}"]))
+
+                # TODO: Actually we know that the taken_index is always empty,
+                # but with our implementation we now follow the original version
+                # and treat it like this is not the case.
+            else:
+                qubit_name_counter\
+                    = handle_move(qubit_by_current_square,
+                                  circuit, qubit_name_counter, prefix)
+
+        if superposition_from is not None:
+            # We are entangled, so we still have to do the other part.
+            # We already did the first move
+            for move in superposition_from.moves[1:]:
+                qubit_name_counter\
+                    = handle_move(qubit_by_current_square,
+                                  circuit, qubit_name_counter, taker_prefix)
 
         # Measure all qubits
         circuit.append(cirq.measure(*qubit_by_current_square.values(), key="result"))
@@ -575,22 +645,21 @@ class Game:
         collapsed_square = None
 
         for square, qubit in qubit_by_current_square.items():
+            square = int(square.split('-')[1])
+
             if measurement[list(qubit_by_current_square.values()).index(qubit)] == 1:
-                collapsed_square = square
-                break
-
-        piece = self.board.piece_map[collapsed_square]
-
-        # Update the board occupancy
-        for square in superposition.occupied_squares:
-            self.board.classic_occupancy[square] = ClassicalSquareState.EMPTY
-            self.board.piece_map[square] = None
-
-        self.board.classic_occupancy[collapsed_square] = ClassicalSquareState.OCCUPIED
-        self.board.piece_map[collapsed_square] = piece
+                self.board.classic_occupancy[square] = ClassicalSquareState.OCCUPIED
+            else:
+                self.board.classic_occupancy[square] = ClassicalSquareState.EMPTY
+                self.board.piece_map[square] = None
 
         # Remove the superposition
         self.superpositions.remove(superposition)
+
+        # Remove the entanglement if applicable
+        if entanglement is not None:
+            self.entanglements.remove(entanglement)
+            self.superpositions.remove(superposition_from)
 
         return collapsed_square == square_index
 
