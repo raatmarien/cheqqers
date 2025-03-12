@@ -116,17 +116,17 @@ class Board:
 
                 i += 1
 
-    def get_possible_moves(self, color: PieceColor):
-        take_moves = self.get_take_moves(color)
+    def get_possible_moves(self, color: PieceColor, superpositions=None):
+        take_moves = self.get_take_moves(color, superpositions)
         if len(take_moves) > 0:
             return take_moves
         else:
-            return self._get_possible_moves(color, False)
+            return self._get_possible_moves(color, False, superpositions)
 
-    def get_take_moves(self, color: PieceColor):
-        return self._get_possible_moves(color, True)
+    def get_take_moves(self, color: PieceColor, superpositions):
+        return self._get_possible_moves(color, True, superpositions)
 
-    def _get_possible_moves(self, color: PieceColor, take: bool):
+    def _get_possible_moves(self, color: PieceColor, take: bool, superpositions):
         moves = []
         for y in range(self.size):
             for x in range(self.size):
@@ -134,6 +134,12 @@ class Board:
                     continue
 
                 i = self.xy_index_map[(x, y)]
+
+                if self.classic_occupancy[i] != ClassicalSquareState.EMPTY and\
+                   self.piece_map[i] is None:
+                    __import__("pdb").set_trace()
+                    pass
+
                 if self.classic_occupancy[i] == ClassicalSquareState.EMPTY or\
                    self.piece_map[i].color != color:
                     continue
@@ -166,11 +172,11 @@ class Board:
 
         # Note: We don't allow split or merge moves with takes
         if not take:
-            moves += self._find_split_and_merge_moves(moves)
+            moves += self._find_split_and_merge_moves(moves, superpositions)
 
         return moves
 
-    def _find_split_and_merge_moves(self, moves: list[Move]):
+    def _find_split_and_merge_moves(self, moves: list[Move], superpositions):
         # Split moves
         split_moves = []
         for move in moves:
@@ -198,25 +204,37 @@ class Board:
                 continue
 
             related_moves = [rm for rm in moves
-                             if rm.to_index == move.to_index
-                             and self.from_same_piece(move.from_index,
-                                                      rm.from_index)]
+                             if rm.to_index == move.to_index]
             if len(related_moves) < 2:
                 continue
             for i in range(len(related_moves)):
                 for j in range(i + 1, len(related_moves)):
-                    merge_moves.append(
-                        MergeMove(False,
-                                  related_moves[i].from_index,
-                                  related_moves[j].from_index,
-                                  move.to_index))
+                    # Apply same piece and no-double occupancy rule
+                    if (
+                            self.from_same_piece(
+                                related_moves[i].from_index,
+                                related_moves[j].from_index, superpositions) and
+                            self.piece_map[related_moves[i].from_index].crowned ==
+                            self.piece_map[related_moves[j].from_index].crowned):
+
+                        merge_moves.append(
+                            MergeMove(False,
+                                      related_moves[i].from_index,
+                                      related_moves[j].from_index,
+                                      move.to_index))
 
         return split_moves + merge_moves
 
-    def from_same_piece(self, index1, index2):
-        if index1 == index2:
-            return True
-        return True  # TODO actually check. Probably need some info on the superpositions.
+    def from_same_piece(self, index1, index2, superpositions):
+        if superpositions is None:
+            return False
+
+        for superposition in superpositions:
+            if index1 in superposition.occupied_squares and\
+               index2 in superposition.occupied_squares:
+                return True
+
+        return False
 
     def display(self):
         """Display the current board state"""
@@ -278,7 +296,9 @@ class PieceSuperposition():
         self.occupied_squares += [move.to_index1, move.to_index2]
 
     def _apply_merge_move(self, move: MergeMove):
-        raise 'TODO: implement'
+        self.occupied_squares.remove(move.from_index1)
+        self.occupied_squares.remove(move.from_index2)
+        self.occupied_squares.append(move.to_index)
 
 
 class PieceEntanglement:
@@ -319,7 +339,7 @@ class Game:
         if self.moves_since_take >= 40:
             return GameState.DRAW
 
-        moves = self.board.get_possible_moves(self.turn)
+        moves = self.board.get_possible_moves(self.turn, self.superpositions)
         if len(moves) == 0:
             return GameState.WHITE_WON if self.turn == PieceColor.BLACK\
                 else GameState.BLACK_WON
@@ -346,7 +366,7 @@ class Game:
             self.moves_since_take = 0
 
         if not move.is_take_move or\
-           len(self.board.get_take_moves(self.turn)) == 0:
+           len(self.board.get_take_moves(self.turn, None)) == 0:
             self.turn = self.turn.other()
 
     def _find_superposition_on_square(self, square_id):
@@ -503,8 +523,25 @@ class Game:
             self.board.piece_map[i] = piece
 
     def _apply_merge_move(self, move: MergeMove):
-        # Implement merge move logic here
-        pass
+        piece = self.board.piece_map[move.from_index1]
+
+        superposition = self._find_superposition_on_square(move.from_index1)
+        superposition.apply_move(move)
+
+        for index in [move.from_index1, move.from_index2]:
+            self.board.classic_occupancy[index] = ClassicalSquareState.EMPTY
+            self.board.piece_map[index] = None
+
+        # Check if the piece should be crowned (reached the opposite edge)
+        if not piece.crowned:
+            to_x, to_y = self.board.index_xy_map[move.to_index]
+            if (piece.color == PieceColor.WHITE and to_y == self.board.size - 1) or \
+               (piece.color == PieceColor.BLACK and to_y == 0):
+                piece = piece.copy()
+                piece.crowned = True
+
+        self.board.classic_occupancy[move.to_index] = ClassicalSquareState.QUANTUM
+        self.board.piece_map[move.to_index] = piece
 
     def measure(self, square_index: int) -> bool:
         """
@@ -548,6 +585,26 @@ class Game:
                 circuit.append(cirq.MatrixGate(in_qubit_sqrt_iswap).on(
                     qubit_by_current_square[add_prefix(move.to_index1)],
                     qubit_by_current_square[add_prefix(move.to_index2)]))
+            elif isinstance(move, MergeMove):
+                # We simply use the inverse of the split move
+                hermitian_conjugate = np.array([
+                    [1, 0, 0, 0],
+                    [0, -1j/np.sqrt(2), -1j/np.sqrt(2), 0],
+                    [0, -1j/np.sqrt(2), 1j/np.sqrt(2), 0],
+                    [0, 0, 0, 1]
+                ])
+
+                # Rename the first from to the target
+                qubit = qubit_by_current_square[add_prefix(move.from_index1)]
+                qubit_by_current_square[add_prefix(move.to_index)] = qubit
+                del qubit_by_current_square[add_prefix(move.from_index1)]
+
+                # Now apply the matrix, we need to invert the basis as per
+                # the quantum chess merge jump unitary
+                circuit.append(cirq.MatrixGate(hermitian_conjugate).on(
+                    qubit_by_current_square[add_prefix(move.from_index2)],
+                    qubit_by_current_square[add_prefix(move.to_index)]))
+
             return qubit_name_counter
 
         superposition = self._find_superposition_on_square(square_index)
@@ -654,17 +711,25 @@ class Game:
         collapsed_square = None
 
         s = 0
+        square_found = {}
         for square, qubit in qubit_by_current_square.items():
             square = int(square.split('-')[1])
 
             if measurement[list(qubit_by_current_square.values()).index(qubit)] == 1:
                 s += 1
+                square_found[square] = True
+            else:
+                if square not in square_found:
+                    square_found[square] = False
+        taken = s == 1 and entanglement is not None
+
+        for square, found in square_found.items():
+            if found:
                 self.board.classic_occupancy[square] = ClassicalSquareState.OCCUPIED
             else:
                 self.board.classic_occupancy[square] = ClassicalSquareState.EMPTY
                 self.board.piece_map[square] = None
 
-        taken = s == 1 and entanglement is not None
 
         # Remove the superposition
         self.superpositions.remove(superposition)

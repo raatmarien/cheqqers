@@ -146,12 +146,12 @@ class TestGetPossibleMoves(unittest.TestCase):
                              f"Expected 7 classical moves, but found {len(classical_moves)}")
             self.assertEqual(len(split_moves), 3,
                              f"Expected 3 split moves, but found {len(split_moves)}")
-            self.assertEqual(len(merge_moves), 3,
-                             f"Expected 3 merge moves, but found {len(merge_moves)}")
+            self.assertEqual(len(merge_moves), 0,
+                             f"Expected 0 merge moves, but found {len(merge_moves)}")
 
             # Check the total count
-            self.assertEqual(len(all_moves), 13,
-                             f"Expected 13 total moves, but found {len(all_moves)}")
+            self.assertEqual(len(all_moves), 10,
+                             f"Expected 10 total moves, but found {len(all_moves)}")
 
             # Validate a few of the classical moves by checking coordinates
             # We expect the pieces in the third row (y=2) to be able to move forward
@@ -221,7 +221,7 @@ class TestTakeMoves(unittest.TestCase):
             self.fail("Could not find suitable positions for the test scenario")
 
         # Get take moves for white
-        take_moves = board.get_take_moves(PieceColor.WHITE)
+        take_moves = board.get_take_moves(PieceColor.WHITE, None)
 
         # check if a take move was found
         self.assertGreater(len(take_moves), 0, "No take moves found")
@@ -268,7 +268,7 @@ class TestTakeMoves(unittest.TestCase):
                 self.fail(f"Position ({x}, {y}) not found in the board mapping")
 
         # Get take moves for white
-        take_moves = board.get_take_moves(PieceColor.WHITE)
+        take_moves = board.get_take_moves(PieceColor.WHITE, None)
 
         # Should find 2 take moves
         self.assertEqual(len(take_moves), 2,
@@ -320,7 +320,7 @@ class TestTakeMoves(unittest.TestCase):
 
         # Get all possible moves (should only return take moves if any exist)
         all_moves = board.get_possible_moves(PieceColor.WHITE)
-        take_moves = board.get_take_moves(PieceColor.WHITE)
+        take_moves = board.get_take_moves(PieceColor.WHITE, None)
 
         # Check that get_possible_moves only returns take moves
         self.assertEqual(len(all_moves), len(take_moves),
@@ -470,6 +470,45 @@ class TestEntanglementGame(unittest.TestCase):
         self.assertLess(white_won, 45)
         self.assertGreater(black_won, 20)
         self.assertLess(black_won, 45)
+
+
+class TestInterferenceGame(unittest.TestCase):
+    def test_random_interference_game(self, board_size=8, start_rows=1):
+        """Run a random game of quantum checkers with superposition + entanglement + interference"""
+        amount = 1000
+        moves = []
+        white_won = 0
+        black_won = 0
+        for _ in range(amount):
+            game = Game(board_size, start_rows, True)
+            move_count = 0
+
+            while game.get_game_state() == GameState.IN_PROGRESS:
+                possible_moves = game.board.get_possible_moves(game.turn, game.superpositions)
+
+                # Select a random move
+                random_move = random.choice(possible_moves)
+
+                # Apply the move
+                game.apply_move(random_move)
+                move_count += 1
+
+            moves.append(move_count)
+            result = game.get_game_state()
+            if result == GameState.WHITE_WON:
+                white_won += 1
+            elif result == GameState.BLACK_WON:
+                black_won += 1
+
+        print(statistics.mean(moves))
+        print(white_won)
+        print(black_won)
+        # self.assertGreater(statistics.mean(moves), 45)
+        # self.assertLess(statistics.mean(moves), 65)
+        # self.assertGreater(white_won, 20)
+        # self.assertLess(white_won, 45)
+        # self.assertGreater(black_won, 20)
+        # self.assertLess(black_won, 45)
 
 
 class TestQuantumMeasurement(unittest.TestCase):
