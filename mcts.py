@@ -25,7 +25,8 @@ class MCTS:
 
     def search(self, game):
         self.game = deepcopy(game)
-        self.root = Node(self.game, self.args)
+        self.root_color = game.turn
+        self.root = Node(self.game, self.args, self.root_color)
 
         possible_moves = self.game.board.get_possible_moves(self.game.turn, self.game.superpositions)
 
@@ -56,10 +57,11 @@ class MCTS:
         return self.root.children[np.argmax(action_probs)].move
 
 class Node:
-    def __init__(self, game, args, move=None, parent=None, weight=1):
+    def __init__(self, game, args, root_color, move=None, parent=None, weight=1):
         self.game = deepcopy(game)
         self.args = args
         self.move = move
+        self.root_color = root_color 
         self.parent = parent
         self.weight = weight
         self.children = []
@@ -98,7 +100,7 @@ class Node:
         new_game = deepcopy(self.game)
         new_game.apply_move(action)
 
-        child = Node(new_game, self.args, action, self, 1)
+        child = Node(new_game, self.args, self.root_color, action, self, 1)
         self.children.append(child)
         return [child]
 
@@ -115,7 +117,7 @@ class Node:
             counter += 1
 
         result = sim_game.get_game_state()
-        return 1 if (result == GameState.WHITE_WON and sim_game.turn == PieceColor.WHITE) or (result == GameState.BLACK_WON and sim_game.turn == PieceColor.BLACK) else 0
+        return 1 if (result == GameState.WHITE_WON and self.root_color == PieceColor.WHITE) or (result == GameState.BLACK_WON and self.root_color == PieceColor.BLACK) else 0
 
     def backpropagate(self, value):
         self.value_sum += value

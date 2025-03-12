@@ -15,7 +15,7 @@ def run_game(size, start_rows, agent1, agent2):
     args_low = {
         "C": 1.4,  # srqt 2
         "num_searches": 800,  # Budget per rollout
-        "num_simulations": 2,  # Budget for extra simulations per node
+        "num_simulations": 1,  # Budget for extra simulations per node
         "attempt": 0,
     }
     p2 = mcts_bot(args_low)
