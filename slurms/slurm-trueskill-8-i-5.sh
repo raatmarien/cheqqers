@@ -17,7 +17,7 @@
 #
 # Wall clock limit
 #SBATCH --time=23:59:00
-#SBATCH --mem=50G
+#SBATCH --mem=200G
 #Load some modules
 module load ALICE/default
 cd /home/lijt/quantum-checkers

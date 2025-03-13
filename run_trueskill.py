@@ -60,34 +60,37 @@ def run_tournament(size, start_rows, num_iterations, game_type):
 
         # For each match
         for i, j in matches:
-
-            # print("\t Match:", agent_names[i], "vs", agent_names[j])
-            # Translate ruleset to right Game
-            game = Game(size=size, start_rows=start_rows, game_type=game_type)
-            # Generate new agents
-            white = GameState.WHITE_WON
-            black = GameState.BLACK_WON
-            agents_white = [random_bot(), mcts_bot(args_low, white), mcts_bot(args_medium, white), mcts_bot(args_high, white)]
-            agents_black = [random_bot(), mcts_bot(args_low, black), mcts_bot(args_medium, black), mcts_bot(args_high, black)]
-
-            p1 = agents_white[i]
-            p2 = agents_black[j]
-
-            while game.get_game_state() == GameState.IN_PROGRESS:
-                selected_move = p1.select_move(game) if game.turn == PieceColor.WHITE else p2.select_move(game)
-                game.apply_move(selected_move)
-
-            # Get game statistics
-            if game.get_game_state() == GameState.WHITE_WON:
-                new_r1, new_r2 = env.rate_1vs1(ratings[agent_names[i]], ratings[agent_names[j]])
-            elif game.get_game_state() == GameState.BLACK_WON:
-                new_r2, new_r1 = env.rate_1vs1(ratings[agent_names[j]], ratings[agent_names[i]])
-            else:  # draw
-                new_r1, new_r2 = env.rate_1vs1(ratings[agent_names[i]], ratings[agent_names[j]], drawn=True)
-
-            ratings[agent_names[i]] = new_r1
-            ratings[agent_names[j]] = new_r2
-
+            while True:
+                try:
+                    # print("\t Match:", agent_names[i], "vs", agent_names[j])
+                    # Translate ruleset to right Game
+                    game = Game(size=size, start_rows=start_rows, game_type=game_type)
+                    # Generate new agents
+                    white = GameState.WHITE_WON
+                    black = GameState.BLACK_WON
+                    agents_white = [random_bot(), mcts_bot(args_low, white), mcts_bot(args_medium, white), mcts_bot(args_high, white)]
+                    agents_black = [random_bot(), mcts_bot(args_low, black), mcts_bot(args_medium, black), mcts_bot(args_high, black)]
+        
+                    p1 = agents_white[i]
+                    p2 = agents_black[j]
+        
+                    while game.get_game_state() == GameState.IN_PROGRESS:
+                        selected_move = p1.select_move(game) if game.turn == PieceColor.WHITE else p2.select_move(game)
+                        game.apply_move(selected_move)
+        
+                    # Get game statistics
+                    if game.get_game_state() == GameState.WHITE_WON:
+                        new_r1, new_r2 = env.rate_1vs1(ratings[agent_names[i]], ratings[agent_names[j]])
+                    elif game.get_game_state() == GameState.BLACK_WON:
+                        new_r2, new_r1 = env.rate_1vs1(ratings[agent_names[j]], ratings[agent_names[i]])
+                    else:  # draw
+                        new_r1, new_r2 = env.rate_1vs1(ratings[agent_names[i]], ratings[agent_names[j]], drawn=True)
+        
+                    ratings[agent_names[i]] = new_r1
+                    ratings[agent_names[j]] = new_r2
+                except:
+                    print("Failed to run match, retrying")
+    
     return ratings
 
 
