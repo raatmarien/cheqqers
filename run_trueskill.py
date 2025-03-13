@@ -1,3 +1,4 @@
+import sys
 from enum import Enum
 import copy
 import cirq
@@ -91,8 +92,18 @@ def run_tournament(size, start_rows, num_iterations, game_type):
 
 
 if __name__ == '__main__':
-    print("Experiment 8x8 with 60 games per agent")
-    for game_type in [GameType.CLASSIC, GameType.SUPERPOSITION, GameType.ENTANGLEMENT, GameType.INTERFERENCE]:
-        print(f"Playing tournament for 8x8 in mode {game_type}")
-        ratings = run_tournament(8, 3, 10, game_type)
+    game_types = {
+        "c": [GameType.CLASSIC],
+        "s": [GameType.SUPERPOSITION],
+        "e": [GameType.ENTANGLEMENT],
+        "i": [GameType.INTERFERENCE],
+        "a": [GameType.CLASSIC, GameType.SUPERPOSITION, GameType.ENTANGLEMENT, GameType.INTERFERENCE]
+    }[sys.argv[1]]
+    board_size = int(sys.argv[2])
+    rows = 1 if board_size == 5 else 3
+    amount = int(sys.argv[3])
+    print(f"Experiment {board_size}x{board_size} with {amount} repeats per agent")
+    for game_type in game_types:
+        print(f"Playing tournament for {board_size}x{board_size} in mode {game_type}")
+        ratings = run_tournament(board_size, rows, amount, game_type)
         print(ratings)
