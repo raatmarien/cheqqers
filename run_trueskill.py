@@ -91,8 +91,8 @@ def run_tournament(size, start_rows, num_iterations, game_type):
 
 
 if __name__ == '__main__':
-    print("Experiment 5x5 with 150 games per agent")
+    print("Experiment 8x8 with 60 games per agent")
     for game_type in [GameType.CLASSIC, GameType.SUPERPOSITION, GameType.ENTANGLEMENT, GameType.INTERFERENCE]:
-        print(f"Playing tournament for 5x5 in mode {game_type}")
-        ratings = run_tournament(5, 1, 25, game_type)
+        print(f"Playing tournament for 8x8 in mode {game_type}")
+        ratings = run_tournament(8, 3, 10, game_type)
         print(ratings)
