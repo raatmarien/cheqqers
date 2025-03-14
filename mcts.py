@@ -4,7 +4,7 @@ import random
 from copy import deepcopy
 import traceback
 from time import sleep
-from run import GameState, PieceColor
+from qcheckers_with_interference import GameState, PieceColor
 from random import choice
 
 class RandomBot:

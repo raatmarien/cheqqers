@@ -47,12 +47,17 @@ def run_tournament(size, start_rows, num_iterations, game_type):
         "high_mcts": trueskill.Rating(),
     }
 
+    file_name = f"incremental_{size}_tournament_results_for_{game_type}_{random.randint(0,100000)}.txt"
+    with open(file_name, 'a') as f:
+        f.write(f'[\n')
+        f.flush()
+
+
     for k in range(num_iterations):
         sd = random.randint(0, 100000000000000000)
         random.seed(sd)
 
         # print("Running iteration", k)
-
         
         agent_names = ['random', 'low_mcts', 'medium_mcts', 'high_mcts']
         matches = generate_matches(range(4))
@@ -77,7 +82,18 @@ def run_tournament(size, start_rows, num_iterations, game_type):
                     while game.get_game_state() == GameState.IN_PROGRESS:
                         selected_move = p1.select_move(game) if game.turn == PieceColor.WHITE else p2.select_move(game)
                         game.apply_move(selected_move)
-        
+
+                    with open(file_name, 'a') as f:
+                        f.write(f'({agent_names[i]}, {agent_names[j]}, ')
+                        if game.get_game_state() == GameState.WHITE_WON:
+                            f.write('1')
+                        elif game.get_game_state() == GameState.BLACK_WON:
+                            f.write('0')
+                        else:  # draw
+                            f.write('0.5')
+                        f.write('),\n')
+                        f.flush()
+                        
                     # Get game statistics
                     if game.get_game_state() == GameState.WHITE_WON:
                         new_r1, new_r2 = env.rate_1vs1(ratings[agent_names[i]], ratings[agent_names[j]])
@@ -88,6 +104,9 @@ def run_tournament(size, start_rows, num_iterations, game_type):
         
                     ratings[agent_names[i]] = new_r1
                     ratings[agent_names[j]] = new_r2
+                    break
+                except KeyboardInterrupt:
+                    exit()
                 except:
                     print("Failed to run match, retrying")
     
