@@ -48,7 +48,13 @@ class MCTS:
 
             # If the game has ended
             if result != GameState.IN_PROGRESS.value:
-                value = 0.5 if result == GameState.DRAW else (0 if result == self.goal_state else 1)
+                value = 0
+                if node.game.turn == PieceColor.WHITE:
+                    value = 0.5 if result == GameState.DRAW else (
+                        0 if result == GameState.BLACK_WON else 1)
+                else:
+                    value = 0.5 if result == GameState.DRAW else (
+                        0 if result == GameState.WHITE_WON else 1)
                 node.backpropagate(value)
             else:
                 # Expand all children
@@ -120,6 +126,8 @@ class Node:
             counter += 1
 
         result = sim_game.get_game_state()
+        if result == GameState.DRAW:
+            return 0.5
         return 1 if (result == GameState.WHITE_WON and self.root_color == PieceColor.WHITE) or (result == GameState.BLACK_WON and self.root_color == PieceColor.BLACK) else 0
 
     def backpropagate(self, value):
