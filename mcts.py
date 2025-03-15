@@ -110,6 +110,7 @@ class Node:
     def simulate(self):
         sim_game = deepcopy(self.game)
         rollout_limit = self.args.get("rollout", 100)
+        rollout_color = sim_game.turn
 
         p1, p2 = RandomBot(), RandomBot()
         counter = 0
@@ -122,7 +123,7 @@ class Node:
         result = sim_game.get_game_state()
         if result == GameState.DRAW:
             return 0.5
-        return 1 if (result == GameState.WHITE_WON and self.root_color == PieceColor.WHITE) or (result == GameState.BLACK_WON and self.root_color == PieceColor.BLACK) else 0
+        return 1 if (result == GameState.WHITE_WON and rollout_color == PieceColor.BLACK) or (result == GameState.BLACK_WON and rollout_color == PieceColor.WHITE) else 0
 
     def backpropagate(self, value):
         self.value_sum += value
