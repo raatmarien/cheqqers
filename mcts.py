@@ -44,17 +44,11 @@ class MCTS:
             while node.is_fully_expanded():
                 node = node.select()
 
-            result = node.game.get_game_state().value
+            result = node.game.get_game_state()
 
             # If the game has ended
-            if result != GameState.IN_PROGRESS.value:
-                value = 0
-                if node.game.turn == PieceColor.WHITE:
-                    value = 0.5 if result == GameState.DRAW else (
-                        0 if result == GameState.BLACK_WON else 1)
-                else:
-                    value = 0.5 if result == GameState.DRAW else (
-                        0 if result == GameState.WHITE_WON else 1)
+            if result != GameState.IN_PROGRESS:
+                value = 0.5 if result == GameState.DRAW else 1
                 node.backpropagate(value)
             else:
                 # Expand all children
