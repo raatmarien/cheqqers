@@ -217,7 +217,8 @@ class GameInterface:
         moves = []
         mcts_moves = []
         prev_take = False  # variable to check if a piece has been taken before
-        self.draw_board()
+        if self.GUI:
+            self.draw_board()
         # pygame.image.save(self.screen, f"screenshots/screenshot{self.scrshot_counter}.jpeg")
         self.scrshot_counter += 1
         # for i in [3, 2, 2, 1, 1, 2, 2, 1]:

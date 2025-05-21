@@ -2,6 +2,7 @@ from random import randint
 import traceback
 from mcts import MCTS
 from enums import CheckersPlayer
+from qcheckers_with_interference import GameState
 
 
 class bot:
@@ -13,8 +14,10 @@ class bot:
 
 
 class human_player(bot):
-    def select_move(self, game, possible_moves):
+    def select_move(self, game):
         selected = False
+        possible_moves = game.get_possible_moves()
+
         while not selected:
             move = self.get_move()
             try:
@@ -35,7 +38,9 @@ class human_player(bot):
 
 
 class random_bot(bot):
-    def select_move(self, game, possible_movesg):
+    def select_move(self, game):
+
+        possible_moves = game.board.get_possible_moves(game.turn, game.superpositions)
         try:
             if len(possible_moves) - 1 == 0:
                 return possible_moves[0]
@@ -44,6 +49,15 @@ class random_bot(bot):
             print(traceback.format_exc())
             print(possible_moves)
 
+class mcts_bot(bot):
+    def __init__(self, args, goal_state = GameState.WHITE_WON):
+        self.mcts = MCTS(args, goal_state)
+
+    def select_move(self, game):
+        try:
+            return self.mcts.search(game)
+        except Exception as error:
+            print(traceback.format_exc())
 
 class heuristic_bot(bot):
     # def __init__(self, game, depth=2) -> None:
@@ -51,35 +65,26 @@ class heuristic_bot(bot):
     #     self.depth = depth
     #     self.player = game.player
 
-    def select_move(
-        self, game, parent_player: CheckersPlayer, curr_depth=0, max_depth=2
-    ):
+    def select_move( self, game, parent_player: CheckersPlayer, curr_depth=0, max_depth=2 ):
+
+        possible_moves = game.board.get_possible_moves(game.turn, game.superpositions)
+
         scores = []
         possible_moves = game.legal_moves
-        if (
-            curr_depth == max_depth
-        ):  # if we reached the depth we want to go to, evaluate the board
+        if curr_depth == max_depth:  # if we reached the depth we want to go to, evaluate the board
             score = self.evaluate_board(game)
-            if (
-                parent_player != game.player
-            ):  # Invert the score if the player is not the same as the parent player
+            if parent_player != game.player:  # Invert the score if the player is not the same as the parent player
                 score = -score
             return score
-        if (
-            len(possible_moves) == 0
-        ):  # If there are no possible moves, return the score of the board
+        
+        if len(possible_moves) == 0:  # If there are no possible moves, return the score of the board
             return self.evaluate_board(game)
-        for (
-            i
-        ) in (
-            possible_moves
-        ):  # For all moves we can do from this position, do the move and recursively call this function
+        
+        for i in possible_moves:  # For all moves we can do from this position, do the move and recursively call this function
             cp = game.get_copy()
             player = cp.player
             cp.player_move(i)  # player probably changes here
-            scores.append(
-                self.select_move(cp, player, curr_depth + 1, max_depth)
-            )  # is gonna return a score for this specific move
+            scores.append(self.select_move(cp, player, curr_depth + 1, max_depth))  # is gonna return a score for this specific move
         if curr_depth == 0:
             return possible_moves[scores.index(max(scores))]
         return sum(scores) / len(scores)  # Return average of scores
@@ -89,6 +94,7 @@ class heuristic_bot(bot):
         modifier = 1
         if game.player == CheckersPlayer.BLACK:
             modifier = -1
+        
         for key, value in game.classical_squares.items():
             points = value.chance
             if value.king:
@@ -97,10 +103,6 @@ class heuristic_bot(bot):
                 score += points
             elif value.color == CheckersPlayer.BLACK:
                 score -= value.chance
-        score = (
-            score * modifier
-        )  # Multiply by modifier to make sure the score is correct for the player
-        return (
-            -score
-        )  # Return negative score since this function is called from the parent.
+        score = score * modifier  # Multiply by modifier to make sure the score is correct for the player
+        return -score
         pass
