@@ -56,7 +56,7 @@ import matplotlib as mpl
 fig_size_dim    = 5
 golden_ratio    = (1+np.sqrt(5))/2
 # Increase height for three subplots
-fig_size        = (fig_size_dim, fig_size_dim/golden_ratio * 1)
+fig_size        = (fig_size_dim, fig_size_dim/golden_ratio * 1.75)
 
 def plot_style():
     font_size       = 12
@@ -93,15 +93,15 @@ colors = ['blue', 'green', 'orange', 'red']
 # }
 # Ratings for 25 games of 5x5 checkers board
 ratings = {
-    'Classic': [(18.990, 0.980), (24.988, 0.851), (26.514, 0.856), (28.716, 0.878)],
-    'Level 1': [(21.553, 0.880), (27.364, 0.833), (26.097, 0.829), (28.267, 0.832)],
-    'Level 2': [(22.712, 0.888), (26.725, 0.832), (28.829, 0.833), (28.646, 0.842)],
-    'Level 3': [(23.171, 0.930), (27.541, 0.839), (28.918, 0.839), (30.506, 0.864)]
+    'Classic': [(9.301, 3.117), (26.033, 1.510), (28.836, 1.397), (30.526, 1.568)],
+    'Level 1': [(14.841, 2.358), (31.208, 1.369), (28.299, 1.339), (30.182, 1.419)],
+    'Level 2': [(14.282, 2.342), (26.088, 1.312), (29.344, 1.307), (29.838, 1.400)],
+    'Level 3': [(10.655, 3.066), (26.449, 1.485), (30.721, 1.417), (31.233, 1.551)]
 }
 # Plot
 
 # Plotting background horizontal lines
-for i in range(10, 35, 5):
+for i in range(5, 40, 5):
     plt.axhline(y=i, color='lightgrey', linestyle='--', linewidth=0.5)
 
 for i, agent in enumerate(agents):
@@ -114,6 +114,7 @@ for i, agent in enumerate(agents):
     # poly = np.polyfit(x, means, 1)
     # plt.plot(x, np.polyval(poly, x), color=colors[i], linestyle='--')
 
+plt.legend(bbox_to_anchor =(0.5, 1.7), loc='upper center')
 # Adding vertical lines between game types
 for i in range(len(variants) - 1):
     plt.axvline(x=i + 0.9, color='grey', linestyle='-', linewidth=0.5)
@@ -121,7 +122,7 @@ for i in range(len(variants) - 1):
 plt.xticks(np.arange(len(variants)) + 0.25, variants)
 plt.ylabel('TrueSkill rating')
 plt.title('Agent ratings compared on 8x8 board')
-plt.legend()
 plt.tight_layout()
+plt.margins(y=0)
 plt.savefig('trueskill_ratings_8x8.pdf')
 plt.show()
