@@ -2,7 +2,7 @@ import unittest
 import statistics
 import random
 
-from enums importl GameState, GameType
+from enums import GameState, GameType
 from game import Game
 from moves import SplitMove, ClassicalMove
 
