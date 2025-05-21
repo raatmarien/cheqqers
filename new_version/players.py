@@ -1,7 +1,9 @@
 import random
 
+from enums import GameState
 from moves import ClassicalMove, SplitMove, MergeMove
 from game import Game
+from mcts import MCTS
 
 
 class Player:
@@ -41,4 +43,25 @@ class CliPlayer(Player):
 class RandomPlayer(Player):
     def get_move(self, game: Game):
         moves = game.board.get_possible_moves(game.turn, game.superpositions)
-        return moves[random.randint(0, len(moves) - 1)]
+        return random.choice(moves)
+
+
+class MctsPlayer(Player):
+    def __init__(self, is_white_player: bool, args: dict = None):
+        self.args = args
+        if args is None:
+            self.args = {
+                "C": 1.4,  # srqt 2
+                "num_searches": 100,  # Budget per rollout
+                "num_simulations": 1,  # Budget for extra simulations per node
+                "attempt": 0,
+            }
+
+        self.goal_state = GameState.WHITE_WON
+        if not is_white_player:
+            self.goal_state = GameState.BLACK_WON
+
+        self.mcts = MCTS(self.args, self.goal_state)
+
+    def get_move(self, game: Game):
+        return self.mcts.search(game)
