@@ -14,6 +14,8 @@ class Player:
 class CliPlayer(Player):
     def get_move(self, game: Game):
         print(f"Turn: {game.turn.name}")
+        print("Chances:")
+        print(game.get_all_chances())
         print("Board:")
         print(game.board.display())
         

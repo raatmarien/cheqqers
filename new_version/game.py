@@ -244,21 +244,7 @@ class Game:
         self.board.classic_occupancy[move.to_index] = ClassicalSquareState.QUANTUM
         self.board.piece_map[move.to_index] = piece
 
-    def measure(self, square_index: int) -> bool:
-        """
-        Measure whether a piece exists at a specific square.
-
-        Args:
-            square_index: The index of the square to measure
-
-        Returns:
-            bool: True if a piece is found at the square, False otherwise
-            bool: Whether anything was found to be taken during measurement
-        """
-        if self.board.classic_occupancy[square_index] != ClassicalSquareState.QUANTUM:
-            return (self.board.classic_occupancy[square_index] == ClassicalSquareState.OCCUPIED,
-                    False)
-
+    def _get_circuit_for_square(self, square_index):
         def handle_move(qubit_by_current_square, circuit, qubit_name_counter, prefix):
             def add_prefix(index):
                 return f"{prefix}-{index}"
@@ -422,6 +408,27 @@ class Game:
                     = handle_move(qubit_by_current_square,
                                   circuit, qubit_name_counter, taker_prefix)
 
+        return circuit, qubit_by_current_square, entanglement, superposition,\
+            superposition_from
+
+    def measure(self, square_index: int) -> bool:
+        """
+        Measure whether a piece exists at a specific square.
+
+        Args:
+            square_index: The index of the square to measure
+
+        Returns:
+            bool: True if a piece is found at the square, False otherwise
+            bool: Whether anything was found to be taken during measurement
+        """
+        if self.board.classic_occupancy[square_index] != ClassicalSquareState.QUANTUM:
+            return (self.board.classic_occupancy[square_index] == ClassicalSquareState.OCCUPIED,
+                    False)
+
+        circuit, qubit_by_current_square, entanglement, superposition, superposition_from\
+            = self._get_circuit_for_square(square_index)
+
         # Measure all qubits
         circuit.append(cirq.measure(*qubit_by_current_square.values(), key="result"))
 
@@ -462,3 +469,32 @@ class Game:
             self.superpositions.remove(superposition_from)
 
         return square_found[square_index], taken
+
+    def get_all_chances(self):
+        chances = {}
+        for i, occupancy in enumerate(self.board.classic_occupancy):
+            if occupancy == ClassicalSquareState.QUANTUM\
+               and self.board.index_xy_map[i] not in chances:
+                chances |= self._get_chances_for(i)
+        return chances
+
+    def _get_chances_for(self, square_index):
+        circuit, qubit_by_current_square, entanglement, superposition, superposition_from\
+            = self._get_circuit_for_square(square_index)
+
+        simulator = cirq.Simulator()
+        squares = []
+        observables = []
+        for name, qubit in qubit_by_current_square.items():
+            square = self.board.index_xy_map[int(name.split('-')[1])]
+            squares.append(square)
+            observables.append(cirq.Z(qubit))
+
+        ev_list = simulator.simulate_expectation_values(
+            circuit, observables=observables)
+        for i in range(len(ev_list)):
+            # Convert from Z eigenvalues (-1, 1) to chance of |1>
+            ev_list[i] = (1 - ev_list[i]) / 2.0
+
+        return dict(zip(squares, ev_list))
+
