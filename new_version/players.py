@@ -1,3 +1,5 @@
+import random
+
 from moves import ClassicalMove, SplitMove, MergeMove
 from game import Game
 
@@ -35,3 +37,8 @@ class CliPlayer(Player):
         move_idx = int(input("Enter the move index: ").strip())
         return moves[move_idx]
 
+
+class RandomPlayer(Player):
+    def get_move(self, game: Game):
+        moves = game.board.get_possible_moves(game.turn, game.superpositions)
+        return moves[random.randint(0, len(moves) - 1)]
