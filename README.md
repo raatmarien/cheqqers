@@ -20,13 +20,13 @@ python --version
 Then create a virtual environment for the dependencies.
 
 ```
-python -m venv ./qcheckersenv
+python -m venv ./cheqqersenv
 ```
 
 Activate it now (and everytime you want to do something with this project in the shell).
 
 ```
-source qcheckersenv/bin/activate
+source cheqqersenv/bin/activate
 ```
 
 And install the requirements:
