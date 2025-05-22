@@ -60,3 +60,11 @@
   box-shadow: 0 0 10px rgba(0, 255, 0, 0.8); /* Glowing effect */
   box-sizing: border-box; /* Ensure the border is inside the square */
 }
+
+.split-icon {
+    width: 100%;
+}
+
+.rotate {
+  transform: rotate(90deg);
+}

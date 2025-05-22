@@ -26,11 +26,24 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
     onMove(move);
   };
 
+  const handleSplit = (split1: number, split2: number) => {
+    let move = boardState.possible_moves.findIndex(
+      m => (m.from_index == selectedPiece &&
+            (m.to_index1 == split1 || m.to_index1 == split2) &&
+            (m.to_index2 == split1 || m.to_index2 == split2)));
+    setSelectedPiece(null);
+    onMove(move);
+  };
+
   const boardSize = 8; // 8x8 checkers board
 
   // Helper function to determine if a square is black
   const isBlackSquare = (row: number, col: number) => {
     return (row + col) % 2 === 0; // Black squares have odd (row + col)
+  };
+
+  const getIndex = (row: number, col: number) => {
+    return Math.floor((col + (row * 8)) / 2);
   };
 
   // Generate the board squares
@@ -39,11 +52,12 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
   for (let row = boardSize - 1; row >= 0; row--) {
     for (let col = 0; col < boardSize; col++) {
       const isBlack = isBlackSquare(row, col);
-      let index = Math.floor((col + (row * 8)) / 2);
+      let index = getIndex(row, col);
 
       let piece = null;
       let highlightSquare = false;
-      if (isBlack && boardState.classic_occupancy[index] === 1) {
+      let icon = null;
+      if (isBlack && boardState.piece_map[index]) {
         const pieceColor = boardState.piece_map[index]?.color;
         const pieceClass = pieceColor === 0 ? "piece-white" : "piece-black";
         const isMoveable = boardState.possible_moves.some(
@@ -59,6 +73,37 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
           .possible_moves
           .filter(m => m.from_index == selectedPiece)
           .some(m => m.to_index == index)
+      } else if (selectedPiece) {
+        // Maybe show split?
+        if (row > 0 && row < boardSize - 1) {
+          // Left/right split
+          let left = getIndex(row, col - 1);
+          let right = getIndex(row, col + 1);
+
+          if (boardState.possible_moves.some(
+            m => (m.from_index == selectedPiece &&
+                  (m.to_index1 == left || m.to_index1 == right) &&
+                  (m.to_index2 == left || m.to_index2 == right)))) {
+            icon = <img src="/public/split.png"
+                        className="split-icon"
+                        onClick={() => handleSplit(left, right)}
+                   />
+          }
+        }
+        if (col > 0 && col < boardSize - 1) {
+          // Up/down split
+          let up = getIndex(row + 1, col);
+          let down = getIndex(row - 1, col);
+
+          if (boardState.possible_moves.some(
+            m => (m.from_index == selectedPiece &&
+                  (m.to_index1 == up || m.to_index1 == down) &&
+                  (m.to_index2 == up || m.to_index2 == down)))) {
+            icon = <img src="/public/split.png"
+                        className="split-icon rotate"
+                        onClick={() => handleSplit(up, down)} />
+          }
+        }
       }
 
       squares.push(
@@ -66,9 +111,9 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
           key={`${row}-${col}`}
           className={`square ${isBlack ? "dark" : "light"} ` +
                      `${highlightSquare ? "highlight-square" : ""}`}
-          onClick={() => selectedPiece && handleSquareClick(index) }
+          onClick={() => selectedPiece && isBlack && handleSquareClick(index) }
         >
-          {piece}
+          {piece || icon}
         </div>
       );
     }
