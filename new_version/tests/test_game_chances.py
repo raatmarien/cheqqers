@@ -17,19 +17,22 @@ class TestGameChances:
 
     def test_single_split(self, game, xy):
         game.apply_move(
-            SplitMove(False, xy[(2, 0)],
-                      xy[(1, 1)], xy[(3, 1)]))
+            SplitMove(
+                is_take_move=False, from_index=xy[(2, 0)],
+                to_index1=xy[(1, 1)], to_index2=xy[(3, 1)]))
         chances = game.get_all_chances()
         assert chances[(1, 1)] == approx(0.5)
         assert chances[(3, 1)] == approx(0.5)
 
     def test_double_split(self, game, xy):
         game.apply_move(
-            SplitMove(False, xy[(2, 0)],
-                      xy[(1, 1)], xy[(3, 1)]))
+            SplitMove(
+                is_take_move=False, from_index=xy[(2, 0)],
+                to_index1=xy[(1, 1)], to_index2=xy[(3, 1)]))
         game.apply_move(
-            SplitMove(False, xy[(3, 1)],
-                      xy[(2, 2)], xy[(4, 2)]))
+            SplitMove(
+                is_take_move=False, from_index=xy[(3, 1)],
+                to_index1=xy[(2, 2)], to_index2=xy[(4, 2)]))
         chances = game.get_all_chances()
         assert chances[(1, 1)] == approx(0.5)
         assert chances[(2, 2)] == approx(0.25)
@@ -37,10 +40,12 @@ class TestGameChances:
 
     def test_split_after_move(self, game, xy):
         game.apply_move(
-            SplitMove(False, xy[(2, 0)],
-                      xy[(1, 1)], xy[(3, 1)]))
+            SplitMove(
+                is_take_move=False, from_index=xy[(2, 0)],
+                to_index1=xy[(1, 1)], to_index2=xy[(3, 1)]))
         game.apply_move(
-            ClassicalMove(False, xy[(1, 1)], xy[(0, 2)]))
+            ClassicalMove(is_take_move=False,
+                          from_index=xy[(1, 1)], to_index=xy[(0, 2)]))
         chances = game.get_all_chances()
         assert chances[(0, 2)] == approx(0.5)
         assert chances[(3, 1)] == approx(0.5)

@@ -1,16 +1,13 @@
+from pydantic import BaseModel
 import copy
+
 from enums import PieceColor
 
 
-class Piece:
+class Piece(BaseModel):
     color: PieceColor
     crowned: bool
-    moves_since_measure: int
-
-    def __init__(self, color, crowned):
-        self.color = color
-        self.crowned = crowned
-        self.moves_since_measure = 0
+    moves_since_measure: int = 0
 
     def copy(self):
         return copy.deepcopy(self)

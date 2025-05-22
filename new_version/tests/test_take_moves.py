@@ -39,11 +39,13 @@ class TestTakeMoves(unittest.TestCase):
         # Place pieces at the designated positions
         if white_pos is not None and black_pos is not None and target_pos is not None:
             # Place white piece
-            board.piece_map[white_pos] = Piece(PieceColor.WHITE, False)
+            board.piece_map[white_pos] = Piece(color=PieceColor.WHITE,
+                                               crowned=False)
             board.classic_occupancy[white_pos] = ClassicalSquareState.OCCUPIED
 
             # Place black piece to be taken
-            board.piece_map[black_pos] = Piece(PieceColor.BLACK, False)
+            board.piece_map[black_pos] = Piece(color=PieceColor.BLACK,
+                                               crowned=False)
             board.classic_occupancy[black_pos] = ClassicalSquareState.OCCUPIED
         else:
             self.fail("Could not find suitable positions for the test scenario")
@@ -90,7 +92,7 @@ class TestTakeMoves(unittest.TestCase):
         for (x, y), color, crowned in positions:
             if (x, y) in board.xy_index_map:
                 index = board.xy_index_map[(x, y)]
-                board.piece_map[index] = Piece(color, crowned)
+                board.piece_map[index] = Piece(color=color, crowned=crowned)
                 board.classic_occupancy[index] = ClassicalSquareState.OCCUPIED
             else:
                 self.fail(f"Position ({x}, {y}) not found in the board mapping")
@@ -141,7 +143,7 @@ class TestTakeMoves(unittest.TestCase):
         for (x, y), color, crowned in positions:
             if (x, y) in board.xy_index_map:
                 index = board.xy_index_map[(x, y)]
-                board.piece_map[index] = Piece(color, crowned)
+                board.piece_map[index] = Piece(color=color, crowned=crowned)
                 board.classic_occupancy[index] = ClassicalSquareState.OCCUPIED
             else:
                 self.fail(f"Position ({x}, {y}) not found in the board mapping")

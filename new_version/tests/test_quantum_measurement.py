@@ -16,8 +16,10 @@ class TestQuantumMeasurement(unittest.TestCase):
     def test_measure_two_square_superposition(self):
         """Test that a piece in superposition between two squares collapses to one."""
         # Manually create a split move
-        move = SplitMove(False, 1, 2, 3)
-        self.game.superpositions.append(PieceSuperposition(move, 0))
+        move = SplitMove(
+            is_take_move=False, from_index=1,
+            to_index1=2, to_index2=3)
+        self.game.superpositions.append(PieceSuperposition.create(move, 0))
         self.game.board.classic_occupancy[2] = ClassicalSquareState.QUANTUM
         self.game.board.classic_occupancy[3] = ClassicalSquareState.QUANTUM
 
@@ -37,10 +39,14 @@ class TestQuantumMeasurement(unittest.TestCase):
 
     def test_measure_three_square_superposition(self):
         """Test that a piece in superposition between three squares collapses to one."""
-        move1 = SplitMove(False, 1, 2, 3)
-        move2 = SplitMove(False, 2, 4, 5)
+        move1 = SplitMove(
+            is_take_move=False, from_index=1,
+            to_index1=2, to_index2=3)
+        move2 = SplitMove(
+            is_take_move=False, from_index=2,
+            to_index1=4, to_index2=5)
 
-        superposition = PieceSuperposition(move1, 0)
+        superposition = PieceSuperposition.create(move1, 0)
         superposition.apply_move(move2)
         self.game.superpositions.append(superposition)
 
@@ -62,10 +68,13 @@ class TestQuantumMeasurement(unittest.TestCase):
 
     def test_measure_after_classical_move(self):
         """Test that measuring after a classical move results in the expected collapse."""
-        move1 = SplitMove(False, 1, 2, 3)
-        move2 = ClassicalMove(False, 3, 4)
+        move1 = SplitMove(
+            is_take_move=False, from_index=1,
+            to_index1=2, to_index2=3)
+        move2 = ClassicalMove(
+            is_take_move=False, from_index=3, to_index=4)
 
-        superposition = PieceSuperposition(move1, 0)
+        superposition = PieceSuperposition.create(move1, 0)
         superposition.apply_move(move2)
         self.game.superpositions.append(superposition)
 

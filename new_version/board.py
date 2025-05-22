@@ -33,9 +33,11 @@ class Board:
 
                 occupancy = ClassicalSquareState.OCCUPIED
                 if y < start_rows:
-                    self.piece_map.append(Piece(PieceColor.WHITE, False))
+                    self.piece_map.append(Piece(color=PieceColor.WHITE,
+                                                crowned=False))
                 elif y >= (self.size - start_rows):
-                    self.piece_map.append(Piece(PieceColor.BLACK, False))
+                    self.piece_map.append(Piece(color=PieceColor.BLACK,
+                                                crowned=False))
                 else:
                     self.piece_map.append(None)
                     occupancy = ClassicalSquareState.EMPTY
@@ -92,11 +94,13 @@ class Board:
                         i_to = self.xy_index_map[(x_to, y_to)]
                         if self.classic_occupancy[i_to] != ClassicalSquareState.EMPTY:
                             continue
-                        moves.append(ClassicalMove(True, i, i_to))
+                        moves.append(ClassicalMove(
+                            is_take_move=True, from_index=i, to_index=i_to))
                     else:
                         if self.classic_occupancy[i_] != ClassicalSquareState.EMPTY:
                             continue
-                        moves.append(ClassicalMove(False, i, i_))
+                        moves.append(ClassicalMove(
+                            is_take_move=False, from_index=i, to_index=i_))
 
         # Note: We don't allow split or merge moves with takes
         if not take:
@@ -118,11 +122,11 @@ class Board:
                 continue
             for i in range(len(related_moves)):
                 for j in range(i + 1, len(related_moves)):
-                    split_moves.append(
-                        SplitMove(False,
-                                  move.from_index,
-                                  related_moves[i].to_index,
-                                  related_moves[j].to_index))
+                    split_moves.append(SplitMove(
+                        is_take_move=False,
+                        from_index=move.from_index,
+                        to_index1=related_moves[i].to_index,
+                        to_index2=related_moves[j].to_index))
 
         # Merge moves
         merge_moves = []
@@ -145,11 +149,11 @@ class Board:
                             self.piece_map[related_moves[i].from_index].crowned ==
                             self.piece_map[related_moves[j].from_index].crowned):
 
-                        merge_moves.append(
-                            MergeMove(False,
-                                      related_moves[i].from_index,
-                                      related_moves[j].from_index,
-                                      move.to_index))
+                        merge_moves.append(MergeMove(
+                            is_take_move=False,
+                            from_index1=related_moves[i].from_index,
+                            from_index2=related_moves[j].from_index,
+                            to_index=move.to_index))
 
         return split_moves + merge_moves
 

@@ -147,11 +147,13 @@ class Game:
 
                 superposition_taken = self._find_superposition_on_square(taken_index)
                 superposition_taken.insert_entanglement_placeholder()
-                superposition_from = PieceSuperposition(move, piece.moves_since_measure)
+                superposition_from = PieceSuperposition.create(move, piece.moves_since_measure)
 
                 self.superpositions.append(superposition_from)
                 self.entanglements.append(
-                    PieceEntanglement(superposition_taken, superposition_from))
+                    PieceEntanglement(
+                        superposition_taken=superposition_taken,
+                        superposition_from=superposition_from))
 
                 # But the taken piece is definitely not there anymore
                 self.board.classic_occupancy[taken_index] = ClassicalSquareState.EMPTY
@@ -210,7 +212,7 @@ class Game:
             superposition = self._find_superposition_on_square(move.from_index)
             superposition.apply_move(move)
         else:
-            self.superpositions.append(PieceSuperposition(move, piece.moves_since_measure))
+            self.superpositions.append(PieceSuperposition.create(move, piece.moves_since_measure))
 
         self.board.classic_occupancy[move.from_index] = ClassicalSquareState.EMPTY
         self.board.piece_map[move.from_index] = None

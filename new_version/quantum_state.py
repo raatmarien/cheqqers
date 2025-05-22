@@ -1,22 +1,27 @@
+from pydantic import BaseModel
+
 from moves import Move, ClassicalMove, SplitMove, MergeMove
 
 
-class PieceSuperposition:
+class PieceSuperposition(BaseModel):
     """Keeps track of the quantum state of one piece over the board
     """
     occupied_squares: list[int]
     moves: list[Move]
     moves_since_measure: int
 
-    def __init__(self, move: Move, moves_since_measure):
-        self.moves_since_measure = moves_since_measure
+    @staticmethod
+    def create(move: Move, moves_since_measure):
+        occupied_squares = None
         if isinstance(move, ClassicalMove):
-            self.occupied_squares = [move.from_index, move.to_index]
+            occupied_squares = [move.from_index, move.to_index]
         elif isinstance(move, SplitMove):
-            self.occupied_squares = [move.to_index1, move.to_index2]
+            occupied_squares = [move.to_index1, move.to_index2]
         else:
             raise 'Superposition can only be start with split or classic take'
-        self.moves = [move]
+        return PieceSuperposition(
+            occupied_squares=occupied_squares,
+            moves=[move], moves_since_measure=moves_since_measure)
 
     def apply_move(self, move: Move):
         self.moves.append(move)
@@ -45,10 +50,6 @@ class PieceSuperposition:
         self.occupied_squares.append(move.to_index)
 
 
-class PieceEntanglement:
+class PieceEntanglement(BaseModel):
     superposition_taken: PieceSuperposition
     superposition_from: PieceSuperposition
-
-    def __init__(self, superposition_taken, superposition_from):
-        self.superposition_taken = superposition_taken
-        self.superposition_from = superposition_from
