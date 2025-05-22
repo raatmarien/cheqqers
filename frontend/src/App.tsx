@@ -1,35 +1,43 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useEffect, useState } from "react";
+import GameBoard from "./components/GameBoard";
+import { fetchInitialBoard } from "./services/api";
 
-function App() {
-  const [count, setCount] = useState(0)
+const App: React.FC = () => {
+  const [boardState, setBoardState] = useState(null); // Initial state for the board
+
+  useEffect(() => {
+    const getBoardState = async () => {
+      try {
+        const data = await fetchInitialBoard();
+        setBoardState(data);
+      } catch (error) {
+        console.error("Failed to load initial board state:", error);
+      }
+    };
+
+    getBoardState();
+  }, []);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100vh", // Full height of the viewport
+        width: "100vw", // Full width of the viewport
+        backgroundColor: "#f8f8f8", // Optional: Light background color for contrast
+        margin: 0, // Remove any default margin
+        overflow: "hidden", // Prevent scrolling
+      }}
+    >
+      {boardState ? (
+        <GameBoard boardState={boardState} />
+      ) : (
+        <p>Loading board...</p>
+      )}
+    </div>
+  );
+};
 
-export default App
+export default App;
