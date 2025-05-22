@@ -1,10 +1,10 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, Union
 
 from game import Game
 from enums import GameType, ClassicalSquareState, PieceColor
 from piece import Piece
-from moves import Move
+from moves import ClassicalMove, SplitMove, MergeMove
 from quantum_state import PieceSuperposition, PieceEntanglement
 
 
@@ -16,11 +16,14 @@ class GameStateObject(BaseModel):
 
     # Game properies
     game_type: GameType
-    moves: list[Move]
+    moves: list[Union[ClassicalMove, SplitMove, MergeMove]]
     turn: PieceColor
     moves_since_take: int
     superpositions: list[PieceSuperposition]
     entanglements: list[PieceEntanglement]
+
+    # Possible moves
+    possible_moves: list[Union[ClassicalMove, SplitMove, MergeMove]]
 
     @staticmethod
     def from_game(game: Game):
@@ -33,7 +36,9 @@ class GameStateObject(BaseModel):
             turn=game.turn,
             moves_since_take=game.moves_since_take,
             superpositions=game.superpositions,
-            entanglements=game.entanglements)
+            entanglements=game.entanglements,
+            possible_moves=game.board.get_possible_moves(
+                game.turn, game.superpositions))
 
     def to_game(self):
         game = Game(

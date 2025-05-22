@@ -43,3 +43,8 @@ python main.py
 
 If you want to play against another player, or a different bot, you can easily change the players in `main.py`.
 
+The python code also includes an API backend, which can be started with:
+
+```
+python -m fastapi dev api.py
+```
