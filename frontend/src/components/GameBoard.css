@@ -1,0 +1,40 @@
+.board {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr); /* 8 columns */
+  grid-template-rows: repeat(8, 1fr);   /* 8 rows */
+  aspect-ratio: 1 / 1; /* Ensure the board is always square */
+  width: 90vw; /* Responsive width: 90% of viewport width */
+  max-width: 400px; /* Maximum size for larger screens */
+  border: 2px solid black; /* Optional: Add a border around the board */
+}
+
+.square {
+  width: 100%; /* Fill the grid cell */
+  height: 100%;
+  display: flex; /* Center content inside the square */
+  align-items: center;
+  justify-content: center;
+}
+
+.square.light {
+  background-color: #f0d9b5; /* Light square color */
+}
+
+.square.dark {
+  background-color: #b58863; /* Dark square color */
+}
+
+.piece {
+  width: 70%; /* Piece size relative to square */
+  height: 70%;
+  border-radius: 50%; /* Make pieces circular */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5); /* Add shadow for a 3D effect */
+}
+
+.piece-white {
+  background-color: white; /* White piece */
+}
+
+.piece-black {
+  background-color: black; /* Black piece */
+}
