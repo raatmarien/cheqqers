@@ -1,4 +1,2 @@
-pygame==2.6.1
-trueskill==0.4.5
 cirq==1.4.1
-setuptools==76.0.0
+pydantic>=2.0

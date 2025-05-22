@@ -3,9 +3,9 @@ import math
 import random
 from copy import deepcopy
 import traceback
-from time import sleep
-from qcheckers_with_interference import GameState, PieceColor
-from random import choice
+
+from enums import GameState, PieceColor
+
 
 class RandomBot:
     def select_move(self, game):
@@ -13,11 +13,12 @@ class RandomBot:
         try:
             if len(possible_moves) == 1:
                 return possible_moves[0]
-            return choice(possible_moves)
+            return random.choice(possible_moves)
         except Exception:
             print(traceback.format_exc())
             print(possible_moves)
             return None  # Safe fallback
+
 
 class MCTS:
     goal_state: GameState
@@ -58,6 +59,7 @@ class MCTS:
 
         action_probs = np.array([child.visit_count for child in self.root.children])
         return self.root.children[np.argmax(action_probs)].move
+
 
 class Node:
     def __init__(self, game, args, root_color, move=None, parent=None, weight=1):
