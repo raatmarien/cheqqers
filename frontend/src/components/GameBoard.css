@@ -38,3 +38,17 @@
 .piece-black {
   background-color: black; /* Black piece */
 }
+/* Style for clickable pieces */
+.moveable {
+  cursor: pointer;
+  position: relative;
+  box-shadow: 0 0 5px rgba(0, 255, 0, 0.8), 0 0 8px rgba(0, 255, 0, 0.6);
+  animation: pulse 1.5s infinite;
+  transform: scale(1.1); /* Slightly enlarge clickable pieces */
+}
+
+/* Optional hover effect for clickable pieces */
+.moveable:hover {
+  transform: scale(1.2); /* Enlarge on hover */
+  box-shadow: 0 0 8px rgba(0, 255, 0, 1), 0 0 12px rgba(0, 255, 0, 0.8);
+}

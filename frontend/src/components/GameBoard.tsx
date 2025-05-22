@@ -22,17 +22,19 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState }) => {
   for (let row = boardSize - 1; row >= 0; row--) {
     for (let col = 0; col < boardSize; col++) {
       const isBlack = isBlackSquare(row, col);
-      let blackSquareIndex = Math.floor((col + (row * 8)) / 2);
+      let index = Math.floor((col + (row * 8)) / 2);
 
       let piece = null;
-      if (isBlack && boardState.classic_occupancy[blackSquareIndex] === 1) {
-        const pieceColor = boardState.piece_map[blackSquareIndex]?.color;
+      if (isBlack && boardState.classic_occupancy[index] === 1) {
+        const pieceColor = boardState.piece_map[index]?.color;
         const pieceClass = pieceColor === 0 ? "piece-white" : "piece-black";
-        piece = <div className={`piece ${pieceClass}`} />;
-      }
+        const isMoveable = boardState.possible_moves.some(
+          m => m.from_index == index)
 
-      if (isBlack) {
-        blackSquareIndex++; // Increment only for black squares
+
+        piece = <div className={`piece ${pieceClass} ` +
+                                `${isMoveable ? "moveable" : ""}`}
+                />;
       }
 
       squares.push(
