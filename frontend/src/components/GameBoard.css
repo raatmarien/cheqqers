@@ -52,3 +52,11 @@
   transform: scale(1.2); /* Enlarge on hover */
   box-shadow: 0 0 8px rgba(0, 255, 0, 1), 0 0 12px rgba(0, 255, 0, 0.8);
 }
+
+.highlight-square {
+  position: relative;
+  background-color: rgba(0, 255, 0, 0.2); /* Light green overlay */
+  border: 2px dashed #00ff00; /* Dashed green border */
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.8); /* Glowing effect */
+  box-sizing: border-box; /* Ensure the border is inside the square */
+}

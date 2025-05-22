@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from "react";
 import GameBoard from "./components/GameBoard";
-import { fetchInitialBoard } from "./services/api";
+import { fetchInitialBoard, doMove } from "./services/api";
 
 const App: React.FC = () => {
   const [boardState, setBoardState] = useState(null); // Initial state for the board
+
+  const onMove = async (moveIndex: number) => {
+    const data = await doMove(boardState, moveIndex);
+    setBoardState(data)
+  };
 
   useEffect(() => {
     const getBoardState = async () => {
@@ -32,7 +37,8 @@ const App: React.FC = () => {
       }}
     >
       {boardState ? (
-        <GameBoard boardState={boardState} />
+        <GameBoard boardState={boardState}
+                   onMove={onMove} />
       ) : (
         <p>Loading board...</p>
       )}
