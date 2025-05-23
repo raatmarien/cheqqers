@@ -1,12 +1,14 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from moves import Move, ClassicalMove, SplitMove, MergeMove
 from typing import Union, Optional
+from uuid import uuid4, UUID
 
 
 class PieceSuperposition(BaseModel):
     """Keeps track of the quantum state of one piece over the board
     """
+    uuid: UUID = Field(default_factory=uuid4)
     occupied_squares: list[int]
     moves: list[Optional[Union[ClassicalMove, SplitMove, MergeMove]]]
     moves_since_measure: int
@@ -49,6 +51,9 @@ class PieceSuperposition(BaseModel):
 
     def _apply_merge_move(self, move: MergeMove):
         self.occupied_squares.append(move.to_index)
+
+    def __eq__(self, other):
+        return self.occupied_squares == other.occupied_squares
 
 
 class PieceEntanglement(BaseModel):

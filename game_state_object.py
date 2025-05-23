@@ -1,5 +1,6 @@
 from pydantic import BaseModel
-from typing import Optional, Union, Dict
+from typing import Optional, Union, Dict, Tuple
+from uuid import UUID
 
 from game import Game
 from enums import GameType, ClassicalSquareState, PieceColor, GameState
@@ -20,7 +21,7 @@ class GameStateObject(BaseModel):
     turn: PieceColor
     moves_since_take: int
     superpositions: list[PieceSuperposition]
-    entanglements: list[PieceEntanglement]
+    entanglements: list[Tuple[UUID, UUID]]
 
     # Extra's
     possible_moves: list[Union[ClassicalMove, SplitMove, MergeMove]]
@@ -29,6 +30,9 @@ class GameStateObject(BaseModel):
 
     @staticmethod
     def from_game(game: Game):
+        entanglements = [
+            (e.superposition_taken.uuid, e.superposition_from.uuid)
+            for e in game.entanglements]
         return GameStateObject(
             board_size=game.board.size,
             piece_map=game.board.piece_map,
@@ -38,7 +42,7 @@ class GameStateObject(BaseModel):
             turn=game.turn,
             moves_since_take=game.moves_since_take,
             superpositions=game.superpositions,
-            entanglements=game.entanglements,
+            entanglements=entanglements,
             possible_moves=game.board.get_possible_moves(
                 game.turn, game.superpositions),
             chances=game.get_all_chances(),
@@ -55,5 +59,12 @@ class GameStateObject(BaseModel):
         game.turn = self.turn
         game.moves_since_take = self.moves_since_take
         game.superpositions = self.superpositions
-        game.entanglements = self.entanglements
+        real_entanglements = []
+        for t, f in self.entanglements:
+            real_entanglements.append(PieceEntanglement(
+                superposition_from=next((s for s in self.superpositions
+                                         if s.uuid == f), None),
+                superposition_taken=next((s for s in self.superpositions
+                                          if s.uuid == t), None)))
+        game.entanglements = real_entanglements
         return game

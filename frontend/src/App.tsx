@@ -26,6 +26,7 @@ const App: React.FC = () => {
     localStorage.setItem("boardState", JSON.stringify(data)); // Save the updated board state
   };
 
+  // TODO: Display king
   const startNewGame = async () => {
     try {
       const data = await fetchInitialBoard(parseInt(quantumnessLevel));
