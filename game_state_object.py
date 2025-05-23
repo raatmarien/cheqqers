@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from typing import Optional, Union, Dict
 
 from game import Game
-from enums import GameType, ClassicalSquareState, PieceColor
+from enums import GameType, ClassicalSquareState, PieceColor, GameState
 from piece import Piece
 from moves import ClassicalMove, SplitMove, MergeMove
 from quantum_state import PieceSuperposition, PieceEntanglement
@@ -22,11 +22,10 @@ class GameStateObject(BaseModel):
     superpositions: list[PieceSuperposition]
     entanglements: list[PieceEntanglement]
 
-    # Possible moves
+    # Extra's
     possible_moves: list[Union[ClassicalMove, SplitMove, MergeMove]]
-
-    # Chances
     chances: Dict[int, float]
+    game_state: GameState
 
     @staticmethod
     def from_game(game: Game):
@@ -42,7 +41,8 @@ class GameStateObject(BaseModel):
             entanglements=game.entanglements,
             possible_moves=game.board.get_possible_moves(
                 game.turn, game.superpositions),
-            chances=game.get_all_chances())
+            chances=game.get_all_chances(),
+            game_state=game.get_game_state())
 
     def to_game(self):
         game = Game(

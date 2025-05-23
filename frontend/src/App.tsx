@@ -92,27 +92,45 @@ const App: React.FC = () => {
     </div>
   );
 
-  return (
-    <div className="app-container">
-      <header className="app-header">
-        <h1 className="app-title">Cheqqers</h1>
-        {gameStarted && (
-          <button onClick={handleExitToMainMenu} className="exit-button">
-            Exit to Main Menu
-          </button>
-        )}
-      </header>
-      {gameStarted ? (
-        boardState ? (
-          <GameBoard boardState={boardState} onMove={onMove} />
+  let endGameScreen = (
+    boardState?.game_state != 0 ?
+    (<div className="game-over-overlay">
+      <div className="game-over-content">
+        <h2>
+          {boardState?.game_state == 1 ? "White won!"
+          : (boardState?.game_state == 2 ? "Black won!" : "It's a draw")}
+        </h2>
+        <button onClick={handleExitToMainMenu} className="exit-button">
+          Exit to Main Menu
+        </button>
+      </div>
+    </div>) : (<div></div>)
+    );
+
+    return (
+      <div className="app-container">
+        <header className="app-header">
+          <h1 className="app-title">Cheqqers</h1>
+          {gameStarted && (
+            <button onClick={handleExitToMainMenu} className="exit-button">
+              Exit to Main Menu
+            </button>
+          )}
+        </header>
+        {gameStarted ? (
+          boardState ? (
+            <div>
+              <GameBoard boardState={boardState} onMove={onMove} />
+              {endGameScreen}
+            </div>
+          ) : (
+            <p>Loading board...</p>
+          )
         ) : (
-          <p>Loading board...</p>
-        )
-      ) : (
-        startMenu
-      )}
-    </div>
-  );
+          startMenu
+        )}
+      </div>
+    );
 };
 
 export default App;
