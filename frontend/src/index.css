@@ -143,3 +143,22 @@ button:focus-visible {
 .exit-button:hover {
   background-color: #cc0000;
 }
+
+
+/* Quantumness selector styles */
+.quantumness-selector {
+  margin-top: 15px;
+  margin-bottom: 20px;
+  font-size: 1em;
+}
+
+.quantumness-selector label {
+  margin-right: 10px;
+}
+
+.quantumness-selector select {
+  padding: 5px;
+  font-size: 1em;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}

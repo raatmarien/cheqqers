@@ -12,7 +12,13 @@ const App: React.FC = () => {
     return localStorage.getItem("gameStarted") === "true";
   });
 
-  const [againstAi, setAgainstAi] = useState(true);
+  const [quantumnessLevel, setQuantumnessLevel] = useState(() => {
+    return localStorage.getItem("quantumnessLevel") || "3";
+  });
+
+  const [againstAi, setAgainstAi] = useState(() => {
+    return (localStorage.getItem("againstAi") || "true") == "true";
+  });
 
   const onMove = async (moveIndex: number) => {
     const data = await doMove(boardState, moveIndex, againstAi);
@@ -44,14 +50,39 @@ const App: React.FC = () => {
     localStorage.removeItem("gameStarted");
   };
 
+  const handleQuantumnessChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedLevel = event.target.value;
+    setQuantumnessLevel(selectedLevel);
+    localStorage.setItem("quantumnessLevel", selectedLevel);
+  };
+
+  const handleAiChange = (event) => {
+    const ai = event.target.checked;
+    setAgainstAi(ai);
+    localStorage.setItem("againstAi", `${ai}`);
+  };
+
   let startMenu = (
     <div className="start-menu">
-      <h1>Welcome to Quantum Checkers</h1>
+      <h1>Cheqqers - A Quantum Checkers Game</h1>
+      <div className="quantumness-selector">
+        <label htmlFor="quantumness-level">Quantumness Level:</label>
+        <select
+          id="quantumness-level"
+          value={quantumnessLevel}
+          onChange={handleQuantumnessChange}
+        >
+          <option value="0">Classical</option>
+          <option value="1">Quantum level 1 (superpositions)</option>
+          <option value="2">Quantum level 2 (entanglement)</option>
+          <option value="3">Quantum level 3 (interference)</option>
+        </select>
+      </div>
       <label className="checkbox-label">
         <input
           type="checkbox"
-          checked={againstAi}
-          onChange={(e) => setAgainstAi(e.target.checked)}
+          checked={againstAi == true}
+          onChange={handleAiChange}
         />
         Play against AI
       </label>
