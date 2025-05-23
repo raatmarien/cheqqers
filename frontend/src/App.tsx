@@ -17,7 +17,7 @@ const App: React.FC = () => {
   });
 
   const [againstAi, setAgainstAi] = useState(() => {
-    return (localStorage.getItem("againstAi") || "true") == "true";
+    return (localStorage.getItem("againstAi") || "false") == "true";
   });
 
   const onMove = async (moveIndex: number) => {
