@@ -4,7 +4,7 @@ import "./GameBoard.css";
 interface GameBoardProps {
   boardState: {
     classic_occupancy: number[]; // Array representing which squares are occupied
-    piece_map: { color: number }[]; // Array representing the pieces and their colors
+    piece_map: { color: number, crowned: boolean }[]; // Array representing the pieces and their colors
     possible_moves: any[];
     chances: any;
   };
