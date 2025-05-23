@@ -1,13 +1,14 @@
 from pydantic import BaseModel
 
 from moves import Move, ClassicalMove, SplitMove, MergeMove
+from typing import Union, Optional
 
 
 class PieceSuperposition(BaseModel):
     """Keeps track of the quantum state of one piece over the board
     """
     occupied_squares: list[int]
-    moves: list[Move]
+    moves: list[Optional[Union[ClassicalMove, SplitMove, MergeMove]]]
     moves_since_measure: int
 
     @staticmethod

@@ -60,14 +60,17 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
       if (isBlack && boardState.piece_map[index]) {
         const pieceColor = boardState.piece_map[index]?.color;
         const pieceClass = pieceColor === 0 ? "piece-white" : "piece-black";
+        let chance = boardState.chances[index];
+        
         const isMoveable = boardState.possible_moves.some(
           m => m.from_index == index)
 
 
         piece = <div className={`piece ${pieceClass} ` +
                                 `${isMoveable ? "moveable" : ""}`}
-                     onClick={() => isBlack && handlePieceClick(index)}
-                />;
+                     onClick={() => isBlack && handlePieceClick(index)}>
+        <div className="change-text">{chance ? (Math.round(chance * 100) + "%") : ""}</div>
+        </div>;
       } else if (isBlack && selectedPiece) {
         highlightSquare = boardState
           .possible_moves
@@ -84,7 +87,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
             m => (m.from_index == selectedPiece &&
                   (m.to_index1 == left || m.to_index1 == right) &&
                   (m.to_index2 == left || m.to_index2 == right)))) {
-            icon = <img src="/public/split.png"
+            icon = <img src="/split.png"
                         className="split-icon"
                         onClick={() => handleSplit(left, right)}
                    />
@@ -99,7 +102,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
             m => (m.from_index == selectedPiece &&
                   (m.to_index1 == up || m.to_index1 == down) &&
                   (m.to_index2 == up || m.to_index2 == down)))) {
-            icon = <img src="/public/split.png"
+            icon = <img src="/split.png"
                         className="split-icon rotate"
                         onClick={() => handleSplit(up, down)} />
           }

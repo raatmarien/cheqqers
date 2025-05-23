@@ -476,7 +476,7 @@ class Game:
         chances = {}
         for i, occupancy in enumerate(self.board.classic_occupancy):
             if occupancy == ClassicalSquareState.QUANTUM\
-               and self.board.index_xy_map[i] not in chances:
+               and i not in chances:
                 chances |= self._get_chances_for(i)
         return chances
 
@@ -488,7 +488,7 @@ class Game:
         squares = []
         observables = []
         for name, qubit in qubit_by_current_square.items():
-            square = self.board.index_xy_map[int(name.split('-')[1])]
+            square = int(name.split('-')[1])
             squares.append(square)
             observables.append(cirq.Z(qubit))
 
@@ -496,7 +496,7 @@ class Game:
             circuit, observables=observables)
         for i in range(len(ev_list)):
             # Convert from Z eigenvalues (-1, 1) to chance of |1>
-            ev_list[i] = (1 - ev_list[i]) / 2.0
+            ev_list[i] = abs((1 - ev_list[i]) / 2.0)
 
         return dict(zip(squares, ev_list))
 

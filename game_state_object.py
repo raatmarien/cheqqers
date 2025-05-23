@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional, Union
+from typing import Optional, Union, Dict
 
 from game import Game
 from enums import GameType, ClassicalSquareState, PieceColor
@@ -25,6 +25,9 @@ class GameStateObject(BaseModel):
     # Possible moves
     possible_moves: list[Union[ClassicalMove, SplitMove, MergeMove]]
 
+    # Chances
+    chances: Dict[int, float]
+
     @staticmethod
     def from_game(game: Game):
         return GameStateObject(
@@ -38,7 +41,8 @@ class GameStateObject(BaseModel):
             superpositions=game.superpositions,
             entanglements=game.entanglements,
             possible_moves=game.board.get_possible_moves(
-                game.turn, game.superpositions))
+                game.turn, game.superpositions),
+            chances=game.get_all_chances())
 
     def to_game(self):
         game = Game(

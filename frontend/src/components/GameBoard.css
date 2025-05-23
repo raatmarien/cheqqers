@@ -28,15 +28,21 @@
   width: 70%; /* Piece size relative to square */
   height: 70%;
   border-radius: 50%; /* Make pieces circular */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5); /* Add shadow for a 3D effect */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5); /* Add shadow for a 3D effec
+t */
+  display: flex;
+  justify-content: center;
+  align-items: center  
 }
 
 .piece-white {
   background-color: white; /* White piece */
+  color: black;
 }
 
 .piece-black {
   background-color: black; /* Black piece */
+  color: white;
 }
 /* Style for clickable pieces */
 .moveable {
@@ -67,4 +73,8 @@
 
 .rotate {
   transform: rotate(90deg);
+}
+
+.change-text {
+  font-size: small;
 }
