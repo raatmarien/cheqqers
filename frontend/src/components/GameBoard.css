@@ -44,6 +44,14 @@ t */
   background-color: black; /* Black piece */
   color: white;
 }
+
+.crowned-piece {
+  background-size: cover;
+  background-position:
+    center;
+  background-image: url("/crown.png");
+}
+
 /* Style for clickable pieces */
 .moveable {
   cursor: pointer;

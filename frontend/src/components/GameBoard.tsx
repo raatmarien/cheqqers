@@ -73,7 +73,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
   const squares = [];
 
   for (let row = boardSize - 1; row >= 0; row--) {
- for (let col = 0; col < boardSize; col++) {
+    for (let col = 0; col < boardSize; col++) {
       const isBlack = isBlackSquare(row, col);
       let index = getIndex(row, col);
 
@@ -83,6 +83,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
       if (isBlack && boardState.piece_map[index]) {
         const pieceColor = boardState.piece_map[index]?.color;
         const pieceClass = pieceColor === 0 ? "piece-white" : "piece-black";
+        const crowned = boardState.piece_map[index].crowned;
         let chance = boardState.chances[index];
         
         const isMoveable = boardState.possible_moves.some(
@@ -90,9 +91,10 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
 
 
         piece = <div className={`piece ${pieceClass} ` +
-                                `${isMoveable ? "moveable" : ""}`}
+                                `${isMoveable ? "moveable" : ""} ` +
+                                `${crowned ? "crowned-piece" : ""}`}
                      onClick={() => isBlack && handlePieceClick(index)}>
-        <div className="change-text">{chance ? (Math.round(chance * 100) + "%") : ""}</div>
+          <div className="change-text">{chance != null ? (Math.round(chance * 100) + "%") : ""}</div>
         </div>;
       } else if (isBlack && selectedPiece != null) {
         highlightSquare = boardState
@@ -179,7 +181,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
         <div
           key={`${row}-${col}`}
           className={`square ${isBlack ? "dark" : "light"} ` +
-                     `${highlightSquare ? "highlight-square" : ""}`}
+                     `${highlightSquare ? "highlight-square" : ""} `}
           onClick={() => selectedPiece != null && isBlack && handleSquareClick(index) }
         >
           {piece || icon}
