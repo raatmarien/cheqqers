@@ -43,8 +43,24 @@ python main.py
 
 If you want to play against another player, or a different bot, you can easily change the players in `main.py`.
 
-The python code also includes an API backend, which can be started with:
+## Web app
+
+You can play Cheqqers in a GUI using the web app. To do that you need to run the front end and the backend.
+
+The backend can be started with:
 
 ```
 python -m fastapi dev api.py
+```
+
+For the frontend, you will need NPM (at least version 10). Then install the dependencies:
+
+```
+npm install
+```
+
+The frontend can be started with:
+
+```
+npm run dev
 ```
