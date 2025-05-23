@@ -16,7 +16,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
   };
 
   const handleSquareClick = (index: number) => {
-    if (!selectedPiece) return;
+    if (selectedPiece == null || selectedPiece == undefined) return;
 
     let move = boardState.possible_moves.findIndex(
       m => m.from_index == selectedPiece && m.to_index == index);
@@ -37,11 +37,14 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
 
   const handleMerge = (index: number) => {
     let move = boardState.possible_moves.findIndex(
-      m => m.to_index == index);
+      m => m.from_index1 && m.from_index2 && m.to_index == index);
     setSelectedPiece(null);
     onMove(move);
   };
 
+  // TODO: Bottom left corner doesn't want to move often?
+
+  
   const boardSize = 8; // 8x8 checkers board
 
   // Helper function to determine if a square is black
@@ -68,7 +71,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
   const squares = [];
 
   for (let row = boardSize - 1; row >= 0; row--) {
-    for (let col = 0; col < boardSize; col++) {
+ for (let col = 0; col < boardSize; col++) {
       const isBlack = isBlackSquare(row, col);
       let index = getIndex(row, col);
 
@@ -89,12 +92,12 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
                      onClick={() => isBlack && handlePieceClick(index)}>
         <div className="change-text">{chance ? (Math.round(chance * 100) + "%") : ""}</div>
         </div>;
-      } else if (isBlack && selectedPiece) {
+      } else if (isBlack && selectedPiece != null) {
         highlightSquare = boardState
           .possible_moves
           .filter(m => m.from_index == selectedPiece)
           .some(m => m.to_index == index)
-      } else if (selectedPiece) {
+      } else if (selectedPiece != null) {
         // Maybe show split?
         if (row > 0 && row < boardSize - 1) {
           // Left/right split
@@ -127,7 +130,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
         }
       } else if (isBlack) {
         // Maybe show merge
-        let merge_move = boardState.possible_moves.some(
+        let merge_move = boardState.possible_moves.find(
           m => (m.from_index1 && m.from_index2 &&
                 m.to_index == index));
         if (merge_move) {
@@ -135,6 +138,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
           let f2 = merge_move.from_index2;
           let t = merge_move.to_index;
           let rotation = 0;
+
           if (getRow(f1) == getRow(f2)) {
             // Up/down
             if (getRow(f1) < getRow(t)) {
@@ -155,7 +159,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
           }
           icon = <img src="/merge.png"
                       className="split-icon"
-                      style={{transform: `rotate({rotation}deg)`}}
+                      style={{transform: `rotate(${rotation}deg)`}}
                       onClick={() => handleMerge(index)} />
         }
       }
@@ -165,7 +169,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
           key={`${row}-${col}`}
           className={`square ${isBlack ? "dark" : "light"} ` +
                      `${highlightSquare ? "highlight-square" : ""}`}
-          onClick={() => selectedPiece && isBlack && handleSquareClick(index) }
+          onClick={() => selectedPiece != null && isBlack && handleSquareClick(index) }
         >
           {piece || icon}
         </div>
