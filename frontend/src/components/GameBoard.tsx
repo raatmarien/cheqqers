@@ -62,7 +62,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
     const row = Math.floor(index / 4);
     const isRowEven = row % 2 === 0;
     const colInRow = index % 4;
-    const col = isRowEven ? (colInRow * 2 + 1) : (colInRow * 2);
+    const col = isRowEven ? (colInRow * 2) : (colInRow * 2) + 1;
     return { row, col };
   };
 
@@ -147,7 +147,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
 
           if (getRow(f1) == getRow(f2)) {
             // Up/down
-            if (getRow(f1) < getRow(t)) {
+            if (getRow(f1) < getRow(index)) {
               // Up
               rotation = 0;
             } else {
@@ -155,7 +155,11 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
               rotation = 180;
             }
           } else if (getCol(f1) == getCol(f2)) {
-            if (getCol(f1) > getCol(t)) {
+            console.log(index);
+            console.log(getRowColFromIndex(index));
+            console.log(f1);
+            console.log(getRowColFromIndex(f1));
+            if (getCol(f1) < getCol(index)) {
               // Right
               rotation = 90;
             } else {
