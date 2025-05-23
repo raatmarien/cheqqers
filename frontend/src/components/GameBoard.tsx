@@ -138,6 +138,8 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
           let f2 = merge_move.from_index2;
           let t = merge_move.to_index;
           let rotation = 0;
+          let flip = false
+          let icon_src = "/merge.png";
 
           if (getRow(f1) == getRow(f2)) {
             // Up/down
@@ -148,18 +150,25 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
               // Down
               rotation = 180;
             }
-          } else {
-            if (getCol(f1) < getCol(t)) {
+          } else if (getCol(f1) == getCol(f2)) {
+            if (getCol(f1) > getCol(t)) {
               // Right
               rotation = 90;
             } else {
               // Left
               rotation = 270;
             }
+          } else {
+            // Diagonal
+            icon_src = "/diagonal_merge.png";
+            if ((getCol(f1) > getCol(f2) && getRow(f1) > getRow(f2)) ||
+                (getCol(f1) < getCol(f2) && getRow(f1) < getRow(f2))) {
+              flip = true
+            }
           }
-          icon = <img src="/merge.png"
+          icon = <img src={icon_src}
                       className="split-icon"
-                      style={{transform: `rotate(${rotation}deg)`}}
+                      style={{transform: `rotate(${rotation}deg) ${flip ? "scaleX(-1)" : ""}`}}
                       onClick={() => handleMerge(index)} />
         }
       }
