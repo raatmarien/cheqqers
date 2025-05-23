@@ -66,3 +66,80 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+/* General app container styles */
+.app-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Full height of the viewport */
+  width: 100vw; /* Full width of the viewport */
+  background-color: #f8f8f8; /* Optional: Light background color for contrast */
+  margin: 0; /* Remove any default margin */
+  overflow: hidden; /* Prevent scrolling */
+}
+
+/* Start menu styles */
+.start-menu {
+  text-align: center;
+}
+
+/* Checkbox label styles */
+.checkbox-label {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 1.2em;
+  font-weight: 400;
+}
+
+/* Button styling for the start button */
+.start-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.start-button:hover {
+  background-color: #0056b3;
+}
+
+/* Header styles */
+.app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  box-sizing: border-box; /* Include padding and border in the width */
+  background-color: #222;
+  color: white;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.app-title {
+  margin: 0;
+  font-size: 1.5em;
+}
+
+.exit-button {
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.3s ease;
+}
+
+.exit-button:hover {
+  background-color: #cc0000;
+}

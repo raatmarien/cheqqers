@@ -11,10 +11,10 @@ export const fetchInitialBoard = async () => {
   }
 };
 
-export const doMove = async (boardState: object, moveIndex: number) => {
+export const doMove = async (boardState: object, moveIndex: number, againstAi: bool) => {
   try {
     const response = await axios.post(
-        `${config.backendUrl}/move/${moveIndex}?do_ai_move=false`,
+        `${config.backendUrl}/move/${moveIndex}?do_ai_move=${againstAi}`,
       boardState);
     return response.data;
   } catch (error) {

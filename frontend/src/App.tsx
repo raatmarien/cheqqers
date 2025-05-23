@@ -3,53 +3,83 @@ import GameBoard from "./components/GameBoard";
 import { fetchInitialBoard, doMove } from "./services/api";
 
 const App: React.FC = () => {
-  const [boardState, setBoardState] = useState(null); // Initial state for the board
+  const [boardState, setBoardState] = useState(() => {
+    const savedState = localStorage.getItem("boardState");
+    return savedState ? JSON.parse(savedState) : null;
+  });
 
-  const [gameStarted, setGameStarted] = useState(false);
+  const [gameStarted, setGameStarted] = useState(() => {
+    return localStorage.getItem("gameStarted") === "true";
+  });
+
   const [againstAi, setAgainstAi] = useState(true);
 
   const onMove = async (moveIndex: number) => {
-    const data = await doMove(boardState, moveIndex);
-    setBoardState(data)
+    const data = await doMove(boardState, moveIndex, againstAi);
+    setBoardState(data);
+    localStorage.setItem("boardState", JSON.stringify(data)); // Save the updated board state
   };
 
-  useEffect(() => {
-    const getBoardState = async () => {
-      try {
-        const data = await fetchInitialBoard();
-        setBoardState(data);
-      } catch (error) {
-        console.error("Failed to load initial board state:", error);
-      }
-    };
+  const startNewGame = async () => {
+    try {
+      const data = await fetchInitialBoard();
+      setBoardState(data);
+      setGameStarted(true);
+      localStorage.setItem("boardState", JSON.stringify(data));
+      localStorage.setItem("gameStarted", "true");
+    } catch (error) {
+      console.error("Failed to load initial board state:", error);
+    }
+  };
 
-    getBoardState();
-  }, []);
+  const handleStartGameClick = () => {
+    localStorage.removeItem("boardState");
+    localStorage.setItem("gameStarted", "true");
+    startNewGame();
+  };
 
-  let startMenu = <div>
-    <button onClick={() => setGameStarted(true) }>Start game!</button>
-  </div>;
+  const handleExitToMainMenu = () => {
+    setGameStarted(false);
+    localStorage.removeItem("boardState");
+    localStorage.removeItem("gameStarted");
+  };
+
+  let startMenu = (
+    <div className="start-menu">
+      <h1>Welcome to Quantum Checkers</h1>
+      <label className="checkbox-label">
+        <input
+          type="checkbox"
+          checked={againstAi}
+          onChange={(e) => setAgainstAi(e.target.checked)}
+        />
+        Play against AI
+      </label>
+      <button onClick={handleStartGameClick} className="start-button">
+        Start Game!
+      </button>
+    </div>
+  );
 
   return (
-    <div
-    style={{
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      height: "100vh", // Full height of the viewport
-      width: "100vw", // Full width of the viewport
-      backgroundColor: "#f8f8f8", // Optional: Light background color for contrast
-      margin: 0, // Remove any default margin
-      overflow: "hidden", // Prevent scrolling
-    }}
-    >
-      {gameStarted ? 
-      (boardState ? (
-        <GameBoard boardState={boardState}
-                   onMove={onMove} />
+    <div className="app-container">
+      <header className="app-header">
+        <h1 className="app-title">Cheqqers</h1>
+        {gameStarted && (
+          <button onClick={handleExitToMainMenu} className="exit-button">
+            Exit to Main Menu
+          </button>
+        )}
+      </header>
+      {gameStarted ? (
+        boardState ? (
+          <GameBoard boardState={boardState} onMove={onMove} />
+        ) : (
+          <p>Loading board...</p>
+        )
       ) : (
-        <p>Loading board...</p>
-        )) : (startMenu)}
+        startMenu
+      )}
     </div>
   );
 };
