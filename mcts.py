@@ -110,22 +110,26 @@ class Node:
         return [child]
 
     def simulate(self):
-        sim_game = deepcopy(self.game)
-        rollout_limit = self.args.get("rollout", 100)
-        rollout_color = sim_game.turn
+        try:
+            sim_game = deepcopy(self.game)
+            rollout_limit = self.args.get("rollout", 100)
+            rollout_color = sim_game.turn
 
-        p1, p2 = RandomBot(), RandomBot()
-        counter = 0
+            p1, p2 = RandomBot(), RandomBot()
+            counter = 0
 
-        while sim_game.get_game_state() == GameState.IN_PROGRESS and counter < rollout_limit:
-            selected_move = p1.select_move(sim_game) if sim_game.turn == PieceColor.WHITE else p2.select_move(sim_game)
-            sim_game.apply_move(selected_move)
-            counter += 1
+            while sim_game.get_game_state() == GameState.IN_PROGRESS and counter < rollout_limit:
+                selected_move = p1.select_move(sim_game) if sim_game.turn == PieceColor.WHITE else p2.select_move(sim_game)
+                sim_game.apply_move(selected_move)
+                counter += 1
 
-        result = sim_game.get_game_state()
-        if result == GameState.DRAW:
-            return 0.5
-        return 1 if (result == GameState.WHITE_WON and rollout_color == PieceColor.BLACK) or (result == GameState.BLACK_WON and rollout_color == PieceColor.WHITE) else 0
+            result = sim_game.get_game_state()
+            if result == GameState.DRAW:
+                return 0.5
+            return 1 if (result == GameState.WHITE_WON and rollout_color == PieceColor.BLACK) or (result == GameState.BLACK_WON and rollout_color == PieceColor.WHITE) else 0
+        except Exception as e:
+            print(f"There was some error {e} while simulating MCTS")
+            return 0.5  # Ignore errors
 
     def backpropagate(self, value):
         self.value_sum += value

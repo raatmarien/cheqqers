@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import GameBoard from "./components/GameBoard";
 import { fetchInitialBoard, doMove } from "./services/api";
 
@@ -21,14 +21,14 @@ const App: React.FC = () => {
   });
 
   const onMove = async (moveIndex: number) => {
-    const data = await doMove(boardState, moveIndex, againstAi, quantumnessLevel);
+    const data = await doMove(boardState, moveIndex, againstAi);
     setBoardState(data);
     localStorage.setItem("boardState", JSON.stringify(data)); // Save the updated board state
   };
 
   const startNewGame = async () => {
     try {
-      const data = await fetchInitialBoard(quantumnessLevel);
+      const data = await fetchInitialBoard(parseInt(quantumnessLevel));
       setBoardState(data);
       setGameStarted(true);
       localStorage.setItem("boardState", JSON.stringify(data));
@@ -56,7 +56,7 @@ const App: React.FC = () => {
     localStorage.setItem("quantumnessLevel", selectedLevel);
   };
 
-  const handleAiChange = (event) => {
+  const handleAiChange = (event : any) => {
     const ai = event.target.checked;
     setAgainstAi(ai);
     localStorage.setItem("againstAi", `${ai}`);

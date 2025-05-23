@@ -5,8 +5,10 @@ interface GameBoardProps {
   boardState: {
     classic_occupancy: number[]; // Array representing which squares are occupied
     piece_map: { color: number }[]; // Array representing the pieces and their colors
-    onMove: (moveIndex: number) => void; // Add this prop
+    possible_moves: any[];
+    chances: any;
   };
+  onMove: (moveIndex: number) => void;
 }
 
 const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
@@ -19,7 +21,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
     if (selectedPiece == null || selectedPiece == undefined) return;
 
     let move = boardState.possible_moves.findIndex(
-      m => m.from_index == selectedPiece && m.to_index == index);
+      (m: any) => m.from_index == selectedPiece && m.to_index == index);
     if (move == -1) return;
 
     setSelectedPiece(null);
@@ -28,7 +30,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
 
   const handleSplit = (split1: number, split2: number) => {
     let move = boardState.possible_moves.findIndex(
-      m => (m.from_index == selectedPiece &&
+      (m: any) => (m.from_index == selectedPiece &&
             (m.to_index1 == split1 || m.to_index1 == split2) &&
             (m.to_index2 == split1 || m.to_index2 == split2)));
     setSelectedPiece(null);
@@ -37,7 +39,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
 
   const handleMerge = (index: number) => {
     let move = boardState.possible_moves.findIndex(
-      m => m.from_index1 && m.from_index2 && m.to_index == index);
+      (m: any) => m.from_index1 && m.from_index2 && m.to_index == index);
     setSelectedPiece(null);
     onMove(move);
   };
@@ -84,7 +86,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
         let chance = boardState.chances[index];
         
         const isMoveable = boardState.possible_moves.some(
-          m => m.from_index == index)
+          (m: any) => m.from_index == index)
 
 
         piece = <div className={`piece ${pieceClass} ` +
@@ -95,8 +97,8 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
       } else if (isBlack && selectedPiece != null) {
         highlightSquare = boardState
           .possible_moves
-          .filter(m => m.from_index == selectedPiece)
-          .some(m => m.to_index == index)
+          .filter((m: any) => m.from_index == selectedPiece)
+          .some((m: any) => m.to_index == index)
       } else if (selectedPiece != null) {
         // Maybe show split?
         if (row > 0 && row < boardSize - 1) {
@@ -105,7 +107,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
           let right = getIndex(row, col + 1);
 
           if (boardState.possible_moves.some(
-            m => (m.from_index == selectedPiece &&
+            (m: any) => (m.from_index == selectedPiece &&
                   (m.to_index1 == left || m.to_index1 == right) &&
                   (m.to_index2 == left || m.to_index2 == right)))) {
             icon = <img src="/split.png"
@@ -120,7 +122,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
           let down = getIndex(row - 1, col);
 
           if (boardState.possible_moves.some(
-            m => (m.from_index == selectedPiece &&
+            (m: any) => (m.from_index == selectedPiece &&
                   (m.to_index1 == up || m.to_index1 == down) &&
                   (m.to_index2 == up || m.to_index2 == down)))) {
             icon = <img src="/split.png"
@@ -131,8 +133,8 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
       } else if (isBlack) {
         // Maybe show merge
         let merge_move = boardState.possible_moves.find(
-          m => (m.from_index1 && m.from_index2 &&
-                m.to_index == index));
+          (m: any) => (m.from_index1 && m.from_index2 &&
+                       m.to_index == index));
         if (merge_move) {
           let f1 = merge_move.from_index1;
           let f2 = merge_move.from_index2;

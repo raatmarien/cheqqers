@@ -11,7 +11,7 @@ export const fetchInitialBoard = async (gameType: number) => {
   }
 };
 
-export const doMove = async (boardState: object, moveIndex: number, againstAi: bool) => {
+export const doMove = async (boardState: object, moveIndex: number, againstAi: boolean) => {
   try {
     const response = await axios.post(
         `${config.backendUrl}/move/${moveIndex}?do_ai_move=${againstAi}`,

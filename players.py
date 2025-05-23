@@ -54,7 +54,7 @@ class MctsPlayer(Player):
         if args is None:
             self.args = {
                 "C": 1.4,  # srqt 2
-                "num_searches": 100,  # Budget per rollout
+                "num_searches": 50,  # Budget per rollout
                 "num_simulations": 1,  # Budget for extra simulations per node
                 "attempt": 0,
             }
