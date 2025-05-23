@@ -35,17 +35,35 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
     onMove(move);
   };
 
+  const handleMerge = (index: number) => {
+    let move = boardState.possible_moves.findIndex(
+      m => m.to_index == index);
+    setSelectedPiece(null);
+    onMove(move);
+  };
+
   const boardSize = 8; // 8x8 checkers board
 
   // Helper function to determine if a square is black
   const isBlackSquare = (row: number, col: number) => {
     return (row + col) % 2 === 0; // Black squares have odd (row + col)
   };
-
-  const getIndex = (row: number, col: number) => {
+ 
+ const getIndex = (row: number, col: number) => {
     return Math.floor((col + (row * 8)) / 2);
   };
 
+  const getRowColFromIndex = (index: number) => {
+    const row = Math.floor(index / 4);
+    const isRowEven = row % 2 === 0;
+    const colInRow = index % 4;
+    const col = isRowEven ? (colInRow * 2 + 1) : (colInRow * 2);
+    return { row, col };
+  };
+
+  const getRow = (index: number) => getRowColFromIndex(index).row;
+  const getCol = (index: number) => getRowColFromIndex(index).col;
+  
   // Generate the board squares
   const squares = [];
 
@@ -106,6 +124,39 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
                         className="split-icon rotate"
                         onClick={() => handleSplit(up, down)} />
           }
+        }
+      } else if (isBlack) {
+        // Maybe show merge
+        let merge_move = boardState.possible_moves.some(
+          m => (m.from_index1 && m.from_index2 &&
+                m.to_index == index));
+        if (merge_move) {
+          let f1 = merge_move.from_index1;
+          let f2 = merge_move.from_index2;
+          let t = merge_move.to_index;
+          let rotation = 0;
+          if (getRow(f1) == getRow(f2)) {
+            // Up/down
+            if (getRow(f1) < getRow(t)) {
+              // Up
+              rotation = 0;
+            } else {
+              // Down
+              rotation = 180;
+            }
+          } else {
+            if (getCol(f1) < getCol(t)) {
+              // Right
+              rotation = 90;
+            } else {
+              // Left
+              rotation = 270;
+            }
+          }
+          icon = <img src="/merge.png"
+                      className="split-icon"
+                      style={{transform: `rotate({rotation}deg)`}}
+                      onClick={() => handleMerge(index)} />
         }
       }
 
