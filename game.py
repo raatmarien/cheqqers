@@ -61,9 +61,14 @@ class Game:
 
         last_row = 0 if self.turn == PieceColor.BLACK else self.board.size - 1
         if not move.is_take_move or\
-           len(self.board.get_take_moves(self.turn, None)) == 0 or\
+           not self._has_another_take_move(self.turn, move) or\
            self.board.index_xy_map[move.to_index][1] == last_row: # Also reset if piece is kinged
             self.turn = self.turn.other()
+
+    def _has_another_take_move(self, turn: PieceColor, move: ClassicalMove):
+        next_moves = self.board.get_take_moves(turn, None)
+        return len([m for m in next_moves
+                    if m.from_index == move.to_index]) > 0
 
     def _find_superposition_on_square(self, square_id):
         for superposition in self.superpositions:
