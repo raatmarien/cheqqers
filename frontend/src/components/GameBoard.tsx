@@ -140,7 +140,6 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
         if (merge_move) {
           let f1 = merge_move.from_index1;
           let f2 = merge_move.from_index2;
-          let t = merge_move.to_index;
           let rotation = 0;
           let flip = false
           let icon_src = "/merge.png";
@@ -155,10 +154,6 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
               rotation = 180;
             }
           } else if (getCol(f1) == getCol(f2)) {
-            console.log(index);
-            console.log(getRowColFromIndex(index));
-            console.log(f1);
-            console.log(getRowColFromIndex(f1));
             if (getCol(f1) < getCol(index)) {
               // Right
               rotation = 90;
