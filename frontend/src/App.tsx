@@ -21,14 +21,14 @@ const App: React.FC = () => {
   });
 
   const onMove = async (moveIndex: number) => {
-    const data = await doMove(boardState, moveIndex, againstAi);
+    const data = await doMove(boardState, moveIndex, againstAi, quantumnessLevel);
     setBoardState(data);
     localStorage.setItem("boardState", JSON.stringify(data)); // Save the updated board state
   };
 
   const startNewGame = async () => {
     try {
-      const data = await fetchInitialBoard();
+      const data = await fetchInitialBoard(quantumnessLevel);
       setBoardState(data);
       setGameStarted(true);
       localStorage.setItem("boardState", JSON.stringify(data));

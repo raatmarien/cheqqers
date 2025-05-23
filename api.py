@@ -20,9 +20,16 @@ app.add_middleware(
 
 
 @app.get("/start")
-def get_start_state():
+def get_start_state(game_type: str):
+    game_type_enum = GameType.INTERFERENCE
+    if game_type == "0":
+        game_type_enum = GameType.CLASSIC
+    if game_type == "1":
+        game_type_enum = GameType.SUPERPOSITION
+    if game_type == "2":
+        game_type_enum = GameType.ENTANGLEMENT
     game = Game(size=8, start_rows=3,
-                game_type=GameType.INTERFERENCE)
+                game_type=game_type_enum)
     return GameStateObject.from_game(game)
 
 
