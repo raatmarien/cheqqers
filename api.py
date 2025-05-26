@@ -43,9 +43,10 @@ def read_item(move_index: int, game_state: GameStateObject,
     game.apply_move(moves[move_index])
 
     if do_ai_move:
-        opponent = MctsPlayer(
-            is_white_player=(game.turn == PieceColor.WHITE))
-        opponent_move = opponent.get_move(game=game)
-        game.apply_move(opponent_move)
+        while game.turn != PieceColor.WHITE:
+            opponent = MctsPlayer(
+                is_white_player=(game.turn == PieceColor.WHITE))
+            opponent_move = opponent.get_move(game=game)
+            game.apply_move(opponent_move)
 
     return GameStateObject.from_game(game)
