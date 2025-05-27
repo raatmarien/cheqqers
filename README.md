@@ -64,3 +64,19 @@ The frontend can be started with:
 ```
 npm run dev
 ```
+
+## License
+
+Cheqqers is free and open source software. You can use it under the
+conditions of the GNU Affero General Public License version 3, or (at
+your option) any later version. A copy of the license is included in
+the `COPYING` file.
+
+The icons used for the frontend in `frontend/src/public` are available
+under the <a
+href="https://creativecommons.org/publicdomain/zero/1.0/">CC0
+1.0</a><img
+src="https://mirrors.creativecommons.org/presskit/icons/cc.svg"
+style="max-width: 1em;max-height:1em;margin-left: .2em;"><img
+src="https://mirrors.creativecommons.org/presskit/icons/zero.svg"
+style="max-width: 1em;max-height:1em;margin-left: .2em;"> license.
