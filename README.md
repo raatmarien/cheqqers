@@ -9,7 +9,33 @@ There are three versions of Quantumness that can be used:
 - INTERFERENCE: Checkers with entanglement, superpositions and interference. This means that if a piece tries to capture a piece in superposition, they become entangled.
 
 
-## Installing
+## Docker
+This project lets you play Cheqqers in a Docker container — no need to install Python or dependencies locally.
+
+### Prerequisites
+
+- Install [Docker](https://www.docker.com/products/docker-desktop/) on your computer.
+- Clone this repository:
+
+### Building the docker image
+Navigate to the root directory of this repository and run the following command to build the docker image.
+```
+docker build -t cheqqers .
+```
+- `-t cheqqers` tags the image with the name cheqqers for easy reference.
+- `.` tells Docker to use the current directory where the Dockerfile lives.
+
+### Run the game interactively
+Start the game container and interact with it in your terminal:
+```
+docker run -it --rm cheqqers
+```
+- `-it` connects your terminal input/output to the container so you can play.
+- `--rm` removes the container once you exit to keep things clean.
+- `cheqqers` is the image name from the build step.
+
+
+## Installing without docker
 
 You'll need Python 3. Check that you have at least version 3.12 with
 
@@ -80,3 +106,5 @@ src="https://mirrors.creativecommons.org/presskit/icons/cc.svg"
 style="max-width: 1em;max-height:1em;margin-left: .2em;"><img
 src="https://mirrors.creativecommons.org/presskit/icons/zero.svg"
 style="max-width: 1em;max-height:1em;margin-left: .2em;"> license.
+
+
