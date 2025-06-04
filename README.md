@@ -10,6 +10,7 @@ There are three versions of Quantumness that can be used:
 
 
 ## Docker
+
 This project lets you play Cheqqers in a Docker container — no need to install Python or dependencies locally.
 
 ### Prerequisites
@@ -17,22 +18,49 @@ This project lets you play Cheqqers in a Docker container — no need to install
 - Install [Docker](https://www.docker.com/products/docker-desktop/) on your computer.
 - Clone this repository:
 
-### Building the docker image
+### Playing in the terminal
+
 Navigate to the root directory of this repository and run the following command to build the docker image.
+
 ```
 docker build -t cheqqers .
 ```
+
 - `-t cheqqers` tags the image with the name cheqqers for easy reference.
 - `.` tells Docker to use the current directory where the Dockerfile lives.
 
-### Run the game interactively
-Start the game container and interact with it in your terminal:
+You can now start the game container and interact with it in your terminal:
+
 ```
 docker run -it --rm cheqqers
 ```
+
 - `-it` connects your terminal input/output to the container so you can play.
 - `--rm` removes the container once you exit to keep things clean.
 - `cheqqers` is the image name from the build step.
+
+### Playing in the browser
+
+To play in the browser, the frontend and the backend have to be
+running. This can be done by using the web Dockerfile. Build it using
+the following command:
+
+```
+docker build -f Dockerfile.web -t cheqqers-web .
+```
+
+- `-f Dockerfile.web` selects the specific web docker file.
+
+Afterwards, you can run the frontend and backend with the following command:
+
+```
+docker run --rm -p 8000:8000 -p 5173:5173 cheqqers-web
+```
+
+- `-p 8000:8000` connects the api port to your local machine
+- `-p 5173:5173` connects the frontend port to your local machine
+
+You should now be able to play Cheqqers in your browser at [http://localhost:5173](http://localhost:5173).
 
 
 ## Installing without docker
