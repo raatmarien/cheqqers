@@ -29,7 +29,7 @@ interface GameBoardProps {
   onMove: (moveIndex: number) => void;
 }
 
-const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
+const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove, embedded }) => {
   const [selectedPiece, setSelectedPiece] = React.useState<number | null>(null);
   const handlePieceClick = (index: number) => {
     setSelectedPiece(prev => (prev === index ? null : index));
@@ -205,6 +205,12 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
         </div>
       );
     }
+  }
+
+  if (embedded) {
+    return (<div className="board" style={{maxWidth: "100%", width: "100vw" }}>
+      {squares}
+    </div>);
   }
 
   return <div className="board">{squares}</div>;

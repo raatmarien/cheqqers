@@ -20,8 +20,15 @@ import React, { useState } from "react";
 import GameBoard from "./components/GameBoard";
 import { fetchInitialBoard, doMove } from "./services/api";
 
+
 const App: React.FC = () => {
+  let query = new URLSearchParams(window.location.search);
+  let embedded = query.get('embed') === 'true';
+
   const [boardState, setBoardState] = useState(() => {
+    if (embedded) {
+      return null;
+    }
     const savedState = localStorage.getItem("boardState");
     return savedState ? JSON.parse(savedState) : null;
   });
@@ -31,10 +38,16 @@ const App: React.FC = () => {
   });
 
   const [quantumnessLevel, setQuantumnessLevel] = useState(() => {
+    if (embedded) {
+      return query.get('level') || "0";
+    }
     return localStorage.getItem("quantumnessLevel") || "3";
   });
 
   const [againstAi, setAgainstAi] = useState(() => {
+    if (embedded) {
+      return (query.get('ai') || "false") == "true";
+    }
     return (localStorage.getItem("againstAi") || "false") == "true";
   });
 
@@ -126,30 +139,48 @@ const App: React.FC = () => {
     </div>) : (<div></div>)
     );
 
-    return (
-      <div className="app-container">
-        <header className="app-header">
-          <h1 className="app-title">Cheqqers</h1>
-          {gameStarted && (
-            <button onClick={handleExitToMainMenu} className="exit-button">
-              Exit to Main Menu
-            </button>
-          )}
-        </header>
-        {gameStarted ? (
-          boardState ? (
-            <div>
-              <GameBoard boardState={boardState} onMove={onMove} />
-              {endGameScreen}
-            </div>
-          ) : (
-            <p>Loading board...</p>
-          )
-        ) : (
-          startMenu
-        )}
+  if (embedded) {
+    if (!boardState) {
+      startNewGame();
+    }
+    /* todo level */
+    return (<div>
+      {boardState ? (
+      <div>
+        <GameBoard boardState={boardState} onMove={onMove} embedded={true} />
+        {endGameScreen}
       </div>
-    );
+      ) : (
+      <p>Loading board...</p>
+      )}
+    </div>);
+  }
+
+  return (
+    <div className="app-container">
+      <header className="app-header">
+        <h1 className="app-title">Cheqqers</h1>
+        {gameStarted && (
+          <button onClick={handleExitToMainMenu} className="exit-button">
+            Exit to Main Menu
+          </button>
+        )}
+      </header>
+      {gameStarted ? (
+        boardState ? (
+          <div>
+            <GameBoard boardState={boardState} onMove={onMove}
+            embedded={false} />
+            {endGameScreen}
+          </div>
+        ) : (
+          <p>Loading board...</p>
+        )
+      ) : (
+        startMenu
+      )}
+    </div>
+  );
 };
 
 export default App;
