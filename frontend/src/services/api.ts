@@ -40,3 +40,15 @@ export const doMove = async (boardState: object, moveIndex: number, againstAi: b
     throw error;
   }
 };
+
+export const doAiMove = async (boardState: object) => {
+  try {
+    const response = await axios.post(
+        `${config.backendUrl}/ai-move`,
+      boardState);
+    return response.data;
+  } catch (error) {
+    console.error("Error processing the move:", error);
+    throw error;
+  }
+};

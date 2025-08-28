@@ -18,7 +18,7 @@
  *  */
 import React, { useState } from "react";
 import GameBoard from "./components/GameBoard";
-import { fetchInitialBoard, doMove } from "./services/api";
+import { fetchInitialBoard, doMove, doAiMove } from "./services/api";
 
 const App: React.FC = () => {
   const [boardState, setBoardState] = useState(() => {
@@ -38,10 +38,19 @@ const App: React.FC = () => {
     return (localStorage.getItem("againstAi") || "false") == "true";
   });
 
+  const [thinking, setThinking] = useState();
+
   const onMove = async (moveIndex: number) => {
-    const data = await doMove(boardState, moveIndex, againstAi);
+    const data = await doMove(boardState, moveIndex, false);
     setBoardState(data);
     localStorage.setItem("boardState", JSON.stringify(data)); // Save the updated board state
+    if (againstAi) {
+      setThinking(true);
+      const dataNext = await doAiMove(data);
+      setBoardState(dataNext);
+      localStorage.setItem("boardState", JSON.stringify(dataNext)); // Save the updated board state
+      setThinking(false);
+    }
   };
 
   // TODO: Display king
@@ -138,7 +147,7 @@ const App: React.FC = () => {
         </header>
         {gameStarted ? (
           boardState ? (
-            <div>
+            <div style={thinking ? {"pointer-events": "none"} : {}}>
               <GameBoard boardState={boardState} onMove={onMove} />
               {endGameScreen}
             </div>
