@@ -38,7 +38,7 @@ const App: React.FC = () => {
     return (localStorage.getItem("againstAi") || "false") == "true";
   });
 
-  const [thinking, setThinking] = useState();
+  const [thinking, setThinking] = useState(false);
 
   const onMove = async (moveIndex: number) => {
     const data = await doMove(boardState, moveIndex, false);
@@ -147,7 +147,7 @@ const App: React.FC = () => {
         </header>
         {gameStarted ? (
           boardState ? (
-            <div style={thinking ? {"pointer-events": "none"} : {}}>
+            <div style={thinking ? {pointerEvents: "none"} : {}}>
               <GameBoard boardState={boardState} onMove={onMove} />
               {endGameScreen}
             </div>
