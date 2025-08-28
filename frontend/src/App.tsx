@@ -147,9 +147,12 @@ const App: React.FC = () => {
         </header>
         {gameStarted ? (
           boardState ? (
+            <div>
             <div style={thinking ? {pointerEvents: "none"} : {}}>
               <GameBoard boardState={boardState} onMove={onMove} />
               {endGameScreen}
+            </div>
+            <div>{thinking ? (<p>AI is thinking...</p>) : (<div></div>)}</div>
             </div>
           ) : (
             <p>Loading board...</p>
