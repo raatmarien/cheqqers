@@ -204,3 +204,28 @@ button:focus-visible {
 .restart-button:hover {
   background-color: #0056b3;
 }
+
+/* Menu buttons container */
+.menu-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  margin-top: 10px;
+}
+
+/* Tutorial button on menu */
+.tutorial-menu-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #6c5ce7;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.tutorial-menu-button:hover {
+  background-color: #5b4cdb;
+}
