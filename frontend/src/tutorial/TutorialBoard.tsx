@@ -206,20 +206,25 @@ const TutorialBoard: React.FC<TutorialBoardProps> = ({ scenario, onMoveComplete,
       delete newPieces[move.from_index2];
       newPieces[move.to_index] = { ...piece };
       
-      // Keep some residue on source squares for realistic quantum behavior
-      // In real quantum mechanics, merge doesn't always fully transfer probability
+      // Keep some residue on source squares for realistic quantum behavior.
+      // In real quantum mechanics, the merge move (inverse of split) doesn't always
+      // fully transfer probability due to phase interference. The actual distribution
+      // depends on accumulated phases, but we use simplified approximations here:
+      // - ~75% of total probability goes to target (constructive interference)
+      // - ~12.5% of each source's probability stays (destructive interference residue)
       const chance1 = superpositions[move.from_index1] || 0.5;
       const chance2 = superpositions[move.from_index2] || 0.5;
+      const targetProbability = (chance1 + chance2) * 0.75;
+      const residueFraction = 0.125; // Fraction that stays on source squares
+      
       newPieces[move.from_index1] = { ...piece };
       newPieces[move.from_index2] = { ...piece };
       setPieces(newPieces);
 
-      // Merge superposition with residue (simplified quantum behavior)
       const newSuperpositions = { ...superpositions };
-      // Due to interference, some probability may remain on source squares
-      newSuperpositions[move.to_index] = (chance1 + chance2) * 0.75; // ~75% goes to target
-      newSuperpositions[move.from_index1] = chance1 * 0.125; // ~12.5% stays
-      newSuperpositions[move.from_index2] = chance2 * 0.125; // ~12.5% stays
+      newSuperpositions[move.to_index] = targetProbability;
+      newSuperpositions[move.from_index1] = chance1 * residueFraction;
+      newSuperpositions[move.from_index2] = chance2 * residueFraction;
       setSuperpositions(newSuperpositions);
 
       setSelectedPiece(null);
