@@ -17,7 +17,7 @@
  * <https://www.gnu.org/licenses/>.
  */
 import React, { useState, useEffect } from "react";
-import { tutorialSections, getStepByIndex, getTotalSteps } from "./tutorialData";
+import { tutorialSections, getStepByIndex, getTotalSteps, getSectionBoundaries } from "./tutorialData";
 import TutorialBoard from "./TutorialBoard";
 import "./Tutorial.css";
 
@@ -29,16 +29,19 @@ interface TutorialProps {
 const Tutorial: React.FC<TutorialProps> = ({ isOpen, onClose }) => {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [moveCompleted, setMoveCompleted] = useState(false);
+  const [wrongMove, setWrongMove] = useState(false);
   const [boardKey, setBoardKey] = useState(0); // Used to force re-render of board
 
   const totalSteps = getTotalSteps();
   const stepData = getStepByIndex(currentStepIndex);
+  const sectionBoundaries = getSectionBoundaries();
 
   // Reset tutorial when it opens
   useEffect(() => {
     if (isOpen) {
       setCurrentStepIndex(0);
       setMoveCompleted(false);
+      setWrongMove(false);
       setBoardKey(prev => prev + 1);
     }
   }, [isOpen]);
@@ -46,6 +49,7 @@ const Tutorial: React.FC<TutorialProps> = ({ isOpen, onClose }) => {
   useEffect(() => {
     // Reset move state when step changes
     setMoveCompleted(false);
+    setWrongMove(false);
     setBoardKey(prev => prev + 1);
   }, [currentStepIndex]);
 
@@ -72,6 +76,17 @@ const Tutorial: React.FC<TutorialProps> = ({ isOpen, onClose }) => {
 
   const handleMoveComplete = () => {
     setMoveCompleted(true);
+    setWrongMove(false);
+  };
+
+  const handleWrongMove = () => {
+    setWrongMove(true);
+  };
+
+  const handleReset = () => {
+    setWrongMove(false);
+    setMoveCompleted(false);
+    setBoardKey(prev => prev + 1);
   };
 
   const handleSkipSection = () => {
@@ -95,16 +110,48 @@ const Tutorial: React.FC<TutorialProps> = ({ isOpen, onClose }) => {
   const canProceed = step.isInformational || moveCompleted;
   const isLastStep = currentStepIndex === totalSteps - 1;
 
-  // Calculate progress
-  const progressPercent = ((currentStepIndex + 1) / totalSteps) * 100;
+  // Calculate progress percentage for each section
+  const renderProgressBar = () => {
+    return (
+      <div className="tutorial-progress-container">
+        {sectionBoundaries.map((boundary, index) => {
+          const sectionWidth = ((boundary.end - boundary.start + 1) / totalSteps) * 100;
+          const isCurrentSection = currentStepIndex >= boundary.start && currentStepIndex <= boundary.end;
+          const isCompletedSection = currentStepIndex > boundary.end;
+          
+          // Calculate progress within the current section
+          let fillPercent = 0;
+          if (isCompletedSection) {
+            fillPercent = 100;
+          } else if (isCurrentSection) {
+            const stepsInSection = boundary.end - boundary.start + 1;
+            const stepsCompleted = currentStepIndex - boundary.start + 1;
+            fillPercent = (stepsCompleted / stepsInSection) * 100;
+          }
+          
+          return (
+            <div 
+              key={index}
+              className="tutorial-progress-section"
+              style={{ width: `${sectionWidth}%` }}
+              title={boundary.title}
+            >
+              <div 
+                className="tutorial-progress-bar" 
+                style={{ width: `${fillPercent}%` }} 
+              />
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
 
   return (
     <div className="tutorial-overlay">
       <div className="tutorial-modal">
         <div className="tutorial-header">
-          <div className="tutorial-progress-container">
-            <div className="tutorial-progress-bar" style={{ width: `${progressPercent}%` }} />
-          </div>
+          {renderProgressBar()}
           <div className="tutorial-section-title">{section.title}</div>
           <button className="tutorial-close-button" onClick={onClose} aria-label="Close tutorial">
             ×
@@ -121,12 +168,18 @@ const Tutorial: React.FC<TutorialProps> = ({ isOpen, onClose }) => {
                 key={boardKey}
                 scenario={step.scenario}
                 onMoveComplete={handleMoveComplete}
+                onWrongMove={handleWrongMove}
               />
               {step.instructions && (
-                <div className={`tutorial-instructions ${moveCompleted ? 'completed' : ''}`}>
+                <div className={`tutorial-instructions ${moveCompleted ? 'completed' : ''} ${wrongMove ? 'error' : ''}`}>
                   {moveCompleted ? (
                     <>
-                      <span className="checkmark">✓</span> Great job! Click "Next" to continue.
+                      <span className="checkmark">✓</span> Well done! Click "Next" to continue.
+                    </>
+                  ) : wrongMove ? (
+                    <>
+                      <span className="error-icon">✗</span> That's not the right move. 
+                      <button className="tutorial-reset-button" onClick={handleReset}>Try Again</button>
                     </>
                   ) : (
                     <>

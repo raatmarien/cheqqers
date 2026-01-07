@@ -38,6 +38,16 @@
   border-radius: 2px;
   overflow: hidden;
   margin-bottom: 10px;
+  display: flex;
+  gap: 3px;
+}
+
+.tutorial-progress-section {
+  height: 100%;
+  background-color: #444;
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
 }
 
 .tutorial-progress-bar {
@@ -117,6 +127,12 @@
   background-color: rgba(76, 175, 80, 0.15);
 }
 
+.tutorial-instructions.error {
+  color: #f44336;
+  background-color: rgba(244, 67, 54, 0.15);
+  flex-wrap: wrap;
+}
+
 .tutorial-instructions .arrow {
   font-size: 1.2em;
 }
@@ -124,6 +140,27 @@
 .tutorial-instructions .checkmark {
   font-size: 1.2em;
   color: #4CAF50;
+}
+
+.tutorial-instructions .error-icon {
+  font-size: 1.2em;
+  color: #f44336;
+}
+
+.tutorial-reset-button {
+  margin-left: auto;
+  padding: 6px 12px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: background-color 0.2s;
+}
+
+.tutorial-reset-button:hover {
+  background-color: #d32f2f;
 }
 
 .tutorial-footer {

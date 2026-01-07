@@ -23,9 +23,10 @@ import "./TutorialBoard.css";
 interface TutorialBoardProps {
   scenario: TutorialScenario;
   onMoveComplete: () => void;
+  onWrongMove: () => void;
 }
 
-const TutorialBoard: React.FC<TutorialBoardProps> = ({ scenario, onMoveComplete }) => {
+const TutorialBoard: React.FC<TutorialBoardProps> = ({ scenario, onMoveComplete, onWrongMove }) => {
   const [selectedPiece, setSelectedPiece] = useState<number | null>(null);
   const [pieces, setPieces] = useState<{ [index: number]: TutorialPiece }>({ ...scenario.pieces });
   const [superpositions, setSuperpositions] = useState<{ [index: number]: number }>(
@@ -54,6 +55,16 @@ const TutorialBoard: React.FC<TutorialBoardProps> = ({ scenario, onMoveComplete 
   const getRow = (index: number) => getRowColFromIndex(index).row;
   const getCol = (index: number) => getRowColFromIndex(index).col;
 
+  // Helper to check if a move type matches the required type
+  const isMoveTypeAllowed = (moveType: 'classical' | 'split' | 'merge', isCapture: boolean): boolean => {
+    if (!scenario.requiredMoveType) return true; // No restriction
+    
+    if (scenario.requiredMoveType === 'capture') {
+      return moveType === 'classical' && isCapture;
+    }
+    return moveType === scenario.requiredMoveType;
+  };
+
   const handlePieceClick = (index: number) => {
     if (moveCompleted) return;
     
@@ -77,6 +88,18 @@ const TutorialBoard: React.FC<TutorialBoardProps> = ({ scenario, onMoveComplete 
     );
 
     if (move && move.from_index !== undefined && move.to_index !== undefined) {
+      // Check if this is a capture move
+      const fromRow = getRow(move.from_index);
+      const toRow = getRow(move.to_index);
+      const isCapture = Math.abs(toRow - fromRow) === 2;
+      
+      // Check if move type is allowed
+      if (!isMoveTypeAllowed('classical', isCapture)) {
+        setSelectedPiece(null);
+        onWrongMove();
+        return;
+      }
+
       // Execute the classical move
       const piece = pieces[move.from_index];
       if (!piece) return;
@@ -86,7 +109,6 @@ const TutorialBoard: React.FC<TutorialBoardProps> = ({ scenario, onMoveComplete 
       
       // Check for crowning
       const newPiece = { ...piece };
-      const toRow = getRow(move.to_index);
       if (piece.color === 0 && toRow === 7) {
         newPiece.crowned = true;
       } else if (piece.color === 1 && toRow === 0) {
@@ -94,10 +116,9 @@ const TutorialBoard: React.FC<TutorialBoardProps> = ({ scenario, onMoveComplete 
       }
 
       // Check for capture (if the move jumps over a square)
-      const fromRow = getRow(move.from_index);
       const fromCol = getCol(move.from_index);
       const toCol = getCol(move.to_index);
-      if (Math.abs(toRow - fromRow) === 2) {
+      if (isCapture) {
         const capturedRow = (fromRow + toRow) / 2;
         const capturedCol = (fromCol + toCol) / 2;
         const capturedIndex = getIndex(capturedRow, capturedCol);
@@ -123,6 +144,13 @@ const TutorialBoard: React.FC<TutorialBoardProps> = ({ scenario, onMoveComplete 
 
   const handleSplit = (split1: number, split2: number) => {
     if (moveCompleted || selectedPiece === null) return;
+
+    // Check if split move is allowed
+    if (!isMoveTypeAllowed('split', false)) {
+      setSelectedPiece(null);
+      onWrongMove();
+      return;
+    }
 
     const move = scenario.validMoves.find(
       (m: TutorialMove) => 
@@ -159,6 +187,12 @@ const TutorialBoard: React.FC<TutorialBoardProps> = ({ scenario, onMoveComplete 
   const handleMerge = (toIndex: number) => {
     if (moveCompleted) return;
 
+    // Check if merge move is allowed
+    if (!isMoveTypeAllowed('merge', false)) {
+      onWrongMove();
+      return;
+    }
+
     const move = scenario.validMoves.find(
       (m: TutorialMove) => m.type === 'merge' && m.to_index === toIndex
     );
@@ -171,13 +205,21 @@ const TutorialBoard: React.FC<TutorialBoardProps> = ({ scenario, onMoveComplete 
       delete newPieces[move.from_index1];
       delete newPieces[move.from_index2];
       newPieces[move.to_index] = { ...piece };
+      
+      // Keep some residue on source squares for realistic quantum behavior
+      // In real quantum mechanics, merge doesn't always fully transfer probability
+      const chance1 = superpositions[move.from_index1] || 0.5;
+      const chance2 = superpositions[move.from_index2] || 0.5;
+      newPieces[move.from_index1] = { ...piece };
+      newPieces[move.from_index2] = { ...piece };
       setPieces(newPieces);
 
-      // Merge superposition (simplified - actual quantum behavior is more complex)
+      // Merge superposition with residue (simplified quantum behavior)
       const newSuperpositions = { ...superpositions };
-      delete newSuperpositions[move.from_index1];
-      delete newSuperpositions[move.from_index2];
-      newSuperpositions[move.to_index] = 1.0; // Simplified for tutorial
+      // Due to interference, some probability may remain on source squares
+      newSuperpositions[move.to_index] = (chance1 + chance2) * 0.75; // ~75% goes to target
+      newSuperpositions[move.from_index1] = chance1 * 0.125; // ~12.5% stays
+      newSuperpositions[move.from_index2] = chance2 * 0.125; // ~12.5% stays
       setSuperpositions(newSuperpositions);
 
       setSelectedPiece(null);

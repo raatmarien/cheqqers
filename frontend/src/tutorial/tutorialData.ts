@@ -43,6 +43,8 @@ export interface TutorialScenario {
   validMoves: TutorialMove[];
   // Optional: which pieces can be selected
   selectablePieces?: number[];
+  // Required move type for this step (if specified, only this type completes the step)
+  requiredMoveType?: 'classical' | 'split' | 'merge' | 'capture';
 }
 
 // A single tutorial step
@@ -99,6 +101,7 @@ export const tutorialSections: TutorialSection[] = [
             { type: 'classical', from_index: getIndex(2, 2), to_index: getIndex(3, 3) },
           ],
           selectablePieces: [getIndex(2, 2)],
+          requiredMoveType: 'classical',
         },
         instructions: "Click on the white piece, then click on one of the highlighted squares to move it forward diagonally.",
       },
@@ -114,6 +117,7 @@ export const tutorialSections: TutorialSection[] = [
             { type: 'classical', from_index: getIndex(2, 2), to_index: getIndex(4, 4) },
           ],
           selectablePieces: [getIndex(2, 2)],
+          requiredMoveType: 'capture',
         },
         instructions: "Click on the white piece, then click on the square behind the black piece to capture it.",
       },
@@ -129,6 +133,7 @@ export const tutorialSections: TutorialSection[] = [
             { type: 'classical', from_index: getIndex(6, 4), to_index: getIndex(7, 5) },
           ],
           selectablePieces: [getIndex(6, 4)],
+          requiredMoveType: 'classical',
         },
         instructions: "Move the white piece to the top row to crown it. Click the piece, then click on a highlighted square.",
       },
@@ -146,6 +151,7 @@ export const tutorialSections: TutorialSection[] = [
             { type: 'classical', from_index: getIndex(4, 4), to_index: getIndex(3, 5) },
           ],
           selectablePieces: [getIndex(4, 4)],
+          requiredMoveType: 'classical',
         },
         instructions: "Notice the crowned piece can move in any diagonal direction. Click it and move it to any highlighted square.",
       },
@@ -169,7 +175,7 @@ export const tutorialSections: TutorialSection[] = [
       },
       {
         title: "The Split Move",
-        description: "Instead of moving to one square, you can 'split' a piece to move to TWO squares simultaneously! The piece exists in both locations at once (in superposition). Look for the split icon (↗↘) between two possible destination squares.",
+        description: "Instead of moving to one square, you can 'split' a piece to move to TWO squares simultaneously! The piece exists in both locations at once (in superposition). Look for the split icon (← →) between two possible destination squares.",
         scenario: {
           pieces: {
             [getIndex(2, 2)]: { color: 0, crowned: false }, // White piece
@@ -180,8 +186,9 @@ export const tutorialSections: TutorialSection[] = [
             { type: 'split', from_index: getIndex(2, 2), to_index1: getIndex(3, 1), to_index2: getIndex(3, 3) },
           ],
           selectablePieces: [getIndex(2, 2)],
+          requiredMoveType: 'split',
         },
-        instructions: "Click on the white piece, then click the split icon (↗↘) that appears between the two possible squares to split the piece into superposition.",
+        instructions: "Click on the white piece, then click the split icon (← →) that appears between the two possible squares to split the piece into superposition.",
       },
       {
         title: "Probability Display",
@@ -200,10 +207,13 @@ export const tutorialSections: TutorialSection[] = [
             { type: 'classical', from_index: getIndex(3, 1), to_index: getIndex(4, 2) },
             { type: 'classical', from_index: getIndex(3, 3), to_index: getIndex(4, 2) },
             { type: 'classical', from_index: getIndex(3, 3), to_index: getIndex(4, 4) },
+            { type: 'split', from_index: getIndex(3, 1), to_index1: getIndex(4, 0), to_index2: getIndex(4, 2) },
+            { type: 'split', from_index: getIndex(3, 3), to_index1: getIndex(4, 2), to_index2: getIndex(4, 4) },
           ],
           selectablePieces: [getIndex(3, 1), getIndex(3, 3)],
+          requiredMoveType: 'classical',
         },
-        instructions: "See the 50% on each piece? They're in superposition! You can move either part like a normal piece. Try moving one of them.",
+        instructions: "See the 50% on each piece? They're in superposition! Move one of them like a normal piece by clicking it and selecting a destination.",
       },
       {
         title: "Splitting Again",
@@ -218,22 +228,59 @@ export const tutorialSections: TutorialSection[] = [
             [getIndex(3, 3)]: 0.5,
           },
           validMoves: [
+            { type: 'classical', from_index: getIndex(3, 1), to_index: getIndex(4, 0) },
+            { type: 'classical', from_index: getIndex(3, 1), to_index: getIndex(4, 2) },
+            { type: 'classical', from_index: getIndex(3, 3), to_index: getIndex(4, 2) },
+            { type: 'classical', from_index: getIndex(3, 3), to_index: getIndex(4, 4) },
             { type: 'split', from_index: getIndex(3, 1), to_index1: getIndex(4, 0), to_index2: getIndex(4, 2) },
             { type: 'split', from_index: getIndex(3, 3), to_index1: getIndex(4, 2), to_index2: getIndex(4, 4) },
           ],
           selectablePieces: [getIndex(3, 1), getIndex(3, 3)],
+          requiredMoveType: 'split',
         },
-        instructions: "Click on one of the pieces in superposition and use the split move to divide it further.",
+        instructions: "Click on one of the 50% pieces and use the split move (← →) to divide it further into two 25% pieces.",
       },
       {
         title: "Measurement: Capturing Superpositions",
-        description: "When you try to capture a piece in superposition, a 'measurement' occurs. The piece randomly 'collapses' to one location based on probabilities. If it's where you're capturing, success! If not, the piece appears elsewhere and your turn is wasted (counts as a pass).",
-        isInformational: true,
+        description: "When you try to capture a piece in superposition, a 'measurement' occurs. The piece randomly 'collapses' to one location based on probabilities. If it's where you're capturing, success! If not, the piece appears elsewhere and your turn is wasted.",
+        scenario: {
+          pieces: {
+            [getIndex(2, 2)]: { color: 0, crowned: false }, // White piece
+            [getIndex(3, 3)]: { color: 1, crowned: false }, // Black piece in superposition
+            [getIndex(3, 5)]: { color: 1, crowned: false }, // Black piece in superposition (other location)
+          },
+          superpositions: {
+            [getIndex(3, 3)]: 0.5,
+            [getIndex(3, 5)]: 0.5,
+          },
+          validMoves: [
+            { type: 'classical', from_index: getIndex(2, 2), to_index: getIndex(4, 4) },
+          ],
+          selectablePieces: [getIndex(2, 2)],
+          requiredMoveType: 'capture',
+        },
+        instructions: "Try to capture the black piece in superposition (50%). Click the white piece, then click the square behind the black piece to attempt the capture.",
       },
       {
         title: "Measurement: Being Captured",
         description: "If YOUR piece is in superposition and tries to capture, it's also measured first. The piece must actually be at the position you're attacking from, or the capture fails.",
-        isInformational: true,
+        scenario: {
+          pieces: {
+            [getIndex(2, 0)]: { color: 0, crowned: false }, // White piece in superposition
+            [getIndex(2, 4)]: { color: 0, crowned: false }, // White piece in superposition (other location)
+            [getIndex(3, 1)]: { color: 1, crowned: false }, // Black piece to capture
+          },
+          superpositions: {
+            [getIndex(2, 0)]: 0.5,
+            [getIndex(2, 4)]: 0.5,
+          },
+          validMoves: [
+            { type: 'classical', from_index: getIndex(2, 0), to_index: getIndex(4, 2) },
+          ],
+          selectablePieces: [getIndex(2, 0)],
+          requiredMoveType: 'capture',
+        },
+        instructions: "Your white piece is in superposition (50%). Try to capture the black piece - your piece will be measured first!",
       },
     ],
   },
@@ -250,13 +297,48 @@ export const tutorialSections: TutorialSection[] = [
       },
       {
         title: "Creating Entanglement",
-        description: "When your solid piece attempts to capture an opponent's piece in superposition, both pieces become entangled. The capturing piece enters superposition too - in one state it captured, in another it stayed still. The pieces' fates are now linked!",
-        isInformational: true,
+        description: "When your solid piece attempts to capture an opponent's piece in superposition, both pieces become entangled. The capturing piece enters superposition too - in one state it captured, in another it stayed still.",
+        scenario: {
+          pieces: {
+            [getIndex(2, 2)]: { color: 0, crowned: false }, // White piece (solid)
+            [getIndex(3, 3)]: { color: 1, crowned: false }, // Black piece in superposition
+            [getIndex(3, 5)]: { color: 1, crowned: false }, // Black piece in superposition (other location)
+          },
+          superpositions: {
+            [getIndex(3, 3)]: 0.5,
+            [getIndex(3, 5)]: 0.5,
+          },
+          validMoves: [
+            { type: 'classical', from_index: getIndex(2, 2), to_index: getIndex(4, 4) },
+          ],
+          selectablePieces: [getIndex(2, 2)],
+          requiredMoveType: 'capture',
+        },
+        instructions: "Capture the black piece in superposition with your solid white piece. In Level 2, this creates entanglement instead of measurement!",
       },
       {
         title: "Entangled States",
         description: "Entangled pieces are shown connected by a line. When either entangled piece is measured, both collapse together! Their outcomes are correlated - if the capture happened in one reality, both pieces reflect that.",
-        isInformational: true,
+        scenario: {
+          pieces: {
+            [getIndex(4, 4)]: { color: 0, crowned: false }, // White piece (entangled, captured state)
+            [getIndex(2, 2)]: { color: 0, crowned: false }, // White piece (entangled, original state)
+            [getIndex(3, 5)]: { color: 1, crowned: false }, // Black piece (remaining superposition)
+          },
+          superpositions: {
+            [getIndex(4, 4)]: 0.5,
+            [getIndex(2, 2)]: 0.5,
+            [getIndex(3, 5)]: 0.5,
+          },
+          validMoves: [
+            { type: 'classical', from_index: getIndex(4, 4), to_index: getIndex(5, 3) },
+            { type: 'classical', from_index: getIndex(4, 4), to_index: getIndex(5, 5) },
+            { type: 'classical', from_index: getIndex(2, 2), to_index: getIndex(3, 1) },
+          ],
+          selectablePieces: [getIndex(4, 4), getIndex(2, 2)],
+          requiredMoveType: 'classical',
+        },
+        instructions: "The white pieces are now entangled. Move one of them to see how the board state changes.",
       },
       {
         title: "Strategic Implications",
@@ -281,24 +363,44 @@ export const tutorialSections: TutorialSection[] = [
         description: "If two parts of the same superposition can both move to the same square, you can perform a 'merge' move. Due to quantum phases, the probabilities redistribute - they don't simply add up! Look for the merge icon (arrows pointing inward).",
         scenario: {
           pieces: {
-            [getIndex(4, 0)]: { color: 0, crowned: false },
+            [getIndex(4, 2)]: { color: 0, crowned: false },
             [getIndex(4, 4)]: { color: 0, crowned: false },
           },
           superpositions: {
-            [getIndex(4, 0)]: 0.5,
+            [getIndex(4, 2)]: 0.5,
             [getIndex(4, 4)]: 0.5,
           },
           validMoves: [
-            { type: 'merge', from_index1: getIndex(4, 0), from_index2: getIndex(4, 4), to_index: getIndex(5, 2) },
+            { type: 'merge', from_index1: getIndex(4, 2), from_index2: getIndex(4, 4), to_index: getIndex(5, 3) },
           ],
           selectablePieces: [],
+          requiredMoveType: 'merge',
         },
-        instructions: "See the merge icon on the square between the two pieces? Click it to perform a merge move.",
+        instructions: "See the merge icon on the square between the two pieces? Click it to perform a merge move and combine the superposition.",
       },
       {
         title: "Interference Effects",
-        description: "When pieces merge, quantum interference affects the result. Depending on the phases (which accumulate with each move), the merge might: concentrate probability on the target square, leave some probability on source squares, or create complex probability distributions.",
-        isInformational: true,
+        description: "When pieces merge, quantum interference affects the result. Depending on the phases (which accumulate with each move), the merge might concentrate probability or redistribute it in unexpected ways.",
+        scenario: {
+          pieces: {
+            [getIndex(3, 1)]: { color: 0, crowned: false },
+            [getIndex(3, 5)]: { color: 0, crowned: false },
+          },
+          superpositions: {
+            [getIndex(3, 1)]: 0.5,
+            [getIndex(3, 5)]: 0.5,
+          },
+          validMoves: [
+            { type: 'classical', from_index: getIndex(3, 1), to_index: getIndex(4, 0) },
+            { type: 'classical', from_index: getIndex(3, 1), to_index: getIndex(4, 2) },
+            { type: 'classical', from_index: getIndex(3, 5), to_index: getIndex(4, 4) },
+            { type: 'classical', from_index: getIndex(3, 5), to_index: getIndex(4, 6) },
+            { type: 'split', from_index: getIndex(3, 1), to_index1: getIndex(4, 0), to_index2: getIndex(4, 2) },
+            { type: 'split', from_index: getIndex(3, 5), to_index1: getIndex(4, 4), to_index2: getIndex(4, 6) },
+          ],
+          selectablePieces: [getIndex(3, 1), getIndex(3, 5)],
+        },
+        instructions: "Move or split one of the pieces to see how superposition works. In the actual game, phases accumulate and affect merge outcomes!",
       },
       {
         title: "True Quantum Behavior",
@@ -330,6 +432,23 @@ export const tutorialSections: TutorialSection[] = [
 // Total number of steps across all sections
 export const getTotalSteps = (): number => {
   return tutorialSections.reduce((total, section) => total + section.steps.length, 0);
+};
+
+// Get section boundaries for progress bar visualization
+export const getSectionBoundaries = (): { start: number; end: number; title: string }[] => {
+  const boundaries: { start: number; end: number; title: string }[] = [];
+  let currentIndex = 0;
+  
+  for (const section of tutorialSections) {
+    boundaries.push({
+      start: currentIndex,
+      end: currentIndex + section.steps.length - 1,
+      title: section.title,
+    });
+    currentIndex += section.steps.length;
+  }
+  
+  return boundaries;
 };
 
 // Get a specific step by global index
