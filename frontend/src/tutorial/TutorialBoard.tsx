@@ -202,7 +202,7 @@ const TutorialBoard: React.FC<TutorialBoardProps> = ({ scenario, onMoveComplete 
     if (selectedPiece === null || moveCompleted) return null;
 
     // Check for horizontal split (left/right)
-    if (row > 0 && row < boardSize - 1) {
+    if (col > 0 && col < boardSize - 1) {
       const left = getIndex(row, col - 1);
       const right = getIndex(row, col + 1);
 
@@ -220,7 +220,7 @@ const TutorialBoard: React.FC<TutorialBoardProps> = ({ scenario, onMoveComplete 
     }
 
     // Check for vertical split (up/down)
-    if (col > 0 && col < boardSize - 1) {
+    if (row > 0 && row < boardSize - 1) {
       const up = getIndex(row + 1, col);
       const down = getIndex(row - 1, col);
 
