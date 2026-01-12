@@ -1,7 +1,6 @@
 .board {
   display: grid;
-  grid-template-columns: repeat(8, 1fr); /* 8 columns */
-  grid-template-rows: repeat(8, 1fr);   /* 8 rows */
+  /* Grid columns and rows are set dynamically via inline styles */
   aspect-ratio: 1 / 1; /* Ensure the board is always square */
   width: 90vw; /* Responsive width: 90% of viewport width */
   max-width: 400px; /* Maximum size for larger screens */

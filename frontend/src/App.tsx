@@ -20,6 +20,15 @@ import React, { useState } from "react";
 import GameBoard from "./components/GameBoard";
 import { fetchInitialBoard, doMove, doAiMove } from "./services/api";
 
+// Default rows of pieces for each board size
+const defaultRowsForSize: { [key: number]: number } = {
+  4: 1,
+  5: 2,
+  6: 2,
+  7: 3,
+  8: 3,
+};
+
 const App: React.FC = () => {
   const [boardState, setBoardState] = useState(() => {
     const savedState = localStorage.getItem("boardState");
@@ -36,6 +45,16 @@ const App: React.FC = () => {
 
   const [againstAi, setAgainstAi] = useState(() => {
     return (localStorage.getItem("againstAi") || "false") == "true";
+  });
+
+  const [boardSize, setBoardSize] = useState(() => {
+    const saved = localStorage.getItem("boardSize");
+    return saved ? parseInt(saved) : 8;
+  });
+
+  const [startRows, setStartRows] = useState(() => {
+    const saved = localStorage.getItem("startRows");
+    return saved ? parseInt(saved) : 3;
   });
 
   const [thinking, setThinking] = useState(false);
@@ -56,7 +75,7 @@ const App: React.FC = () => {
   // TODO: Display king
   const startNewGame = async () => {
     try {
-      const data = await fetchInitialBoard(parseInt(quantumnessLevel));
+      const data = await fetchInitialBoard(parseInt(quantumnessLevel), boardSize, startRows);
       setBoardState(data);
       setGameStarted(true);
       localStorage.setItem("boardState", JSON.stringify(data));
@@ -90,6 +109,27 @@ const App: React.FC = () => {
     localStorage.setItem("againstAi", `${ai}`);
   };
 
+  const handleBoardSizeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const newSize = parseInt(event.target.value);
+    setBoardSize(newSize);
+    localStorage.setItem("boardSize", `${newSize}`);
+    // Update start rows to default for new board size
+    const newDefaultRows = defaultRowsForSize[newSize] || 3;
+    setStartRows(newDefaultRows);
+    localStorage.setItem("startRows", `${newDefaultRows}`);
+  };
+
+  // Maximum rows of pieces allowed (leaves middle row empty)
+  const maxStartRows = Math.floor((boardSize - 1) / 2);
+
+  const handleStartRowsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newRows = parseInt(event.target.value);
+    // Ensure rows is at least 1 and at most maxStartRows
+    const validRows = Math.max(1, Math.min(newRows, maxStartRows));
+    setStartRows(validRows);
+    localStorage.setItem("startRows", `${validRows}`);
+  };
+
   let startMenu = (
     <div className="start-menu">
       <h1>Cheqqers - A Quantum Checkers Game</h1>
@@ -105,6 +145,31 @@ const App: React.FC = () => {
           <option value="2">Quantum level 2 (entanglement)</option>
           <option value="3">Quantum level 3 (interference)</option>
         </select>
+      </div>
+      <div className="board-size-selector">
+        <label htmlFor="board-size">Board Size:</label>
+        <select
+          id="board-size"
+          value={boardSize}
+          onChange={handleBoardSizeChange}
+        >
+          <option value="4">4x4</option>
+          <option value="5">5x5</option>
+          <option value="6">6x6</option>
+          <option value="7">7x7</option>
+          <option value="8">8x8</option>
+        </select>
+      </div>
+      <div className="start-rows-selector">
+        <label htmlFor="start-rows">Rows of pieces:</label>
+        <input
+          type="number"
+          id="start-rows"
+          value={startRows}
+          onChange={handleStartRowsChange}
+          min={1}
+          max={maxStartRows}
+        />
       </div>
       <label className="checkbox-label">
         <input

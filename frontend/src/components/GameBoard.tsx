@@ -21,6 +21,7 @@ import "./GameBoard.css";
 
 interface GameBoardProps {
   boardState: {
+    board_size: number; // Size of the board (e.g., 8 for 8x8)
     classic_occupancy: number[]; // Array representing which squares are occupied
     piece_map: { color: number, crowned: boolean }[]; // Array representing the pieces and their colors
     possible_moves: any[];
@@ -65,7 +66,8 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
   // TODO: Bottom left corner doesn't want to move often?
 
   
-  const boardSize = 8; // 8x8 checkers board
+  const boardSize = boardState.board_size; // Use board size from state
+  const squaresPerRow = Math.floor(boardSize / 2); // Number of playable squares per row
 
   // Helper function to determine if a square is black
   const isBlackSquare = (row: number, col: number) => {
@@ -73,13 +75,13 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
   };
  
  const getIndex = (row: number, col: number) => {
-    return Math.floor((col + (row * 8)) / 2);
+    return Math.floor((col + (row * boardSize)) / 2);
   };
 
   const getRowColFromIndex = (index: number) => {
-    const row = Math.floor(index / 4);
+    const row = Math.floor(index / squaresPerRow);
     const isRowEven = row % 2 === 0;
-    const colInRow = index % 4;
+    const colInRow = index % squaresPerRow;
     const col = isRowEven ? (colInRow * 2) : (colInRow * 2) + 1;
     return { row, col };
   };
@@ -207,7 +209,17 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove }) => {
     }
   }
 
-  return <div className="board">{squares}</div>;
+  return (
+    <div 
+      className="board"
+      style={{
+        gridTemplateColumns: `repeat(${boardSize}, 1fr)`,
+        gridTemplateRows: `repeat(${boardSize}, 1fr)`
+      }}
+    >
+      {squares}
+    </div>
+  );
 };
 
 export default GameBoard;

@@ -163,6 +163,42 @@ button:focus-visible {
   border: 1px solid #ccc;
 }
 
+/* Board size selector styles */
+.board-size-selector {
+  margin-bottom: 15px;
+  font-size: 1em;
+}
+
+.board-size-selector label {
+  margin-right: 10px;
+}
+
+.board-size-selector select {
+  padding: 5px;
+  font-size: 1em;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+/* Start rows selector styles */
+.start-rows-selector {
+  margin-bottom: 20px;
+  font-size: 1em;
+}
+
+.start-rows-selector label {
+  margin-right: 10px;
+}
+
+.start-rows-selector input[type="number"] {
+  padding: 5px;
+  font-size: 1em;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  width: 60px;
+  text-align: center;
+}
+
 .game-over-overlay {
   position: fixed;
   top: 0;
