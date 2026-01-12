@@ -19,9 +19,9 @@
 import axios from "axios";
 import config from "../config";
 
-export const fetchInitialBoard = async (gameType: number) => {
+export const fetchInitialBoard = async (gameType: number, boardSize: number = 8, startRows: number = 3) => {
   try {
-    const response = await axios.get(`${config.backendUrl}/start?game_type=${gameType}`);
+    const response = await axios.get(`${config.backendUrl}/start?game_type=${gameType}&size=${boardSize}&start_rows=${startRows}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching the initial board:", error);
