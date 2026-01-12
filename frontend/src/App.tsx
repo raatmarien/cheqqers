@@ -119,11 +119,13 @@ const App: React.FC = () => {
     localStorage.setItem("startRows", `${newDefaultRows}`);
   };
 
+  // Maximum rows of pieces allowed (leaves middle row empty)
+  const maxStartRows = Math.floor((boardSize - 1) / 2);
+
   const handleStartRowsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newRows = parseInt(event.target.value);
-    // Ensure rows is at least 1 and at most (boardSize - 1) / 2 (leave middle row empty)
-    const maxRows = Math.floor((boardSize - 1) / 2);
-    const validRows = Math.max(1, Math.min(newRows, maxRows));
+    // Ensure rows is at least 1 and at most maxStartRows
+    const validRows = Math.max(1, Math.min(newRows, maxStartRows));
     setStartRows(validRows);
     localStorage.setItem("startRows", `${validRows}`);
   };
@@ -166,7 +168,7 @@ const App: React.FC = () => {
           value={startRows}
           onChange={handleStartRowsChange}
           min={1}
-          max={Math.floor((boardSize - 1) / 2)}
+          max={maxStartRows}
         />
       </div>
       <label className="checkbox-label">
