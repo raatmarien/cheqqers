@@ -16,9 +16,10 @@
  * License along with Cheqqers. If not, see
  * <https://www.gnu.org/licenses/>.
  *  */
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import GameBoard from "./components/GameBoard";
 import { fetchInitialBoard, doMove, doAiMove } from "./services/api";
+import { Tutorial } from "./tutorial";
 
 // Default rows of pieces for each board size
 const defaultRowsForSize: { [key: number]: number } = {
@@ -58,6 +59,26 @@ const App: React.FC = () => {
   });
 
   const [thinking, setThinking] = useState(false);
+
+  // Tutorial state
+  const [showTutorial, setShowTutorial] = useState(false);
+
+  // Check if this is the first visit and show tutorial
+  useEffect(() => {
+    const hasSeenTutorial = localStorage.getItem("hasSeenTutorial");
+    if (!hasSeenTutorial) {
+      setShowTutorial(true);
+    }
+  }, []);
+
+  const handleCloseTutorial = () => {
+    setShowTutorial(false);
+    localStorage.setItem("hasSeenTutorial", "true");
+  };
+
+  const handleOpenTutorial = () => {
+    setShowTutorial(true);
+  };
 
   const onMove = async (moveIndex: number) => {
     const data = await doMove(boardState, moveIndex, false);
@@ -179,9 +200,14 @@ const App: React.FC = () => {
         />
         Play against AI
       </label>
-      <button onClick={handleStartGameClick} className="start-button">
-        Start Game!
-      </button>
+      <div className="menu-buttons">
+        <button onClick={handleStartGameClick} className="start-button">
+          Start Game!
+        </button>
+        <button onClick={handleOpenTutorial} className="tutorial-menu-button">
+          How to Play
+        </button>
+      </div>
     </div>
   );
 
@@ -225,6 +251,7 @@ const App: React.FC = () => {
         ) : (
           startMenu
         )}
+        <Tutorial isOpen={showTutorial} onClose={handleCloseTutorial} />
       </div>
     );
 };

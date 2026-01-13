@@ -1,0 +1,106 @@
+/* Tutorial Board Styles */
+.tutorial-board {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  max-width: 300px;
+  border: 2px solid #333;
+  margin: 0 auto;
+}
+
+.tutorial-board .square {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tutorial-board .square.light {
+  background-color: #f0d9b5;
+}
+
+.tutorial-board .square.dark {
+  background-color: #b58863;
+}
+
+.tutorial-board .piece {
+  width: 70%;
+  height: 70%;
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.tutorial-board .piece-white {
+  background-color: white;
+  color: black;
+}
+
+.tutorial-board .piece-black {
+  background-color: black;
+  color: white;
+}
+
+.tutorial-board .crowned-piece {
+  background-size: cover;
+  background-position: center;
+  background-image: url("/crown.png");
+}
+
+.tutorial-board .moveable {
+  cursor: pointer;
+  position: relative;
+  box-shadow: 0 0 5px rgba(0, 255, 0, 0.8), 0 0 8px rgba(0, 255, 0, 0.6);
+  animation: pulse 1.5s infinite;
+  transform: scale(1.1);
+}
+
+.tutorial-board .moveable:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 8px rgba(0, 255, 0, 1), 0 0 12px rgba(0, 255, 0, 0.8);
+}
+
+.tutorial-board .highlight-square {
+  position: relative;
+  background-color: rgba(0, 255, 0, 0.2);
+  border: 2px dashed #00ff00;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
+  box-sizing: border-box;
+}
+
+.tutorial-board .split-icon {
+  width: 100%;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.tutorial-board .split-icon:hover {
+  transform: scale(1.1);
+}
+
+.tutorial-board .split-icon.rotate {
+  transform: rotate(90deg);
+}
+
+.tutorial-board .split-icon.rotate:hover {
+  transform: rotate(90deg) scale(1.1);
+}
+
+.tutorial-board .change-text {
+  font-size: 0.6em;
+  font-weight: bold;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(0, 255, 0, 0.8), 0 0 8px rgba(0, 255, 0, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 10px rgba(0, 255, 0, 1), 0 0 15px rgba(0, 255, 0, 0.9);
+  }
+}
