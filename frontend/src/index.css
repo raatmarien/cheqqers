@@ -1,1 +1,301 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
+
+/* ═══ Futuristic Cheqqers Theme ═══ */
+
+body {
+    background-color: #050505;
+    color: #ffffff;
+    font-family: 'Outfit', sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+:root {
+    /* Board */
+    --board-dark: #1a1e2e;
+    --board-light: #2a2f42;
+    --board-border: #3a3f55;
+    --board-glow: rgba(99, 102, 241, 0.15);
+
+    /* Pieces */
+    --piece-white-fill: #e8e0f0;
+    --piece-white-stroke: #c4b8d8;
+    --piece-white-highlight: #f5f0ff;
+    --piece-black-fill: #2d2d3d;
+    --piece-black-stroke: #1a1a28;
+    --piece-black-highlight: #3d3d55;
+
+    /* Accents */
+    --accent-select: #22d3ee;
+    --accent-capture: #f43f5e;
+    --accent-target: #34d399;
+    --accent-quantum: #a78bfa;
+
+    /* Panel */
+    --panel-bg: rgba(15, 17, 28, 0.85);
+    --panel-border: rgba(99, 102, 241, 0.2);
+}
+
+/* Pulsing capture square */
+@keyframes capture-pulse {
+
+    0%,
+    100% {
+        opacity: 0.3;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.capture-pulse {
+    animation: capture-pulse 1s ease-in-out infinite;
+}
+
+/* Quantum shimmer for superposition pieces */
+@keyframes quantum-shimmer {
+
+    0%,
+    100% {
+        filter: brightness(1);
+    }
+
+    50% {
+        filter: brightness(1.3);
+    }
+}
+
+.quantum-shimmer {
+    animation: quantum-shimmer 2s ease-in-out infinite;
+}
+
+/* Toast slide-in */
+@keyframes toast-in {
+    0% {
+        transform: translateX(-50%) translateY(-100%);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+}
+
+.toast-enter {
+    animation: toast-in 0.3s ease-out forwards;
+}
+
+/* Move history entry fade-in */
+@keyframes fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.move-entry-new {
+    animation: fade-in-up 0.3s ease-out;
+}
+
+/* Turn indicator glow */
+@keyframes turn-glow {
+
+    0%,
+    100% {
+        text-shadow: 0 0 10px currentColor;
+    }
+
+    50% {
+        text-shadow: 0 0 20px currentColor, 0 0 40px currentColor;
+    }
+}
+
+.turn-indicator {
+    animation: turn-glow 2s ease-in-out infinite;
+}
+
+/* ═══ Main Menu & Splash Redesign ═══ */
+
+/* Slow float animation */
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+.animate-float {
+    animation: float 4s ease-in-out infinite;
+}
+
+/* Main menu slide up */
+@keyframes fade-slide-up {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-slide-up {
+    animation: fade-slide-up 0.5s ease-out forwards;
+}
+
+/* Glassmorphism Panel */
+.glass-panel {
+    background: rgba(15, 17, 28, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+/* Sleek Buttons */
+.glass-button {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.2s ease-in-out;
+}
+
+.glass-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Dark gradient overlay for splash screen */
+.splash-overlay {
+    background: radial-gradient(circle at center, rgba(15, 17, 28, 0.4) 0%, rgba(5, 7, 15, 0.8) 100%);
+    backdrop-filter: blur(4px);
+}
+
+/* Pulse Glow for 'Press Any Key' */
+@keyframes pulse-glow {
+
+    0%,
+    100% {
+        opacity: 0.5;
+        text-shadow: 0 0 10px rgba(167, 139, 250, 0.3);
+    }
+
+    50% {
+        opacity: 1;
+        text-shadow: 0 0 20px rgba(167, 139, 250, 0.8);
+    }
+}
+
+.animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* ═══ Quantris.io Inspired Buttons ═══ */
+
+.quantris-btn {
+    position: relative;
+    background: rgba(13, 17, 34, 0.85);
+    /* Deep translucent core */
+    border-radius: 0.5rem;
+    /* Rectangular corners */
+    border: 1px solid rgba(78, 203, 255, 0.15);
+    box-shadow:
+        0px 1px 0px 0px inset rgba(255, 255, 255, 0.1),
+        /* Top rim highlight */
+        0 8px 32px 0 rgba(78, 203, 255, 0.05);
+    /* Soft outer ambient blue glow */
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+}
+
+/* Gradient glowing borders (Pseudo-element) */
+.quantris-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: inherit;
+    padding: 2px;
+    /* Thickness of the glowing border */
+    background: linear-gradient(135deg, rgba(255, 66, 164, 0.8), rgba(176, 66, 255, 0.8), rgba(78, 203, 255, 0.8));
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+}
+
+.quantris-btn:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow:
+        0px 1px 0px 0px inset rgba(255, 255, 255, 0.2),
+        0 12px 40px 0 rgba(176, 66, 255, 0.2);
+    /* Intensified purple blow */
+    background: rgba(13, 17, 34, 0.95);
+}
+
+.quantris-btn:hover::before {
+    opacity: 1;
+}
+
+.quantris-title {
+    font-family: 'Orbitron', 'Outfit', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    background: linear-gradient(to right, #fff, #e0e7ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+/* Color overrides for individual buttons */
+.quantris-play::before {
+    background: linear-gradient(135deg, #FF42A4, #B042FF, #4ECBFF);
+}
+
+.quantris-puzzles::before {
+    background: linear-gradient(135deg, #a855f7, #6366f1);
+}
+
+.quantris-tutorials::before {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+}
+
+.quantris-design::before {
+    background: linear-gradient(135deg, #ec4899, #f43f5e);
+}
