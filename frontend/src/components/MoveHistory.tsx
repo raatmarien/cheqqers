@@ -37,56 +37,83 @@ const MoveHistory: React.FC<MoveHistoryProps> = ({ moveHistory }) => {
         }
     }, [moveHistory.length]);
 
+    // Group moves into rows (White move + Black move)
+    const rows: { white?: string; black?: string; moveNum: number }[] = [];
+    for (let i = 0; i < moveHistory.length; i += 2) {
+        rows.push({
+            white: moveHistory[i],
+            black: moveHistory[i + 1],
+            moveNum: Math.floor(i / 2) + 1,
+        });
+    }
+
+    const renderPly = (entry: string | undefined, isWhite: boolean, isLatest: boolean) => {
+        if (!entry) return <div className="flex-1" />;
+        const hasQuantum = entry.includes(';M:');
+        
+        return (
+            <div
+                className={`flex-1 flex items-center gap-1.5 px-2 py-1.5 rounded text-xs font-mono transition-colors ${
+                    isLatest ? 'bg-indigo-500/20 border border-indigo-500/30' : 'hover:bg-white/5'
+                }`}
+            >
+                {/* Player color indicator */}
+                <span className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                    isWhite ? 'bg-[#e8e0f0] border border-[#c4b8d8]' : 'bg-[#2d2d3d] border border-[#4a4a6a]'
+                }`} />
+
+                {/* Move notation */}
+                <span className={`flex-1 truncate ${isLatest ? 'text-white font-bold' : 'text-zinc-400'}`}>
+                    {formatMove(entry)}
+                </span>
+
+                {/* Move type icon */}
+                {moveTypeIcon(entry) !== '' && (
+                    <span className="text-[10px] text-zinc-500" title="Move type">
+                        {moveTypeIcon(entry)}
+                    </span>
+                )}
+
+                {/* Quantum indicator */}
+                {hasQuantum && (
+                    <span className="text-purple-400 text-[10px]" title="Quantum collapsed">
+                        ⚛
+                    </span>
+                )}
+            </div>
+        );
+    };
+
     return (
-        <div className="flex flex-col h-full">
-            <div className="flex items-center gap-2 px-4 py-3 border-b" style={{ borderColor: 'var(--panel-border)' }}>
-                <span className="text-indigo-400 text-sm font-bold uppercase tracking-wider">📜 Moves</span>
-                <span className="ml-auto text-xs text-zinc-600">{moveHistory.length}</span>
+        <div className="flex flex-col h-full bg-[#0a0c14]">
+            <div className="flex items-center gap-2 px-4 py-3 border-b border-indigo-500/20 bg-indigo-950/20">
+                <span className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] drop-shadow-[0_0_8px_rgba(99,102,241,0.4)]">📜 Move History</span>
+                <span className="ml-auto text-[10px] font-mono text-indigo-500/60 font-bold bg-indigo-500/10 px-2 py-0.5 rounded-full border border-indigo-500/20">
+                    {moveHistory.length} PLIES
+                </span>
             </div>
 
-            <div ref={scrollRef} className="flex-1 overflow-y-auto p-2 space-y-0.5">
-                {moveHistory.length === 0 ? (
-                    <div className="text-zinc-600 text-xs text-center py-8 italic">No moves yet</div>
+            <div className="grid grid-cols-[30px_1fr_1fr] gap-1 px-4 py-2 border-b border-indigo-500/10 text-[10px] font-bold text-indigo-300/40 uppercase tracking-widest">
+                <div>#</div>
+                <div>White</div>
+                <div>Black</div>
+            </div>
+
+            <div ref={scrollRef} className="flex-1 overflow-y-auto p-2 space-y-1 custom-scrollbar">
+                {rows.length === 0 ? (
+                    <div className="text-zinc-700 text-xs text-center py-12 italic opacity-50">No moves recorded</div>
                 ) : (
-                    moveHistory.map((entry, idx) => {
-                        const isWhite = idx % 2 === 0;
-                        const moveNum = Math.floor(idx / 2) + 1;
-                        const hasQuantum = entry.includes(';M:');
-                        const isLatest = idx === moveHistory.length - 1;
+                    rows.map((row, idx) => {
+                        const isLatestWhite = (idx * 2) === moveHistory.length - 1;
+                        const isLatestBlack = (idx * 2 + 1) === moveHistory.length - 1;
 
                         return (
-                            <div
-                                key={idx}
-                                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded text-xs font-mono transition-colors ${isLatest ? 'bg-indigo-500/10 border border-indigo-500/20' : 'hover:bg-white/5'
-                                    }`}
-                            >
-                                {/* Move number (only on white's move) */}
-                                <span className="text-zinc-600 w-5 text-right text-[10px]">
-                                    {isWhite && !entry.startsWith('M') ? `${moveNum}.` : ''}
+                            <div key={idx} className="grid grid-cols-[30px_1fr_1fr] gap-1 items-center">
+                                <span className="text-[10px] font-mono text-zinc-600 text-center font-bold">
+                                    {row.moveNum}.
                                 </span>
-
-                                {/* Player color indicator */}
-                                <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${isWhite ? 'bg-[#e8e0f0] border border-[#c4b8d8]' : 'bg-[#2d2d3d] border border-[#4a4a6a]'
-                                    }`} />
-
-                                {/* Move notation */}
-                                <span className={`flex-1 ${isLatest ? 'text-zinc-200' : 'text-zinc-400'}`}>
-                                    {formatMove(entry)}
-                                </span>
-
-                                {/* Move type icon */}
-                                {moveTypeIcon(entry) !== '' && (
-                                    <span className="text-[10px] text-zinc-600" title="Move type">
-                                        {moveTypeIcon(entry)}
-                                    </span>
-                                )}
-
-                                {/* Quantum indicator */}
-                                {hasQuantum && (
-                                    <span className="text-purple-500 text-[10px]" title="Quantum collapsed">
-                                        ⚛
-                                    </span>
-                                )}
+                                {renderPly(row.white, true, isLatestWhite)}
+                                {renderPly(row.black, false, isLatestBlack)}
                             </div>
                         );
                     })

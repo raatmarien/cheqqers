@@ -62,7 +62,9 @@ export interface GameStateObject {
     game_state: number;
     game_type: number;
     classic_occupancy: number[];
-    piece_map: Record<number, { color: number, crowned: boolean } | null>;
+    piece_map: Record<number, { color: number, crowned: boolean, pieceIds: number[] } | null>;
+    next_piece_id: number;
+    jumped_piece_ids_this_turn: number[];
     possible_moves: Move[];
     chances: Record<number, number>;
     move_history: HistoryEntry[];
@@ -77,11 +79,23 @@ export class CheqqersGame {
     startRows: number;
 
     squares: QuantumEntity[];
-    pieceProperties: Record<number, { color: PieceColor, crowned: boolean } | null>;
+    pieceProperties: Record<number, { color: PieceColor, crowned: boolean, pieceIds: number[] } | null>;
+
+    nextPieceId: number = 1;
+    jumpedPieceIdsThisTurn: number[] = [];
 
     movesSinceTake: number = 0;
     multiJumpSquare: number | null = null;  // Track piece mid-multi-jump chain
     private justCrowned: boolean = false;
+
+    // Draw rule tracking
+    private stateHistory: Map<string, number> = new Map(); // hash -> count
+    private consecutiveKingMoves: number = 0;
+    private specialEndgameMoves: number = 0; // Moves for 16-move and 5-move rules
+    private endgameRuleActive: '16' | '5' | null = null;
+    private _isCalculatingDepth: boolean = false;
+    public disableDepthCalculation: boolean = false;
+    public forceAllMoves: boolean = false;
 
     private _state: GameState = GameState.IN_PROGRESS;
     public get state(): GameState { return this._state; }
@@ -126,13 +140,13 @@ export class CheqqersGame {
         // White pieces at the bottom (indices start at 0 -> row 0)
         for (let i = 0; i < startRows * squaresPerRow; i++) {
             this.squares[i].apply(Operations.Shift(SquareState.OCCUPIED));
-            this.pieceProperties[i] = { color: PieceColor.WHITE, crowned: false };
+            this.pieceProperties[i] = { color: PieceColor.WHITE, crowned: false, pieceIds: [this.nextPieceId++] };
         }
 
         // Black pieces at the top
         for (let i = totalSquares - (startRows * squaresPerRow); i < totalSquares; i++) {
             this.squares[i].apply(Operations.Shift(SquareState.OCCUPIED));
-            this.pieceProperties[i] = { color: PieceColor.BLACK, crowned: false };
+            this.pieceProperties[i] = { color: PieceColor.BLACK, crowned: false, pieceIds: [this.nextPieceId++] };
         }
     }
 
@@ -151,6 +165,7 @@ export class CheqqersGame {
         }
 
         for (const placement of puzzleData.pieces) {
+            const pieceId = this.nextPieceId++;
             if (placement.superposition && placement.superposition.length > 0) {
                 // Determine probability based on number of superposition states
                 const numBranches = placement.superposition.length;
@@ -159,7 +174,8 @@ export class CheqqersGame {
                 this.squares[placement.superposition[0]].apply(Operations.Shift(SquareState.OCCUPIED));
                 this.pieceProperties[placement.superposition[0]] = {
                     color: placement.color === PieceColor.WHITE ? PieceColor.WHITE : PieceColor.BLACK,
-                    crowned: placement.crowned || false
+                    crowned: placement.crowned || false,
+                    pieceIds: [pieceId]
                 };
 
                 // For subsequent indices, we simulate a split from the first index
@@ -188,17 +204,27 @@ export class CheqqersGame {
 
                     this.pieceProperties[idx2] = {
                         color: placement.color === PieceColor.WHITE ? PieceColor.WHITE : PieceColor.BLACK,
-                        crowned: placement.crowned || false
+                        crowned: placement.crowned || false,
+                        pieceIds: [pieceId]
                     };
                 }
             } else if (placement.index !== undefined) {
                 this.squares[placement.index].apply(Operations.Shift(SquareState.OCCUPIED));
                 this.pieceProperties[placement.index] = {
                     color: placement.color === PieceColor.WHITE ? PieceColor.WHITE : PieceColor.BLACK,
-                    crowned: placement.crowned || false
+                    crowned: placement.crowned || false,
+                    pieceIds: [pieceId]
                 };
             }
         }
+
+        // Initial state hash for Threefold Repetition rule
+        this.movesSinceTake = 0;
+        this.multiJumpSquare = null;
+        this.consecutiveKingMoves = 0;
+        this.stateHistory.clear();
+        const initialHash = this.getBoardStateHash();
+        this.stateHistory.set(initialHash, 1);
     }
 
     public getIndex(col: number, row: number): number {
@@ -214,7 +240,7 @@ export class CheqqersGame {
         return { col, row };
     }
 
-    public getPossibleMoves(): Move[] {
+    public getPossibleMoves(skipDepthCalculation: boolean = false): Move[] {
         // If mid-multi-jump, only allow captures from the jumping piece
         if (this.multiJumpSquare !== null) {
             return this.findMoves(true, this.multiJumpSquare);
@@ -222,6 +248,31 @@ export class CheqqersGame {
 
         const takeMoves = this.getTakeMoves();
         if (takeMoves.length > 0) {
+            // Apply "Longest Path" rule if there's a choice between different capture lengths
+            if (!skipDepthCalculation && !this.forceAllMoves && !this._isCalculatingDepth && !this.disableDepthCalculation && takeMoves.length > 1) {
+                this._isCalculatingDepth = true;
+                try {
+                    const currentState = {
+                        board_size: this.boardSize,
+                        game_type: this.gameType,
+                        turn: this.turn,
+                        next_piece_id: this.nextPieceId,
+                        jumped_piece_ids_this_turn: this.jumpedPieceIdsThisTurn,
+                        piece_map: this.getMinimalPieceMap()
+                    };
+                    // Map each move to its maximum possible depth
+                    const moveDepths = takeMoves.map(m => {
+                        const d = this.calculateMaxCaptureDepth(currentState, m as ClassicalMove);
+                        console.log(`[getPossibleMoves] Move ${CheqqersGame.encodeMoveNotation(m)} has depth ${d}`);
+                        return d;
+                    });
+                    const maxDepth = Math.max(...moveDepths);
+                    console.log(`[getPossibleMoves] maxDepth=${maxDepth}`);
+                    return takeMoves.filter((_, i) => moveDepths[i] === maxDepth);
+                } finally {
+                    this._isCalculatingDepth = false;
+                }
+            }
             return takeMoves;
         }
 
@@ -310,6 +361,11 @@ export class CheqqersGame {
                                 break;
                             }
                             if (isEnemy) {
+                                // If this enemy shares a pieceId with someone we already jumped this turn,
+                                // we CANNOT jump it again! It's like jumping our own tail. Stop searching this ray.
+                                const sharesId = curPieceProp.pieceIds?.some(id => this.jumpedPieceIdsThisTurn.includes(id));
+                                if (sharesId) break;
+
                                 foundEnemySquareIndex = curIndex;
                             } else if (isEmpty) {
                                 if (!canMoveBackwards) break;
@@ -342,7 +398,84 @@ export class CheqqersGame {
             }
         }
 
+        if (restrictToSquareIndex !== undefined) {
+            console.log(`[findMoves] restricted to ${restrictToSquareIndex}, found ${moves.length} moves. turn=${this.turn}`);
+        }
         return moves;
+    }
+
+    private calculateMaxCaptureDepth(state: { 
+        board_size: number, 
+        game_type: GameType, 
+        turn: PieceColor, 
+        next_piece_id: number, 
+        jumped_piece_ids_this_turn: number[],
+        piece_map: (null | { color: number, crowned: boolean, pieceIds: number[] })[]
+    }, initialMove: ClassicalMove): number {
+        // Create a scratch game to simulate the move sequence
+        const game = new CheqqersGame(state.board_size, 0, state.game_type as any);
+        game.disableDepthCalculation = true;
+        // Minimal setup for simulation
+        game.turn = state.turn as any;
+        game.nextPieceId = state.next_piece_id;
+        game.jumpedPieceIdsThisTurn = [...state.jumped_piece_ids_this_turn];
+        
+        // Populate pieces
+        for (let idx = 0; idx < state.piece_map.length; idx++) {
+            const prop = state.piece_map[idx];
+            if (prop) {
+                game.squares[idx].apply(Operations.Shift(SquareState.OCCUPIED));
+                game.pieceProperties[idx] = { 
+                    color: prop.color as any,
+                    crowned: prop.crowned,
+                    pieceIds: [...prop.pieceIds]
+                };
+            }
+        }
+
+        // Find and apply the initial move
+        const moves = game.getPossibleMoves(true);
+        const moveIdx = moves.findIndex(m => 
+            'from_index' in m && !('to_index1' in m) && (m as ClassicalMove).from_index === initialMove.from_index && (m as ClassicalMove).to_index === initialMove.to_index
+        );
+        
+        if (moveIdx === -1) return 1;
+
+        game.applyMove(moveIdx);
+        
+        // If it's not a multi-jump continuation, we're done with this piece for this "path"
+        if (game.multiJumpSquare === null) return 1;
+        
+        // Recursive exploration of further jumps
+        const nextMoves = game.getPossibleMoves(true);
+        if (nextMoves.length === 0) return 1;
+
+        const nextState = {
+            board_size: game.boardSize,
+            game_type: game.gameType,
+            turn: game.turn,
+            next_piece_id: game.nextPieceId,
+            jumped_piece_ids_this_turn: game.jumpedPieceIdsThisTurn,
+            piece_map: game.getMinimalPieceMap()
+        };
+
+        const nextDepths = nextMoves.map(nm => this.calculateMaxCaptureDepth(nextState, nm as ClassicalMove));
+        return 1 + Math.max(0, ...nextDepths);
+    }
+
+    private getMinimalPieceMap() {
+        const map: (null | { color: number, crowned: boolean, pieceIds: number[] })[] = new Array(this.squares.length).fill(null);
+        for (let i = 0; i < this.squares.length; i++) {
+            const probs = this.squares[i].getProbabilities();
+            if ((probs[SquareState.OCCUPIED] || 0) > 0.001 && this.pieceProperties[i]) {
+                map[i] = {
+                    color: this.pieceProperties[i]!.color,
+                    crowned: this.pieceProperties[i]!.crowned,
+                    pieceIds: this.pieceProperties[i]!.pieceIds
+                };
+            }
+        }
+        return map;
     }
 
     private findSplitAndMergeMoves(classicalMoves: Move[]): Move[] {
@@ -390,18 +523,44 @@ export class CheqqersGame {
         return [...splitMoves, ...mergeMoves];
     }
 
-    /** Get the landing square indices for any move type */
-    private getLandingSquares(move: Move): number[] {
+    /** Get all squares that should be measured or are involved in landing for any move type.
+     * Returns a list of objects with index and role ('landing' | 'jumped') */
+    public getInvolvedSquares(move: Move): { index: number, role: 'landing' | 'jumped' }[] {
+        const result: { index: number, role: 'landing' | 'jumped' }[] = [];
         if ('to_index1' in move && 'to_index2' in move) {
             // Split move
-            return [(move as SplitMove).to_index1, (move as SplitMove).to_index2];
+            const sm = move as SplitMove;
+            result.push({ index: sm.to_index1, role: 'landing' }, { index: sm.to_index2, role: 'landing' });
         } else if ('from_index1' in move && 'from_index2' in move) {
             // Merge move
-            return [(move as MergeMove).to_index];
+            result.push({ index: (move as MergeMove).to_index, role: 'landing' });
         } else {
             // Classical or take move
-            return [(move as ClassicalMove).to_index];
+            const cm = move as ClassicalMove;
+            result.push({ index: cm.to_index, role: 'landing' });
+
+            if (cm.is_take_move) {
+                // Find the square that was jumped over
+                const { col: fC, row: fR } = this.getRowColFromIndex(cm.from_index);
+                const { col: tC, row: tR } = this.getRowColFromIndex(cm.to_index);
+                const dx = tC > fC ? 1 : -1;
+                const dy = tR > fR ? 1 : -1;
+
+                for (let step = 1; step < Math.abs(tC - fC); step++) {
+                    const checkC = fC + (step * dx);
+                    const checkR = fR + (step * dy);
+                    const checkIdx = this.getIndex(checkC, checkR);
+
+                    const p = this.squares[checkIdx].getProbabilities();
+                    const emptyProb = p[SquareState.EMPTY] || 0;
+                    if (emptyProb < 0.999) {
+                        result.push({ index: checkIdx, role: 'jumped' });
+                        break;
+                    }
+                }
+            }
         }
+        return result;
     }
 
     public static encodeMoveNotation(move: Move): string {
@@ -411,14 +570,39 @@ export class CheqqersGame {
         } else if ('to_index1' in move && 'to_index2' in move) {
             const sm = move as SplitMove;
             const sorted = [sm.to_index1, sm.to_index2].sort((a, b) => a - b);
-            return `${sq(sm.from_index)}->${sq(sorted[0])}^${sq(sorted[1])}`;
+            return `${sq(sm.from_index)}-${sq(sorted[0])}^${sq(sorted[1])}`;
         } else if ('from_index1' in move && 'from_index2' in move) {
             const mm = move as MergeMove;
             const sorted = [mm.from_index1, mm.from_index2].sort((a, b) => a - b);
-            return `${sq(sorted[0])}^${sq(sorted[1])}->${sq(mm.to_index)}`;
+            return `${sq(sorted[0])}^${sq(sorted[1])}-${sq(mm.to_index)}`;
         } else {
-            return `${sq((move as ClassicalMove).from_index)}->${sq((move as ClassicalMove).to_index)}`;
+            return `${sq((move as ClassicalMove).from_index)}-${sq((move as ClassicalMove).to_index)}`;
         }
+    }
+
+    private getBoardStateHash(): string {
+        // Build a deterministic string representing the board state
+        // Includes: piece positions, colors, crowning, turn, and quantum amplitudes (rounded)
+        const parts: string[] = [];
+        parts.push(`T:${this.turn}`);
+
+        for (let i = 0; i < this.squares.length; i++) {
+            const props = this.pieceProperties[i];
+            const probs = this.squares[i].getProbabilities();
+            const occ = probs[SquareState.OCCUPIED] || 0;
+
+            if (occ > 0.0001) {
+                const color = props?.color === PieceColor.WHITE ? 'W' : 'B';
+                const crowned = props?.crowned ? 'K' : 'M';
+                // Round probability to avoid floating point jitter in hashes
+                const probStr = occ > 0.9999 ? '1' : occ.toFixed(3);
+                parts.push(`${i}${color}${crowned}${probStr}`);
+            }
+        }
+
+        const hash = parts.join('|');
+        console.log(`[getBoardStateHash] hash=${hash}`);
+        return hash;
     }
 
     public applyMove(moveIndex: number, replayForcedMeasurements?: number[]) {
@@ -426,44 +610,53 @@ export class CheqqersGame {
         const move = moves[moveIndex];
         if (!move) return;
 
+        const fromIdxBefore = ('from_index' in move) ? (move as ClassicalMove).from_index : 
+                             (('from_index1' in move) ? (move as MergeMove).from_index1 : -1);
+        const pieceBefore = fromIdxBefore !== -1 ? this.pieceProperties[fromIdxBefore] : null;
+
         const forcedMeasurementOutcomes: number[] = [];
         let replayMeasurementIndex = 0;
 
         try {
             this.justCrowned = false;
 
-            // Forced measurement: if any landing square is in superposition, measure it.
-            // If measurement reveals it's occupied, the move FAILS and turn ends.
-            const landingSquares = this.getLandingSquares(move);
+            // Forced measurement: if any landing or jumped square is in superposition, measure it.
+            // Level 2 (Entanglement) and above allow interacting with ghosts directly.
+            const measurementSquares = this.getInvolvedSquares(move);
             let moveFailed = false;
-            for (const sqIdx of landingSquares) {
-                const occ = this.squares[sqIdx].getProbabilities()[SquareState.OCCUPIED] || 0;
-                if (occ > 0.001 && occ < 0.999) {
-                    // Square is in superposition — force a measurement!
-                    console.log(`[forcedMeasure] Landing square ${sqIdx} has ${(occ * 100).toFixed(0)}% occupancy, measuring...`);
 
-                    // Use replay outcome if available, otherwise measure probabilistically
+            const shouldForceMeasure = this.gameType === GameType.SUPERPOSITION;
+
+            if (shouldForceMeasure) {
+                for (const { index: sqIdx, role } of measurementSquares) {
+                    const occ = this.squares[sqIdx].getProbabilities()[SquareState.OCCUPIED] || 0;
+                    if (occ > 0.001 && occ < 0.999) {
+                    console.log(`[forcedMeasure] Square ${sqIdx} (${role}) has ${(occ * 100).toFixed(0)}% occupancy, measuring...`);
+
                     const forcedOutcome = replayForcedMeasurements?.[replayMeasurementIndex];
                     if (forcedOutcome !== undefined) replayMeasurementIndex++;
 
                     const result = this.measureSquare(sqIdx, forcedOutcome);
                     forcedMeasurementOutcomes.push(result);
 
-                    if (result === SquareState.OCCUPIED) {
-                        // Measurement revealed the square is occupied — move fails!
-                        console.log(`[forcedMeasure] Square ${sqIdx} measured as OCCUPIED — move fails!`);
+                    if (role === 'landing' && result === SquareState.OCCUPIED) {
+                        console.log(`[forcedMeasure] Landing square ${sqIdx} measured as OCCUPIED — move fails!`);
                         moveFailed = true;
                         break;
-                    } else {
-                        console.log(`[forcedMeasure] Square ${sqIdx} measured as EMPTY — move proceeds!`);
+                    } else if (role === 'jumped' && result === SquareState.EMPTY) {
+                        console.log(`[forcedMeasure] Jumped square ${sqIdx} measured as EMPTY — move fails (nothing to jump)!`);
+                        moveFailed = true;
+                        break;
                     }
                 }
             }
+        }
 
             if (moveFailed) {
                 // Move fails: turn switches as penalty
                 this.turn = this.turn === PieceColor.WHITE ? PieceColor.BLACK : PieceColor.WHITE;
                 this.multiJumpSquare = null;
+                this.jumpedPieceIdsThisTurn = [];
                 this.cleanupPieceProperties();
                 this.disentangleCollapsedEntities();
                 this.debugDumpState(`After failed move ${moveIndex} (forced measurement)`);
@@ -471,7 +664,7 @@ export class CheqqersGame {
             } else {
 
                 if ('is_take_move' in move && move.is_take_move) {
-                    this.applyTakeMove(move as ClassicalMove);
+                    this.applyTakeMove(move as ClassicalMove, replayForcedMeasurements);
                 } else if ('to_index1' in move && 'to_index2' in move) {
                     this.applySplitMove(move as SplitMove);
                 } else if ('from_index1' in move && 'from_index2' in move) {
@@ -488,11 +681,23 @@ export class CheqqersGame {
                 this.disentangleCollapsedEntities();
 
                 if (!('is_take_move' in move && move.is_take_move)) {
+                    // Check if a piece that can NOT be a king was moved (i.e. a pawn)
+                    // If a pawn moves, the game is irreversible, so we clear state history
+                    if (!pieceBefore?.crowned) {
+                        this.stateHistory.clear();
+                        this.consecutiveKingMoves = 0;
+                    } else {
+                        this.consecutiveKingMoves += 1;
+                    }
+
                     this.turn = this.turn === PieceColor.WHITE ? PieceColor.BLACK : PieceColor.WHITE;
                     this.multiJumpSquare = null;
+                    this.jumpedPieceIdsThisTurn = [];
                     this.movesSinceTake += 1;
                 } else {
                     this.movesSinceTake = 0;
+                    this.consecutiveKingMoves = 0;
+                    this.stateHistory.clear(); // Capture is irreversible
                     let classicalLandingSquare = ('to_index' in move) ? move.to_index : null;
                     let canTakeAgain = false;
 
@@ -506,6 +711,7 @@ export class CheqqersGame {
                     if (!canTakeAgain) {
                         this.turn = this.turn === PieceColor.WHITE ? PieceColor.BLACK : PieceColor.WHITE;
                         this.multiJumpSquare = null;
+                        this.jumpedPieceIdsThisTurn = [];
                     } else {
                         this.multiJumpSquare = classicalLandingSquare;
                     }
@@ -594,13 +800,6 @@ export class CheqqersGame {
         }
     }
 
-    /**
-     * After measurements, entities in definite states can get trapped inside
-     * JointQuantumSystems. This method checks all joint systems and factors out
-     * any entity whose marginal probability is 100% for a single state.
-     * 
-     * If ALL entities in a system are definite, the whole system is dissolved.
-     */
     private disentangleCollapsedEntities() {
         const processedSystems = new Set<JointQuantumSystem>();
 
@@ -654,10 +853,6 @@ export class CheqqersGame {
         }
     }
 
-    /**
-     * Remove a single entity from a joint system, given that it's in a definite state.
-     * Rebuild the jointAmplitudes without that entity's dimension.
-     */
     private factorOutEntity(sys: JointQuantumSystem, entityIndex: number, definiteState: number) {
         const newEntities = sys.entities.filter((_, i) => i !== entityIndex);
 
@@ -697,7 +892,6 @@ export class CheqqersGame {
 
             if (states[entityIndex] !== definiteState) continue;
 
-            // Compute new joint key without the factored-out entity
             const newStates = states.filter((_, i) => i !== entityIndex);
             let newJointK = 0;
             for (let i = 0; i < newStates.length; i++) {
@@ -711,13 +905,11 @@ export class CheqqersGame {
             };
         }
 
-        // Update the system in-place
         sys.entities.splice(entityIndex, 1);
         sys.dimensions.splice(entityIndex, 1);
         sys.totalDimension = sys.dimensions.reduce((a, b) => a * b, 1);
         sys.jointAmplitudes = newAmps;
 
-        // Update entity references
         for (const entity of sys.entities) {
             entity.entangledSystem = sys;
         }
@@ -786,23 +978,19 @@ export class CheqqersGame {
             if (toSq.entangledSystem) toSq.entangledSystem.measureTarget(toSq);
         }
 
-        // 2-square interaction (from, to). Join dimension = 2*2=4
         const getJoint = (f: number, t: number) => f * 2 + t;
         const transitions: { from: number, to: number, amplitude: { re: number, im: number } }[] = [];
-
-        // If from is occupied (1) and to is empty (0) -> (0, 1)
         transitions.push({ from: getJoint(1, 0), to: getJoint(0, 1), amplitude: { re: 1, im: 0 } });
 
         EntanglementEngine.interactMany([fromSq, toSq], Operations.SparseTransition(transitions));
 
-        // Only copy properties if the piece actually moved there (or exists on some branch)
         const toProb = toSq.getProbabilities()[SquareState.OCCUPIED] || 0;
         if (toProb > 0.0001) {
             this.movePieceProperties(move.from_index, move.to_index);
         }
     }
 
-    private applyTakeMove(move: ClassicalMove) {
+    private applyTakeMove(move: ClassicalMove, forcedMeasurementOutcomes: number[] = []) {
         const fromSq = this.squares[move.from_index];
         const toSq = this.squares[move.to_index];
 
@@ -831,19 +1019,32 @@ export class CheqqersGame {
         }
 
         const takenSq = this.squares[takenIndex];
+        const takenProps = this.pieceProperties[takenIndex];
+        if (takenProps && takenProps.pieceIds) {
+            this.jumpedPieceIdsThisTurn.push(...takenProps.pieceIds);
+        }
 
-        if (this.gameType === GameType.SUPERPOSITION) {
+        // 1. Quantum Measurement (All modes except Classic)
+        if (this.gameType >= GameType.SUPERPOSITION) {
+            let mIdx = 0;
             for (const sq of [fromSq, takenSq, toSq]) {
-                if (sq.entangledSystem) sq.entangledSystem.measureTarget(sq);
+                const outcome = forcedMeasurementOutcomes[mIdx++];
+                if (sq.entangledSystem) sq.entangledSystem.measureTarget(sq, outcome);
+                else sq.measure(outcome);
             }
         }
 
+        // 2. Classic Override (Early return)
         if (this.gameType === GameType.CLASSIC) {
+            this.movePieceProperties(move.from_index, move.to_index);
+            this.pieceProperties[takenIndex] = null;
+            this.pieceProperties[move.from_index] = null;
+
             this.executeClassicalOverride(move.from_index, [takenIndex], move.to_index);
             return;
         }
 
-        // 3-square CCX equivalent
+        // 3. Quantum Interaction
         EntanglementEngine.conditionalInteract({
             controls: [{ entity: fromSq, state: 1 }, { entity: takenSq, state: 1 }],
             targets: [
@@ -853,10 +1054,22 @@ export class CheqqersGame {
             ]
         });
 
-        // Only copy properties if the take succeeded on at least one branch
-        const toProb = toSq.getProbabilities()[SquareState.OCCUPIED] || 0;
-        if (toProb > 0.0001) {
+        // 4. Update Properties based on outcome
+        const toProbAfter = toSq.getProbabilities()[SquareState.OCCUPIED] || 0;
+        if (toProbAfter > 0.0001) {
             this.movePieceProperties(move.from_index, move.to_index);
+            
+            // If the piece 100% left its starting square, clear its properties there
+            const fromProbAfter = fromSq.getProbabilities()[SquareState.OCCUPIED] || 0;
+            if (fromProbAfter < 0.001) {
+                this.pieceProperties[move.from_index] = null;
+            }
+
+            // Likewise, if the taken piece was 100% captured, clear its properties
+            const takenProbAfter = takenSq.getProbabilities()[SquareState.OCCUPIED] || 0;
+            if (takenProbAfter < 0.001) {
+                this.pieceProperties[takenIndex] = null;
+            }
         }
     }
 
@@ -902,8 +1115,17 @@ export class CheqqersGame {
 
         EntanglementEngine.interactMany([from1Sq, from2Sq, toSq], Operations.SparseTransition(transitions));
 
-        // Copy properties to the target square, then destroy the original markers
+        // Copy properties to the target square
         this.movePieceProperties(move.from_index1, move.to_index);
+
+        // Merge the pieceIds! This combines their identity.
+        if (this.pieceProperties[move.to_index]) {
+            const ids1 = this.pieceProperties[move.from_index1]?.pieceIds || [];
+            const ids2 = this.pieceProperties[move.from_index2]?.pieceIds || [];
+            this.pieceProperties[move.to_index]!.pieceIds = Array.from(new Set([...ids1, ...ids2]));
+        }
+
+        // destroy the original markers
         this.pieceProperties[move.from_index1] = null;
         this.pieceProperties[move.from_index2] = null;
     }
@@ -921,22 +1143,32 @@ export class CheqqersGame {
     }
 
     private checkWinStates() {
+        let whitePieces = 0;
+        let blackPieces = 0;
+        let whiteKings = 0;
+        let blackKings = 0;
         let whiteProb = 0;
         let blackProb = 0;
 
         for (let i = 0; i < this.squares.length; i++) {
             const probs = this.squares[i].getProbabilities();
             const occ = probs[SquareState.OCCUPIED] || 0;
-            if (this.pieceProperties[i] && occ > 0) {
-                if (this.pieceProperties[i]!.color === PieceColor.WHITE) {
+            const props = this.pieceProperties[i];
+            
+            if (props && occ > 0.0001) {
+                if (props.color === PieceColor.WHITE) {
                     whiteProb += occ;
+                    whitePieces++;
+                    if (props.crowned) whiteKings++;
                 } else {
                     blackProb += occ;
+                    blackPieces++;
+                    if (props.crowned) blackKings++;
                 }
             }
         }
 
-        const possibleMoves = this.getPossibleMoves();
+        const possibleMoves = this.getPossibleMoves(true);
         console.log(`[checkWinStates] Turn: ${this.turn}, WhiteProb: ${whiteProb}, BlackProb: ${blackProb}, possibleMoves: ${possibleMoves.length}`);
 
         // In Quantum Cheqqers, pieces can exist in very tiny branches!
@@ -957,7 +1189,67 @@ export class CheqqersGame {
             return;
         }
 
-        if (this.movesSinceTake >= 50) {
+        // 1) Threefold Repetition
+        const hash = this.getBoardStateHash();
+        const count = (this.stateHistory.get(hash) || 0) + 1;
+        this.stateHistory.set(hash, count);
+        if (this.boardSize === 4) console.log(`[REPETITION] hash=${hash} count=${count} turn=${this.turn}`);
+        if (count >= 3) {
+            console.log("[checkWinStates] DRAW due to threefold repetition");
+            this.state = GameState.DRAW;
+            return;
+        }
+
+        // 2) 25-Move Rule (25 consecutive moves with kings without capture)
+        if (whiteKings > 0 && blackKings > 0 && this.consecutiveKingMoves >= 50) { // 50 half-moves = 25 full moves
+            console.log("[checkWinStates] DRAW due to 25 move king rule");
+            this.state = GameState.DRAW;
+            return;
+        }
+
+        // 3) 16-Move Rule: 1 king vs 3 pieces (at least one king)
+        // 4) 5-Move Rule: 1 king vs 2 pieces or fewer (at least one king)
+        const isOneKingWhite = whiteKings === 1 && whitePieces === 1;
+        const isOneKingBlack = blackKings === 1 && blackPieces === 1;
+
+        if (isOneKingWhite || isOneKingBlack) {
+            const otherPieces = isOneKingWhite ? blackPieces : whitePieces;
+            const otherKings = isOneKingWhite ? blackKings : whiteKings;
+
+            if (otherKings >= 1) {
+                if (otherPieces === 3) {
+                    if (this.endgameRuleActive !== '16') {
+                        this.endgameRuleActive = '16';
+                        this.specialEndgameMoves = 0;
+                    }
+                    this.specialEndgameMoves++;
+                    if (this.specialEndgameMoves >= 32) { // 32 half-moves
+                        console.log("[checkWinStates] DRAW due to 16 move rule");
+                        this.state = GameState.DRAW;
+                        return;
+                    }
+                } else if (otherPieces <= 2) {
+                    if (this.endgameRuleActive !== '5') {
+                        this.endgameRuleActive = '5';
+                        this.specialEndgameMoves = 0;
+                    }
+                    this.specialEndgameMoves++;
+                    if (this.specialEndgameMoves >= 10) { // 10 half-moves
+                        console.log("[checkWinStates] DRAW due to 5 move rule");
+                        this.state = GameState.DRAW;
+                        return;
+                    }
+                } else {
+                    this.endgameRuleActive = null;
+                }
+            } else {
+                this.endgameRuleActive = null;
+            }
+        } else {
+            this.endgameRuleActive = null;
+        }
+
+        if (this.movesSinceTake >= 100) { // 50 full moves (Standard rule fallback)
             console.log("[checkWinStates] DRAW due to 50 move rule");
             this.state = GameState.DRAW;
             return;
@@ -971,7 +1263,7 @@ export class CheqqersGame {
     }
 
     public toGameStateObject(): GameStateObject {
-        const piece_map: (null | { color: number, crowned: boolean })[] = new Array(this.squares.length).fill(null);
+        const piece_map: (null | { color: number, crowned: boolean, pieceIds: number[] })[] = new Array(this.squares.length).fill(null);
         const chances: Record<number, number> = {};
 
         for (let i = 0; i < this.squares.length; i++) {
@@ -981,10 +1273,12 @@ export class CheqqersGame {
             if (occupiedProb > 0.0001 && this.pieceProperties[i]) {
                 piece_map[i] = {
                     color: this.pieceProperties[i]!.color,
-                    crowned: this.pieceProperties[i]!.crowned
+                    crowned: this.pieceProperties[i]!.crowned,
+                    pieceIds: this.pieceProperties[i]!.pieceIds
                 };
 
-                if (occupiedProb < 0.9999) {
+                if (occupiedProb < 0.9999 && occupiedProb > 0.001) {
+                    console.log(`[toGameStateObject] Sq ${i} has occ ${occupiedProb}`);
                     chances[i] = occupiedProb;
                 }
             }
@@ -1045,6 +1339,8 @@ export class CheqqersGame {
             game_type: this.gameType,
             classic_occupancy: new Array(this.squares.length).fill(0),
             piece_map: piece_map,
+            next_piece_id: this.nextPieceId,
+            jumped_piece_ids_this_turn: this.jumpedPieceIdsThisTurn,
             possible_moves: this.getPossibleMoves(),
             chances: chances,
             move_history: this.moveHistory,

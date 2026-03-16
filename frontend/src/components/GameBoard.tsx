@@ -8,10 +8,8 @@ interface GameBoardProps {
   measuringSquares?: number[];
   isDesignMode?: boolean;
   onSquareDrop?: (squareIndex: number, pieceData: any) => void;
-  onForceTurn?: (color: number) => void;
 }
-
-const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove, onMeasure, measuringSquares, isDesignMode, onSquareDrop, onForceTurn }) => {
+const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove, onMeasure, measuringSquares, isDesignMode, onSquareDrop }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const appRef = useRef<PIXI.Application | null>(null);
   const stateRef = useRef(boardState);
@@ -24,6 +22,22 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove, onMeasure, me
   const onMeasureRef = useRef(onMeasure);
   const measuringRef = useRef<number[]>([]);
 
+  // ─── Quantum split mode ───
+  const [isQuantumMode, setIsQuantumMode] = useState(false);
+  const isQuantumModeRef = useRef(false);
+  const [splitFirstTarget, setSplitFirstTarget] = useState<number | null>(null);
+  const splitFirstTargetRef = useRef<number | null>(null);
+
+  // ─── Merge discovery mode ───
+  const [isMergeMode, setIsMergeMode] = useState(false);
+  const isMergeModeRef = useRef(false);
+  const mergeFirstRef = useRef<number | null>(null);
+  const mergeSecondRef = useRef<number | null>(null);
+
+  const lastClickRef = useRef<{ time: number; index: number | null }>({ time: 0, index: null });
+
+  console.log("GameBoard Render, isQuantumMode:", isQuantumMode, "splitFirstTarget:", splitFirstTarget);
+
   useEffect(() => { onMeasureRef.current = onMeasure; }, [onMeasure]);
   useEffect(() => { contextMenuRef.current = contextMenu; }, [contextMenu]);
   useEffect(() => { measuringRef.current = measuringSquares || []; }, [measuringSquares]);
@@ -31,49 +45,208 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove, onMeasure, me
   const showToast = (msg: string) => {
     if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
     setToast(msg);
-    toastTimeoutRef.current = setTimeout(() => setToast(null), 2000);
+    toastTimeoutRef.current = setTimeout(() => setToast(null), 4000);
   };
 
   useEffect(() => { stateRef.current = boardState; }, [boardState]);
   useEffect(() => { selectedRef.current = selectedPiece; }, [selectedPiece]);
 
+  // Auto-select piece when a multi-jump continuation is forced
+  useEffect(() => {
+    if (!boardState) return;
+    
+    // Reset selection if we're at the very beginning of a board state (e.g. new tutorial step)
+    // We check if history is empty.
+    if (!boardState.move_history || boardState.move_history.length === 0) {
+      setSelectedPiece(null);
+      selectedRef.current = null;
+      return;
+    }
+
+    if (boardState.game_state !== 0) return;
+    const moves = boardState.possible_moves as any[];
+    if (moves.length === 0) return;
+
+    const firstFrom = moves[0].from_index;
+    const allSameFrom = moves.every((m: any) => m.from_index === firstFrom);
+    const allTakes = moves.every((m: any) => m.is_take_move);
+    const isMultiJumpContinuation = boardState.jumped_piece_ids_this_turn && boardState.jumped_piece_ids_this_turn.length > 0;
+
+    if (allSameFrom && allTakes && isMultiJumpContinuation && firstFrom !== undefined) {
+      setSelectedPiece(firstFrom);
+      // Ensure quantum mode is exited if a capture is underway
+      if (isQuantumModeRef.current) exitQuantumMode();
+    }
+  }, [boardState]);
+
   const onMoveRef = useRef(onMove);
   useEffect(() => { onMoveRef.current = onMove; }, [onMove]);
 
+  // ─── Quantum mode helpers ───
+  const enterQuantumMode = () => {
+    console.log("Entering quantum mode. selectedPiece:", selectedRef.current);
+    setIsQuantumMode(true);
+    isQuantumModeRef.current = true;
+    setSplitFirstTarget(null);
+    splitFirstTargetRef.current = null;
+  };
+
+  const exitQuantumMode = () => {
+    console.log("Exiting quantum mode");
+    setIsQuantumMode(false);
+    isQuantumModeRef.current = false;
+    setSplitFirstTarget(null);
+    splitFirstTargetRef.current = null;
+  };
+
+  const enterMergeMode = (firstIndex: number) => {
+    console.log("Entering merge mode. firstIndex:", firstIndex);
+    setIsMergeMode(true);
+    isMergeModeRef.current = true;
+    mergeFirstRef.current = firstIndex;
+    mergeSecondRef.current = null;
+  };
+
+  const exitMergeMode = () => {
+    console.log("Exiting merge mode");
+    setIsMergeMode(false);
+    isMergeModeRef.current = false;
+    mergeFirstRef.current = null;
+    mergeSecondRef.current = null;
+  };
+
+  const handleMergeDiscoveryClick = (index: number) => {
+    const currentState = stateRef.current;
+    const first = mergeFirstRef.current;
+    if (!currentState || first === null) {
+      exitMergeMode();
+      return;
+    }
+
+    // Phase 1: Clicking a partner
+    const potentialPartners = currentState.possible_moves.filter((m: any) => 
+      m.from_index1 !== undefined && (m.from_index1 === first || m.from_index2 === first)
+    ).map((m: any) => m.from_index1 === first ? m.from_index2 : m.from_index1);
+
+    if (potentialPartners.includes(index)) {
+      console.log("Partner selected:", index);
+      mergeSecondRef.current = index;
+      return;
+    }
+
+    // Phase 2: Clicking the destination
+    const second = mergeSecondRef.current;
+    if (second !== null) {
+      const moveIndex = currentState.possible_moves.findIndex((m: any) => 
+        m.from_index1 !== undefined && 
+        ((m.from_index1 === first && m.from_index2 === second) || 
+         (m.from_index1 === second && m.from_index2 === first)) &&
+        m.to_index === index
+      );
+
+      if (moveIndex !== -1) {
+        console.log("Executing merge move, index:", moveIndex);
+        exitMergeMode();
+        setSelectedPiece(null);
+        selectedRef.current = null;
+        onMoveRef.current(moveIndex);
+        return;
+      }
+    }
+
+    // Clicking elsewhere exits merge mode
+    if (index !== first && index !== second) {
+      exitMergeMode();
+    }
+  };
+
+  const handleQuantumSquareClick = (index: number) => {
+    const currentState = stateRef.current;
+    const sel = selectedRef.current;
+    if (!currentState || sel === null) {
+      console.log("Quantum click ignored: state or selection null");
+      exitQuantumMode();
+      return;
+    }
+
+    const first = splitFirstTargetRef.current;
+    console.log("handleQuantumSquareClick", { index, first, moves: currentState.possible_moves.length });
+
+    if (first === null) {
+      const isValidTarget = currentState.possible_moves.some(
+        (m: any) => m.from_index === sel && m.to_index1 !== undefined &&
+          (m.to_index1 === index || m.to_index2 === index)
+      );
+      if (isValidTarget) {
+        console.log("First target set:", index);
+        setSplitFirstTarget(index);
+        splitFirstTargetRef.current = index;
+      } else {
+        console.log("Clicked square is not a valid first target. Ignoring.");
+        // Don't exit anymore, just ignore. If they want to exit they can use the X.
+      }
+    } else {
+      if (first === index) {
+        console.log("Deselecting first target.");
+        setSplitFirstTarget(null);
+        splitFirstTargetRef.current = null;
+        return;
+      }
+
+      const moveIndex = currentState.possible_moves.findIndex(
+        (m: any) => m.from_index === sel && m.to_index1 !== undefined &&
+          ((m.to_index1 === first && m.to_index2 === index) ||
+            (m.to_index1 === index && m.to_index2 === first))
+      );
+
+      if (moveIndex !== -1) {
+        console.log("Executing quantum split move, index:", moveIndex);
+        exitQuantumMode();
+        setSelectedPiece(null);
+        selectedRef.current = null;
+        onMoveRef.current(moveIndex);
+      } else {
+        console.log("Not a valid second target for selected first target. Ignoring.");
+      }
+    }
+  };
+
   // ─── Click handler ───
-  const handlePixiSquareClick = (index: number) => {
+  const handlePixiSquareClick = (index: number | null) => {
     const currentState = stateRef.current;
     if (!currentState) return;
     if (!isDesignMode && currentState.game_state !== 0) return;
 
-    if (selectedRef.current === null) {
-      const piece = currentState.piece_map[index];
-      if (piece) {
-        if (isDesignMode && piece.color !== currentState.turn && onForceTurn) {
-          onForceTurn(piece.color);
-        }
+    // In quantum/merge mode, clicks are handled by special handlers
+    if (isQuantumModeRef.current) return;
+    if (isMergeModeRef.current) return;
 
+    const sel = selectedRef.current;
+
+    // CASE 0: Clicking outside playable area or on unplayable square
+    if (index === null) {
+      setSelectedPiece(null);
+      return;
+    }
+
+    const piece = currentState.piece_map[index];
+
+    // CASE 1: No piece selected yet
+    if (sel === null) {
+      if (piece) {
         if (piece.color === currentState.turn || isDesignMode) {
-          const hasMove = currentState.possible_moves.some((m: any) => m.from_index === index || m.from_index1 === index || m.from_index2 === index);
-          if (!hasMove && !isDesignMode) {
-            const hasTakes = currentState.possible_moves.some((m: any) => m.is_take_move);
-            if (hasTakes) {
-              showToast('⚠️ You must capture! Look for the glowing square.');
-            }
-          }
           setSelectedPiece(index);
         } else {
-          setSelectedPiece(index);
+          showToast('Not your turn!');
         }
-      } else {
-        setSelectedPiece(index);
       }
       return;
     }
 
-    const sel = selectedRef.current;
-    if (sel === index) { setSelectedPiece(null); return; }
+    // CASE 2: Piece already selected
 
+    // PRIORITY: Always check if there's a move from current selection to THIS square first
+    // This handles the case where there's a ghost piece of your own color on the landing square.
     const moveIndex = currentState.possible_moves.findIndex(
       (m: any) => m.from_index === sel && m.to_index === index
     );
@@ -81,32 +254,33 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove, onMeasure, me
     if (moveIndex !== -1) {
       setSelectedPiece(null);
       onMoveRef.current(moveIndex);
-    } else {
+      return;
+    }
+
+    // If no move, handle re-selection or deselection
+    if (sel === index) {
+      // Clicking the already selected piece again deselects it
+      setSelectedPiece(null);
+    } else if (piece && (piece.color === currentState.turn || isDesignMode)) {
+      // Switching selection to another own piece
       setSelectedPiece(index);
+    } else {
+      // Clicking an empty square (that is not a move) or enemy piece deselects everything
+      setSelectedPiece(null);
+      if (piece) showToast('Not a valid move!');
     }
   };
 
-  const handleSplit = (split1: number, split2: number) => {
-    if (!isDesignMode && stateRef.current?.game_state !== 0) return;
-    const sel = selectedPiece;
-    if (sel === null) return;
-    const moveIndex = boardState.possible_moves.findIndex(
-      (m: any) => (m.from_index === sel &&
-        (m.to_index1 === split1 || m.to_index1 === split2) &&
-        (m.to_index2 === split1 || m.to_index2 === split2))
-    );
-    setSelectedPiece(null);
-    onMoveRef.current(moveIndex);
-  };
+  const handlePixiSquareClickRef = useRef(handlePixiSquareClick);
+  useEffect(() => { handlePixiSquareClickRef.current = handlePixiSquareClick; }, [handlePixiSquareClick]);
 
-  const handleMerge = (index: number) => {
-    if (!isDesignMode && stateRef.current?.game_state !== 0) return;
-    const moveIndex = boardState.possible_moves.findIndex(
-      (m: any) => m.from_index1 !== undefined && m.from_index2 !== undefined && m.to_index === index
-    );
-    setSelectedPiece(null);
-    onMoveRef.current(moveIndex);
-  };
+  const handleQuantumSquareClickRef = useRef(handleQuantumSquareClick);
+  useEffect(() => { handleQuantumSquareClickRef.current = handleQuantumSquareClick; }, [handleQuantumSquareClick]);
+  const handleMergeDiscoveryClickRef = useRef(handleMergeDiscoveryClick);
+  useEffect(() => { handleMergeDiscoveryClickRef.current = handleMergeDiscoveryClick; }, [handleMergeDiscoveryClick]);
+
+  // handleMerge is now deprecated in favor of discovery flow
+  // handleMerge is now deprecated in favor of discovery flow
 
   // ─── Futuristic Color Palette ───
   const COLORS = {
@@ -124,6 +298,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove, onMeasure, me
     targetGlow: 0x34d399,   // emerald
     captureGlow: 0xf43f5e,  // rose
     quantumGlow: 0xa78bfa,  // purple
+    mergeGlow: 0xfb923c,    // orange
     crownGold: 0xfbbf24,
   };
 
@@ -158,10 +333,18 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove, onMeasure, me
 
       // Layers
       const boardLayer = new PIXI.Container();
-      const captureLayer = new PIXI.Container(); // capture square highlights
+      const captureLayer = new PIXI.Container();
       const highlightLayer = new PIXI.Container();
+      const quantumLayer = new PIXI.Container();
       const pieceLayer = new PIXI.Container();
-      app.stage.addChild(boardLayer, captureLayer, highlightLayer, pieceLayer);
+      
+      // Ensure layers on top of squares don't block clicks
+      captureLayer.eventMode = 'none';
+      highlightLayer.eventMode = 'none';
+      quantumLayer.eventMode = 'none';
+      pieceLayer.eventMode = 'none';
+      
+      app.stage.addChild(boardLayer, captureLayer, highlightLayer, quantumLayer, pieceLayer);
 
       // Board border
       const borderGfx = new PIXI.Graphics();
@@ -169,9 +352,134 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove, onMeasure, me
       borderGfx.fill({ color: COLORS.boardBorder, alpha: 0.6 });
       boardLayer.addChild(borderGfx);
 
+      // Global quantum mode border (pulsing purple)
+      const globalQuantumGfx = new PIXI.Graphics();
+      globalQuantumGfx.roundRect(margin - 6, margin - 6, boardPixels + 12, boardPixels + 12, 10);
+      globalQuantumGfx.stroke({ color: COLORS.quantumGlow, width: 4, alpha: 0 });
+      globalQuantumGfx.visible = false;
+      boardLayer.addChild(globalQuantumGfx);
+
+      // Interaction Overlay (Topmost invisible layer for reliable hit-testing)
+      const interactionLayer = new PIXI.Graphics();
+      interactionLayer.rect(margin, margin, boardPixels, boardPixels);
+      interactionLayer.fill({ color: 0x000000, alpha: 0 }); // Invisible but catches events
+      interactionLayer.eventMode = 'static';
+      interactionLayer.cursor = 'pointer';
+      
+      const getSquareAtPosition = (px: number, py: number) => {
+        const boardSizeInternal = stateRef.current.board_size;
+        const relativeX = (px - margin) / squareSize;
+        const relativeY = (py - margin) / squareSize;
+        if (relativeX < 0 || relativeX >= boardSizeInternal || relativeY < 0 || relativeY >= boardSizeInternal) return null;
+        
+        const col = Math.floor(relativeX);
+        const row = boardSizeInternal - 1 - Math.floor(relativeY);
+        if ((row + col) % 2 !== 0) return null;
+        
+        return getIndex(row, col);
+      };
+
+      interactionLayer.on('pointerdown', (e: PIXI.FederatedPointerEvent) => {
+        const pos = interactionLayer.toLocal(e.global);
+        const index = getSquareAtPosition(pos.x, pos.y);
+        
+        // Clicks outside playable squares deselect everything
+        if (index === null && selectedRef.current !== null) {
+          handlePixiSquareClickRef.current(null);
+        }
+        
+        if (index === null) {
+          setContextMenu(null);
+          return;
+        }
+
+        if (e.button === 2) {
+          const canvasRect = (app.canvas as HTMLCanvasElement).getBoundingClientRect();
+          const scaleX = canvasRect.width / 800;
+          const scaleY = canvasRect.height / 800;
+          
+          // Get screen center of square
+          const row = getRow(index);
+          const col = getCol(index);
+          const vY = margin + (boardSize - 1 - row) * squareSize;
+          const vX = margin + col * squareSize;
+
+          setContextMenu({
+            x: vX * scaleX + (squareSize * scaleX / 2),
+            y: vY * scaleY + (squareSize * scaleY / 2),
+            squareIndex: index
+          });
+          return;
+        }
+
+        setContextMenu(null);
+
+        // All interaction logic unified in handlePixiSquareClickRef
+        const state = stateRef.current;
+        const piece = state?.piece_map[index !== null ? index : -1];
+        const isFriendlyPiece = piece && piece.color === state?.turn;
+
+        // Double-click detection for Quantum Mode
+        const now = Date.now();
+        const isDoubleClick = index !== null && 
+                             index === lastClickRef.current.index && 
+                             (now - lastClickRef.current.time) < 400; // 400ms threshold for double-tap comfort
+
+        lastClickRef.current = { time: now, index };
+
+        if (isDoubleClick && isFriendlyPiece) {
+          if (!isQuantumModeRef.current && !isMergeModeRef.current) {
+            // Check for split moves
+            const hasSplitMoves = stateRef.current?.possible_moves?.some(
+              (m: any) => m.from_index === index && m.to_index1 !== undefined
+            );
+            // Check for merge moves
+            const hasMergeMoves = stateRef.current?.possible_moves?.some(
+              (m: any) => m.from_index1 !== undefined && (m.from_index1 === index || m.from_index2 === index)
+            );
+
+            if (hasSplitMoves) {
+              enterQuantumMode();
+              return;
+            } else if (hasMergeMoves) {
+              enterMergeMode(index);
+              return;
+            }
+          }
+        }
+
+        handlePixiSquareClickRef.current(index);
+      });
+
+      let swallowNextPointerUp = false;
+
+      interactionLayer.on('pointerup', (e: PIXI.FederatedPointerEvent) => {
+        if (swallowNextPointerUp) {
+          swallowNextPointerUp = false;
+          return;
+        }
+        if (isQuantumModeRef.current) {
+          const pos = interactionLayer.toLocal(e.global);
+          const index = getSquareAtPosition(pos.x, pos.y);
+          if (index !== null) handleQuantumSquareClickRef.current(index);
+        } else if (isMergeModeRef.current) {
+          const pos = interactionLayer.toLocal(e.global);
+          const index = getSquareAtPosition(pos.x, pos.y);
+          if (index !== null) handleMergeDiscoveryClickRef.current(index);
+          else exitMergeMode();
+        }
+      });
+
+      interactionLayer.on('pointermove', () => { 
+        // No longer needed for double-click
+      });
+
+      app.stage.addChild(interactionLayer);
+
       const pieceSprites: PIXI.Graphics[] = [];
       const highlightSprites: PIXI.Graphics[] = [];
       const captureSprites: PIXI.Graphics[] = [];
+      const quantumHighlightSprites: PIXI.Graphics[] = [];
 
       // Draw board squares
       for (let row = boardSize - 1; row >= 0; row--) {
@@ -186,42 +494,18 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove, onMeasure, me
           sqGfx.fill(isPlayable ? COLORS.boardDark : COLORS.boardLight);
           sqGfx.x = vX;
           sqGfx.y = vY;
-
-          if (isPlayable) {
-            sqGfx.eventMode = 'static';
-            sqGfx.cursor = 'pointer';
-            sqGfx.on('pointerdown', (e: PIXI.FederatedPointerEvent) => {
-              if (e.button === 2) {
-                // Right-click: show context menu
-                const canvasRect = (app.canvas as HTMLCanvasElement).getBoundingClientRect();
-                const scaleX = canvasRect.width / 800;
-                const scaleY = canvasRect.height / 800;
-                setContextMenu({
-                  x: vX * scaleX + (squareSize * scaleX / 2),
-                  y: vY * scaleY + (squareSize * scaleY / 2),
-                  squareIndex: index
-                });
-              } else {
-                setContextMenu(null);
-                handlePixiSquareClick(index);
-              }
-            });
-            // Prevent browser context menu
-            sqGfx.on('rightclick', (e: PIXI.FederatedPointerEvent) => {
-              e.preventDefault?.();
-            });
-
-            if (isDesignMode && onSquareDrop) {
-              sqGfx.on('pointerup', () => {
-                // Drag and drop is handled by HTML5 drag/drop usually, but PIXI pointer events
-                // could interfere or be used instead if dragging PIXI objects.
-                // Since palette uses HTML drag and drop, we'll handle drop on the canvas container level.
-              });
-            }
-          }
           boardLayer.addChild(sqGfx);
 
           if (isPlayable) {
+            // Quantum target highlight (background purple)
+            const qhGfx = new PIXI.Graphics();
+            qhGfx.rect(0, 0, squareSize, squareSize);
+            qhGfx.fill({ color: COLORS.quantumGlow, alpha: 0.4 });
+            qhGfx.x = vX;
+            qhGfx.y = vY;
+            qhGfx.visible = false;
+            quantumLayer.addChild(qhGfx);
+            quantumHighlightSprites[index] = qhGfx;
             // Capture highlight (red square glow)
             const capGfx = new PIXI.Graphics();
             capGfx.rect(2, 2, squareSize - 4, squareSize - 4);
@@ -281,29 +565,54 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove, onMeasure, me
           gfx.stroke({ color: COLORS.selectGlow, width: 2, alpha: 0.9 });
         }
 
-        // Piece body - outer ring (edge color)
-        gfx.circle(cx, cy, r);
-        gfx.fill(isWhite ? COLORS.pieceWhiteEdge : COLORS.pieceBlackEdge);
-
-        // Piece body - inner fill
-        gfx.circle(cx, cy, r * 0.85);
-        gfx.fill(isWhite ? COLORS.pieceWhite : COLORS.pieceBlack);
-
-        // Inner sheen / highlight
-        gfx.circle(cx - r * 0.15, cy - r * 0.2, r * 0.45);
-        gfx.fill({ color: isWhite ? 0xffffff : 0x5a5a7a, alpha: 0.3 });
-
-        // King 'Q' symbol
         if (isCrowned) {
-          // The 'O' part of the Q
-          gfx.circle(cx, cy, r * 0.35);
-          gfx.stroke({ color: COLORS.crownGold, width: r * 0.12 });
+          // TOTAL REDESIGN: Matching the logo 'Q'
+          const primaryColor = isWhite ? COLORS.pieceWhite : 0x818cf8; // Use bright indigo for black queens to be visible
+          
+          // Double Ring Structure
+          gfx.circle(cx, cy, r);
+          gfx.stroke({ color: primaryColor, width: r * 0.18 });
+          
+          gfx.circle(cx, cy, r * 0.72);
+          gfx.stroke({ color: primaryColor, width: r * 0.08, alpha: 0.7 });
 
-          // The tail of the Q (bottom right)
-          gfx.moveTo(cx + r * 0.15, cy + r * 0.15);
-          gfx.lineTo(cx + r * 0.45, cy + r * 0.45);
-          // @ts-ignore - cap is valid in PIXI v8 but might complain in older typings
-          gfx.stroke({ color: COLORS.crownGold, width: r * 0.12, cap: 'round' });
+          // The 'Q' Tail
+          const tailLen = r * 0.25;
+          const tailAngle = Math.PI / 4; // 45 degrees
+          gfx.moveTo(cx + Math.cos(tailAngle) * r * 0.8, cy + Math.sin(tailAngle) * r * 0.8);
+          gfx.lineTo(cx + Math.cos(tailAngle) * (r + tailLen), cy + Math.sin(tailAngle) * (r + tailLen));
+          // @ts-ignore
+          gfx.stroke({ color: primaryColor, width: r * 0.18, cap: 'round' });
+
+          // The Crown inside (Matches logo peaks)
+          const crownWidth = r * 0.5;
+          const crownHeight = r * 0.35;
+          const crownY = cy - r * 0.05;
+
+          gfx.poly([
+            cx - crownWidth / 2, crownY + crownHeight / 2, // bottom-left
+            cx + crownWidth / 2, crownY + crownHeight / 2, // bottom-right
+            cx + crownWidth / 2, crownY - crownHeight / 2, // top-right peak
+            cx + crownWidth / 5, crownY - crownHeight / 8, // right valley
+            cx, crownY - crownHeight / 2,                  // middle peak
+            cx - crownWidth / 5, crownY - crownHeight / 8, // left valley
+            cx - crownWidth / 2, crownY - crownHeight / 2, // top-left peak
+          ]);
+          gfx.fill(primaryColor);
+
+        } else {
+          // Standard circular piece body
+          // Piece body - outer ring (edge color)
+          gfx.circle(cx, cy, r);
+          gfx.fill(isWhite ? COLORS.pieceWhiteEdge : COLORS.pieceBlackEdge);
+
+          // Piece body - inner fill
+          gfx.circle(cx, cy, r * 0.85);
+          gfx.fill(isWhite ? COLORS.pieceWhite : COLORS.pieceBlack);
+
+          // Inner sheen / highlight
+          gfx.circle(cx - r * 0.15, cy - r * 0.2, r * 0.45);
+          gfx.fill({ color: isWhite ? 0xffffff : 0x5a5a7a, alpha: 0.3 });
         }
 
         // Probability label for quantum pieces
@@ -329,7 +638,19 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove, onMeasure, me
         const sel = selectedRef.current;
         if (!state) return;
 
+        const isQuantumMode = isQuantumModeRef.current;
         const time = ticker.lastTime / 1000;
+
+        // Global quantum/merge mode border pulse
+        if (globalQuantumGfx) {
+          const isActive = isQuantumMode || isMergeMode;
+          globalQuantumGfx.visible = isActive;
+          if (isActive) {
+            const pulse = 0.5 + 0.5 * Math.sin(time * 3);
+            globalQuantumGfx.alpha = pulse;
+            globalQuantumGfx.stroke({ color: isMergeMode ? COLORS.mergeGlow : COLORS.quantumGlow, width: 4, alpha: pulse });
+          }
+        }
 
         // Compute capture pieces
         const hasTakes = state.possible_moves.some((m: any) => m.is_take_move);
@@ -341,25 +662,25 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove, onMeasure, me
         }
 
         for (let i = 0; i < pieceSprites.length; i++) {
-          if (!pieceSprites[i]) continue;
           const gfx = pieceSprites[i];
           const hlGfx = highlightSprites[i];
           const capGfx = captureSprites[i];
+          const qhGfx = quantumHighlightSprites[i];
+          if (!gfx || !hlGfx || !capGfx || !qhGfx) continue;
 
           const pieceObj = state.piece_map[i];
           const chance = state.chances[i] !== undefined ? state.chances[i] : (pieceObj ? 1.0 : 0.0);
           const isQuantum = chance < 0.99 && chance > 0.01;
 
+          // ─ 1. Piece rendering ─
           if (chance > 0 && pieceObj) {
             gfx.visible = true;
             const isMeasuring = measuringRef.current.includes(i);
             if (isMeasuring) {
-              // Rapid flickering during measurement: oscillate between visible/invisible
-              const flickerRate = 12 + 8 * Math.sin(time * 2); // Accelerating flicker
+              const flickerRate = 12 + 8 * Math.sin(time * 2);
               const flickerAlpha = 0.15 + 0.85 * (0.5 + 0.5 * Math.sin(time * flickerRate));
               gfx.alpha = flickerAlpha;
             } else {
-              // More dramatic alpha: 50% piece = 0.5 alpha
               gfx.alpha = isQuantum ? chance : 1.0;
             }
             drawPiece(gfx, pieceObj.color === 0, pieceObj.crowned, sel === i, isQuantum, chance, time);
@@ -367,23 +688,21 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove, onMeasure, me
             gfx.visible = false;
           }
 
-          // Target highlight
+          // ─ 2. Classical target highlight (green dot) ─
           let isTarget = false;
-          if (sel !== null) {
+          if (sel !== null && !isQuantumMode) {
             isTarget = state.possible_moves.some((m: any) => m.from_index === sel && m.to_index === i);
           }
           hlGfx.visible = isTarget;
 
-          // Capture square highlight OR measurement animation
+          // ─ 3. Capture square highlight OR measurement animation ─
           const isMeasuring = measuringRef.current.includes(i);
           if (isMeasuring) {
-            // Measurement animation: pulsing purple scanning ring
             capGfx.visible = true;
             capGfx.clear();
             const cx = squareSize / 2;
             const cy = squareSize / 2;
-            // Contracting ring
-            const ringProgress = (time * 2) % 1; // 0→1 repeating
+            const ringProgress = (time * 2) % 1;
             const ringRadius = squareSize * 0.6 * (1 - ringProgress);
             const ringAlpha = 0.3 + 0.7 * (1 - ringProgress);
             capGfx.circle(cx, cy, ringRadius);
@@ -405,7 +724,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove, onMeasure, me
             capGfx.visible = false;
           }
 
-          // Entanglement highlight (purple border when context menu targets an entangled partner)
+          // ─ 4. Entanglement highlight (context menu) ─
           const ctxMenu = contextMenuRef.current;
           if (ctxMenu && state.quantum_states) {
             const ctxSq = ctxMenu.squareIndex;
@@ -415,20 +734,78 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove, onMeasure, me
             if (isEntangled) {
               const ePulse = 0.4 + 0.4 * Math.sin(time * 3);
               capGfx.visible = true;
-              // Repurpose graphics: draw purple border
               capGfx.clear();
               capGfx.rect(2, 2, squareSize - 4, squareSize - 4);
               capGfx.stroke({ color: COLORS.quantumGlow, width: 3, alpha: ePulse });
               capGfx.fill({ color: COLORS.quantumGlow, alpha: 0.1 });
-            } else if (!mustCapturePieces.has(i)) {
-              // Reset capture sprite if it was repurposed
-              if (capGfx.visible) {
-                capGfx.clear();
-                capGfx.rect(2, 2, squareSize - 4, squareSize - 4);
-                capGfx.fill({ color: COLORS.captureGlow, alpha: 0.5 });
-                capGfx.visible = false;
-              }
             }
+          }
+
+          // ─ 5. Quantum/Merge target highlights ─
+          const firstTarget = splitFirstTargetRef.current;
+          const isPotentialSplitTarget = isQuantumMode && sel !== null && state.possible_moves.some(
+            (m: any) => m.from_index === sel && m.to_index1 !== undefined &&
+              (m.to_index1 === i || m.to_index2 === i)
+          );
+
+          const mFirst = mergeFirstRef.current;
+          const mSecond = mergeSecondRef.current;
+          const isMergePartner = isMergeMode && mFirst !== null && state.possible_moves.some(
+            (m: any) => m.from_index1 !== undefined && 
+              ((m.from_index1 === mFirst && m.from_index2 === i) || 
+               (m.from_index2 === mFirst && m.from_index1 === i))
+          );
+          const isMergeDestination = isMergeMode && mFirst !== null && mSecond !== null && state.possible_moves.some(
+            (m: any) => m.from_index1 !== undefined && 
+              ((m.from_index1 === mFirst && m.from_index2 === mSecond) || 
+               (m.from_index2 === mFirst && m.from_index1 === mSecond)) &&
+              m.to_index === i
+          );
+
+          if (isPotentialSplitTarget) {
+            qhGfx.visible = true;
+            const isFirst = firstTarget === i;
+            const pulse = 0.6 + 0.4 * Math.sin(time * 6);
+            const baseAlpha = isFirst ? 0.9 : 0.55;
+
+            qhGfx.clear();
+            qhGfx.rect(2, 2, squareSize - 4, squareSize - 4);
+            qhGfx.fill({ color: COLORS.quantumGlow, alpha: baseAlpha * (isFirst ? 1.0 : pulse) });
+
+            if (isFirst) {
+              qhGfx.stroke({ color: 0xffffff, width: 3, alpha: 0.8 });
+            } else {
+              qhGfx.stroke({ color: COLORS.quantumGlow, width: 2, alpha: 0.4 * pulse });
+            }
+          } else if (isMergePartner || isMergeDestination || mFirst === i) {
+            qhGfx.visible = true;
+            qhGfx.clear();
+            qhGfx.rect(2, 2, squareSize - 4, squareSize - 4);
+            
+            const pulse = 0.7 + 0.3 * Math.sin(time * 5);
+            if (mFirst === i) {
+              qhGfx.fill({ color: COLORS.mergeGlow, alpha: 0.4 });
+              qhGfx.stroke({ color: 0xffffff, width: 2, alpha: 0.8 });
+            } else if (isMergePartner) {
+              const baseAlpha = (mSecond === i) ? 0.9 : 0.5;
+              qhGfx.fill({ color: COLORS.mergeGlow, alpha: baseAlpha * pulse });
+              if (mSecond === i) qhGfx.stroke({ color: 0xffffff, width: 3, alpha: 0.9 });
+            } else if (isMergeDestination) {
+              qhGfx.fill({ color: 0xffffff, alpha: 0.2 * pulse });
+              qhGfx.stroke({ color: COLORS.mergeGlow, width: 4, alpha: 0.9 * pulse });
+              
+              // Draw a little 'plus' or diamond inside destination
+              const cx = squareSize / 2;
+              const cy = squareSize / 2;
+              const ds = squareSize * 0.2;
+              qhGfx.moveTo(cx - ds, cy);
+              qhGfx.lineTo(cx + ds, cy);
+              qhGfx.moveTo(cx, cy - ds);
+              qhGfx.lineTo(cx, cy + ds);
+              qhGfx.stroke({ color: COLORS.mergeGlow, width: 3 });
+            }
+          } else {
+            qhGfx.visible = false;
           }
         }
       });
@@ -458,93 +835,8 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove, onMeasure, me
   const marginPercent = (12 / 800) * 100;
   const boardPercent = 100 - marginPercent * 2;
 
-  for (let row = 0; row < boardSize; row++) {
-    for (let col = 0; col < boardSize; col++) {
-      const isBlack = (row + col) % 2 === 0;
-      const visualYPercent = marginPercent + ((boardSize - 1 - row) / boardSize) * boardPercent;
-      const visualXPercent = marginPercent + (col / boardSize) * boardPercent;
-      const szPercent = boardPercent / boardSize;
 
-      if (!isBlack) {
-        if (selectedPiece !== null) {
-          // Horizontal split
-          if (col > 0 && col < boardSize - 1) {
-            let left = getIndex(row, col - 1);
-            let right = getIndex(row, col + 1);
-            if (boardState.possible_moves.some(
-              (m: any) => (m.from_index === selectedPiece &&
-                (m.to_index1 === left || m.to_index1 === right) &&
-                (m.to_index2 === left || m.to_index2 === right))
-            )) {
-              overlays.push(<img
-                key={`split-horiz-${row}-${col}`}
-                src="/split.png"
-                onClick={() => handleSplit(left, right)}
-                className="absolute z-10 cursor-pointer hover:scale-125 transition-transform drop-shadow-[0_0_8px_rgba(167,139,250,0.6)]"
-                style={{ left: `${visualXPercent}%`, top: `${visualYPercent}%`, width: `${szPercent}%`, height: `${szPercent}%` }}
-              />);
-            }
-          }
-          // Vertical split
-          if (row > 0 && row < boardSize - 1) {
-            let up = getIndex(row + 1, col);
-            let down = getIndex(row - 1, col);
-            if (boardState.possible_moves.some(
-              (m: any) => (m.from_index === selectedPiece &&
-                (m.to_index1 === up || m.to_index1 === down) &&
-                (m.to_index2 === up || m.to_index2 === down))
-            )) {
-              overlays.push(<img
-                key={`split-vert-${row}-${col}`}
-                src="/split.png"
-                onClick={() => handleSplit(up, down)}
-                className="absolute z-10 rotate-90 cursor-pointer hover:scale-125 transition-transform drop-shadow-[0_0_8px_rgba(167,139,250,0.6)]"
-                style={{ left: `${visualXPercent}%`, top: `${visualYPercent}%`, width: `${szPercent}%`, height: `${szPercent}%` }}
-              />);
-            }
-          }
-        }
-      } else {
-        const index = getIndex(row, col);
-        let merge_move = boardState.possible_moves.find(
-          (m: any) => (m.from_index1 !== undefined && m.from_index2 !== undefined && m.to_index === index)
-        );
-        if (merge_move) {
-          let f1 = merge_move.from_index1;
-          let f2 = merge_move.from_index2;
-          let rotation = 0;
-          let flip = false;
-          let icon_src = "/merge.png";
-
-          if (getRow(f1) === getRow(f2)) {
-            rotation = getRow(f1) < getRow(index) ? 0 : 180;
-          } else if (getCol(f1) === getCol(f2)) {
-            rotation = getCol(f1) < getCol(index) ? 90 : 270;
-          } else {
-            icon_src = "/diagonal_merge.png";
-            if ((getCol(f1) > getCol(f2) && getRow(f1) > getRow(f2)) ||
-              (getCol(f1) < getCol(f2) && getRow(f1) < getRow(f2))) {
-              flip = true;
-            }
-          }
-
-          overlays.push(<img
-            key={`merge-${index}`}
-            src={icon_src}
-            onClick={() => handleMerge(index)}
-            className="absolute z-10 cursor-pointer hover:scale-125 transition-transform drop-shadow-[0_0_8px_rgba(167,139,250,0.6)]"
-            style={{
-              left: `${visualXPercent}%`,
-              top: `${visualYPercent}%`,
-              width: `${szPercent}%`,
-              height: `${szPercent}%`,
-              transform: `rotate(${rotation}deg) ${flip ? "scaleX(-1)" : ""}`
-            }}
-          />);
-        }
-      }
-    }
-  }
+  // ─── Merge overlays (Deprecated, using Pixi) ───
 
   const handleDragOver = (e: React.DragEvent) => {
     if (!isDesignMode) return;
@@ -591,12 +883,22 @@ const GameBoard: React.FC<GameBoardProps> = ({ boardState, onMove, onMeasure, me
     <div
       className="relative aspect-square w-full max-w-[500px] rounded-lg overflow-hidden shadow-[0_0_30px_rgba(99,102,241,0.15)]"
       onContextMenu={(e) => e.preventDefault()}
-      onClick={() => contextMenu && setContextMenu(null)}
+      onClick={(e) => { e.stopPropagation(); if (contextMenu) setContextMenu(null); }}
       onDragOver={handleDragOver}
       onDrop={handleDrop}
     >
       <div ref={containerRef} className="absolute inset-0 z-0" />
       {overlays}
+      {isQuantumMode && (
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 bg-purple-950/95 border border-purple-500/40 text-purple-200 px-4 py-2 rounded-full text-sm font-medium shadow-lg whitespace-nowrap backdrop-blur-sm transition-all duration-300 animate-in fade-in slide-in-from-bottom-2">
+          <span>⚛</span>
+          <span>{splitFirstTarget === null ? 'Quantum mode — tap first target' : 'Now tap the second target'}</span>
+          <button
+            className="ml-1 text-purple-400 hover:text-white transition-colors p-1"
+            onClick={(e) => { e.stopPropagation(); exitQuantumMode(); setSelectedPiece(null); }}
+          >✕</button>
+        </div>
+      )}
       {toast && (
         <div className="toast-enter absolute top-3 left-1/2 -translate-x-1/2 z-20 bg-rose-950/90 border border-rose-500/30 text-rose-200 px-4 py-2 rounded-lg text-sm font-medium shadow-lg whitespace-nowrap backdrop-blur-sm">
           {toast}
